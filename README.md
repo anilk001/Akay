@@ -1,0 +1,100 @@
+# AKAY — Trade Offers (`offers.akay.ie`)
+
+The public B2B beverage catalogue for AKAY. A fast, static [Astro](https://astro.build)
+site that reads the offers **live from Airtable at build time** and renders every
+card as plain HTML — so the published site needs no server and is served globally
+by Cloudflare Pages.
+
+Replaces the previous Softr page. Same Airtable base, full design control, own domain.
+
+---
+
+## What it shows
+
+Only **public-safe** fields are ever read from Airtable. Supplier identity, buy
+prices, margins and internal notes are **not requested**, so they cannot reach the
+browser. The catalogue lists, per offer: product, pack spec, price (per the listing
+basis + the complementary unit/case figure), duty tier (**T1** export / **T2** EU
+duty-paid), origin, incoterm, stock status, **cases available**, and a one-tap
+prefilled **WhatsApp enquiry**.
+
+Search, category filter, and price/name sort run client-side on the pre-rendered
+cards (no data round-trips).
+
+---
+
+## Local development
+
+```bash
+npm install
+cp .env.example .env         # then paste your read-only Airtable token into .env
+npm run dev                  # http://localhost:4321
+```
+
+Without a token (or without network access) the site builds from
+`src/data/offers-snapshot.json` — a committed sample — so the build never breaks.
+With a token it fetches the full live catalogue.
+
+Refresh the offline snapshot from live data:
+
+```bash
+AIRTABLE_TOKEN=pat... npm run sync-offers
+```
+
+---
+
+## Environment variables
+
+| Variable | Purpose |
+|---|---|
+| `AIRTABLE_TOKEN` | **Read-only** Personal Access Token (`data.records:read`, `schema.bases:read`). Build-time only; never shipped to the browser. |
+| `AIRTABLE_BASE_ID` | Defaults to the `Akay Offers` base (`appaDSdZkAE9PGkjT`). |
+| `AIRTABLE_OFFERS_TABLE` | Defaults to `Offers`. |
+
+Never commit the token — `.env` is git-ignored.
+
+---
+
+## Deploy — Cloudflare Pages
+
+1. **Connect the repo** in Cloudflare Pages → *Create a project* → *Connect to Git* → this repo.
+2. **Build settings**
+   - Framework preset: **Astro**
+   - Build command: `npm run build`
+   - Output directory: `dist`
+3. **Environment variables** (Settings → Environment variables): add `AIRTABLE_TOKEN`
+   (and optionally `AIRTABLE_BASE_ID`). These are encrypted at rest.
+4. **Deploy.** Cloudflare builds the site; the build fetches live offers.
+
+### Refresh when offers change
+The site is static, so it reflects Airtable as of the last build. To refresh:
+- Create a **Deploy Hook** (Settings → Builds & deployments → Deploy hooks) and
+  `POST` to it — nightly (Cloudflare cron / n8n) and/or from an Airtable automation
+  when an offer changes. Each hit rebuilds and republishes in ~1 minute.
+
+---
+
+## Go-live — point `offers.akay.ie` (domain at GoDaddy)
+
+1. In Cloudflare Pages → your project → **Custom domains** → *Set up a custom domain*
+   → enter `offers.akay.ie`. Cloudflare shows the target hostname.
+2. In **GoDaddy** → your domain → **DNS** → add a **CNAME**:
+   - Type `CNAME`, Name `offers`, Value = the `*.pages.dev` hostname Cloudflare gave you.
+3. Wait for DNS + automatic HTTPS to provision (usually minutes). Done.
+
+---
+
+## Project layout
+
+```
+src/
+  data/
+    airtable.mjs          live fetch + normalize (public-safe fields only)
+    offers-snapshot.json  offline/CI fallback sample
+  lib/
+    fetch-offers.mjs      refresh the snapshot from live data
+  pages/
+    index.astro           the catalogue (design + interactivity)
+public/
+  akay-bird.png           logo (hummingbird, transparent)
+```

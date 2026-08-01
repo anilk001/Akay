@@ -1,0 +1,16 @@
+{
+  "name": "akay-trade-offers",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AKAY B2B beverage trade catalogue — offers.akay.ie. Astro static site reading live from Airtable.",
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "sync-offers": "node src/lib/fetch-offers.mjs"
+  },
+  "dependencies": {
+    "astro": "^4.16.18"
+  }
+}

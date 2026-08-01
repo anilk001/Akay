@@ -1,0 +1,321 @@
+---
+import { getOffers } from '../data/airtable.mjs';
+
+const WA = '353872382368';
+const { offers, source } = await getOffers();
+
+// ---- derive per-offer view data (basis split so the price never repeats) ----
+function priceParts(detail = '') {
+  const parts = detail.split('·').map((s) => s.trim());
+  const first = parts[0] || '';
+  const basis = /\/\s*bottle/i.test(first) ? '/ btl'
+    : /\/\s*case/i.test(first) ? '/ case'
+    : /\/\s*unit/i.test(first) ? '/ unit' : '';
+  const msg = basis === '/ btl' ? 'per bottle' : basis === '/ case' ? 'per case' : basis === '/ unit' ? 'per unit' : '';
+  const other = parts.slice(1).join(' · ');
+  return { basis, other, msg };
+}
+function waLink(o, msg) {
+  const amt = o.amount != null ? o.amount.toFixed(2) : '';
+  const txt = `Hi Anil, I'd like a quote for ${o.name} (${o.spec}) listed at ${o.currency} ${amt}${msg ? ' ' + msg : ''}.`;
+  return `https://wa.me/${WA}?text=${encodeURIComponent(txt)}`;
+}
+const STOCK = { in: ['ok', 'In stock'], warn: ['warn', 'Limited'], enq: ['neu', 'Enquire'] };
+
+const view = offers.map((o) => {
+  const { basis, other, msg } = priceParts(o.priceDetail);
+  return { ...o, basis, other, wa: waLink(o, msg), st: STOCK[o.stock] || STOCK.enq };
+});
+
+const categories = ['All', ...Array.from(new Set(view.map((o) => o.category))).sort()];
+const brandCount = new Set(view.map((o) => o.brand)).size;
+const currencies = Array.from(new Set(view.map((o) => o.currency).filter(Boolean))).sort();
+const stats = [
+  [view.length, 'live offers'],
+  [categories.length - 1, 'categories'],
+  [currencies.join(' / ') || '—', 'currencies'],
+  [brandCount, 'brands'],
+];
+---
+
+<!doctype html>
+<html lang="en" data-source={source}>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AKAY — Trade Offers</title>
+  <meta name="description" content="AKAY wholesale beverage offers — spirits and beer by the case, live trade pricing, pack specs and duty tier on every line." />
+  <link rel="icon" href="/akay-bird.png" />
+  <style>
+    :root{
+      --paper:#F7F5F0; --paper-2:#EFEDE4; --card:#FFFFFF; --ink:#17140F; --ink-soft:#41473F;
+      --muted:#767E72; --line:#E4E0D4; --line-soft:#ECE8DD;
+      --brass:#B4231F; --brass-2:#D0362E; --forest:#0E7A3B; --lime:#6FA82E;
+      --ok:#0E7A3B; --ok-bg:#E2F0E5; --warn:#9A6A12; --warn-bg:#F5E9CE; --neu:#5C6A78; --neu-bg:#E9ECEF;
+      --shadow:0 1px 2px rgba(20,33,26,.06),0 6px 20px -8px rgba(20,33,26,.14);
+      --radius:14px;
+      --serif:"Hoefler Text","Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+      --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      --mono:ui-monospace,"SF Mono","SFMono-Regular",Menlo,Consolas,monospace;
+    }
+    @media (prefers-color-scheme:dark){
+      :root{
+        --paper:#0C140F; --paper-2:#081009; --card:#13201A; --ink:#F1EFE7; --ink-soft:#C6CEC4;
+        --muted:#8A968A; --line:#243029; --line-soft:#1B2620;
+        --brass:#EC5A52; --brass-2:#F26E66; --forest:#37B866; --lime:#9BD84F;
+        --ok:#5FC97E; --ok-bg:#123021; --warn:#E0B65C; --warn-bg:#31280F; --neu:#9AA7B4; --neu-bg:#1B2530;
+        --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px -12px rgba(0,0,0,.6);
+      }
+    }
+    :root[data-theme="light"]{
+      --paper:#F7F5F0; --paper-2:#EFEDE4; --card:#FFFFFF; --ink:#17140F; --ink-soft:#41473F;
+      --muted:#767E72; --line:#E4E0D4; --line-soft:#ECE8DD; --brass:#B4231F; --brass-2:#D0362E; --forest:#0E7A3B; --lime:#6FA82E;
+      --ok:#0E7A3B; --ok-bg:#E2F0E5; --warn:#9A6A12; --warn-bg:#F5E9CE; --neu:#5C6A78; --neu-bg:#E9ECEF;
+    }
+    :root[data-theme="dark"]{
+      --paper:#0C140F; --paper-2:#081009; --card:#13201A; --ink:#F1EFE7; --ink-soft:#C6CEC4;
+      --muted:#8A968A; --line:#243029; --line-soft:#1B2620; --brass:#EC5A52; --brass-2:#F26E66; --forest:#37B866; --lime:#9BD84F;
+      --ok:#5FC97E; --ok-bg:#123021; --warn:#E0B65C; --warn-bg:#31280F; --neu:#9AA7B4; --neu-bg:#1B2530;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0}
+    body{background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.5;-webkit-font-smoothing:antialiased}
+    .wrap{max-width:1200px;margin:0 auto;padding:0 20px}
+
+    header.bar{position:sticky;top:0;z-index:40;background:color-mix(in srgb,var(--paper) 86%,transparent);
+      backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+    .bar-in{display:flex;align-items:center;gap:16px;height:60px}
+    .mark{display:inline-flex;align-items:center;gap:9px;font-family:var(--serif);font-weight:600;font-size:26px;letter-spacing:.02em;color:var(--ink);text-decoration:none;line-height:1}
+    .logo-slot{flex-shrink:0;height:34px;width:auto;filter:drop-shadow(0 1px 2px rgba(0,0,0,.18))}
+    .mark b{color:var(--brass)}
+    .dot{width:6px;height:6px;border-radius:50%;background:var(--brass-2);display:inline-block;margin:0 2px 2px 2px}
+    .bar-sub{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.04em}
+    .bar-spacer{flex:1}
+    .theme-btn{border:1px solid var(--line);background:var(--card);color:var(--ink-soft);border-radius:9px;
+      height:34px;padding:0 12px;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+    .theme-btn:hover{border-color:var(--brass-2);color:var(--ink)}
+
+    .hero{border-bottom:1px solid var(--line);background:
+      radial-gradient(120% 140% at 100% 0,color-mix(in srgb,var(--forest) 12%,transparent),transparent 55%),
+      radial-gradient(90% 120% at 0 100%,color-mix(in srgb,var(--brass) 7%,transparent),transparent 60%)}
+    .hero-in{padding:34px 0 26px}
+    .eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--brass);margin:0 0 12px}
+    h1{font-family:var(--serif);font-weight:600;font-size:clamp(30px,5vw,46px);line-height:1.04;margin:0;max-width:16ch;text-wrap:balance;letter-spacing:-.01em}
+    .lede{margin:14px 0 0;max-width:56ch;color:var(--ink-soft);font-size:16px}
+    .ticker{display:flex;flex-wrap:wrap;gap:26px;margin-top:24px;padding-top:20px;border-top:1px solid var(--line-soft)}
+    .stat .n{font-family:var(--mono);font-size:22px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
+    .stat .l{font-size:12px;color:var(--muted);letter-spacing:.03em}
+
+    .controls{position:sticky;top:60px;z-index:30;background:color-mix(in srgb,var(--paper) 90%,transparent);
+      backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:14px 0}
+    .controls-in{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+    .search{position:relative;flex:1;min-width:220px}
+    .search input{width:100%;height:42px;border:1px solid var(--line);background:var(--card);color:var(--ink);
+      border-radius:11px;padding:0 14px 0 40px;font-size:15px;font-family:var(--sans)}
+    .search input:focus{outline:2px solid var(--brass-2);outline-offset:1px;border-color:transparent}
+    .search svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted)}
+    .chips{display:flex;flex-wrap:wrap;gap:7px}
+    .chip{border:1px solid var(--line);background:var(--card);color:var(--ink-soft);border-radius:999px;
+      height:36px;padding:0 15px;font-size:13.5px;cursor:pointer;transition:.14s;white-space:nowrap}
+    .chip:hover{border-color:var(--brass-2)}
+    .chip[aria-pressed="true"]{background:var(--forest);color:var(--paper);border-color:var(--forest)}
+    select.sort{height:36px;border:1px solid var(--line);background:var(--card);color:var(--ink-soft);
+      border-radius:999px;padding:0 14px;font-size:13.5px;cursor:pointer;font-family:var(--sans)}
+
+    main{padding:26px 0 40px}
+    .count{font-family:var(--mono);font-size:12.5px;color:var(--muted);margin:0 0 16px;letter-spacing:.03em}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px;
+      display:flex;flex-direction:column;gap:0;box-shadow:var(--shadow);transition:.16s;position:relative;overflow:hidden}
+    .card:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--brass-2) 55%,var(--line))}
+    .card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--brass-2);opacity:0;transition:.16s}
+    .card:hover::before{opacity:1}
+    .c-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+    .brand{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--brass);margin-bottom:6px}
+    .pname{font-family:var(--serif);font-size:19px;font-weight:600;line-height:1.15;margin:0;color:var(--ink);text-wrap:balance}
+    .cat-tag{flex-shrink:0;font-size:10.5px;font-family:var(--mono);letter-spacing:.08em;text-transform:uppercase;
+      color:var(--ink-soft);border:1px solid var(--line);border-radius:6px;padding:3px 7px;margin-top:2px}
+    .spec{font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);margin:12px 0 0;letter-spacing:.01em}
+    .metaline{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+    .tag{font-size:11px;padding:3px 8px;border-radius:6px;font-family:var(--mono);letter-spacing:.03em;
+      border:1px solid var(--line);color:var(--muted)}
+    .tag.tier{border-color:color-mix(in srgb,var(--brass-2) 45%,var(--line));color:var(--brass)}
+    .price-row{margin-top:16px;padding-top:14px;border-top:1px solid var(--line-soft);display:flex;align-items:flex-end;justify-content:space-between;gap:8px}
+    .price .amt{font-family:var(--mono);font-size:22px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums;line-height:1}
+    .price .cur{font-size:12px;color:var(--muted);font-family:var(--mono)}
+    .price .basis{font-size:12px;color:var(--muted);font-family:var(--mono);letter-spacing:.01em}
+    .price .sub{font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-top:5px;font-variant-numeric:tabular-nums}
+    .pill{font-size:11px;font-weight:600;padding:4px 9px;border-radius:999px;white-space:nowrap;font-family:var(--sans)}
+    .pill.ok{background:var(--ok-bg);color:var(--ok)}
+    .pill.warn{background:var(--warn-bg);color:var(--warn)}
+    .pill.neu{background:var(--neu-bg);color:var(--neu)}
+    .stock{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+    .qty{font-family:var(--mono);font-size:11.5px;font-weight:600;color:var(--ok);font-variant-numeric:tabular-nums;letter-spacing:.02em}
+    .qty.muted{color:var(--muted);font-weight:400}
+    .c-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:16px}
+    .incoterm{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+    .enquire{display:inline-flex;align-items:center;gap:7px;background:var(--forest);color:var(--paper);
+      text-decoration:none;font-size:13px;font-weight:600;padding:8px 13px;border-radius:9px;transition:.14s;border:1px solid transparent}
+    :root[data-theme="dark"] .enquire{color:#0A140F}
+    @media (prefers-color-scheme:dark){.enquire{color:#0A140F}}
+    .enquire:hover{background:var(--brass);color:#fff}
+    .empty{text-align:center;padding:60px 20px;color:var(--muted);font-family:var(--mono);font-size:14px}
+
+    footer{border-top:1px solid var(--line);padding:26px 0 44px;color:var(--muted);font-size:12.5px}
+    footer .wrap{display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between}
+    footer .note{max-width:64ch;line-height:1.6}
+    @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+    @media (max-width:560px){.hero-in{padding:26px 0 20px}.ticker{gap:18px}}
+  </style>
+</head>
+<body>
+  <header class="bar">
+    <div class="wrap bar-in">
+      <a class="mark" href="/" aria-label="AKAY home">
+        <img class="logo-slot" src="/akay-bird.png" alt="" width="320" height="279" />AKAY<span class="dot"></span><b>trade</b>
+      </a>
+      <span class="bar-sub">offers.akay.ie</span>
+      <span class="bar-spacer"></span>
+      <button class="theme-btn" id="themeBtn" aria-label="Toggle light or dark theme">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5 19 19M19 5l-1.5 1.5M6.5 17.5 5 19"/></svg>
+        <span id="themeLbl">Theme</span>
+      </button>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="wrap hero-in">
+      <p class="eyebrow">Wholesale beverage offers · duty-paid &amp; export</p>
+      <h1>Live trade pricing, straight from the desk.</h1>
+      <p class="lede">Spirits and beer by the case, with current pricing, pack specs and duty tier on every line. Filter, compare, and send a WhatsApp enquiry in one tap — no login, no PDF.</p>
+      <div class="ticker">
+        {stats.map((s) => (
+          <div class="stat"><div class="n">{s[0]}</div><div class="l">{s[1]}</div></div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="controls">
+    <div class="wrap controls-in">
+      <label class="search">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input id="q" type="search" placeholder="Search brand or product — e.g. Jameson, gin, Glenfiddich" autocomplete="off" />
+      </label>
+      <div class="chips" id="cats">
+        {categories.map((c) => (
+          <button class="chip" data-cat={c} aria-pressed={c === 'All' ? 'true' : 'false'}>{c}</button>
+        ))}
+      </div>
+      <select class="sort" id="sort" aria-label="Sort offers">
+        <option value="rel">Sort: Featured</option>
+        <option value="asc">Price ↑ (low→high)</option>
+        <option value="desc">Price ↓ (high→low)</option>
+        <option value="az">Name A→Z</option>
+      </select>
+    </div>
+  </section>
+
+  <main class="wrap">
+    <p class="count" id="count">Showing {view.length} of {view.length} offers</p>
+    <div class="grid" id="grid">
+      {view.map((o) => (
+        <article class="card" data-cat={o.category} data-name={(o.name + ' ' + o.brand).toLowerCase()} data-amt={o.amount ?? 0}>
+          <div class="c-top">
+            <div>
+              <div class="brand">{o.brand}</div>
+              <h3 class="pname">{o.name}</h3>
+            </div>
+            <span class="cat-tag">{o.category}</span>
+          </div>
+          <div class="spec">{o.spec}</div>
+          <div class="metaline">
+            {o.tier && <span class="tag tier">{o.tier}</span>}
+            {o.origin && <span class="tag">{o.origin}</span>}
+            {o.currency && <span class="tag">{o.currency}</span>}
+          </div>
+          <div class="price-row">
+            <div class="price">
+              <div><span class="cur">{o.currency}</span> <span class="amt">{o.amount != null ? o.amount.toFixed(2) : '—'}</span> <span class="basis">{o.basis}</span></div>
+              {o.other && <div class="sub">{o.other}</div>}
+            </div>
+            <div class="stock">
+              <span class={`pill ${o.st[0]}`}>{o.st[1]}</span>
+              {o.qty ? <span class="qty" title="Cases available">{o.qty.toLocaleString()} cases</span> : <span class="qty muted">on request</span>}
+            </div>
+          </div>
+          <div class="c-foot">
+            <span class="incoterm">{o.terms}</span>
+            <a class="enquire" href={o.wa} target="_blank" rel="noopener">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.5A10 10 0 1 0 12 2Zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-1.7-.1-.4-.1-.9-.3-1.6-.6-2.8-1.2-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8 0-1.3.7-2 .9-2.2.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5.2.6.8 2 .9 2.1.1.1.1.3 0 .5-.1.2-.1.3-.3.5l-.4.5c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.4 1.5.3.1.5.1.6-.1.2-.2.7-.8.9-1.1.2-.3.4-.2.6-.1l1.8.9c.3.1.5.2.5.3.1.2.1.7-.1 1.4Z"/></svg>
+              Enquire
+            </a>
+          </div>
+        </article>
+      ))}
+    </div>
+    <div class="empty" id="empty" hidden>No offers match that filter. Try clearing the search.</div>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <div class="note">
+        Live catalogue from AKAY's Airtable. Prices are indicative and shown per the listing basis; supplier identity, buy prices and margins are never published. <strong>T1</strong> = export / under-bond · <strong>T2</strong> = EU duty-paid.
+      </div>
+      <div style="font-family:var(--mono);text-align:right">© AKAY · Dublin<br />hello@akay.ie</div>
+    </div>
+  </footer>
+
+  <script>
+    const grid = document.getElementById('grid');
+    const cards = Array.from(grid.children);
+    const q = document.getElementById('q');
+    const cats = document.getElementById('cats');
+    const sortSel = document.getElementById('sort');
+    const countEl = document.getElementById('count');
+    const emptyEl = document.getElementById('empty');
+    const total = cards.length;
+    let state = { q: '', cat: 'All', sort: 'rel' };
+    const order = cards.map((c, i) => [c, i]); // preserve original "featured" order
+
+    function apply() {
+      let shown = 0;
+      for (const c of cards) {
+        const okCat = state.cat === 'All' || c.dataset.cat === state.cat;
+        const okQ = !state.q || c.dataset.name.includes(state.q);
+        const vis = okCat && okQ;
+        c.hidden = !vis;
+        if (vis) shown++;
+      }
+      // sort visible cards by re-appending in the chosen order
+      let arr = order.slice();
+      if (state.sort === 'asc') arr.sort((a, b) => (+a[0].dataset.amt) - (+b[0].dataset.amt));
+      else if (state.sort === 'desc') arr.sort((a, b) => (+b[0].dataset.amt) - (+a[0].dataset.amt));
+      else if (state.sort === 'az') arr.sort((a, b) => a[0].querySelector('.pname').textContent.localeCompare(b[0].querySelector('.pname').textContent));
+      else arr.sort((a, b) => a[1] - b[1]);
+      for (const [c] of arr) grid.appendChild(c);
+
+      countEl.textContent = `Showing ${shown} of ${total} offers` + (state.cat !== 'All' ? ` · ${state.cat}` : '');
+      emptyEl.hidden = shown > 0;
+    }
+
+    q.addEventListener('input', (e) => { state.q = e.target.value.toLowerCase().trim(); apply(); });
+    sortSel.addEventListener('change', (e) => { state.sort = e.target.value; apply(); });
+    cats.addEventListener('click', (e) => {
+      const b = e.target.closest('.chip');
+      if (!b) return;
+      state.cat = b.dataset.cat;
+      Array.from(cats.children).forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+      apply();
+    });
+
+    const root = document.documentElement;
+    document.getElementById('themeBtn').addEventListener('click', () => {
+      const cur = root.getAttribute('data-theme') || (matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light');
+      const next = cur === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      document.getElementById('themeLbl').textContent = next === 'dark' ? 'Light' : 'Dark';
+    });
+  </script>
+</body>
+</html>
