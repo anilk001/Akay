@@ -1,0 +1,41 @@
+name: Scheduled catalogue refresh
+
+# Keeps offers.akay.ie current with Airtable.
+#
+# The site is a static build, so it reflects Airtable as of the last deploy.
+# Netlify redeploys automatically on every push, so this workflow makes an
+# empty commit on a schedule — each one triggers a fresh Netlify build that
+# re-fetches the full live catalogue. No dashboard, no secrets, no build hook.
+#
+# Runs 3x/day (well within Netlify's free build minutes). Adjust the cron below
+# to refresh more or less often. You can also trigger it by hand from the
+# Actions tab (Run workflow).
+
+on:
+  schedule:
+    - cron: '0 6,12,18 * * *'   # 06:00, 12:00, 18:00 UTC every day
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+# If several runs overlap, keep only the latest.
+concurrency:
+  group: catalogue-refresh
+  cancel-in-progress: true
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the site branch
+        uses: actions/checkout@v4
+        with:
+          ref: claude/softr-webflow-migration-50kj20
+
+      - name: Trigger a rebuild via an empty commit
+        run: |
+          git config user.name "akay-refresh-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git commit --allow-empty -m "chore: scheduled catalogue refresh"
+          git push origin HEAD:claude/softr-webflow-migration-50kj20
