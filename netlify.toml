@@ -1,0 +1,22 @@
+# Netlify build configuration for the AKAY offers catalogue.
+# Netlify auto-detects Astro, but pinning it here keeps builds reproducible.
+# Set AIRTABLE_TOKEN (and optionally AIRTABLE_BASE_ID) in the Netlify UI:
+#   Site settings → Environment variables. Build-time only; never shipped to the browser.
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# Long-cache the immutable hashed assets and the logo.
+[[headers]]
+  for = "/_assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/akay-bird.png"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
