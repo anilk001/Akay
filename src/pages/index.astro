@@ -106,6 +106,30 @@ const stats = [
     .stat .n{font-family:var(--mono);font-size:22px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
     .stat .l{font-size:12px;color:var(--muted);letter-spacing:.03em}
 
+    /* Category request form */
+    .req{border-bottom:1px solid var(--line);background:color-mix(in srgb,var(--forest) 5%,transparent)}
+    .req-in{padding:20px 0;display:flex;flex-wrap:wrap;align-items:center;gap:16px 22px}
+    .req-copy{flex:1;min-width:230px}
+    .req-copy h2{font-family:var(--serif);font-size:20px;font-weight:600;margin:0 0 3px;color:var(--ink);text-wrap:balance}
+    .req-copy p{margin:0;color:var(--ink-soft);font-size:13.5px;max-width:44ch}
+    .req-form{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+    .req-form select,.req-form input{height:42px;border:1px solid var(--line);background:var(--card);color:var(--ink);
+      border-radius:10px;padding:0 12px;font-size:14px;font-family:var(--sans)}
+    .req-form select{min-width:180px;cursor:pointer}
+    .req-form input[type=email]{min-width:190px}
+    .req-form input[type=text]{min-width:180px}
+    .req-form select:focus,.req-form input:focus{outline:2px solid var(--brass-2);outline-offset:1px;border-color:transparent}
+    .req-form button{height:42px;padding:0 18px;border:1px solid transparent;border-radius:10px;background:var(--forest);
+      color:var(--paper);font-weight:600;font-size:14px;cursor:pointer;transition:.14s;white-space:nowrap}
+    :root[data-theme="dark"] .req-form button{color:#0A140F}
+    @media (prefers-color-scheme:dark){.req-form button{color:#0A140F}}
+    .req-form button:hover{background:var(--brass);color:#fff}
+    .req-form button:disabled{opacity:.55;cursor:default}
+    .req-msg{flex-basis:100%;margin:2px 0 0;font-size:13px;font-family:var(--mono);line-height:1.5}
+    .req-msg.ok{color:var(--ok)}
+    .req-msg.err{color:var(--brass)}
+    .req-msg a{color:inherit}
+
     .controls{position:sticky;top:60px;z-index:30;background:color-mix(in srgb,var(--paper) 90%,transparent);
       backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:14px 0}
     .controls-in{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
@@ -194,6 +218,28 @@ const stats = [
           <div class="stat"><div class="n">{s[0]}</div><div class="l">{s[1]}</div></div>
         ))}
       </div>
+    </div>
+  </section>
+
+  <section class="req">
+    <div class="wrap req-in">
+      <div class="req-copy">
+        <h2>Offers straight to your inbox</h2>
+        <p>Pick a category and we'll email you our current live offers — no login, no PDF.</p>
+      </div>
+      <form class="req-form" id="reqForm">
+        <select name="category" id="reqCat" required aria-label="Category">
+          <option value="" disabled selected>Choose a category…</option>
+          <option value="Special Offers">★ Special Offers — best deals</option>
+          {categories.filter((c) => c !== 'All').map((c) => (
+            <option value={c}>{c}</option>
+          ))}
+        </select>
+        <input type="email" id="reqEmail" name="email" placeholder="you@company.com" required aria-label="Your email" />
+        <input type="text" id="reqNote" name="note" placeholder="Anything specific? (optional)" aria-label="Optional note" />
+        <button type="submit" id="reqBtn">Email me offers</button>
+        <p class="req-msg" id="reqMsg" role="status" hidden></p>
+      </form>
     </div>
   </section>
 
@@ -314,6 +360,41 @@ const stats = [
       Array.from(cats.children).forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
       filter();
     });
+
+    // Category request form -> n8n webhook (emails the caller our live offers in that category).
+    const reqForm = document.getElementById('reqForm');
+    if (reqForm) {
+      const WEBHOOK = 'https://akay-team.app.n8n.cloud/webhook/category-request';
+      reqForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('reqBtn');
+        const msg = document.getElementById('reqMsg');
+        const category = document.getElementById('reqCat').value;
+        const email = document.getElementById('reqEmail').value.trim();
+        const note = document.getElementById('reqNote').value.trim();
+        if (!category || !email) return;
+        const label = btn.textContent;
+        btn.disabled = true; btn.textContent = 'Sending…';
+        try {
+          await fetch(WEBHOOK, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+            body: new URLSearchParams({ category, email, note }).toString(),
+          });
+          msg.className = 'req-msg ok';
+          msg.textContent = `Done — we've emailed our current ${category} offers to ${email}. Check your inbox (and spam) in a moment.`;
+          msg.hidden = false;
+          reqForm.reset();
+        } catch (err) {
+          msg.className = 'req-msg err';
+          msg.innerHTML = `Sorry, that didn't send. Email us at <a href="mailto:offers@akay.ie">offers@akay.ie</a> and we'll get them straight over.`;
+          msg.hidden = false;
+        } finally {
+          btn.disabled = false; btn.textContent = label;
+        }
+      });
+    }
 
     const root = document.documentElement;
     document.getElementById('themeBtn').addEventListener('click', () => {
