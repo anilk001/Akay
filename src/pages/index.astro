@@ -129,6 +129,14 @@ const stats = [
     .req-msg.ok{color:var(--ok)}
     .req-msg.err{color:var(--brass)}
     .req-msg a{color:inherit}
+    /* Requirement-list (email) intake — static content, paired under the category form */
+    .requirement-list-note{flex-basis:100%;margin-top:16px;padding-top:15px;border-top:1px dashed var(--line);
+      display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px}
+    .requirement-list-note h3{font-family:var(--serif);font-size:15px;font-weight:600;margin:0;color:var(--ink);white-space:nowrap}
+    .requirement-list-note p{margin:0;color:var(--ink-soft);font-size:13.5px;line-height:1.55;max-width:82ch}
+    .requirement-list-note a{color:var(--brass);font-weight:600;text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--brass) 40%,transparent)}
+    .requirement-list-note a:hover{color:var(--forest)}
+    .requirement-list-note strong{color:var(--ink);font-weight:600}
 
     .controls{position:sticky;top:60px;z-index:30;background:color-mix(in srgb,var(--paper) 90%,transparent);
       backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:14px 0}
@@ -240,6 +248,10 @@ const stats = [
         <button type="submit" id="reqBtn">Email me offers</button>
         <p class="req-msg" id="reqMsg" role="status" hidden></p>
       </form>
+      <div class="requirement-list-note">
+        <h3>Have a full requirement list?</h3>
+        <p>Email it to <a href="mailto:offers@akay.ie?subject=Requirement%20List">offers@akay.ie</a> with "Requirement List" in the subject line, and attach an Excel file with three columns: <strong>Brand</strong>, <strong>Product Name</strong>, and <strong>Quantity</strong>. We'll price whatever matches our current stock automatically.</p>
+      </div>
     </div>
   </section>
 
