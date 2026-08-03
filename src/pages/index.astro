@@ -1,5 +1,5 @@
 ---
-import { getOffers, getFeaturedOffers } from '../data/airtable.mjs';
+import { getOffers } from '../data/airtable.mjs';
 
 const WA = '353872382368';
 const { offers, source } = await getOffers();
@@ -27,8 +27,9 @@ function toView(o) {
   return { ...o, basis, other, wa: waLink(o, msg), st: STOCK[o.stock] || STOCK.enq };
 }
 const view = offers.map(toView);
-// Featured: isolated second query; [] if none/unavailable, so the section just hides.
-const featured = (await getFeaturedOffers()).map(toView);
+// Pin Featured offers to the front of the catalogue; stable sort keeps original order otherwise.
+const gridItems = [...view].sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
+const featuredCount = view.filter((o) => o.featured).length;
 
 const categories = ['All', ...Array.from(new Set(view.map((o) => o.category))).sort()];
 const brandCount = new Set(view.map((o) => o.brand)).size;
@@ -151,6 +152,7 @@ const stats = [
     .feat .card{border-color:color-mix(in srgb,var(--brass-2) 40%,var(--line))}
     .feat-badge{align-self:flex-start;font-family:var(--mono);font-size:10px;font-weight:bold;letter-spacing:.08em;
       text-transform:uppercase;color:#fff;background:#B4231F;padding:3px 8px;border-radius:6px;margin-bottom:12px}
+    .card.feat-on{border-color:color-mix(in srgb,var(--brass-2) 50%,var(--line))}
 
     .controls{position:sticky;top:60px;z-index:30;background:color-mix(in srgb,var(--paper) 90%,transparent);
       backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:14px 0}
@@ -243,48 +245,6 @@ const stats = [
     </div>
   </section>
 
-  {featured.length > 0 && (
-  <section class="feat">
-    <div class="wrap feat-in">
-      <div class="feat-head">
-        <span class="feat-eyebrow">★ Featured</span>
-        <h2>Handpicked offers</h2>
-      </div>
-      <div class="feat-grid">
-        {featured.map((o) => (
-          <article class="card">
-            <span class="feat-badge">★ Featured</span>
-            <div class="c-top">
-              <div><div class="brand">{o.brand}</div><h3 class="pname">{o.name}</h3></div>
-              <span class="cat-tag">{o.category}</span>
-            </div>
-            <div class="spec">{o.spec}</div>
-            <div class="metaline">
-              {o.tier && <span class="tag tier">{o.tier}</span>}
-              {o.origin && <span class="tag">{o.origin}</span>}
-              {o.currency && <span class="tag">{o.currency}</span>}
-            </div>
-            <div class="price-row">
-              <div class="price">
-                <div><span class="cur">{o.currency}</span> <span class="amt">{o.amount != null ? o.amount.toFixed(2) : '—'}</span> <span class="basis">{o.basis}</span></div>
-                {o.other && <div class="sub">{o.other}</div>}
-              </div>
-              <div class="stock">
-                <span class={`pill ${o.st[0]}`}>{o.st[1]}</span>
-                {o.qty ? <span class="qty" title="Cases available">{o.qty.toLocaleString()} cases</span> : <span class="qty muted">on request</span>}
-              </div>
-            </div>
-            <div class="c-foot">
-              <span class="incoterm">{o.terms}</span>
-              <a class="enquire" href={o.wa} target="_blank" rel="noopener">Enquire</a>
-            </div>
-          </article>
-        ))}
-      </div>
-    </div>
-  </section>
-  )}
-
   <section class="req">
     <div class="wrap req-in">
       <div class="req-copy">
@@ -334,8 +294,9 @@ const stats = [
   <main class="wrap">
     <p class="count" id="count">Showing {view.length} of {view.length} offers</p>
     <div class="grid" id="grid">
-      {view.map((o) => (
-        <article class="card" data-cat={o.category} data-name={(o.name + ' ' + o.brand).toLowerCase()} data-amt={o.amount ?? 0}>
+      {gridItems.map((o) => (
+        <article class={`card${o.featured ? ' feat-on' : ''}`} data-cat={o.category} data-name={(o.name + ' ' + o.brand).toLowerCase()} data-amt={o.amount ?? 0} data-feat={o.featured ? '1' : '0'}>
+          {o.featured && <span class="feat-badge">★ Featured</span>}
           <div class="c-top">
             <div>
               <div class="brand">{o.brand}</div>

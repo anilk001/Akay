@@ -19,7 +19,7 @@ const FIELDS = [
   'Public Product Description', 'Brand', 'Category', 'Public Spec',
   'Price Display', 'Currency', 'Price Per Unit & Case',
   'Stock Display', 'Stock Cases', 'Public Terms',
-  'Bond/Customs Status', 'Origin Country', 'Public Listing',
+  'Bond/Customs Status', 'Origin Country', 'Public Listing', 'Featured',
 ];
 
 function stockCode(label = '') {
@@ -56,6 +56,7 @@ function normalize(fields) {
     terms: fields['Public Terms'] || '',
     tier: fields['Bond/Customs Status'] || '',
     origin: fields['Origin Country'] || '',
+    featured: fields['Featured'] === true,
   };
 }
 
