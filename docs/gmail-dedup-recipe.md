@@ -5,6 +5,13 @@
 into the existing `Extract Body Blocks` node.
 **Time:** ~10 minutes. **Risk:** low (see [Why this is safe](#why-this-is-safe)).
 
+> **Status: implemented and live (2026-08-03).** Both nodes are in the workflow and the
+> Schedule Trigger is active. Verified end to end: the backstop fetched the two stranded
+> emails in the mailbox, both were routed to review and labelled `Akay/Email-Done`, and no
+> duplicate offers were created. See [What shipped](#what-shipped-vs-this-recipe) for the two
+> places the live config differs from the click-through below, and for a credential issue this
+> surfaced.
+
 ---
 
 ## The problem
@@ -60,6 +67,14 @@ Both queries exclude `-label:Akay/Email-Done`, so once step 3 runs, the email dr
 exactly once; get it wrong and it is never labelled → re‑ingested forever (this is the exact
 class of bug that produced the earlier duplicate offers).
 
+> **The review branch dedups too — important for the backstop.** An email the parser can’t
+> handle goes down the *other* branch (`Has Offer Content?` → … → `Route to Review` →
+> `Mark Reviewed`) and is never created as an offer. That branch still applies the same
+> `Label_8` (`Akay/Email-Done`) — to the **thread** rather than the message — so a
+> review‑routed email is also removed from the query. This matters only for the backstop: the
+> Gmail Trigger never looks back, but a polling search would re‑fetch and re‑review the same
+> email every 10 minutes if the review branch didn’t label it. It does, so it won’t.
+
 > ⚠️ **The trap.** The Gmail “Get Many Messages” node outputs **two** id‑like fields:
 > - `id` — the Gmail **API message id**. This is the real dedup key. It is what the Gmail
 >   Trigger emits and what `Mark Email Done` uses to apply the label.
@@ -86,7 +101,10 @@ Open the workflow: n8n → **Email Body Offer Ingestion — Akay**.
 2. **Credential:** pick the same Gmail credential the existing Gmail nodes use
    (the `offers@akay.ie` account).
 3. **Resource:** `Message`  •  **Operation:** `Get Many`.
-4. **Return All:** `On`  (never cap the backstop — it must see every eligible email).
+4. **Return All:** `Off`, **Limit:** `10`. A bounded batch per run keeps any single execution
+   small (avoids a heavy one-shot run that downloads attachments for the whole backlog at
+   once), and the backstop still clears a backlog over successive 10-minute runs. Raise the
+   limit if you ever expect more than ~10 stranded emails to accumulate between runs.
 5. **Simplify:** `Off`  (so the raw fields, including `id` and the body, are returned).
 6. Expand **Filters** → **Search** (`q`) and paste **exactly**:
    ```
@@ -149,6 +167,30 @@ backstop next runs, so the backstop sees it already `Akay/Email-Done` and skips 
 backstop’s real job is the **stranded** emails the trigger never offered at all; for those
 there is no race. If you ever want to eliminate the window entirely, widen the backstop’s
 cadence (e.g. every 30–60 min) — its purpose is catch‑up, not low latency.
+
+---
+
+## What shipped vs this recipe
+
+Two deliberate differences from the click-through above, plus one thing the rollout surfaced:
+
+1. **Bounded batch, not Return All.** The live node uses `Return All: Off` / `Limit: 10`
+   (see step 2) rather than fetching every match in one execution. Same catch-up guarantee,
+   smaller runs.
+2. **Both branches confirmed to dedup.** Verified in a live run that the review branch
+   (`Mark Reviewed`) applies `Akay/Email-Done` to the thread, so review-routed emails are not
+   re-fetched (see the dedup note above).
+
+**Credential issue this surfaced (now fixed).** The first live backstop run failed at the
+pre-existing `Find Email Profiles` **Airtable** node with *“Invalid authentication token”* —
+the workflow’s Airtable Personal Access Token had expired. This was breaking the whole
+workflow, not just the backstop (the normal Gmail Trigger hits the same Airtable node on any
+real offer email); the backstop just surfaced it by pulling a real offer email. Fixed by
+repointing the four Airtable nodes (`Find Email Profiles`, `Fetch Products`, `Create Products`,
+`Create Offers`) to the valid PAT credential (`Airtable Personal Access Token account`, which
+authenticates against the `Akay Offers` base). **Other Akay n8n workflows may still reference
+the dead token** (`Airtable Personal Access Token account 2`) — worth checking Offer Dispatch,
+WhatsApp/Excel Ingestion and Bounce & Reply Handling.
 
 ---
 
