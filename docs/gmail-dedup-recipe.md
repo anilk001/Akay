@@ -202,12 +202,15 @@ nodes were repointed to the valid PAT (`rgwpGVX08dlSKzwI`):
 | WhatsApp Offer Ingestion | 8 | ✅ scheduled run success post-fix |
 | Excel Offer Ingestion | 5 | repointed (next trigger) |
 | Offer Dispatch | 5 | repointed (not test-run — it emails clients) |
+| Bounce & Reply Handling | 5 | repointed (not test-run — it can delete client records) |
 | Daily Backup | 2 | repointed |
 | Backup — Export One Table (sub-workflow) | 1 | repointed |
 
+Every Akay n8n workflow that touches Airtable has now been repointed (30 nodes across
+7 workflows). Bounce & Reply Handling required its **Available in MCP** setting to be turned
+on first (Workflow → ⋯ → Settings).
+
 **Still needs a human:**
-- **Bounce & Reply Handling** (`Qb8hZEPunRkVT3J2`) — could not be inspected or fixed because
-  MCP access is disabled on that workflow card. Check it manually for the dead token.
 - The dead credential itself should be deleted or re-authorized in n8n so it can't be picked
   again by mistake.
 - Pre-existing, unrelated: Excel Ingestion's `Map Columns (LLM)` node reports a missing
