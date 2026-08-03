@@ -1,0 +1,165 @@
+# Recipe — never lose (or double‑ingest) an offer email
+
+**Workflow:** `Email Body Offer Ingestion — Akay` (n8n id `8oPUD8d9NPVBEime`, currently **active**)
+**Change:** add **two** nodes — a *Schedule Trigger* and a *Gmail “Get Many Messages”* — wired
+into the existing `Extract Body Blocks` node.
+**Time:** ~10 minutes. **Risk:** low (see [Why this is safe](#why-this-is-safe)).
+
+---
+
+## The problem
+
+Today the workflow starts at a single **Gmail Trigger** that polls every minute for:
+
+```
+{label:Process_Akay label:Akay_Processed} -label:Akay/Email-Done
+```
+
+A Gmail *Trigger* only ever hands the workflow messages it notices **after** its last
+poll checkpoint. So an offer email is silently stranded — never ingested — whenever:
+
+- the workflow was **inactive** when the email arrived or got labelled, or
+- a label (`Process_Akay` / `Akay_Processed`) is applied to an **older** email that the
+  trigger’s checkpoint has already moved past, or
+- a poll is **missed** (n8n restart, downtime, error).
+
+The trigger never looks back, so those emails sit in the mailbox with the right labels and
+are simply never processed.
+
+## The fix
+
+Add a second, independent entry path that **re‑scans the whole mailbox** on a timer and
+feeds the *same* first processing node. It uses the *same* query, so it only ever picks up
+emails that are labelled for processing **and not yet** `Akay/Email-Done`. Nothing is
+stranded, because a search doesn’t have a checkpoint — every run sees every still‑eligible
+email.
+
+```
+                 ┌─ Gmail Trigger (every minute) ────────────┐
+                 │                                            ▼
+  NEW ──────────►│                                   ┌──────────────────┐
+                 │                                   │ Extract Body     │──► (rest of
+  BACKSTOP ─────►│                                   │ Blocks           │     the workflow,
+                 │  Schedule Trigger (every 10 min)  └──────────────────┘     unchanged)
+                 └─► Gmail “Get Many Messages” ──────────────▲
+                     (same query)                            │
+```
+
+---
+
+## The one thing that must be right: the dedup key
+
+De‑duplication is **entirely** driven by the `Akay/Email-Done` label. The pipeline:
+
+1. `Flatten Block` stamps `sourceMessageId = item.id || item.messageId || item.sourceMessageId`
+2. `Emails to Mark Done` emits one item per email carrying that id as `messageId`
+3. `Mark Email Done` applies label `Label_8` (**Akay/Email-Done**) to that Gmail message
+
+Both queries exclude `-label:Akay/Email-Done`, so once step 3 runs, the email drops out of
+**both** the trigger’s and the backstop’s results. Get the id right and an email is ingested
+exactly once; get it wrong and it is never labelled → re‑ingested forever (this is the exact
+class of bug that produced the earlier duplicate offers).
+
+> ⚠️ **The trap.** The Gmail “Get Many Messages” node outputs **two** id‑like fields:
+> - `id` — the Gmail **API message id**. This is the real dedup key. It is what the Gmail
+>   Trigger emits and what `Mark Email Done` uses to apply the label.
+> - `messageId` — the RFC‑822 `Message-ID:` **header** (`<...@mail.example>`). This is **not**
+>   the Gmail id and must **not** be used to label.
+>
+> `Flatten Block` already reads `item.id` **first**, so the correct value flows through
+> automatically. **Do not** add a Set/Edit node that maps the search node’s `messageId` over
+> `id` — that would break labelling and reintroduce duplicates. Leave the field names alone.
+
+---
+
+## Step‑by‑step
+
+Open the workflow: n8n → **Email Body Offer Ingestion — Akay**.
+
+### 1. Add the Schedule Trigger
+1. Click the **+** on the canvas → search **Schedule Trigger** → add it.
+2. Set **Trigger Interval** → **Minutes**, **Minutes Between Triggers** = `10`.
+3. Leave everything else default. (Rename to `Backstop — every 10 min` if you like.)
+
+### 2. Add the Gmail “Get Many Messages” node
+1. Click **+** → search **Gmail** → choose the **Gmail** action node (not the Trigger).
+2. **Credential:** pick the same Gmail credential the existing Gmail nodes use
+   (the `offers@akay.ie` account).
+3. **Resource:** `Message`  •  **Operation:** `Get Many`.
+4. **Return All:** `On`  (never cap the backstop — it must see every eligible email).
+5. **Simplify:** `Off`  (so the raw fields, including `id` and the body, are returned).
+6. Expand **Filters** → **Search** (`q`) and paste **exactly**:
+   ```
+   {label:Process_Akay label:Akay_Processed} -label:Akay/Email-Done
+   ```
+7. Expand **Options** → turn **Download Attachments** `On`.
+   *Why:* `Extract Body Blocks` skips an email when a spreadsheet is attached, so the Excel
+   workflow can own it. That guard reads binary attachments; without downloading them here,
+   a spreadsheet email could be parsed from its body **and** by the Excel workflow —
+   a duplicate. Downloading attachments preserves the “attachment always wins” rule.
+   *(Rename the node to `Backstop — Get Offer Emails` if you like.)*
+
+### 3. Wire it in
+1. Connect **Schedule Trigger** → **Gmail “Get Many Messages”**.
+2. Connect **Gmail “Get Many Messages”** → the **input** of the existing `Extract Body Blocks`
+   node. (`Extract Body Blocks` now has two incoming paths; that is expected.)
+3. **Do not touch** the existing Gmail Trigger → Extract Body Blocks connection.
+
+### 4. Save. (Leave the workflow active.)
+
+---
+
+## Test it (before trusting it)
+
+Do this once, deliberately, on a single email:
+
+1. **Prep one email:** pick (or forward in) one offer email. Ensure it has the
+   `Process_Akay` **and** `Akay_Processed` labels and does **not** have `Akay/Email-Done`.
+2. **Dry‑run the new node in isolation:** open **Gmail “Get Many Messages”** →
+   **Execute step**. Confirm your test email appears in the output, and open one output item:
+   - it has a top‑level **`id`** (looks like `1979a…`, ~16 hex chars — the Gmail API id), and
+   - it carries the body (`html` and/or `text`) and, if there’s a spreadsheet, a binary
+     attachment. If the body is empty, revisit **Simplify = Off** / **Download Attachments**.
+3. **Run the whole path:** trigger the Schedule branch (or **Execute Workflow** from the
+   Schedule Trigger) and let it run end to end.
+4. **Verify the outcome:**
+   - the offer(s) land in Airtable **once** (search the product/supplier — no duplicate rows), and
+   - the email now has the **`Akay/Email-Done`** label.
+5. **Verify dedup holds:** let both the 1‑minute trigger and the 10‑minute backstop run for a
+   cycle. The email must **not** be ingested again — because it now carries `Akay/Email-Done`
+   and both queries exclude it.
+
+If offers land once and the label appears, the dedup key is flowing correctly and you’re done.
+
+---
+
+## Why this is safe
+
+- **Additive** — the existing Gmail Trigger and every downstream node are untouched, so
+  nothing that works today can regress.
+- **Testable** — verifiable on a single email (above): lands once, gets `Akay/Email-Done`.
+- **Reversible** — to undo, delete just the two new nodes. No other change to unwind.
+
+### The one edge to be aware of
+
+If the same email is picked up by **both** entry paths inside the same short window — before
+`Mark Email Done` has applied the label — it could be ingested twice. In practice the
+1‑minute trigger almost always processes and labels a new email long before the 10‑minute
+backstop next runs, so the backstop sees it already `Akay/Email-Done` and skips it. The
+backstop’s real job is the **stranded** emails the trigger never offered at all; for those
+there is no race. If you ever want to eliminate the window entirely, widen the backstop’s
+cadence (e.g. every 30–60 min) — its purpose is catch‑up, not low latency.
+
+---
+
+## Reference — the moving parts
+
+| Thing | Value |
+|---|---|
+| Workflow | `Email Body Offer Ingestion — Akay` (`8oPUD8d9NPVBEime`) |
+| Gmail account | `offers@akay.ie` |
+| Search query (both paths) | `{label:Process_Akay label:Akay_Processed} -label:Akay/Email-Done` |
+| Done label | `Akay/Email-Done` (id `Label_8`, applied by `Mark Email Done`) |
+| First processing node | `Extract Body Blocks` |
+| Dedup key | Gmail **API** message `id` (read by `Flatten Block` as `item.id`) |
+| New nodes to add | `Schedule Trigger` (10 min) → `Gmail: Message → Get Many` |
