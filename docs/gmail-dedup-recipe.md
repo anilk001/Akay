@@ -188,9 +188,30 @@ workflow, not just the backstop (the normal Gmail Trigger hits the same Airtable
 real offer email); the backstop just surfaced it by pulling a real offer email. Fixed by
 repointing the four Airtable nodes (`Find Email Profiles`, `Fetch Products`, `Create Products`,
 `Create Offers`) to the valid PAT credential (`Airtable Personal Access Token account`, which
-authenticates against the `Akay Offers` base). **Other Akay n8n workflows may still reference
-the dead token** (`Airtable Personal Access Token account 2`) — worth checking Offer Dispatch,
-WhatsApp/Excel Ingestion and Bounce & Reply Handling.
+authenticates against the `Akay Offers` base).
+
+**The dead token was used across the whole Akay n8n project — swept and fixed (2026-08-03).**
+The expired PAT (`Airtable Personal Access Token account 2` / `z2ohacifc5nLYA76`) was
+authenticating the Airtable nodes in most workflows, so any workflow that touched Airtable was
+failing (WhatsApp Ingestion was erroring every 5 minutes — 1,200+ failed runs). All Airtable
+nodes were repointed to the valid PAT (`rgwpGVX08dlSKzwI`):
+
+| Workflow | Airtable nodes repointed | Verified |
+|---|---|---|
+| Email Body Offer Ingestion | 4 | ✅ live run success |
+| WhatsApp Offer Ingestion | 8 | ✅ scheduled run success post-fix |
+| Excel Offer Ingestion | 5 | repointed (next trigger) |
+| Offer Dispatch | 5 | repointed (not test-run — it emails clients) |
+| Daily Backup | 2 | repointed |
+| Backup — Export One Table (sub-workflow) | 1 | repointed |
+
+**Still needs a human:**
+- **Bounce & Reply Handling** (`Qb8hZEPunRkVT3J2`) — could not be inspected or fixed because
+  MCP access is disabled on that workflow card. Check it manually for the dead token.
+- The dead credential itself should be deleted or re-authorized in n8n so it can't be picked
+  again by mistake.
+- Pre-existing, unrelated: Excel Ingestion's `Map Columns (LLM)` node reports a missing
+  `resource` discriminator — worth a look but not part of this fix.
 
 ---
 
