@@ -1,5 +1,5 @@
 ---
-import { getOffers } from '../data/airtable.mjs';
+import { getOffers, getFeaturedOffers } from '../data/airtable.mjs';
 
 const WA = '353872382368';
 const { offers, source } = await getOffers();
@@ -22,10 +22,13 @@ function waLink(o, msg) {
 }
 const STOCK = { in: ['ok', 'In stock'], warn: ['warn', 'Limited'], enq: ['neu', 'Enquire'] };
 
-const view = offers.map((o) => {
+function toView(o) {
   const { basis, other, msg } = priceParts(o.priceDetail);
   return { ...o, basis, other, wa: waLink(o, msg), st: STOCK[o.stock] || STOCK.enq };
-});
+}
+const view = offers.map(toView);
+// Featured: isolated second query; [] if none/unavailable, so the section just hides.
+const featured = (await getFeaturedOffers()).map(toView);
 
 const categories = ['All', ...Array.from(new Set(view.map((o) => o.category))).sort()];
 const brandCount = new Set(view.map((o) => o.brand)).size;
@@ -138,6 +141,17 @@ const stats = [
     .requirement-list-note a:hover{color:var(--forest)}
     .requirement-list-note strong{color:var(--ink);font-weight:600}
 
+    /* Featured section */
+    .feat{background:color-mix(in srgb,var(--forest) 6%,var(--paper));border-bottom:1px solid var(--line)}
+    .feat-in{padding:26px 0 30px}
+    .feat-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:12px;margin:0 0 16px}
+    .feat-eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--brass);font-weight:bold}
+    .feat-head h2{font-family:var(--serif);font-size:22px;font-weight:600;margin:0;color:var(--ink)}
+    .feat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+    .feat .card{border-color:color-mix(in srgb,var(--brass-2) 40%,var(--line))}
+    .feat-badge{align-self:flex-start;font-family:var(--mono);font-size:10px;font-weight:bold;letter-spacing:.08em;
+      text-transform:uppercase;color:#fff;background:#B4231F;padding:3px 8px;border-radius:6px;margin-bottom:12px}
+
     .controls{position:sticky;top:60px;z-index:30;background:color-mix(in srgb,var(--paper) 90%,transparent);
       backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:14px 0}
     .controls-in{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
@@ -228,6 +242,48 @@ const stats = [
       </div>
     </div>
   </section>
+
+  {featured.length > 0 && (
+  <section class="feat">
+    <div class="wrap feat-in">
+      <div class="feat-head">
+        <span class="feat-eyebrow">★ Featured</span>
+        <h2>Handpicked offers</h2>
+      </div>
+      <div class="feat-grid">
+        {featured.map((o) => (
+          <article class="card">
+            <span class="feat-badge">★ Featured</span>
+            <div class="c-top">
+              <div><div class="brand">{o.brand}</div><h3 class="pname">{o.name}</h3></div>
+              <span class="cat-tag">{o.category}</span>
+            </div>
+            <div class="spec">{o.spec}</div>
+            <div class="metaline">
+              {o.tier && <span class="tag tier">{o.tier}</span>}
+              {o.origin && <span class="tag">{o.origin}</span>}
+              {o.currency && <span class="tag">{o.currency}</span>}
+            </div>
+            <div class="price-row">
+              <div class="price">
+                <div><span class="cur">{o.currency}</span> <span class="amt">{o.amount != null ? o.amount.toFixed(2) : '—'}</span> <span class="basis">{o.basis}</span></div>
+                {o.other && <div class="sub">{o.other}</div>}
+              </div>
+              <div class="stock">
+                <span class={`pill ${o.st[0]}`}>{o.st[1]}</span>
+                {o.qty ? <span class="qty" title="Cases available">{o.qty.toLocaleString()} cases</span> : <span class="qty muted">on request</span>}
+              </div>
+            </div>
+            <div class="c-foot">
+              <span class="incoterm">{o.terms}</span>
+              <a class="enquire" href={o.wa} target="_blank" rel="noopener">Enquire</a>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+  )}
 
   <section class="req">
     <div class="wrap req-in">

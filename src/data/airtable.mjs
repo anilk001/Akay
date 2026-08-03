@@ -100,3 +100,27 @@ export async function getOffers() {
   }
   return { offers: snapshot.offers, source: 'snapshot' };
 }
+
+// Featured offers — a second, isolated query over the SAME connection.
+// Server-side filter: Featured checked AND publicly listed AND send-eligible.
+// Reads only the public-safe display fields (same FIELDS list). Any failure
+// (missing token, missing "Featured" field, network) returns [] so the main
+// catalogue is never affected and the section simply hides when empty.
+export async function getFeaturedOffers() {
+  if (!TOKEN) return [];
+  try {
+    const url = new URL(`https://api.airtable.com/v0/${BASE}/${encodeURIComponent(TABLE)}`);
+    url.searchParams.set('filterByFormula', "AND({Featured}=1,{Public Listing}='Yes',{Send Eligible}='Yes')");
+    url.searchParams.set('pageSize', '50');
+    FIELDS.forEach((f) => url.searchParams.append('fields[]', f));
+    const res = await fetch(url, { headers: { Authorization: `Bearer ${TOKEN}` } });
+    if (!res.ok) throw new Error(`Airtable ${res.status}: ${(await res.text()).slice(0, 100)}`);
+    const data = await res.json();
+    const out = data.records.map((r) => normalize(r.fields)).filter((o) => o.name && !isTestRow(o.name));
+    console.log(`[airtable] fetched ${out.length} featured offers`);
+    return out;
+  } catch (err) {
+    console.warn(`[airtable] featured fetch skipped (${err.message.slice(0, 100)})`);
+    return [];
+  }
+}
