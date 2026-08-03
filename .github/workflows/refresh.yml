@@ -13,7 +13,7 @@ name: Scheduled catalogue refresh
 
 on:
   schedule:
-    - cron: '0 6,12,18 * * *'   # 06:00, 12:00, 18:00 UTC every day
+    - cron: '0 */4 * * *'   # every 4 hours (~6x/day) — stays within Netlify's free build minutes
   workflow_dispatch: {}
 
 permissions:
