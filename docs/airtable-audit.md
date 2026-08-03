@@ -53,20 +53,46 @@ compared 1,807 against the already-reduced 1,804 and marked itself **Verified** 
 "cleared" simply because the lower number became the new baseline. That's a blind spot: a genuine
 loss and an intentional purge look identical after one day.
 
-**This needs a human decision.** If it was a deliberate purge of expired/superseded offers, all
-good — nothing to do. If not, restore from the Drive backup for 2026-07-30
-(`Backup Registry` row has the folder link). I did **not** touch any offer data. I can help
-investigate (e.g. break the current 1,807 down by Status / Is Expired / Public Listing) on request.
+I did **not** touch any offer data.
+
+### Investigation (2026-08-03) — looks intentional, not loss
+
+Breakdown of the current live offers (1,887 — up from the morning's 1,807 as ingestion resumed):
+
+| Cut | Count |
+|---|---:|
+| Status = Live | 1,622 |
+| Status = Expired | 243 |
+| Status = Broadcasted | 16 |
+| Status = Hold | 4 |
+| Status = Sold / Cancelled / Sent | 0 |
+| Public Listing = Yes (on the site) | 1,270 |
+| Public Listing = No | 617 |
+| Offer Date before 2026-07-15 | 96 |
+| Newest Offer Date | 2026-08-03 |
+
+**Read: this looks like an intentional cleanup, not data loss.** The surviving set is coherent —
+overwhelmingly **Live** (1,622), recent (only 96 offers pre-15-Jul), with a sensible public
+catalogue of 1,270. Random corruption would have left a scaled-down copy of the old distribution,
+stale rows included; instead the stale/old rows are exactly what's gone. The most likely cause is
+a **de-duplication of the re-ingested duplicate offers** — the same duplicate-offer problem that
+motivated the Gmail dedup work — which would plausibly take 4,703 down to ~1,800.
+
+Not 100% provable from counts alone. For certainty, the 2026-07-30 Drive backup JSON can be diffed
+against live record IDs to see exactly which offers were removed — say the word and I'll pull it
+from Drive and diff. Absent that, nothing points to accidental loss, so no action is taken.
 
 ---
 
 ## 3. Cleanup candidates (safe, but need your go-ahead)
 
 **Dead fields** — orphaned when the "Offers copy" table was deleted 2026-07-29; each is already
-annotated in the base as _"DEAD FIELD — safe to delete, nothing reads it."_ Deleting a field is
-permanent, so listing rather than auto-removing:
+annotated in the base as _"DEAD FIELD — safe to delete, nothing reads it."_ **These must be
+deleted in the Airtable UI** — the Airtable API/MCP exposes no delete-field operation (it can
+delete records, tables, automations, interfaces and pages, but not a single column). To remove
+each: open the table → click the field header's ▾ → **Delete field**.
 
-| Table | Field |
+| Table | Field to delete |
 |---|---|
 | Enquiries | `zzz_DELETE_OffersCopy` |
 | Offers Sent Log | `zzz_DELETE_OffersCopy` |
