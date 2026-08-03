@@ -21,7 +21,7 @@ Counts are from the day's verified backup (`Backup Registry`, 2026-08-03).
 | 7 | **Offers Sent Log** | 3,750 | Offer Dispatch (write) | ✅ Core |
 | 8 | **Communications Log** | 2,984 | Bounce & Reply (write) | ✅ Core |
 | 9 | **Backup Registry** | 17 | Daily Backup (write), Offer Dispatch (reads it as a dispatch gate) | ✅ Core |
-| 10 | **Category Icons** | 8 | Feeds `Offers.Category Link` → icon lookups shown on the site | ✅ Keep |
+| 10 | ~~**Category Icons**~~ | 8 | Softr-era leftover — **not** used by the new site (which filters on the plain-text `Category` field) or any workflow | 🗑️ **Deleted 2026-08-03** (revert actionId `actlgrs4kJ7nUiPHJ`) |
 | 11 | **Invoices** | 7,304 | **Zoho sync** (`Zoho Invoice ID`, `Last Synced`) — not touched by any n8n workflow | ✅ Keep (external owner) |
 | 12 | **Enquiries** | 611 | Client enquiries — **not touched by any of the 6 n8n workflows** (populated elsewhere, e.g. Tasklet) | ✅ Keep (verify owner) |
 | 13 | **System Instructions** | 2 | Config/reference for AI agents — not touched by n8n | ✅ Keep |
@@ -97,8 +97,11 @@ each: open the table → click the field header's ▾ → **Delete field**.
 | Enquiries | `zzz_DELETE_OffersCopy` |
 | Offers Sent Log | `zzz_DELETE_OffersCopy` |
 | Client Price History | `zzz_DELETE_OffersCopy` |
-| Category Icons | `zzz_DELETE_OffersCopy` |
 | Clients | `zzz_ARCHIVED_Client Price History (text)` |
+| Offers | `Category Link` — orphaned by the Category Icons table deletion (2026-08-03); now dead text |
+| Offers | `Icon (from Category Link)` — lookup left empty after the same deletion |
+
+(The `Category Icons` table's own `zzz_DELETE_OffersCopy` field went away with the table.)
 
 **Empty tables** — `Contacts` (0) and `Client Price History` (0). Both are wired into the schema
 (link fields) but never populated by any workflow. Either they're pending a sync that was never
