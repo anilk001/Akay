@@ -89,10 +89,10 @@ Excel Ingestion, Daily Backup (+ Export One Table), Contact Sync, ERROR HANDLER,
 Bounce & Reply Handling, Supersede Supplier Price Lists, Category Request Handler,
 Excel Requirement Intake, Timewaster Governance Report.
 
-### Parked — decision needed
-- **Link Offers To Products** (`NtEyhHN4tQYzjwj0`) — inactive but a genuine, well-built
-  hourly maintenance job that clears the unlinked Offers→Products backlog. Re-enable if
-  the backlog still needs clearing; otherwise leave off.
+### Re-enabled
+- **Link Offers To Products** (`NtEyhHN4tQYzjwj0`) — re-activated 2026-08-04. A count found
+  **1,007 Live offers with no linked Product**, so the backlog clearly still needed clearing.
+  Now runs hourly, clearing the backlog and keeping new offers linked.
 
 ---
 
@@ -120,7 +120,6 @@ and a description explaining why it is safe to delete. In the **Offers** table:
    n8n MCP; archive it from the workflow list.
 3. **Delete the `Akay Offers (Copy)` base** (`appLSPWjZd2R0e8p4`) — a stale duplicate;
    daily backups make it redundant.
-4. **Decide on `Link Offers To Products`** — re-enable or leave off (see above).
 
 ## Candidates NOT touched (need a decision before removal)
 - **Price-intelligence cluster** on Offers — `Is Cheapest`, `Cheaper By 5%+`,
