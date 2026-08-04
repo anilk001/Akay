@@ -60,8 +60,10 @@ On parse, each channel writes offers into the **Offers** table and links the sup
     default). **Pack/size and incoterm are NOT yet enforced** — incoterm defaults to
     "Other". ⚠️ _Gap → see §11._
   - Rows failing the minimum are collected as **exceptions → Needs-Review**, not created.
-- **Margin.** ⚠️ **Manual.** Automation never sets `Margin %`; a trader (Annika/Anil)
-  enters it in Airtable. `Sell Price` is a formula = `Buy Price × (1 + Margin %)`.
+- **Margin.** ✅ **5% by default at ingest; trader may override.** _(Decided 2026-08-04;
+  needs a small ingestion change — automation currently sets nothing.)_ `Sell Price` is a
+  formula = `Buy Price × (1 + Margin %)`; a trader (Annika/Anil) can change the % on any
+  offer in Airtable.
 - **Good-to-have (Annika fills; NOT blocking):** quantity available, lead time, BBD
   (where the product carries one), cases per pallet / per load. Offers still process
   without these. ⚠️ There is **no queue/notification** surfacing these to Annika yet.
@@ -122,13 +124,12 @@ dispatch halts if bundle members disagree on targeting.
 
 | Path | Behaviour | Status |
 |---|---|---|
-| Email — self-serve category request (webhook) | Pulls Send-Eligible offers in the category → **auto-emails** via Resend; logs an Enquiry when a note is present | ⚠️ auto-sends without human approval |
-| Email — "requirement list" (Gmail poll /15 min) | Parses the sheet, fuzzy-matches Send-Eligible offers → **auto-replies** priced matches; logs unmatched lines for manual pricing | ⚠️ auto-sends without human approval |
+| Email — self-serve category request (webhook) | Pulls Send-Eligible offers in the category; **must be prepared for human review & send** (no auto-reply) | ⚠️ currently auto-sends — **to change** |
+| Email — "requirement list" (Gmail poll /15 min) | Parses the sheet, fuzzy-matches Send-Eligible offers; **must be prepared for human review & send**; logs unmatched lines for manual pricing | ⚠️ currently auto-sends — **to change** |
 | **WhatsApp buyer inquiry** | — | ❌ not handled — inbound buyer questions land in review, unanswered |
 
-⚠️ **Safety point to confirm:** the two email responders reply to a buyer's own request,
-so they auto-send. Decide whether that is acceptable or whether they too should pass a
-human check (see §11).
+🔒 **Safety rule (decided 2026-08-04): NO auto-replies, ever.** Both email responders
+currently auto-send and **must be changed** so a human reviews and sends every reply.
 
 ---
 
@@ -170,21 +171,35 @@ three junk Airtable draft automations were removed._
 
 ---
 
-## 11. Gaps to close, and decisions to confirm
+## 11. Confirmed decisions & build plan
 
-**Build gaps (prioritised):**
-1. **Prove the Excel spine** — re-forward the Halıtlar email; confirm offers land. _(pending)_
-2. **Essential-field gate** — enforce name + pack/size + price+currency + incoterm; send the rest to Needs-Review.
-3. **Annika missing-info queue** — surface offers missing qty / lead time / BBD / cases-per-pallet, without blocking processing.
-4. **End-of-day label sweep** — move `Process_Akay` → `Processed-Akay` once daily.
-5. **PDF offer parsing** and **image (vision) offer parsing** — cover intake forms 1b and 4.
-6. **WhatsApp buyer-inquiry path** — answer quote requests like email enquiries.
+**Confirmed decisions (2026-08-04):**
+- **Margin** — apply **5% by default at ingest**; a trader may override per offer in Airtable.
+- **Trust** — process **all offers Anil forwards** (he only forwards what should be processed).
+  **If** mail ever starts arriving **directly** to offers@akay.ie (not via Anil), then
+  **Blacklisted and Unknown-trust suppliers are held for manual approval** before processing.
+- **Enquiry replies** — **no auto-replies, ever.** Category-request and requirement-list
+  responses are prepared for a **human to review and send**.
+- **Safety** — unchanged: public-safe fields only; no client email without human approval.
 
-**Decisions to confirm before finalising:**
-- **Margin** stays a manual trader input (current), or apply a default % at ingest?
-- **Trust tiers** — process all offers to approval (current), or hold Low/Unknown-trust suppliers?
-- **Enquiry auto-replies** (category request + requirement list) — keep auto-send, or add a human check?
-- **Priority/scope** of the six build gaps above.
+**Decided changes to existing workflows (to implement):**
+- **A. Stop auto-sending enquiry replies** (Category Request Handler + Excel Requirement
+  Intake) — prepare the reply for human review & send instead. _(safety — do first)_
+- **B. Margin 5% default at ingest** across the three ingestors (trader override preserved).
+- **C. Direct-mail trust guard** — hold Blacklisted/Unknown-trust suppliers when mail is
+  not forwarded by Anil. _(only bites if direct inbound starts)_
+
+**New capabilities to build:**
+1. **Prove the Excel spine** — re-forward Halıtlar; confirm offers land. _(pending you)_
+2. **Essential-field gate** — require name + pack/size + price+currency + incoterm; rest → Needs-Review.
+3. **Annika missing-info queue** — surface offers missing qty / lead time / BBD / cases-per-pallet (non-blocking).
+4. **End-of-day sweep** — `Process_Akay` → `Processed-Akay` daily.
+5. **PDF offer parsing.**
+6. **Image (vision) offer parsing.**
+7. **WhatsApp buyer-inquiry path.**
+
+_"Build order" = simply the sequence I tackle these in. Recommended:_
+**A (safety) → 1 (validate) → B → 2 → 3 → 4 → 5 → 6 → 7.**
 
 ---
 
