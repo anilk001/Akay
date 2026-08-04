@@ -7,13 +7,12 @@ name: Scheduled catalogue refresh
 # empty commit on a schedule — each one triggers a fresh Netlify build that
 # re-fetches the full live catalogue. No dashboard, no secrets, no build hook.
 #
-# Runs 3x/day (well within Netlify's free build minutes). Adjust the cron below
-# to refresh more or less often. You can also trigger it by hand from the
-# Actions tab (Run workflow).
+# Runs hourly (24x/day). Adjust the cron below to refresh more or less often.
+# You can also trigger it by hand from the Actions tab (Run workflow).
 
 on:
   schedule:
-    - cron: '0 */4 * * *'   # every 4 hours (~6x/day) — stays within Netlify's free build minutes
+    - cron: '0 * * * *'   # every hour (24x/day) — check this stays within Netlify's free build minutes
   workflow_dispatch: {}
 
 permissions:
