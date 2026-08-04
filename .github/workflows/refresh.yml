@@ -3,26 +3,20 @@ name: Scheduled catalogue refresh
 # Keeps offers.akay.ie current with Airtable.
 #
 # The site is a static build, so it reflects Airtable as of the last deploy.
-# This workflow POSTs to a Netlify Build Hook on a schedule — each hit triggers
-# a fresh Netlify build that re-fetches the full live catalogue. No empty
-# commits, no repo write access; the branch that gets built is whatever the
-# Build Hook is configured for in Netlify.
-#
-# Setup: create a Build Hook in Netlify (Site configuration → Build & deploy →
-# Build hooks), then add its URL as a repository secret named
-# NETLIFY_BUILD_HOOK_URL (Settings → Secrets and variables → Actions).
+# Netlify redeploys automatically on every push, so this workflow makes an
+# empty commit on a schedule — each one triggers a fresh Netlify build that
+# re-fetches the full live catalogue. No dashboard, no secrets, no build hook.
 #
 # Runs hourly (24x/day). Adjust the cron below to refresh more or less often.
 # You can also trigger it by hand from the Actions tab (Run workflow).
 
 on:
   schedule:
-    - cron: '0 * * * *'   # every hour (24x/day) — check this stays within your host's free build minutes
+    - cron: '0 * * * *'   # every hour (24x/day) — check this stays within Netlify's free build minutes
   workflow_dispatch: {}
 
-# No repo write access needed — we only call an external webhook.
 permissions:
-  contents: read
+  contents: write
 
 # If several runs overlap, keep only the latest.
 concurrency:
@@ -33,13 +27,14 @@ jobs:
   refresh:
     runs-on: ubuntu-latest
     steps:
-      - name: Trigger a Netlify rebuild via the Build Hook
-        env:
-          BUILD_HOOK_URL: ${{ secrets.NETLIFY_BUILD_HOOK_URL }}
+      - name: Check out the site branch
+        uses: actions/checkout@v4
+        with:
+          ref: claude/softr-webflow-migration-50kj20
+
+      - name: Trigger a rebuild via an empty commit
         run: |
-          if [ -z "$BUILD_HOOK_URL" ]; then
-            echo "::error::NETLIFY_BUILD_HOOK_URL secret is not set. Add it in Settings → Secrets and variables → Actions."
-            exit 1
-          fi
-          curl -fsS --retry 4 --retry-delay 5 -X POST -d '{}' "$BUILD_HOOK_URL"
-          echo "Build hook triggered — Netlify will rebuild and republish shortly."
+          git config user.name "akay-refresh-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git commit --allow-empty -m "chore: scheduled catalogue refresh"
+          git push origin HEAD:claude/softr-webflow-migration-50kj20
