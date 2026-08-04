@@ -121,11 +121,34 @@ and a description explaining why it is safe to delete. In the **Offers** table:
 3. **Delete the `Akay Offers (Copy)` base** (`appLSPWjZd2R0e8p4`) — a stale duplicate;
    daily backups make it redundant.
 
+## Price Intelligence (new feature — built & activated 2026-08-04)
+
+The six price-comparison fields (`Is Cheapest`, `Cheaper By 5%+`, `Price Delta %`,
+`Best Comparable Price`, `Price Beat Opportunity`, `Alert Sent`) were only ever
+*placeholders* — no workflow computed them (the logic lived in old Tasklet and was
+never rebuilt). A new n8n workflow now computes them.
+
+- **Workflow:** `Price Intelligence — Akay` (`5VTOa4DvuZx0lyCi`), hourly, active.
+- **Comparison:** for each Live offer, finds other Live offers of the **same canonical
+  Product** (via the Products link — the only reliable cross-supplier identity, since
+  suppliers name products differently), **same currency**, same pricing basis
+  (Price Type + PCS/Case). Compares the best price per *other* supplier.
+- **Fields set:** Best Comparable Price (lowest competing price), Price Delta %
+  (negative = we're cheaper), Is Cheapest, Cheaper By 5%+ (beats best competitor by ≥5%),
+  Price Beat Opportunity (a competitor is ≥5% cheaper). All cleared when there is no
+  reliable competitor. Diff-based writes (no hourly churn).
+- **Alert:** one summary email to ak@akay.ie when a new offer is a ≥5%-cheaper standout
+  deal; `Alert Sent` is the set-once idempotency flag.
+- **Currency:** compared within a single currency only (no FX guessing).
+- **Dependency / ramp-up:** relies on the Products link being populated, which the
+  re-enabled `Link Offers To Products` job backfills (was ~10% at build time). Until that
+  completes, Price Intelligence correctly finds few/no comparable pairs and stays quiet —
+  it ramps up automatically as linking fills in, with **zero false alerts** in the interim.
+  Verified across three manual test runs; an early loose version produced false "−96%"
+  deals from incomplete rows, which is why comparison now requires Product link + currency
+  + price basis + supplier all present.
+
 ## Candidates NOT touched (need a decision before removal)
-- **Price-intelligence cluster** on Offers — `Is Cheapest`, `Cheaper By 5%+`,
-  `Price Delta %`, `Best Comparable Price`, `Price Beat Opportunity`, `Alert Sent`.
-  Still initialised by WhatsApp ingestion; part of a price-comparison feature. Removing
-  them safely means retiring that feature first.
 - **Offers Sent Log** two-stage fields — `Send Approval Status`, `Stage 1 Approved At`,
   `Stage 2 Approved At`. Left in place because the dispatch `Write Sent Log` step may
   still map them; verify that first.
