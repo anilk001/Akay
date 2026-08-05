@@ -87,18 +87,23 @@ and ready for a human to publish; each still needs the manual `Listing Approved`
 tick to appear on the site. The 1 genuinely-held offer (`Pending — No Response`)
 was left untouched.
 
-**To surface what's awaiting publish** (Airtable views can't be created via API —
-create this view by hand, or ask for the digest workflow below):
-filter Offers where `Status = Live` AND `Offer Approval Status = Approved` AND
-`Is Expired = No` AND `Listing Approved` is unchecked → that is the "ready,
-awaiting website publish" queue. Optional: a small daily n8n report emailing that
-list to ak@akay.ie so nothing sits unnoticed.
+**Awaiting-publish digest (built).** New workflow **"Awaiting Website Publish —
+Daily Digest"** (`OcLUsD6PAtSgI37q`, active, 08:00 Europe/Dublin, error handler
+attached) queries Offers where `Status=Live` AND `Offer Approval Status=Approved`
+AND `Is Expired=No` AND `Listing Approved` unchecked, and emails the list to
+**info@akay.ie** for Annika to publish (ticking `Listing Approved`). It only emails
+when the queue is non-empty. First run delivered a 33-offer digest successfully.
+The manual publish gate is retained by choice.
 
 ## Open items
 
 1. **(optional) Auto-publish policy.** Manual `Listing Approved` gate retained by
    choice. If trusted offers should ever publish hands-free, have ingestion tick
-   `Listing Approved` for auto-approved offers — not done, by request. The public site
+   `Listing Approved` for auto-approved offers — not done, by request.
+
+2. **(optional) Approval-at-ingestion check.** The 33 slipped through with a blank
+   Offer Approval Status on 2026-08-04; worth confirming ingestion reliably sets
+   it for trusted suppliers so the queue doesn't refill from the same bug. The public site
    (`offers.akay.ie`) is a static Astro build that reads Airtable at build time,
    and `Public Listing` also requires the manual **Listing Approved** tick +
    `Offer Approval Status = Approved`. So "everything looks ready" but not shown
