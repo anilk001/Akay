@@ -67,9 +67,38 @@ Established ground truth from Airtable (**14 tables**) and mechanically checked
   Clients, WhatsApp Log, Offers Sent Log, Communications Log, Backup Registry,
   Contacts) validated clean.
 
+## Website publish gap (#6) — diagnosed & fixed
+
+The site rebuilds hourly (GitHub Action empty-commit → Netlify) and shows offers
+where the `Public Listing` formula = `Yes`. Measured the real gap:
+
+- **1,184 Live offers are public** (site working). **34 Live offers were stuck.**
+- Every stuck offer failed on **one** gate: `Offer Approval Status ≠ Approved`
+  (`Listing Approved` was ticked on all approved offers, so it was not the
+  blocker). `Live+Approved` = `Live+Public` = 1,184 exactly.
+- **33 of the 34** came from **trusted suppliers** (Kollaras = Trust High,
+  premierexports = Medium, Marco Polo = High) but had a **blank** Offer Approval
+  Status — i.e. the documented "Trust High/Medium/Low → auto-approve on
+  ingestion" rule had not been applied to them. That was the bug.
+
+**Fix applied (per Anil's choice — approve only, keep the manual publish gate):**
+set `Offer Approval Status = Approved` on those 33. They are now dispatch-eligible
+and ready for a human to publish; each still needs the manual `Listing Approved`
+tick to appear on the site. The 1 genuinely-held offer (`Pending — No Response`)
+was left untouched.
+
+**To surface what's awaiting publish** (Airtable views can't be created via API —
+create this view by hand, or ask for the digest workflow below):
+filter Offers where `Status = Live` AND `Offer Approval Status = Approved` AND
+`Is Expired = No` AND `Listing Approved` is unchecked → that is the "ready,
+awaiting website publish" queue. Optional: a small daily n8n report emailing that
+list to ak@akay.ie so nothing sits unnoticed.
+
 ## Open items
 
-1. **Website "ready in Airtable but not published" (#6).** The public site
+1. **(optional) Auto-publish policy.** Manual `Listing Approved` gate retained by
+   choice. If trusted offers should ever publish hands-free, have ingestion tick
+   `Listing Approved` for auto-approved offers — not done, by request. The public site
    (`offers.akay.ie`) is a static Astro build that reads Airtable at build time,
    and `Public Listing` also requires the manual **Listing Approved** tick +
    `Offer Approval Status = Approved`. So "everything looks ready" but not shown
