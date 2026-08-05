@@ -1,0 +1,111 @@
+{
+  "id": "eXGO9tGgutIxneYS",
+  "name": "Excel Requirement Intake",
+  "active": true,
+  "settings": { "executionOrder": "v1", "availableInMCP": true },
+  "connections": {
+    "Requirement List Email": { "main": [[{ "node": "Read Requirement Sheet", "type": "main", "index": 0 }]] },
+    "Read Requirement Sheet": { "main": [[{ "node": "Send Eligible Offers", "type": "main", "index": 0 }]] },
+    "Send Eligible Offers": { "main": [[{ "node": "Match Requirements to Offers", "type": "main", "index": 0 }]] },
+    "Match Requirements to Offers": { "main": [[{ "node": "Log Requirement Enquiry", "type": "main", "index": 0 }]] },
+    "Log Requirement Enquiry": { "main": [[{ "node": "Reply With Quoted Prices", "type": "main", "index": 0 }]] }
+  },
+  "nodes": [
+    {
+      "id": "be38dd79-a178-4b92-ae03-c88b51abae28",
+      "name": "Requirement List Email",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.4,
+      "position": [0, 0],
+      "parameters": {
+        "pollTimes": { "item": [{ "mode": "everyX", "value": 15, "unit": "minutes" }] },
+        "simple": false,
+        "filters": { "q": "has:attachment subject:\"requirement list\"", "readStatus": "unread" },
+        "options": { "downloadAttachments": true }
+      }
+    },
+    {
+      "id": "4173c2a9-2b88-42cb-bb40-8ab8400a2318",
+      "name": "Read Requirement Sheet",
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [224, 0],
+      "parameters": { "operation": "xlsx", "binaryPropertyName": "attachment_0", "options": { "headerRow": true, "includeEmptyCells": true } }
+    },
+    {
+      "id": "433e9259-1db2-4237-9429-41758a4e172d",
+      "name": "Send Eligible Offers",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [448, 0],
+      "parameters": {
+        "resource": "record",
+        "operation": "search",
+        "base": { "__rl": true, "mode": "id", "value": "appaDSdZkAE9PGkjT" },
+        "table": { "__rl": true, "mode": "id", "value": "tbljBgWrnIMZzkSAr", "cachedResultName": "Offers" },
+        "filterByFormula": "{Send Eligible}='Yes'",
+        "returnAll": true,
+        "options": { "fields": ["Public Product Description", "Brand", "Product Name", "Price Per Unit & Case", "Public Terms", "Stock Display"] }
+      },
+      "executeOnce": true,
+      "alwaysOutputData": true
+    },
+    {
+      "id": "aa735491-cccb-4473-9118-94b894343536",
+      "name": "Match Requirements to Offers",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [672, 0],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "function normName(raw){\n  if(!raw) return '';\n  let s = String(raw).toLowerCase();\n  s = s.replace(/[.,\\-'\"()]/g,' ');\n  s = s.replace(/\\s+/g,' ').trim();\n  return s;\n}\nfunction bigrams(s){ const out=[]; for(let i=0;i<s.length-1;i++) out.push(s.substring(i,i+2)); return out; }\nfunction diceCoeff(a,b){\n  if(!a || !b) return 0;\n  const A=bigrams(a), B=bigrams(b);\n  if(A.length===0 || B.length===0) return a===b?1:0;\n  const mapB={};\n  B.forEach(bg=>{ mapB[bg]=(mapB[bg]||0)+1; });\n  let matches=0;\n  A.forEach(bg=>{ if(mapB[bg]>0){ matches++; mapB[bg]--; } });\n  return (2*matches)/(A.length+B.length);\n}\nconst af = it => { const j=(it&&it.json)||{}; return { id:j.id, f:(j.fields||j) }; };\nconst offers = $('Send Eligible Offers').all().map(af).filter(x=>x.id).map(({id,f})=>({ id, desc: f['Public Product Description']||((f['Brand']||'')+' '+(f['Product Name']||'')), norm: normName((f['Brand']||'')+' '+(f['Product Name']||'')), price: f['Price Per Unit & Case']||'', terms: f['Public Terms']||'', stock: f['Stock Display']||'' }));\n\nconst rows = $('Read Requirement Sheet').all().map(it=>it.json);\nconst results = [];\nrows.forEach(row=>{\n  const brand = row['Brand']||row['brand']||'';\n  const product = row['Product Name']||row['Product']||row['product']||'';\n  const qty = row['Quantity']||row['Qty']||row['quantity']||'';\n  const wanted = normName(brand+' '+product);\n  if(!wanted){ return; }\n  let best=null,bestScore=0;\n  offers.forEach(o=>{ const s=diceCoeff(wanted,o.norm); if(s>bestScore){bestScore=s;best=o;} });\n  if(best && bestScore>=0.6){\n    results.push({ requested: (brand+' '+product).trim(), qty, matched:true, matchDesc:best.desc, price:best.price, terms:best.terms, stock:best.stock, score:Math.round(bestScore*100) });\n  } else {\n    results.push({ requested: (brand+' '+product).trim(), qty, matched:false });\n  }\n});\n\nconst matchedLines = results.filter(r=>r.matched).map(r=> r.requested + (r.qty?(' (qty '+r.qty+')'):'') + ' -> ' + r.matchDesc + ' - ' + r.price + (r.terms?(' - '+r.terms):'') + (r.stock?(' ['+r.stock+']'):''));\nconst unmatchedLines = results.filter(r=>!r.matched).map(r=> r.requested + (r.qty?(' (qty '+r.qty+')'):''));\n\nreturn [{ json: {\n  matchedCount: matchedLines.length,\n  unmatchedCount: unmatchedLines.length,\n  matchedText: matchedLines.length ? matchedLines.join('\\n') : '(none matched automatically)',\n  unmatchedText: unmatchedLines.length ? unmatchedLines.join('\\n') : '(none)',\n  allRequestedText: results.map(r=>r.requested).join(', ')\n} }];\n"
+      }
+    },
+    {
+      "id": "abb68043-831e-4142-98ae-5c675534e0c8",
+      "name": "Log Requirement Enquiry",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [896, 0],
+      "parameters": {
+        "resource": "record",
+        "operation": "create",
+        "base": { "__rl": true, "mode": "id", "value": "appaDSdZkAE9PGkjT" },
+        "table": { "__rl": true, "mode": "id", "value": "tblgZUj1JeGyHXmcx", "cachedResultName": "Enquiries" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Channel": "Email",
+            "Enquiry Date": "={{ $now.toISO() }}",
+            "Requested Brands": "={{ $json.allRequestedText }}",
+            "Enquiry Notes": "={{ \"Auto-matched: \" + $json.matchedCount + \" of \" + ($json.matchedCount + $json.unmatchedCount) + \". Unmatched lines need manual pricing:\\n\" + $json.unmatchedText }}",
+            "Source Email Subject": "={{ $(\"Requirement List Email\").first().json.subject }}",
+            "Source Email Thread ID": "={{ $(\"Requirement List Email\").first().json.threadId }}"
+          }
+        },
+        "options": { "typecast": true }
+      }
+    },
+    {
+      "id": "db754c41-c654-493e-8892-b2efc3bd8a5b",
+      "name": "Reply With Quoted Prices",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [1120, 0],
+      "parameters": {
+        "resource": "message",
+        "operation": "reply",
+        "messageId": "={{ $(\"Requirement List Email\").first().json.id }}",
+        "message": "={{ \"Thanks for sending your requirement list.\\n\\nPriced automatically from our current live offers:\\n\\n\" + $(\"Match Requirements to Offers\").first().json.matchedText + \"\\n\\nStill checking on:\\n\" + $(\"Match Requirements to Offers\").first().json.unmatchedText + \"\\n\\nSomeone from our team will follow up on those shortly.\\n\\nBest regards,\\nAkay Irl Ltd\" }}",
+        "options": { "appendAttribution": false }
+      },
+      "webhookId": "b53d9966-ead6-4639-9216-bbd220fb0ef0"
+    }
+  ],
+  "_backupMeta": {
+    "versionId": "cb49b559-4e8a-4a13-8297-fab16a924fa6",
+    "capturedAt": "2026-08-05",
+    "note": "Pre-change snapshot of live workflow, captured before applying blueprint edits."
+  }
+}

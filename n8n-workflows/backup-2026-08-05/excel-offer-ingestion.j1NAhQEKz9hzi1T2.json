@@ -1,0 +1,1688 @@
+{
+  "id": "j1NAhQEKz9hzi1T2",
+  "name": "Excel Offer Ingestion — Akay",
+  "active": true,
+  "isArchived": false,
+  "versionId": "5b4a4ea6-19a9-4b93-a3a5-def1d2b57ac6",
+  "activeVersionId": "5b4a4ea6-19a9-4b93-a3a5-def1d2b57ac6",
+  "triggerCount": 1,
+  "createdAt": "2026-07-30T05:29:47.889Z",
+  "updatedAt": "2026-08-04T15:28:17.548Z",
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": true,
+    "errorWorkflow": "OnCFbngmILTKsdkw",
+    "executionTimeout": 1800
+  },
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Select Spreadsheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Select Spreadsheets": {
+      "main": [
+        [
+          {
+            "node": "Extract From File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract From File": {
+      "main": [
+        [
+          {
+            "node": "Read Workbook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Workbook": {
+      "main": [
+        [
+          {
+            "node": "Detect Header",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Detect Header": {
+      "main": [
+        [
+          {
+            "node": "Find Sheet Profile",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Sheet Profile": {
+      "main": [
+        [
+          {
+            "node": "Match Profile",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Match Profile": {
+      "main": [
+        [
+          {
+            "node": "Profile Found?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Profile Found?": {
+      "main": [
+        [
+          {
+            "node": "Normalize Rows",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Build Mapping Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Rows": {
+      "main": [
+        [
+          {
+            "node": "Fetch Products",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Airtable Payload": {
+      "main": [
+        [
+          {
+            "node": "Has Creates?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Creates?": {
+      "main": [
+        [
+          {
+            "node": "Expand Offers",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mark Excel Done",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Expand Offers": {
+      "main": [
+        [
+          {
+            "node": "Create Offers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Offers": {
+      "main": [
+        [
+          {
+            "node": "Mark Excel Done",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Mapping Prompt": {
+      "main": [
+        [
+          {
+            "node": "Map Columns (LLM)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map Columns (LLM)": {
+      "main": [
+        [
+          {
+            "node": "Save Profile",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Profile": {
+      "main": [
+        [
+          {
+            "node": "Normalize Rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Products": {
+      "main": [
+        [
+          {
+            "node": "Fetch Suppliers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Suppliers": {
+      "main": [
+        [
+          {
+            "node": "Fetch Ingested Message IDs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Ingested Message IDs": {
+      "main": [
+        [
+          {
+            "node": "Resolve Supplier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resolve Supplier": {
+      "main": [
+        [
+          {
+            "node": "Need Supplier?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Need Supplier?": {
+      "main": [
+        [
+          {
+            "node": "Create Missing Supplier",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Merge Supplier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Missing Supplier": {
+      "main": [
+        [
+          {
+            "node": "Merge Supplier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Supplier": {
+      "main": [
+        [
+          {
+            "node": "Build Airtable Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {
+          "q": "label:Process_Akay has:attachment -label:Akay/Excel-Done"
+        },
+        "options": {
+          "downloadAttachments": true
+        }
+      },
+      "id": "bb510921-66fb-4e45-974a-282717996e02",
+      "name": "Gmail Trigger",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "/**\n * n8n Code node — \"Select Spreadsheets\"\n * Mode: Run Once for All Items\n *\n * Hardened 2026-08-04. Emits ONE item per SPREADSHEET attachment and nothing\n * else. Selection is by file extension (.xlsx/.xlsm/.xltx/.xls/.csv/.tsv,\n * case-insensitive, with trailing spaces/dots tolerated so\n * \"3.08.2026 P&G .xlsx\" and non-ASCII names like\n * \"Ağustos-Nestle_FiyatListesi.xlsx\" are kept) OR by spreadsheet MIME type\n * (for a mangled or missing filename). Inline images (image001.jpg signature\n * logos) and every other non-spreadsheet part are dropped. There is NO cap —\n * every matching attachment on the message is processed.\n */\n\nconst SPREADSHEET_EXT = /\\.(xlsx|xlsm|xltx|xls|csv|tsv)\\s*$/i;\nconst IMAGE_EXT = /\\.(jpe?g|png|gif|bmp|svg|webp|tiff?|heic|ico)\\s*$/i;\nconst SPREADSHEET_MIME = /(spreadsheetml|ms-excel|excel|csv|tab-separated|vnd\\.oasis\\.opendocument\\.spreadsheet)/i;\nconst IMAGE_MIME = /^image\\//i;\n\nconst out = [];\nconst skipped = [];\n\nfor (const item of $input.all()) {\n  const binaries = item.binary || {};\n\n  for (const [binaryKey, binary] of Object.entries(binaries)) {\n    const rawName = binary && typeof binary.fileName === 'string' ? binary.fileName : '';\n    const name = String(rawName || binaryKey).trim();\n    const mime = String((binary && binary.mimeType) || '').trim();\n\n    // Inline images and signature logos: never treat these as spreadsheets.\n    const isImage = IMAGE_EXT.test(name) || IMAGE_MIME.test(mime);\n    const isSpreadsheet = !isImage && (SPREADSHEET_EXT.test(name) || SPREADSHEET_MIME.test(mime));\n\n    if (isSpreadsheet) {\n      out.push({\n        json: {\n          binaryKey,\n          fileName: name,\n          mimeType: mime,\n          messageId: item.json.id || item.json.messageId || null,\n          threadId: item.json.threadId || null,\n          subject: item.json.subject || '',\n          from: item.json.from || '',\n        },\n        binary: { [binaryKey]: binary },\n      });\n    } else {\n      skipped.push(name || binaryKey);\n    }\n  }\n}\n\nif (skipped.length) {\n  console.log(`Select Spreadsheets: kept ${out.length}, skipped ${skipped.length} non-spreadsheet part(s): ${skipped.join(', ')}`);\n}\n\nreturn out;\n"
+      },
+      "id": "4214e36b-2e4e-4173-931e-f68a532ee334",
+      "name": "Select Spreadsheets",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "binaryPropertyName": "={{ $json.binaryKey }}",
+        "options": {
+          "headerRow": false,
+          "includeEmptyCells": true,
+          "rawData": true
+        }
+      },
+      "id": "dd4508e4-e63a-4f39-94b4-34bf73c0259e",
+      "name": "Extract From File",
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        448,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "/**\n * n8n Code node — \"Read Workbook\"\n * Mode: Run Once for All Items\n */\n\nconst GMAIL_NODE = 'Gmail Trigger';\n\nlet meta = {};\ntry {\n  const g = $(GMAIL_NODE).first().json;\n  const body = String(g.text || g.textAsHtml || g.html || g.snippet || '');\n  const envelope = extractEmail(g.from ?? g.From ?? '');\n  const forwarded = forwardedSender(body);\n  const effective = (forwarded && forwarded.address) || envelope.address || '';\n  const domain = (effective.split('@')[1] || '').toLowerCase();\n  meta = {\n    sourceMessageId: g.id || g.messageId || null,\n    threadId: g.threadId || null,\n    fromAddress: effective,\n    envelopeFrom: envelope.address || '',\n    forwardedFrom: forwarded ? forwarded.address : '',\n    senderName: (forwarded && forwarded.name) || envelope.name || '',\n    senderDomain: domain,\n    senderFromForward: Boolean(forwarded),\n    externalSender: Boolean(effective) && /@/.test(effective) && !/@akay\\.ie$/i.test(effective),\n    subject: g.subject || g.Subject || '',\n  };\n} catch (e) {\n  meta = { sourceMessageId: null, threadId: null, fromAddress: '', envelopeFrom: '', forwardedFrom: '', senderName: '', senderDomain: '', senderFromForward: false, externalSender: false, subject: '' };\n}\n\nconst items = $input.all();\nif (items.length === 0) return [];\n\nconst rows = items.map((item) => toCellArray(item.json)).filter((r) => r.length > 0);\nif (rows.length < 2) return [];\n\nwhile (rows.length && rows[rows.length - 1].every((c) => String(c ?? '').trim() === '')) rows.pop();\n\nreturn [{\n  json: {\n    ...meta,\n    fileName: fileNameFor(items[0]),\n    sheetName: sheetNameFor(),\n    rows,\n    rowCount: rows.length,\n  },\n}];\n\nfunction toCellArray(json) {\n  if (!json || typeof json !== 'object') return [];\n\n  if (Array.isArray(json.row)) return json.row.map(cell);\n\n  const indexed = Object.keys(json)\n    .map((k) => ({ k, i: parseIndex(k) }))\n    .filter((x) => x.i !== null)\n    .sort((a, b) => a.i - b.i);\n\n  if (indexed.length) {\n    const out = [];\n    for (const { k, i } of indexed) out[i] = cell(json[k]);\n    return Array.from(out, (v) => v ?? '');\n  }\n\n  return Object.values(json).map(cell);\n}\n\nfunction parseIndex(key) {\n  const m = String(key).match(/^(?:row_|col_|column_)?(\\d+)$/i);\n  return m ? Number(m[1]) : null;\n}\n\nfunction cell(v) {\n  if (v === null || v === undefined) return '';\n  if (v instanceof Date) return v;\n  return String(v);\n}\n\nfunction fileNameFor(item) {\n  const j = item.json || {};\n  if (j.fileName) return j.fileName;\n  const bin = item.binary && Object.values(item.binary)[0];\n  if (bin && bin.fileName) return bin.fileName;\n  try {\n    const g = $(GMAIL_NODE).first();\n    const gb = g.binary && Object.values(g.binary)[0];\n    if (gb && gb.fileName) return gb.fileName;\n  } catch (e) { /* trigger unavailable — fall through */ }\n  return 'unknown.xlsx';\n}\n\nfunction sheetNameFor() {\n  try {\n    const n = $('Extract From File');\n    const name = n.params && (n.params.options?.sheetName || n.params.sheetName);\n    if (name) return String(name);\n  } catch (e) { /* not resolvable at runtime */ }\n  return 'Sheet1';\n}\n\n/**\n * Envelope sender as { address, name }. Gmail Trigger (simple:false) delivers\n * `from` as an OBJECT ({ value:[{address,name}], text, html }); the old code\n * String()-ified that to \"[object object]\", so supplier resolution by sender\n * never matched. Both the object and the raw \"Name <addr>\" string are handled.\n */\nfunction extractEmail(raw) {\n  if (raw && typeof raw === 'object') {\n    const v = Array.isArray(raw.value) ? raw.value[0] : null;\n    if (v && v.address) return { address: String(v.address).trim().toLowerCase(), name: String(v.name || '').trim() };\n    return parseAddr(String(raw.text || raw.html || ''));\n  }\n  return parseAddr(String(raw));\n}\n\nfunction parseAddr(s) {\n  const m = String(s).match(/<([^>]+)>/);\n  const address = (m ? m[1] : String(s)).trim().toLowerCase();\n  let name = '';\n  const nm = String(s).match(/^\\s*\"?([^\"<]+?)\"?\\s*</);\n  if (nm) name = nm[1].trim();\n  return { address, name };\n}\n\n/**\n * Real supplier from a FORWARDED body header. Offers arrive forwarded into\n * ak@akay.ie / offers@akay.ie, so the envelope sender is the forwarder, not the\n * supplier — the supplier sits in the \"From:\" line under the forward marker.\n * Returns { address, name } or null; null when the address is our own akay.ie\n * (a forward of our own mail is not a supplier), so we never auto-create from it.\n */\nfunction forwardedSender(text) {\n  const src = String(text);\n  const fwd = src.match(/-{2,}\\s*(?:Forwarded|Original)\\s*message\\s*-{2,}/i)\n           || src.match(/Begin forwarded message:/i);\n  if (!fwd || fwd.index === undefined) return null;\n  const header = src.slice(fwd.index, fwd.index + 800);\n  const m = header.match(/\\n\\s*\\*?\\s*From:\\s*\\*?\\s*(.*?)([^\\s<>\"]+@[^\\s<>\"]+\\.[a-z]{2,})/i);\n  if (!m) return null;\n  const address = m[2].toLowerCase().replace(/[.,;>]+$/, '');\n  if (/@akay\\.ie$/i.test(address)) return null;\n  const name = String(m[1] || '').replace(/[<\"]/g, '').replace(/[-–\\s]+$/, '').trim();\n  return { address, name };\n}\n"
+      },
+      "id": "edd7282d-be06-4232-a2c7-1453661c8f69",
+      "name": "Read Workbook",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "/**\n * n8n Code node — \"Detect Header\"\n * Mode: Run Once for All Items\n *\n * Splits each worksheet into SECTIONS and emits one item per section.\n */\n\nconst HEADER_MIN_SCORE = 3;\nconst MAX_CONTINUATION_ROWS = 2;\n\nconst HEADER_HINTS = [\n  'product', 'description', 'brand', 'article', 'item', 'name',\n  'price', 'eur', 'usd', 'cost', 'ppc', 'euro',\n  'case', 'carton', 'ctn', 'pcs', 'units', 'pack', 'qty', 'quantity', 'stock', 'available',\n  'volume', 'size', 'cl', 'ml', 'ltr', 'litre', 'content',\n  'abv', 'alc', 'vol',\n  'origin', 'country', 'ean', 'barcode', 'sku', 'code',\n  'bond', 'customs', 'status', 't1', 't2', 'duty', 'incoterm', 'warehouse', 'delivery',\n  'bbd', 'expiry', 'best before', 'moq', 'pallet', 'lead', 'variant', 'comment',\n];\n\nconst out = [];\n\nfor (const input of $input.all()) {\n  const item = input.json;\n  const rows = item.rows || [];\n\n  const sections = [];\n  let i = 0;\n  while (i < rows.length) {\n    if (scoreAsHeader(rows[i], rows[i + 1]) < HEADER_MIN_SCORE) { i++; continue; }\n\n    let headerCells = (rows[i] || []).map((c) => String(c ?? '').trim());\n    let consumed = i;\n    for (let n = 1; n <= MAX_CONTINUATION_ROWS; n++) {\n      if (!isContinuationRow(rows[i + n], headerCells)) break;\n      headerCells = mergeHeaderRow(headerCells, rows[i + n]);\n      consumed = i + n;\n    }\n\n    sections.push({ start: i, consumed, headerCells });\n    i = consumed + 1;\n  }\n\n  if (sections.length === 0) {\n    out.push({ json: { ...item, rows: undefined, headerFound: false,\n      exceptionReason: `No header row detected in \"${item.sheetName}\"` } });\n    continue;\n  }\n\n  sections.forEach(({ start, consumed, headerCells }, s) => {\n    const end = s + 1 < sections.length ? sections[s + 1].start : rows.length;\n    const dataRows = rows.slice(consumed + 1, end)\n      .filter((r) => r.some((c) => String(c ?? '').trim() !== ''));\n\n    if (dataRows.length === 0) return;\n\n    if (!hasPriceColumn(headerCells)) {\n      out.push({ json: { ...item, rows: undefined, headerFound: false,\n        sectionLabel: sectionLabel(headerCells),\n        headerSample: headerCells.filter(Boolean).join(' | '),\n        exceptionReason: `Section at row ${start} of \"${item.sheetName}\" has no price column — treated as a non-offer block` } });\n      return;\n    }\n\n    out.push({\n      json: {\n        ...item,\n        rows: undefined,\n        headerFound: true,\n        sectionIndex: s,\n        sectionCount: sections.length,\n        sectionLabel: sectionLabel(headerCells),\n        headerRowIndex: start,\n        dataStartRow: consumed + 1,\n        headerCells,\n        dataRows,\n        rowCount: dataRows.length,\n        fingerprint: fingerprint(headerCells),\n        headerSample: headerCells.filter(Boolean).join(' | '),\n        sampleRows: dataRows.slice(0, 5),\n      },\n    });\n  });\n}\n\nreturn out;\n\nfunction scoreAsHeader(row, next) {\n  if (!Array.isArray(row)) return 0;\n\n  const cells = row.map((c) => String(c ?? '').trim()).filter(Boolean);\n  if (cells.length < 3) return 0;\n\n  const numeric = cells.filter(isNumericish).length;\n  if (numeric >= 2) return 0;\n\n  let score = Math.min(cells.length, 8) * 0.5;\n\n  for (const cell of cells) {\n    const lower = cell.toLowerCase();\n    if (HEADER_HINTS.some((h) => lower.includes(h))) score += 1.5;\n  }\n\n  score -= numeric * 1.5;\n\n  if (Array.isArray(next)) {\n    const nextCells = next.map((c) => String(c ?? '').trim()).filter(Boolean);\n    if (nextCells.length >= 3 && nextCells.some(isNumericish)) score += 2;\n  }\n\n  return score;\n}\n\nfunction isContinuationRow(row, header) {\n  if (!Array.isArray(row)) return false;\n\n  const cells = row.map((c) => String(c ?? '').trim());\n  const filled = cells.filter(Boolean);\n  if (filled.length < 2) return false;\n  if (filled.length > header.filter(Boolean).length) return false;\n  if (filled.some(isNumericish)) return false;\n\n  return filled.filter((c) => c.length <= 15).length >= Math.ceil(filled.length / 2);\n}\n\nfunction mergeHeaderRow(header, contRow) {\n  const cont = (contRow || []).map((c) => String(c ?? '').trim());\n  const width = Math.max(header.length, cont.length);\n  const merged = [];\n\n  for (let i = 0; i < width; i++) {\n    const base = header[i] || '';\n    const sub = cont[i] || '';\n    merged.push(sub && sub.length <= 15 ? `${base} ${sub}`.trim() : base);\n  }\n  return merged;\n}\n\nfunction sectionLabel(headerCells) {\n  const generic = /^(qty|quantity|cartons?|available|description|product|item)\\b/i;\n  const candidate = headerCells.find((c) => c && c.length <= 30 && !generic.test(c) && !/^\\d/.test(c));\n  return candidate || headerCells.find(Boolean) || '';\n}\n\nfunction hasPriceColumn(headerCells) {\n  const PRICE_TOKENS = ['price', 'euro', 'eur', 'usd', 'gbp', 'cost', 'prijs', 'prezzo', '€', '$', '£'];\n  return headerCells.some((c) => {\n    const lower = String(c || '').toLowerCase();\n    return PRICE_TOKENS.some((t) => lower.includes(t));\n  });\n}\n\nfunction isNumericish(v) {\n  const s = String(v).replace(/[\\s€$£,]/g, '');\n  return s !== '' && !Number.isNaN(Number(s.replace(',', '.')));\n}\n\nfunction fingerprint(cells) {\n  const norm = cells\n    .filter((c) => c && !isNumericish(c))\n    .map((c) => c.toLowerCase().replace(/[^a-z0-9]/g, ''))\n    .filter(Boolean)\n    .sort();\n  return 'h' + djb2(norm.join('~')).toString(16).padStart(8, '0');\n}\n\nfunction djb2(str) {\n  let h = 5381;\n  for (let i = 0; i < str.length; i++) {\n    h = ((h << 5) + h + str.charCodeAt(i)) >>> 0;\n  }\n  return h;\n}\n"
+      },
+      "id": "e08789d1-001a-47f1-b32c-6a7d2b04143b",
+      "name": "Detect Header",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appaDSdZkAE9PGkjT",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblnsxQlNDzpHhwfV",
+          "mode": "id"
+        },
+        "filterByFormula": "=AND({Status}=\"Active\",{Confidence}=\"High\")",
+        "options": {}
+      },
+      "id": "a8de4005-bdf6-4619-9485-03489f940d60",
+      "name": "Find Sheet Profile",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2,
+      "position": [
+        1104,
+        0
+      ],
+      "executeOnce": true,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "/**\n * n8n Code node — \"Match Profile\"\n * Mode: Run Once for All Items\n */\n\nconst sections = $('Detect Header').all();\nconst profileItems = $input.all();\n\nconst byFingerprint = new Map();\nfor (const p of profileItems) {\n  const rec = p.json || {};\n  const fp = rec['Header Fingerprint'];\n  if (fp && !byFingerprint.has(fp)) byFingerprint.set(fp, rec);\n}\n\nconst out = [];\nfor (const s of sections) {\n  const item = s.json || {};\n\n  if (!item.headerFound || !item.fingerprint) {\n    out.push({ json: { ...item, profileFound: false } });\n    continue;\n  }\n\n  const rec = byFingerprint.get(item.fingerprint);\n  if (!rec) {\n    out.push({ json: { ...item, profileFound: false } });\n    continue;\n  }\n\n  let columnMap = {};\n  let profileDefaults = {};\n  try { columnMap = JSON.parse(rec['Column Map'] || '{}'); } catch (e) {}\n  try { profileDefaults = JSON.parse(rec['Defaults'] || '{}'); } catch (e) {}\n\n  const supplierLink = rec['Supplier'];\n  const supplierRecordId = Array.isArray(supplierLink) && supplierLink.length ? supplierLink[0] : null;\n\n  out.push({\n    json: {\n      ...item,\n      profileFound: true,\n      profileId: rec.id || null,\n      columnMap,\n      profileDefaults,\n      supplierRecordId,\n      supplierValidityDays: rec['Validity Days'] ?? null,\n    },\n  });\n}\n\nreturn out;\n"
+      },
+      "id": "5cebc245-0a10-4369-a112-7c0e1856c40c",
+      "name": "Match Profile",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1216,
+        128
+      ],
+      "notesInFlow": true,
+      "notes": "Re-joins section data (from Detect Header) with the profiles fetched by Find Sheet Profile. The Airtable search replaces the item, so this restores dataRows/headerCells and attaches columnMap/profileDefaults."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "profile-found",
+              "leftValue": "={{ $json.profileFound }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "1c83e1b1-af91-4978-a79b-9de0aca70d08",
+      "name": "Profile Found?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1328,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "/**\n * n8n Code node — \"Normalize Rows\"\n * Mode: Run Once for Each Item\n */\n\nconst OPTIONS = {\n  currency: ['EUR', 'USD', 'GBP', 'AED', 'SGD', 'Other'],\n  unitType: ['Bottle', 'Can', 'Jar', 'Pack', 'Piece', 'Other'],\n  priceType: ['Per Case', 'Per Bottle', 'Per Can', 'Per Piece', 'Per Pack', 'Per Jar'],\n  bond: ['Bonded', 'T1', 'T2', 'Duty Paid', 'On Floor', 'Other'],\n  incoterm: ['EXW', 'FCA', 'FOB', 'CFR', 'CIF', 'DAP', 'DDP', 'Other'],\n  warehouse: ['Loendersloot', 'NL', 'Dubai', 'Poland', 'Riga', 'Spain', 'Vietnam',\n              'Greece', 'Indonesia', 'Czech', 'Other', 'NewCorp', 'Vergèze', 'Bergamo'],\n  category: ['Beer', 'Spirits', 'Champagne', 'Grocery', 'Confectionery',\n             'Toiletries', 'Soft Drinks', 'Other FMCG'],\n};\n\nconst VOLUME_UNIT_FACTOR = { ml: 1, cc: 1, cl: 10, dl: 100, l: 1000, ltr: 1000, litre: 1000 };\n\nconst pad = (v) => String(v).padStart(2, '0');\n\nconst SYNONYMS = {\n  currency: {\n    '€': 'EUR', eur: 'EUR', euro: 'EUR', euros: 'EUR',\n    $: 'USD', usd: 'USD', dollar: 'USD', usdollar: 'USD',\n    '£': 'GBP', gbp: 'GBP', pound: 'GBP', sterling: 'GBP',\n    aed: 'AED', dirham: 'AED', sgd: 'SGD',\n  },\n  bond: {\n    bond: 'Bonded', bonded: 'Bonded', underbond: 'Bonded', inbond: 'Bonded',\n    t1: 'T1', t2: 'T2', export: 'T1', eu: 'T2', community: 'T2',\n    dutypaid: 'Duty Paid', dp: 'Duty Paid', taxpaid: 'Duty Paid',\n    onfloor: 'On Floor', floor: 'On Floor', exstock: 'On Floor',\n  },\n  unitType: {\n    bottle: 'Bottle', btl: 'Bottle', flasche: 'Bottle', bouteille: 'Bottle',\n    can: 'Can', cans: 'Can', tin: 'Can',\n    jar: 'Jar', pack: 'Pack', pouch: 'Pack', piece: 'Piece', pcs: 'Piece', unit: 'Piece',\n  },\n  category: {\n    beer: 'Beer', lager: 'Beer', ale: 'Beer', cider: 'Beer',\n    spirit: 'Spirits', spirits: 'Spirits', whisky: 'Spirits', whiskey: 'Spirits',\n    vodka: 'Spirits', gin: 'Spirits', rum: 'Spirits', liqueur: 'Spirits',\n    cognac: 'Spirits', brandy: 'Spirits', tequila: 'Spirits',\n    champagne: 'Champagne', wine: 'Champagne', wines: 'Champagne',\n    prosecco: 'Champagne', sparkling: 'Champagne', cava: 'Champagne', bordeaux: 'Champagne',\n    softdrink: 'Soft Drinks', softdrinks: 'Soft Drinks', water: 'Soft Drinks',\n    juice: 'Soft Drinks', energy: 'Soft Drinks', soda: 'Soft Drinks',\n    grocery: 'Grocery', food: 'Grocery',\n    confectionery: 'Confectionery', chocolate: 'Confectionery', sweets: 'Confectionery',\n    candy: 'Confectionery', biscuit: 'Confectionery',\n    toiletries: 'Toiletries', cosmetics: 'Toiletries', personalcare: 'Toiletries',\n  },\n};\n\nconst item = $input.item.json;\nconst map = item.columnMap || {};\nconst defaults = item.profileDefaults || {};\nconst headers = item.headerCells || [];\n\n// No usable column map (the LLM mapping failed / needs review, or a stored\n// profile is malformed). Emit ONE visible exception instead of silently\n// dropping every row as 0 — so Build Airtable Payload surfaces it and the\n// section is routed to review rather than vanishing.\nif (map.productName === undefined || map.buyPrice === undefined) {\n  return {\n    json: {\n      fileName: item.fileName,\n      sheetName: item.sheetName,\n      sourceMessageId: item.sourceMessageId,\n      fromAddress: item.fromAddress,\n      supplierRecordId: item.supplierRecordId || null,\n      profileId: item.profileId || null,\n      fingerprint: item.fingerprint,\n      parsedCount: 0,\n      exceptionCount: 1,\n      offers: [],\n      exceptions: [{\n        sheetRow: item.headerRowIndex ?? null,\n        productName: '',\n        exceptionReason: item.exceptionReason\n          || 'No usable column map (needs review): LLM mapping did not yield productName + buyPrice for this section',\n        sourceSheet: `${item.fileName} :: ${item.sheetName}`,\n      }],\n      needsReview: true,\n    },\n  };\n}\n\nconst offers = [];\nconst exceptions = [];\n\n(item.dataRows || []).forEach((row, i) => {\n  const sheetRow = (item.headerRowIndex ?? 0) + 2 + i;\n  const get = (field) => {\n    const idx = map[field];\n    if (idx === undefined || idx === null) return '';\n    return String(row[idx] ?? '').trim();\n  };\n\n  const productName = get('productName');\n  const rawPrice = get('buyPrice');\n\n  if (!productName && !rawPrice) return;\n\n  const problems = [];\n\n  const price = parsePriceCell(rawPrice);\n  if (!productName) problems.push('missing product name');\n  if (price.value === null) problems.push(`unparseable price \"${rawPrice}\"`);\n  else if (price.ambiguous) problems.push(`ambiguous decimal separator in \"${rawPrice}\"`);\n\n  const pack = parsePack(get('packFormat') || get('volumeMl') || productName);\n\n  const volume = parseVolume(get('volumeMl'), defaults.volumeUnit)\n    ?? pack.volumeMl\n    ?? parseVolume(productName, defaults.volumeUnit);\n  const pcsCase = parseNumber(get('pcsCase')).value ?? pack.pcsCase;\n  const abv = parseAbv(get('abv')) ?? pack.abv ?? parseAbv(productName);\n  const weightKg = pack.weightG !== null ? pack.weightG / 1000 : null;\n\n  const bond = coerce('bond', get('bondStatus') || defaults.bondStatus);\n  // Currency actually STATED on the row/sheet (symbol on the price, or a\n  // dedicated currency column) vs. merely inherited from the profile default.\n  // When nothing is stated, the resolved supplier's Default Currency should win\n  // downstream (Build Airtable Payload), so track which case this is.\n  const statedCurrency = price.currency || coerce('currency', get('currency'));\n  const currency = statedCurrency || coerce('currency', defaults.currency);\n  const currencyStated = Boolean(statedCurrency);\n  if (!currency) problems.push('no currency on row or profile default');\n\n  const brand = get('brand') || guessBrand(productName);\n\n  const record = {\n    sheetRow,\n    sourceSheet: `${item.fileName} :: ${item.sheetName}`,\n    sourceMessageId: item.sourceMessageId,\n\n    brand,\n    productName,\n    variant: get('variant') || '',\n    category: coerce('category', get('category') || defaults.category),\n    volumeMl: volume,\n    pcsCase: pcsCase ?? defaults.pcsCase ?? null,\n    unitType: coerce('unitType', get('unitType') || defaults.unitType) || 'Bottle',\n    abv,\n    originCountry: get('originCountry') || defaults.originCountry || '',\n    bondStatus: bond,\n    buyPrice: price.value,\n    currency,\n    priceType: price.basis\n      || coerce('priceType', get('priceType') || defaults.priceType)\n      || 'Per Case',\n    priceBasisStated: Boolean(price.basis),\n    currencyStated,\n    weightKg,\n    stockCases: toCases(parseNumber(get('stockCases')).value, pcsCase, defaults.stockUnit),\n    casesPerPallet: parseNumber(get('casesPerPallet')).value,\n    piecesPerPallet: parseNumber(get('piecesPerPallet')).value,\n    language: get('language') || '',\n    moq: get('moq') || '',\n    leadTime: get('leadTime') || '',\n    eanUnit: cleanEan(get('eanUnit')),\n    eanCase: cleanEan(get('eanCase')),\n    bbd: parseDate(get('bbd')),\n    incoterm: coerce('incoterm', get('incoterm') || defaults.incoterm),\n    warehouse: coerce('warehouse', get('warehouse') || defaults.warehouse),\n\n    productKey: buildProductKey(brand, productName, volume, bond),\n  };\n\n  if (problems.length) {\n    exceptions.push({ ...record, exceptionReason: problems.join('; ') });\n  } else {\n    offers.push(record);\n  }\n});\n\nreturn {\n  json: {\n    fileName: item.fileName,\n    sheetName: item.sheetName,\n    sourceMessageId: item.sourceMessageId,\n    fromAddress: item.fromAddress,\n    supplierRecordId: item.supplierRecordId || null,\n    profileId: item.profileId || null,\n    fingerprint: item.fingerprint,\n    parsedCount: offers.length,\n    exceptionCount: exceptions.length,\n    offers,\n    exceptions,\n  },\n};\n\nfunction parseNumber(raw) {\n  if (raw === null || raw === undefined) return { value: null, ambiguous: false };\n  let s = String(raw).trim();\n  if (!s) return { value: null, ambiguous: false };\n\n  s = s.replace(/euros?|dollars?|pounds?|usd|gbp|aed|sgd|eur|[€$£\\s]/gi, '').trim();\n  if (!s) return { value: null, ambiguous: false };\n\n  if (/[a-z]/i.test(s)) return { value: null, ambiguous: false };\n\n  const hasDot = s.includes('.');\n  const hasComma = s.includes(',');\n  let ambiguous = false;\n\n  if (hasDot && hasComma) {\n    if (s.lastIndexOf(',') > s.lastIndexOf('.')) s = s.replace(/\\./g, '').replace(',', '.');\n    else s = s.replace(/,/g, '');\n  } else if (hasComma) {\n    const after = s.split(',')[1] ?? '';\n    if (s.split(',').length > 2) s = s.replace(/,/g, '');\n    else if (after.length === 3) ambiguous = true;\n    else s = s.replace(',', '.');\n    if (ambiguous) s = s.replace(',', '.');\n  }\n\n  const cleaned = s.replace(/[^0-9.\\-]/g, '');\n  if (!/\\d/.test(cleaned)) return { value: null, ambiguous: false };\n\n  const n = Number(cleaned);\n  return Number.isFinite(n) ? { value: n, ambiguous } : { value: null, ambiguous: false };\n}\n\nfunction parsePriceCell(raw) {\n  const s = String(raw ?? '').trim();\n  if (!s) return { value: null, currency: null, basis: null, ambiguous: false };\n\n  let currency = null;\n  if (/€|\\beur(o|os)?\\b/i.test(s)) currency = 'EUR';\n  else if (/£|\\bgbp\\b|\\bpounds?\\b/i.test(s)) currency = 'GBP';\n  else if (/\\$|\\busd\\b|\\bdollars?\\b/i.test(s)) currency = 'USD';\n  else if (/\\baed\\b/i.test(s)) currency = 'AED';\n  else if (/\\bsgd\\b/i.test(s)) currency = 'SGD';\n\n  let basis = null;\n  const m = s.match(/\\/\\s*(btl|bottle|cs|case|ctn|carton|pc|pcs|piece|pack|can|jar|unit)\\b/i);\n  if (m) {\n    const k = m[1].toLowerCase();\n    if (/^(cs|case|ctn|carton)$/.test(k)) basis = 'Per Case';\n    else if (/^(btl|bottle)$/.test(k)) basis = 'Per Bottle';\n    else if (/^(pc|pcs|piece|unit)$/.test(k)) basis = 'Per Piece';\n    else if (k === 'pack') basis = 'Per Pack';\n    else if (k === 'can') basis = 'Per Can';\n    else if (k === 'jar') basis = 'Per Jar';\n  }\n\n  const numeric = parseNumber(s.replace(/\\/\\s*[a-z]+\\b/gi, ''));\n\n  return { value: numeric.value, currency, basis, ambiguous: numeric.ambiguous };\n}\n\nfunction parsePack(raw) {\n  const s = String(raw ?? '').trim();\n  const out = { pcsCase: null, volumeMl: null, abv: null, weightG: null };\n  if (!s) return out;\n\n  let m = s.match(/(\\d+)\\s*[x×\\/]\\s*(\\d+(?:[.,]\\d+)?)\\s*(g|gr|gram|kg)\\b/i);\n  if (m) {\n    out.pcsCase = Number(m[1]);\n    const n = Number(m[2].replace(',', '.'));\n    out.weightG = /^kg$/i.test(m[3]) ? n * 1000 : n;\n    return out;\n  }\n\n  m = s.match(/(\\d+)\\s*[x×\\/]\\s*(\\d+(?:[.,]\\d+)?)\\s*(ml|cl|dl|l|ltr)\\b/i);\n  if (m) {\n    out.pcsCase = Number(m[1]);\n    out.volumeMl = parseVolume(`${m[2]}${m[3]}`);\n    const abv = s.match(/(\\d+(?:[.,]\\d+)?)\\s*%/);\n    if (abv) out.abv = Number(abv[1].replace(',', '.'));\n    return out;\n  }\n\n  m = s.match(/(\\d+)\\s*\\/\\s*(\\d+(?:[.,]\\d+)?)\\s*(?:\\/\\s*(\\d+(?:[.,]\\d+)?))?/);\n  if (m) {\n    out.pcsCase = Number(m[1]);\n    const mid = Number(m[2].replace(',', '.'));\n    out.volumeMl = mid >= 200 ? Math.round(mid) : Math.round(mid * 10);\n    if (m[3]) {\n      const a = Number(m[3].replace(',', '.'));\n      if (a > 0 && a <= 100) out.abv = a;\n    }\n  }\n  return out;\n}\n\nfunction parseVolume(raw, unitHint) {\n  const s = String(raw ?? '').toLowerCase();\n  if (!s) return null;\n\n  let m = s.match(/(\\d+(?:[.,]\\d+)?)\\s*(ml|cl|dl|l|ltr|litre|liter|cc)\\b/);\n  if (!m) {\n    const bare = parseNumber(s).value;\n    if (bare === null) return null;\n\n    const factor = VOLUME_UNIT_FACTOR[String(unitHint || '').toLowerCase()];\n    if (factor) return Math.round(bare * factor);\n\n    return bare > 0 && bare < 10 ? Math.round(bare * 1000) : Math.round(bare);\n  }\n\n  const n = Number(m[1].replace(',', '.'));\n  switch (m[2]) {\n    case 'ml': case 'cc': return Math.round(n);\n    case 'cl': return Math.round(n * 10);\n    case 'dl': return Math.round(n * 100);\n    default: return Math.round(n * 1000);\n  }\n}\n\nfunction toCases(value, pcsCase, stockUnit) {\n  if (value === null || value === undefined) return null;\n  if (String(stockUnit || '').toLowerCase() !== 'pcs') return value;\n  if (!pcsCase || pcsCase <= 0) return null;\n  return Math.floor(value / pcsCase);\n}\n\nfunction parseAbv(raw) {\n  const s = String(raw ?? '');\n  const m = s.match(/(\\d+(?:[.,]\\d+)?)\\s*%/) || s.match(/^(\\d+(?:[.,]\\d+)?)$/);\n  if (!m) return null;\n  const n = Number(m[1].replace(',', '.'));\n  return n > 0 && n <= 100 ? n : null;\n}\n\nfunction parseDate(raw) {\n  if (!raw) return null;\n  if (raw instanceof Date && !isNaN(raw)) return raw.toISOString().slice(0, 10);\n\n  const s = String(raw).trim();\n  if (!s) return null;\n\n  if (/^\\d{5}$/.test(s)) {\n    const ms = (Number(s) - 25569) * 86400 * 1000;\n    return new Date(ms).toISOString().slice(0, 10);\n  }\n\n  let m = s.match(/^(\\d{4})-(\\d{1,2})-(\\d{1,2})$/);\n  if (m) return `${m[1]}-${pad(m[2])}-${pad(m[3])}`;\n\n  m = s.match(/^([a-z]{3,9})\\.?\\s+(\\d{4})$/i);\n  if (m) {\n    const months = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];\n    const idx = months.indexOf(m[1].slice(0, 3).toLowerCase());\n    if (idx >= 0) return `${m[2]}-${pad(idx + 1)}-01`;\n  }\n\n  m = s.match(/^(\\d{1,2})[\\/.\\-](\\d{1,2})[\\/.\\-](\\d{2,4})$/);\n  if (m) {\n    let [, a, b, y] = m;\n    if (y.length === 2) y = '20' + y;\n    const dayFirst = Number(a) > 12 || Number(b) <= 12;\n    const day = dayFirst ? a : b;\n    const month = dayFirst ? b : a;\n    return `${y}-${pad(month)}-${pad(day)}`;\n  }\n\n  const d = new Date(s);\n  return isNaN(d) ? null : d.toISOString().slice(0, 10);\n}\n\nfunction coerce(kind, raw) {\n  const s = String(raw ?? '').trim();\n  if (!s) return null;\n\n  const exact = OPTIONS[kind].find((o) => o.toLowerCase() === s.toLowerCase());\n  if (exact) return exact;\n\n  const key = s.toLowerCase().replace(/[^a-z0-9€$£]/g, '');\n  const syn = (SYNONYMS[kind] || {})[key];\n  if (syn) return syn;\n\n  for (const [k, v] of Object.entries(SYNONYMS[kind] || {})) {\n    if (key.includes(k)) return v;\n  }\n\n  return OPTIONS[kind].includes('Other') ? 'Other' : null;\n}\n\nfunction cleanEan(raw) {\n  const digits = String(raw ?? '').replace(/\\D/g, '');\n  return /^\\d{8}$|^\\d{12,14}$/.test(digits) ? digits : '';\n}\n\nfunction guessBrand(name) {\n  const first = String(name).trim().split(/\\s+/)[0] || '';\n  return first.length > 1 ? first : '';\n}\n\nfunction buildProductKey(brand, name, volumeMl, bond) {\n  const n = (v) => String(v ?? '').toLowerCase().replace(/[^a-z0-9]/g, '');\n  return [n(brand), n(name), volumeMl ?? '', n(bond)].join('|');\n}\n"
+      },
+      "id": "28cdc6d8-f2ee-43c2-9045-85dba186ce96",
+      "name": "Normalize Rows",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1552,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appaDSdZkAE9PGkjT",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl1m5HfC2yzWECGb",
+          "mode": "id"
+        },
+        "options": {
+          "fields": [
+            "Brand",
+            "Product Name",
+            "Volume ML",
+            "Bond/Customs Status"
+          ]
+        }
+      },
+      "id": "7eb2b471-dca3-4eb7-b41b-191f59356fb6",
+      "name": "Fetch Products",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        0
+      ],
+      "executeOnce": true,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "/**\n * n8n Code node — \"Build Airtable Payload\"\n * Mode: Run Once for All Items\n *\n * Turns normalised spreadsheet rows into Airtable Offers records.\n *\n * ── PRODUCT MATCH KEY FIXED 2026-08-03 ──────────────────────────────────────\n * This node used to key the product index on\n *     Brand | Product Name | Volume | Bond status\n * and that is why roughly 89% of offers ended up with no Products link and were\n * therefore invisible to price comparison (Is Cheapest, Cheaper By 5%+).\n *\n * The reason is data, not logic: BRAND IS EMPTY ON THE LARGE MAJORITY OF PRODUCT\n * RECORDS, and Bond/Customs Status is blank on most of them too. Meanwhile the\n * offer side has no brand column on most sheets either, so Normalize Rows falls\n * back to guessBrand() - the FIRST WORD of the product name. So the offer key\n * carried a brand like \"ardbeg\" while the product key carried an empty string,\n * the two never matched, and every lookup missed. The linking was always being\n * attempted; the key was simply unmatchable.\n *\n * Matching is now on NORMALISED PRODUCT NAME + VOLUME, which are the two fields\n * the Products table actually populates (Product Key there is just the lowercased\n * product name). Brand and Bond are deliberately excluded rather than\n * \"improved\": including a field that is blank on one side of the comparison can\n * only ever destroy matches.\n *\n * Volume stays IN the key. Dropping it would merge a 70cl and a 1L of the same\n * label into one product and attach offers to the wrong pack size, which is a\n * worse failure than not matching at all.\n *\n * Offer.productKey from Normalize Rows is still carried through for the Notes\n * message and the in-run duplicate guard, but is no longer used for lookup.\n *\n * ── EARLIER CHANGES (2026-07-31, Anil) ─────────────────────────────────────\n *  1. DEFAULT VALIDITY IS NOW 30 DAYS (was 14).\n *  2. RE-INGESTION GUARD. Nothing previously stopped the same email being\n *     parsed twice.\n *  3. SUPPLIER RESOLUTION BY SENDER EMAIL. Previously the supplier came ONLY\n *     from the Sheet Profile's link, so any offer parsed on the LLM\n *     profile-miss path was written with no Supplier at all.\n *  4. EMAIL PROVENANCE ON THE RECORD. Sender, subject and thread are now\n *     written into Notes.\n *\n * Also: offers whose Product does not match are CREATED rather than discarded.\n * They previously went to a toReview array that nothing ever wrote, so with\n * Create Offers enabled they would have been silently dropped. The Products link\n * is left blank and the offer is flagged in Notes; the hourly \"Link Offers To\n * Products\" workflow then picks it up and can create the Product if needed.\n */\n\n// Raised from 14 to 30 by Anil, 2026-07-31. Used only when the resolved\n// supplier has no Default Validity Days of its own.\nconst FALLBACK_VALIDITY_DAYS = 30;\n\n// Formula and lookup fields — writing to any of these errors the batch.\n// Supplier Email/Country/Trust are LOOKUPS through the Supplier link, so\n// linking the supplier is what populates them; they must never be written.\nconst READ_ONLY = new Set([\n  'Sell Price', 'Pack Format', 'Is Expired', 'Auto Expiry Date', 'Send Eligible',\n  'Public Listing', 'Public Product Description', 'Public Spec', 'Price Display',\n  'Public Terms', 'Stock Display', 'whatsapp link',\n  'Supplier Name', 'Supplier Email', 'Supplier Country',\n  'Supplier Trust Level', 'Supplier Payment Terms',\n]);\n\nconst products  = nodeRows('Fetch Products');\nconst suppliers = nodeRows('Fetch Suppliers');\nconst ingested  = nodeRows('Fetch Ingested Message IDs');\nconst sections  = $('Normalize Rows').all().map((s) => s.json || {});\n\nconst today = new Date().toISOString().slice(0, 10);\n\nconst productIndex   = buildProductIndex(products);\nconst supplierByMail = buildSupplierIndex(suppliers);\nconst alreadyIngested = new Set(\n  ingested.map((r) => normaliseMessageId((r.fields || r)['Source Message ID'])).filter(Boolean)\n);\n\nconst toCreate   = [];\nconst skipped    = [];\nconst exceptions = [];\nconst summaries  = [];\n\n// Guards against the same row being emitted twice inside ONE run — possible\n// when two detected sections overlap on the same block of the sheet.\nconst seenInRun = new Set();\n\nfor (const item of sections) {\n  const msgId = normaliseMessageId(item.sourceMessageId);\n\n  // ---- Re-ingestion guard -------------------------------------------------\n  // The ID set was read once at the start of this run, so it reflects what was\n  // in Airtable BEFORE this execution. A message ID already present therefore\n  // means this email was ingested on an earlier run, and the whole section is\n  // skipped. It does NOT mean \"this row is a duplicate of another row in the\n  // same workbook\" — one email legitimately produces many offers sharing one\n  // message ID, which is exactly why this check happens per SECTION and not\n  // per offer.\n  if (msgId && alreadyIngested.has(msgId)) {\n    skipped.push({\n      fileName: item.fileName,\n      sheetName: item.sheetName,\n      sourceMessageId: item.sourceMessageId,\n      offersSkipped: (item.offers || []).length,\n      reason: `Message ${msgId} is already present in Offers — email previously ingested, nothing created`,\n    });\n    summaries.push(`${item.fileName} :: ${item.sheetName} — SKIPPED, already ingested`);\n    continue;\n  }\n\n  // ---- Supplier resolution ------------------------------------------------\n  const resolved = resolveSupplier(item, supplierByMail);\n\n  // Validity comes from the supplier record when we have one. The old code read\n  // rec['Validity Days'] off the Sheet Profile, a field that does not exist\n  // there — the real one is Suppliers.Default Validity Days — so every offer\n  // silently fell back to the default.\n  const validityDays = Number(resolved.validityDays) > 0\n    ? Number(resolved.validityDays)\n    : FALLBACK_VALIDITY_DAYS;\n\n  let created = 0;\n  let unlinked = 0;\n\n  for (const offer of item.offers || []) {\n    const rowKey = [msgId, offer.productKey, offer.buyPrice].join('~');\n    if (seenInRun.has(rowKey)) continue;\n    seenInRun.add(rowKey);\n\n    // Name + volume, NOT the brand/bond key — see the header note.\n    const matchKey = productMatchKey(offer.productName, offer.volumeMl);\n    const productId = productIndex.get(matchKey) || null;\n\n    // Currency fallback: when the sheet stated no currency, apply the resolved\n    // supplier's Default Currency (e.g. Halitlar = USD). A stated currency\n    // always wins; with no stated currency and no supplier default, the\n    // profile default carried on the offer stands.\n    const offerCurrency = (!offer.currencyStated && resolved.defaultCurrency)\n      ? resolved.defaultCurrency\n      : offer.currency;\n\n    const fields = {\n      'Offer Name': buildOfferName(offer, resolved.supplierName),\n      'Status': 'Live',\n      'Offer Date': today,\n      'Auto Expiry Days': validityDays,\n\n      'Brand': offer.brand || '',\n      'Product Name': offer.productName,\n      'Variant': offer.variant || '',\n      'Volume ML': offer.volumeMl,\n      'PCS/Case': offer.pcsCase,\n      'Unit Type': offer.unitType,\n      'ABV': offer.abv,\n      'Origin Country': offer.originCountry || '',\n      'Bond/Customs Status': offer.bondStatus,\n      'Buy Price': offer.buyPrice,\n      'Currency': offerCurrency,\n      'Price Type': offer.priceType,\n      'Stock Cases': offer.stockCases,\n      'Weight KG': offer.weightKg,\n      'Cases per Pallet': offer.casesPerPallet,\n      'Pieces per Pallet': offer.piecesPerPallet,\n      'Language': offer.language || '',\n      'MOQ': offer.moq || '',\n      'Lead Time': offer.leadTime || '',\n      'EAN Unit': offer.eanUnit || '',\n      'EAN Case': offer.eanCase || '',\n      'BBD': offer.bbd,\n      'Incoterm': offer.incoterm,\n      'Warehouse': offer.warehouse,\n\n      'Source Sheet': offer.sourceSheet,\n      'Source Message ID': item.sourceMessageId || '',\n      'Notes': buildNotes(item, offer, resolved, productId, matchKey, today),\n    };\n\n    if (offer.category) fields['Category'] = offer.category;\n\n    // Linking the Supplier is also what populates the read-only Supplier Email,\n    // Supplier Country and Supplier Trust Level lookups on the offer.\n    if (resolved.supplierRecordId) fields['Supplier'] = [resolved.supplierRecordId];\n\n    if (productId) fields['Products'] = [productId];\n    else unlinked++;\n\n    toCreate.push({ fields: stripEmpty(fields) });\n    created++;\n  }\n\n  for (const e of item.exceptions || []) {\n    exceptions.push({\n      sheetRow: e.sheetRow,\n      productName: e.productName,\n      reason: e.exceptionReason,\n      sourceSheet: e.sourceSheet,\n    });\n  }\n\n  summaries.push(\n    `${item.fileName} :: ${item.sheetName} — ${created} offers ` +\n    `(${unlinked} without a Product link), ` +\n    `${(item.exceptions || []).length} bad rows, ` +\n    `supplier: ${resolved.supplierName || 'UNRESOLVED'} via ${resolved.via}, ` +\n    `expiry ${validityDays}d`\n  );\n}\n\nreturn [{\n  json: {\n    createCount: toCreate.length,\n    skippedCount: skipped.length,\n    exceptionCount: exceptions.length,\n    toCreate,\n    skipped,\n    exceptions,\n    summary: summaries.join(' | ') || 'nothing to do',\n  },\n}];\n\n// ── helpers ──────────────────────────────────────────────────────────\n\n/** Rows from a named Airtable node, or [] when it did not run. */\nfunction nodeRows(name) {\n  try { return $(name).all().map((i) => i.json || {}); }\n  catch (e) { return []; }\n}\n\n/**\n * Strip the mailbox prefix from a Gmail message ID before comparing.\n *\n * The base holds BOTH \"19fadb488e2d3ea9\" and\n * \"gmail:offers@akay.ie:19fadb488e2d3ea9\" for the same message. They do not\n * string-match, so an exact comparison silently misses one of the two formats —\n * this is the confirmed cause of the CSE Ltd. Jameson, Newport Global, EZATA\n * Drinks and Yael Dahan duplicate batches. Take the last colon-separated\n * segment and lowercase it.\n */\nfunction normaliseMessageId(v) {\n  const s = String(v ?? '').trim();\n  if (!s) return '';\n  const parts = s.split(':');\n  return parts[parts.length - 1].trim().toLowerCase();\n}\n\n/**\n * The single definition of how an Offer is matched to a Product.\n *\n * Punctuation and spacing are stripped entirely, so \"Aberlour A'Bunadh Batch 77\"\n * and \"Aberlour ABunadh Batch 77\" agree - supplier sheets are inconsistent about\n * apostrophes, hyphens and double spaces, and those differences are never\n * meaningful. Volume is kept as a plain number so 700 and \"700\" agree.\n */\nfunction productMatchKey(name, volumeMl) {\n  const n = String(name ?? '').toLowerCase().replace(/[^a-z0-9]/g, '');\n  const v = (volumeMl === null || volumeMl === undefined || volumeMl === '') ? '' : Number(volumeMl);\n  return n + '|' + v;\n}\n\nfunction buildProductIndex(rows) {\n  const index = new Map();\n  for (const p of rows) {\n    const f = p.fields || p;\n    if (!p.id) continue;\n    const key = productMatchKey(f['Product Name'], f['Volume ML']);\n    if (!index.has(key)) index.set(key, p.id);\n  }\n  return index;\n}\n\n/** Suppliers keyed by full email address AND by bare domain. */\nfunction buildSupplierIndex(rows) {\n  const byAddress = new Map();\n  const byDomain = new Map();\n\n  for (const s of rows) {\n    const f = s.fields || s;\n    if (!s.id) continue;\n    const email = String(f['Email'] || '').trim().toLowerCase();\n    if (!email) continue;\n\n    const rec = {\n      id: s.id,\n      name: f['Supplier Name'] || null,\n      validityDays: f['Default Validity Days'] ?? null,\n      defaultCurrency: selectName(f['Default Currency']) || null,\n      status: f['Status'] || null,\n      skip: Boolean(f['Skip Offer Ingestion']),\n    };\n\n    if (!byAddress.has(email)) byAddress.set(email, rec);\n\n    const domain = email.split('@')[1];\n    // A domain is only a usable key while exactly one supplier uses it. Two\n    // suppliers on one domain (or a shared host like gmail.com) makes the\n    // domain ambiguous, so it is removed rather than guessed at.\n    if (domain) {\n      if (byDomain.has(domain)) byDomain.set(domain, null);\n      else byDomain.set(domain, rec);\n    }\n  }\n  return { byAddress, byDomain };\n}\n\n/**\n * Work out which supplier this workbook belongs to.\n *\n * Order matters. The Sheet Profile's own Supplier link is authoritative because\n * a human (or a reviewed LLM mapping) tied that header fingerprint to that\n * supplier. Only when there is no profile link do we fall back to the sending\n * address — which is the case that used to produce offers with no supplier at\n * all, on the profile-miss path.\n *\n * Generic mailbox domains are deliberately NOT domain-matched: several\n * suppliers use hotmail/gmail addresses, so a domain hit there means nothing.\n */\nfunction resolveSupplier(item, index) {\n  const GENERIC = new Set([\n    'gmail.com', 'hotmail.com', 'hotmail.fr', 'outlook.com', 'yahoo.com',\n    'yahoo.co.uk', 'live.com', 'icloud.com', 'aol.com', 'protonmail.com', 'gmx.com',\n  ]);\n\n  if (item.supplierRecordId) {\n    // Enrich from the fetched supplier list when we can, for validity days and\n    // the name used in the internal Offer Name.\n    const match = [...index.byAddress.values()].find((s) => s.id === item.supplierRecordId);\n    return {\n      supplierRecordId: item.supplierRecordId,\n      supplierName: match ? match.name : null,\n      validityDays: match ? match.validityDays : null,\n      defaultCurrency: match ? match.defaultCurrency : null,\n      via: 'sheet profile link',\n    };\n  }\n\n  const from = String(item.fromAddress || '').trim().toLowerCase();\n  if (from) {\n    const exact = index.byAddress.get(from);\n    if (exact) {\n      return {\n        supplierRecordId: exact.id,\n        supplierName: exact.name,\n        validityDays: exact.validityDays,\n        defaultCurrency: exact.defaultCurrency,\n        via: `sender address ${from}`,\n      };\n    }\n\n    const domain = from.split('@')[1];\n    if (domain && !GENERIC.has(domain)) {\n      const byDom = index.byDomain.get(domain);\n      if (byDom) {\n        return {\n          supplierRecordId: byDom.id,\n          supplierName: byDom.name,\n          validityDays: byDom.validityDays,\n          defaultCurrency: byDom.defaultCurrency,\n          via: `sender domain ${domain}`,\n        };\n      }\n    }\n  }\n\n  // Resolve-or-auto-create fallback. A supplier matched from — or auto-created\n  // for — the forwarded sender at run level by the Resolve Supplier / Create\n  // Missing Supplier / Merge Supplier branch. Reached only when neither the\n  // Sheet Profile link nor a direct sender match found one. When this is also\n  // empty the sender was our own akay.ie (or otherwise not external): the offer\n  // is left UNRESOLVED with a NEEDS ATTENTION note rather than inventing a\n  // supplier from our own address.\n  const run = runSupplier();\n  if (run && run.supplierRecordId) {\n    return {\n      supplierRecordId: run.supplierRecordId,\n      supplierName: run.supplierName || null,\n      validityDays: run.validityDays ?? null,\n      defaultCurrency: run.defaultCurrency || null,\n      via: run.via || 'resolve-or-auto-create',\n    };\n  }\n\n  return { supplierRecordId: null, supplierName: null, validityDays: null, defaultCurrency: null, via: 'UNRESOLVED' };\n}\n\n/**\n * Internal provenance for the offer. Notes is flagged INTERNAL ONLY on this\n * table and must never be mapped into Softr, which is why the sender address\n * and thread ID can live here. Public text belongs in Public Note.\n */\nfunction buildNotes(item, offer, resolved, productId, matchKey, today) {\n  const lines = [\n    `Ingested from spreadsheet ${offer.sourceSheet} row ${offer.sheetRow} on ${today}.`,\n    `Email: from ${item.fromAddress || '(sender unknown)'}` +\n      `${item.subject ? `, subject \"${item.subject}\"` : ''}` +\n      `${item.threadId ? `, thread ${item.threadId}` : ''}.`,\n    `Supplier resolved via ${resolved.via}` +\n      `${resolved.supplierName ? ` (${resolved.supplierName})` : ''}.`,\n  ];\n\n  if (!resolved.supplierRecordId) {\n    lines.push('NEEDS ATTENTION: no Supplier could be matched from the Sheet Profile or the sending address. Set the Supplier link by hand — without it this offer has no supplier email, country or trust level.');\n  }\n  if (!productId) {\n    lines.push(`No Product matched name+volume key \"${matchKey}\", so the Products link is blank and this offer is not yet visible to price comparison. The hourly Link Offers To Products workflow will match it, or create the Product if the offer has both a name and a volume.`);\n  }\n  return lines.join(' ');\n}\n\n/**\n * Offer Name is the primary field and is explicitly INTERNAL, so it may carry\n * the supplier name. Public display uses Public Product Description.\n */\nfunction buildOfferName(offer, supplierName) {\n  const parts = [offer.brand, offer.productName, offer.variant].filter(Boolean);\n  const spec = offer.volumeMl ? `${offer.volumeMl}ml` : '';\n  const supplier = supplierName ? ` - ${supplierName}` : '';\n  return `${parts.join(' ')}${spec ? ' ' + spec : ''}${supplier} ${new Date().toISOString().slice(0, 10)}`.trim();\n}\n\n/** Airtable rejects null on some field types; omit rather than send empties. */\nfunction stripEmpty(fields) {\n  const out = {};\n  for (const [k, v] of Object.entries(fields)) {\n    if (READ_ONLY.has(k)) continue;\n    if (v === null || v === undefined || v === '') continue;\n    out[k] = v;\n  }\n  return out;\n}\n\n/**\n * Run-level supplier from the Resolve/Create/Merge branch (Merge Supplier).\n * Empty when that branch produced no supplier — e.g. an internal-only sender.\n */\nfunction runSupplier() {\n  try { return $('Merge Supplier').first().json || null; }\n  catch (e) { return null; }\n}\n\n/** Airtable singleSelect value: {id,name} object over the REST client, or a\n * bare string. Return the plain name either way. */\nfunction selectName(v) {\n  const a = Array.isArray(v) ? v[0] : v;\n  if (a === null || a === undefined) return null;\n  return typeof a === 'object' ? (a.name || null) : String(a);\n}\n"
+      },
+      "id": "fefca4d2-8cdf-413e-8f71-7fb213289875",
+      "name": "Build Airtable Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1984,
+        0
+      ],
+      "notes": "Reads offers from Normalize Rows and products from Fetch Products via $('...').all() (the Airtable search replaces the item). Outputs an aggregate toCreate/toReview/exceptions for dry-run inspection."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "has-creates",
+              "leftValue": "={{ $json.createCount }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "1de671d3-4501-46a2-a19c-c9098bf3c102",
+      "name": "Has Creates?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        2096,
+        0
+      ],
+      "notesInFlow": true,
+      "notes": "Only create records when there are matched offers. Both branches end at Mark Excel Done so the thread is labelled once per run — after the Airtable write when creates exist."
+    },
+    {
+      "parameters": {
+        "jsCode": "/**\n * n8n Code node — \"Expand Offers\"\n * Mode: Run Once for All Items\n *\n * Expands the matched toCreate[] into one flat record item each for\n * Create Offers (autoMapInputData), and stamps the trust-driven Offer\n * Approval Status on every record (Anil, 2026-08-04):\n *\n *   supplier Trust Score High, Medium or Low  -> Approved\n *   Trust = Hold, or no resolvable supplier   -> Awaiting Approval\n *\n * Offer Approval Status is a PROCESSING status feeding Send Eligible and the\n * Public Listing formula. It is NOT a human control point — the two human\n * approvals (Listing Approved on the website, Gate 2 dispatch approval, each\n * by Anil or Annika) are never written by ingestion, so an auto-approved\n * offer still cannot reach the public site or a client inbox on its own.\n *\n * Trust is read per record via the Supplier link id against the run's\n * Fetch Suppliers snapshot. A Supplier id NOT in that snapshot was created\n * THIS run by Create Missing Supplier, which always writes Trust = Medium\n * (Hard Rule 8) -> Approved.\n */\n\nconst AUTO_APPROVE = new Set(['high', 'medium', 'low']);\n\n// Supplier id -> Trust Score name, from the run's supplier snapshot.\nconst trustById = new Map();\ntry {\n  for (const s of $('Fetch Suppliers').all()) {\n    const j = s.json || {};\n    const f = j.fields || j;\n    if (j.id) trustById.set(j.id, selectName(f['Trust Score']));\n  }\n} catch (e) { /* snapshot unavailable — falls through to Awaiting Approval */ }\n\nconst out = [];\nfor (const it of $input.all()) {\n  const recs = (it.json && it.json.toCreate) || [];\n  for (const r of recs) {\n    const rec = r.fields || r;\n\n    const supplierId = Array.isArray(rec['Supplier']) && rec['Supplier'].length\n      ? rec['Supplier'][0] : null;\n\n    let trust = supplierId ? trustById.get(supplierId) : null;\n    // Not in the snapshot but linked => auto-created this run at Medium.\n    if (supplierId && trust === undefined) trust = 'Medium';\n\n    const approved = AUTO_APPROVE.has(String(trust || '').toLowerCase());\n    rec['Offer Approval Status'] = approved ? 'Approved' : 'Awaiting Approval';\n    if (!approved) {\n      rec['Notes'] = `${rec['Notes'] || ''} HELD at Awaiting Approval: supplier trust is ${trust || 'unknown/unresolved'} — only Hold or unknown suppliers hold since 2026-08-04.`.trim();\n    }\n\n    out.push({ json: rec });\n  }\n}\nreturn out;\n\n/** Airtable singleSelect: {id,name} object or bare string — return the name. */\nfunction selectName(v) {\n  const a = Array.isArray(v) ? v[0] : v;\n  if (a === null || a === undefined) return null;\n  return typeof a === 'object' ? (a.name || null) : String(a);\n}\n"
+      },
+      "id": "b48fa01e-f51d-4a1a-a4be-cdb97c270883",
+      "name": "Expand Offers",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2096,
+        128
+      ],
+      "notesInFlow": true,
+      "notes": "Expands the matched toCreate[] into one flat record item each for Create Offers (autoMapInputData). Emits nothing when there are no matched offers."
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appaDSdZkAE9PGkjT",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbljBgWrnIMZzkSAr",
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {}
+        },
+        "options": {
+          "typecast": false
+        }
+      },
+      "id": "47acb6c3-4d4a-4323-b47d-15aef9db2c01",
+      "name": "Create Offers",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2,
+      "position": [
+        2208,
+        0
+      ],
+      "disabled": false
+    },
+    {
+      "parameters": {
+        "resource": "thread",
+        "operation": "addLabels",
+        "threadId": "={{ $('Read Workbook').first().json.threadId }}",
+        "labelIds": [
+          "Label_6"
+        ]
+      },
+      "id": "399035dc-9fe3-43de-abfa-7a7719af8762",
+      "name": "Mark Excel Done",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [
+        2432,
+        0
+      ],
+      "executeOnce": true,
+      "webhookId": "31a69f40-702d-453f-84b3-e448252efa80"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "/**\n * n8n Code node — \"Build Mapping Prompt\" (profile-miss path only)\n * Mode: Run Once for Each Item\n */\n\nconst item = $input.item.json;\n\nconst TARGET_FIELDS = [\n  ['productName',   'REQUIRED. Product/article/description column.'],\n  ['brand',         'Brand or producer, if a separate column exists.'],\n  ['variant',       'Variant/type qualifier, e.g. \"Blue Label\", \"Extra Dry\".'],\n  ['category',      'Beer / Spirits / Wine / Soft Drinks / Grocery etc.'],\n  ['volumeMl',      'Unit volume. May read 70cl, 0.7L, 700ml.'],\n  ['pcsCase',       'Units per case. Often \"PCS\", \"P/C\", \"units\", \"x\".'],\n  ['unitType',      'Bottle / Can / Jar / Pack / Piece.'],\n  ['abv',           'Alcohol by volume percentage.'],\n  ['originCountry', 'Country of origin.'],\n  ['bondStatus',    'Bond/customs status: Bonded, T1, T2, Duty Paid, On Floor.'],\n  ['buyPrice',      'REQUIRED. The price WE PAY the supplier. If several price columns exist, choose the supplier/cost price, never a retail or RRP column.'],\n  ['currency',      'Currency column, if separate from the price.'],\n  ['priceType',     'Whether the price is per case, per bottle, per piece.'],\n  ['stockCases',    'Available stock in cases.'],\n  ['moq',           'Minimum order quantity.'],\n  ['leadTime',      'Lead time / delivery time.'],\n  ['eanUnit',       'EAN/barcode for the unit.'],\n  ['eanCase',       'EAN/barcode for the case.'],\n  ['bbd',           'Best before date / expiry.'],\n  ['incoterm',      'EXW / FCA / FOB / CIF / DAP / DDP.'],\n  ['warehouse',     'Warehouse or stock location.'],\n];\n\nconst headerTable = (item.headerCells || [])\n  .map((h, i) => `  [${i}] ${h || '(blank)'}`)\n  .join('\\n');\n\nconst sampleTable = (item.sampleRows || [])\n  .map((r, i) => `  row ${i + 1}: ${JSON.stringify(r.slice(0, 30))}`)\n  .join('\\n');\n\nconst prompt = `You are mapping a supplier price-list spreadsheet to a fixed schema.\n\nCOLUMN HEADERS (index in brackets):\n${headerTable}\n\nSAMPLE DATA ROWS:\n${sampleTable}\n\nTARGET FIELDS:\n${TARGET_FIELDS.map(([k, d]) => `  ${k}: ${d}`).join('\\n')}\n\nReturn ONLY a single JSON object, no prose, no code fence, no commentary, and\nno corrections or second attempts. Your entire output must start with { and end\nwith }. If you reconsider, output ONLY your final corrected object. Of the form:\n{\"columnMap\": {\"productName\": 2, \"buyPrice\": 7}, \"defaults\": {\"currency\": \"EUR\"}, \"confidence\": \"high\", \"notes\": \"\"}\n\nRules:\n- Values in columnMap are the integer column indices shown above.\n- Omit any target field with no corresponding column. Do not guess.\n- If a value is constant for the whole sheet rather than a column (e.g. the\n  currency appears only in the header text), put it in \"defaults\" instead.\n- productName and buyPrice are required. If either cannot be identified with\n  confidence, set \"confidence\" to \"low\" and explain in \"notes\".\n- Where several columns could be the price, prefer the one we pay the supplier.\n  Never map a retail, RRP, or client-facing price to buyPrice.`;\n\nreturn { json: { ...item, mappingPrompt: prompt } };\n"
+      },
+      "id": "7f4fe3ed-4c2b-4b3d-b775-b51054ffbf37",
+      "name": "Build Mapping Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1552,
+        208
+      ]
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "claude-sonnet-4-5-20250929"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.mappingPrompt }}"
+            }
+          ]
+        },
+        "simplify": false,
+        "options": {
+          "maxTokens": 1024,
+          "temperature": 0
+        }
+      },
+      "id": "e176ab0d-dbc5-4b41-9dc7-d91ba648986b",
+      "name": "Map Columns (LLM)",
+      "type": "@n8n/n8n-nodes-langchain.anthropic",
+      "typeVersion": 1,
+      "position": [
+        1760,
+        208
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "/**\n * n8n Code node — \"Save Profile\"\n * Mode: Run Once for Each Item\n */\n\nconst item = $input.item.json;\n\nconst raw = item.content?.[0]?.text ?? item.text ?? item.message?.content ?? item.response ?? '';\n\nconst parsed = parseMappingResponse(raw);\n\nif (!parsed.ok) {\n  return {\n    json: {\n      ...item,\n      profileSaved: false,\n      needsReview: true,\n      exceptionReason: `Column mapping not usable: ${parsed.reason}`,\n      reviewHeaderSample: item.headerSample,\n      reviewSampleRows: JSON.stringify(item.sampleRows || []).slice(0, 5000),\n      modelReply: String(raw).slice(0, 2000),\n    },\n  };\n}\n\nconst profileName = [\n  item.fileName ? String(item.fileName).replace(/\\.[^.]+$/, '') : 'Unknown file',\n  item.sectionLabel ? `— ${item.sectionLabel}` : '',\n].join(' ').trim();\n\nreturn {\n  json: {\n    ...item,\n    profileSaved: true,\n    needsReview: false,\n\n    'Profile Name': profileName,\n    'Header Fingerprint': item.fingerprint,\n    'Section Label': item.sectionLabel || '',\n    'Header Sample': item.headerSample || '',\n    'Column Map': JSON.stringify(parsed.columnMap),\n    'Defaults': JSON.stringify(withRequiredDefaults(parsed.defaults)),\n    'Confidence': 'High',\n    'Created By': 'LLM',\n    'Times Used': 0,\n    'Status': 'Active',\n    'Notes': [\n      `Auto-mapped from ${item.fileName || 'an attachment'} on first sight.`,\n      parsed.notes ? `Model notes: ${parsed.notes}` : '',\n      'REVIEW BEFORE RELYING ON IT: volumeUnit, stockUnit and priceType are',\n      'assumptions unless the sheet states them. priceType in particular is a',\n      '6-48x error if wrong — drinks lists price per case, FMCG per piece.',\n    ].filter(Boolean).join(' '),\n\n    columnMap: parsed.columnMap,\n    profileDefaults: withRequiredDefaults(parsed.defaults),\n  },\n};\n\nfunction withRequiredDefaults(defaults) {\n  const d = { ...(defaults || {}) };\n  if (!d.currency) d.currency = 'EUR';\n  if (!d.volumeUnit) d.volumeUnit = 'ml';\n  if (!d.stockUnit) d.stockUnit = 'cases';\n  if (!d.priceType) d.priceType = 'Per Case';\n  return d;\n}\n\n/**\n * Robust extraction of the column mapping from the model reply.\n *\n * claude-sonnet-4-5 sometimes returns a CHATTY reply: MULTIPLE ```json blocks\n * separated by prose (\"Wait, let me correct that:\"), the last block being its\n * corrected answer. The old parser stripped a single fence pair then, on\n * failure, grabbed /\\{[\\s\\S]*\\}/ — a greedy span from the first { to the last }\n * that glued both objects AND the prose between them into one blob that never\n * JSON.parses. Confirmed cause of parsedCount 0 in execution 9377.\n *\n * We now collect every candidate object — each ```json/``` fenced block, then\n * every brace-balanced { ... } span in the raw text — JSON.parse each, and keep\n * the LAST one that both parses and carries a usable map (productName +\n * buyPrice, not low confidence). On total failure we return { ok:false } so the\n * caller routes the section to review with a clear note rather than emitting 0.\n */\nfunction parseMappingResponse(rawText) {\n  const text = String(rawText ?? '');\n  const candidates = [];\n\n  const fence = /```(?:json)?\\s*([\\s\\S]*?)```/gi;\n  let fm;\n  while ((fm = fence.exec(text)) !== null) {\n    const body = fm[1] && fm[1].trim();\n    if (body) candidates.push(body);\n  }\n\n  for (const span of balancedObjects(text)) candidates.push(span);\n\n  let reason = 'model did not return JSON';\n  let best = null;\n  for (const cand of candidates) {\n    let obj;\n    try { obj = JSON.parse(cand); } catch { reason = 'model returned malformed JSON'; continue; }\n    if (!obj || typeof obj !== 'object') continue;\n    const map = obj.columnMap || {};\n    if (map.productName === undefined || map.buyPrice === undefined) {\n      reason = 'mapping missing productName or buyPrice';\n      continue;\n    }\n    if (String(obj.confidence).toLowerCase() === 'low') {\n      reason = `low confidence — ${obj.notes || 'unspecified'}`;\n      continue;\n    }\n    best = obj; // keep scanning — the LAST usable block wins (the correction)\n  }\n\n  if (!best) return { ok: false, reason };\n\n  const clean = {};\n  for (const [k, v] of Object.entries(best.columnMap || {})) {\n    if (Number.isInteger(v) && v >= 0) clean[k] = v;\n  }\n  return { ok: true, columnMap: clean, defaults: best.defaults || {}, notes: best.notes || '' };\n}\n\n/**\n * Every top-level brace-balanced { ... } span in the text, in order. A depth\n * scan (string-aware) so two adjacent objects can never be glued into one\n * unparseable blob the way a single greedy regex does.\n */\nfunction balancedObjects(text) {\n  const s = String(text);\n  const out = [];\n  let depth = 0, start = -1, inStr = false, quote = '', esc = false;\n  for (let i = 0; i < s.length; i++) {\n    const c = s[i];\n    if (inStr) {\n      if (esc) esc = false;\n      else if (c === '\\\\') esc = true;\n      else if (c === quote) inStr = false;\n      continue;\n    }\n    if (c === '\"' || c === \"'\") { inStr = true; quote = c; continue; }\n    if (c === '{') { if (depth === 0) start = i; depth++; }\n    else if (c === '}') {\n      if (depth > 0) { depth--; if (depth === 0 && start >= 0) { out.push(s.slice(start, i + 1)); start = -1; } }\n    }\n  }\n  return out;\n}\n"
+      },
+      "id": "0174f60e-a15e-4751-9824-20893695a70f",
+      "name": "Save Profile",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1984,
+        208
+      ]
+    },
+    {
+      "id": "97f92599-2c57-4909-a6c7-5eb501dded8d",
+      "name": "Fetch Suppliers",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2,
+      "position": [
+        1872,
+        0
+      ],
+      "parameters": {
+        "base": {
+          "__rl": true,
+          "mode": "id",
+          "value": "appaDSdZkAE9PGkjT"
+        },
+        "operation": "search",
+        "options": {
+          "fields": [
+            "Supplier Name",
+            "Email",
+            "Default Validity Days",
+            "Trust Score",
+            "Status",
+            "Skip Offer Ingestion",
+            "Default Currency"
+          ]
+        },
+        "table": {
+          "__rl": true,
+          "mode": "id",
+          "value": "tblQkV5h5zuJD13w7"
+        }
+      },
+      "alwaysOutputData": true,
+      "executeOnce": true
+    },
+    {
+      "id": "58ac28fe-c5de-4387-866d-ef07fad15a5f",
+      "name": "Fetch Ingested Message IDs",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2,
+      "position": [
+        1872,
+        160
+      ],
+      "parameters": {
+        "base": {
+          "__rl": true,
+          "mode": "id",
+          "value": "appaDSdZkAE9PGkjT"
+        },
+        "operation": "search",
+        "options": {
+          "fields": [
+            "Source Message ID"
+          ]
+        },
+        "table": {
+          "__rl": true,
+          "mode": "id",
+          "value": "tbljBgWrnIMZzkSAr"
+        }
+      },
+      "alwaysOutputData": true,
+      "executeOnce": true
+    },
+    {
+      "id": "b1000000-0000-4000-8000-000000000101",
+      "name": "Resolve Supplier",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1904,
+        340
+      ],
+      "parameters": {
+        "jsCode": "/**\n * n8n Code node — \"Resolve Supplier\"\n * Mode: Run Once for All Items\n *\n * Added 2026-08-04. Run-level supplier resolution for the (possibly forwarded)\n * sender. Read Workbook now yields a real fromAddress — the forwarded sender is\n * preferred over the akay.ie forwarder — plus an externalSender flag.\n *\n * Existing suppliers are matched BY EMAIL first, then by a non-generic DOMAIN,\n * so a re-forwarded email from a supplier we already hold (e.g. Halıtlar,\n * sales5@halitlar.com) resolves to the existing record and is never duplicated.\n * Only when no existing supplier matches AND the sender is a plausible external\n * address do we flag needCreate — never for our own akay.ie / offers@akay.ie\n * envelope, which is routed to review (left unresolved) instead.\n */\n\nconst GENERIC = new Set([\n  'gmail.com', 'hotmail.com', 'hotmail.fr', 'outlook.com', 'yahoo.com',\n  'yahoo.co.uk', 'live.com', 'icloud.com', 'aol.com', 'protonmail.com', 'gmx.com',\n]);\n\nlet meta = {};\ntry { meta = $('Read Workbook').first().json || {}; } catch (e) { meta = {}; }\n\nconst fromAddress = String(meta.fromAddress || '').trim().toLowerCase();\nconst senderName = String(meta.senderName || '').trim();\nconst senderDomain = String(meta.senderDomain || (fromAddress.split('@')[1] || '')).toLowerCase();\nconst externalSender = Boolean(meta.externalSender);\n\n// Suppliers keyed by full email and by unambiguous domain.\nconst byAddress = new Map();\nconst byDomain = new Map();\nlet suppliers = [];\ntry { suppliers = $('Fetch Suppliers').all().map((i) => i.json || {}); } catch (e) { suppliers = []; }\n\nfor (const s of suppliers) {\n  const f = s.fields || s;\n  if (!s.id) continue;\n  const email = String(f['Email'] || '').trim().toLowerCase();\n  if (!email) continue;\n  const rec = { id: s.id, name: f['Supplier Name'] || null, validityDays: f['Default Validity Days'] ?? null, defaultCurrency: selectName(f['Default Currency']) || null };\n  if (!byAddress.has(email)) byAddress.set(email, rec);\n  const d = email.split('@')[1];\n  if (d) { if (byDomain.has(d)) byDomain.set(d, null); else byDomain.set(d, rec); }\n}\n\nlet existing = null;\nlet via = 'unresolved';\nif (fromAddress) {\n  existing = byAddress.get(fromAddress) || null;\n  if (existing) via = `existing supplier by email ${fromAddress}`;\n  else if (senderDomain && !GENERIC.has(senderDomain)) {\n    const d = byDomain.get(senderDomain);\n    if (d) { existing = d; via = `existing supplier by domain ${senderDomain}`; }\n  }\n}\n\nconst needCreate = !existing && externalSender && /@/.test(fromAddress);\nconst createName = senderName || senderDomain || fromAddress;\n\nreturn [{\n  json: {\n    fromAddress,\n    senderName,\n    senderDomain,\n    externalSender,\n    envelopeFrom: meta.envelopeFrom || '',\n    existingSupplierId: existing ? existing.id : null,\n    existingSupplierName: existing ? existing.name : null,\n    existingValidityDays: existing ? existing.validityDays : null,\n    existingDefaultCurrency: existing ? existing.defaultCurrency : null,\n    needCreate,\n    createEmail: fromAddress,\n    createName,\n    via: existing\n      ? via\n      : needCreate\n        ? `auto-create external supplier ${fromAddress}`\n        : `no external sender to resolve (envelope ${meta.envelopeFrom || 'unknown'}) — left for review`,\n  },\n}];\n\nfunction selectName(v) {\n  const a = Array.isArray(v) ? v[0] : v;\n  if (a === null || a === undefined) return null;\n  return typeof a === 'object' ? (a.name || null) : String(a);\n}\n"
+      }
+    },
+    {
+      "id": "b1000000-0000-4000-8000-000000000102",
+      "name": "Need Supplier?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2064,
+        340
+      ],
+      "parameters": {
+        "conditions": {
+          "combinator": "and",
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "need-create",
+              "leftValue": "={{ $json.needCreate }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "b1000000-0000-4000-8000-000000000103",
+      "name": "Create Missing Supplier",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        2224,
+        260
+      ],
+      "parameters": {
+        "resource": "record",
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "mode": "id",
+          "value": "appaDSdZkAE9PGkjT"
+        },
+        "table": {
+          "__rl": true,
+          "mode": "id",
+          "value": "tblQkV5h5zuJD13w7"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Supplier Name": "={{ $json.createName }}",
+            "Email": "={{ $json.createEmail }}",
+            "Status": "Active",
+            "Trust Score": "Medium",
+            "Notes": "=Auto-created by Claude on {{ $now.toISODate() }} from a first-time forwarded Excel offer (sender {{ $json.createEmail }}). Trust Score Medium; column mapping not yet verified."
+          }
+        },
+        "options": {
+          "typecast": true
+        }
+      }
+    },
+    {
+      "id": "b1000000-0000-4000-8000-000000000104",
+      "name": "Merge Supplier",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2384,
+        340
+      ],
+      "parameters": {
+        "jsCode": "/**\n * n8n Code node — \"Merge Supplier\"\n * Mode: Run Once for All Items\n *\n * Added 2026-08-04. Collapses the resolve/create branch back to a single\n * run-level supplier for Build Airtable Payload. Reads the resolution from\n * Resolve Supplier and, when the auto-create branch ran, the freshly created\n * Supplier record from Create Missing Supplier (a created id wins).\n */\n\nlet resolved = {};\ntry { resolved = $('Resolve Supplier').first().json || {}; } catch (e) { resolved = {}; }\n\nlet supplierRecordId = resolved.existingSupplierId || null;\nlet supplierName = resolved.existingSupplierName || null;\nlet validityDays = resolved.existingValidityDays ?? null;\nlet defaultCurrency = resolved.existingDefaultCurrency || null;\nlet via = resolved.via || 'unresolved';\n\ntry {\n  const created = $('Create Missing Supplier').first().json;\n  if (created && created.id) {\n    supplierRecordId = created.id;\n    const f = created.fields || created;\n    supplierName = f['Supplier Name'] || resolved.createName || null;\n    validityDays = f['Default Validity Days'] ?? null;\n    via = `auto-created supplier ${resolved.createEmail || ''} (Trust Score Medium)`;\n  }\n} catch (e) { /* auto-create branch did not run — keep the resolved values */ }\n\nreturn [{\n  json: {\n    supplierRecordId,\n    supplierName,\n    validityDays,\n    defaultCurrency,\n    via,\n    fromAddress: resolved.fromAddress || '',\n    externalSender: Boolean(resolved.externalSender),\n  },\n}];\n"
+      }
+    }
+  ],
+  "nodeGroups": [],
+  "activeVersion": {
+    "nodes": [
+      {
+        "parameters": {
+          "pollTimes": {
+            "item": [
+              {
+                "mode": "everyMinute"
+              }
+            ]
+          },
+          "simple": false,
+          "filters": {
+            "q": "label:Process_Akay has:attachment -label:Akay/Excel-Done"
+          },
+          "options": {
+            "downloadAttachments": true
+          }
+        },
+        "id": "bb510921-66fb-4e45-974a-282717996e02",
+        "name": "Gmail Trigger",
+        "type": "n8n-nodes-base.gmailTrigger",
+        "typeVersion": 1,
+        "position": [
+          0,
+          80
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "/**\n * n8n Code node — \"Select Spreadsheets\"\n * Mode: Run Once for All Items\n *\n * Hardened 2026-08-04. Emits ONE item per SPREADSHEET attachment and nothing\n * else. Selection is by file extension (.xlsx/.xlsm/.xltx/.xls/.csv/.tsv,\n * case-insensitive, with trailing spaces/dots tolerated so\n * \"3.08.2026 P&G .xlsx\" and non-ASCII names like\n * \"Ağustos-Nestle_FiyatListesi.xlsx\" are kept) OR by spreadsheet MIME type\n * (for a mangled or missing filename). Inline images (image001.jpg signature\n * logos) and every other non-spreadsheet part are dropped. There is NO cap —\n * every matching attachment on the message is processed.\n */\n\nconst SPREADSHEET_EXT = /\\.(xlsx|xlsm|xltx|xls|csv|tsv)\\s*$/i;\nconst IMAGE_EXT = /\\.(jpe?g|png|gif|bmp|svg|webp|tiff?|heic|ico)\\s*$/i;\nconst SPREADSHEET_MIME = /(spreadsheetml|ms-excel|excel|csv|tab-separated|vnd\\.oasis\\.opendocument\\.spreadsheet)/i;\nconst IMAGE_MIME = /^image\\//i;\n\nconst out = [];\nconst skipped = [];\n\nfor (const item of $input.all()) {\n  const binaries = item.binary || {};\n\n  for (const [binaryKey, binary] of Object.entries(binaries)) {\n    const rawName = binary && typeof binary.fileName === 'string' ? binary.fileName : '';\n    const name = String(rawName || binaryKey).trim();\n    const mime = String((binary && binary.mimeType) || '').trim();\n\n    // Inline images and signature logos: never treat these as spreadsheets.\n    const isImage = IMAGE_EXT.test(name) || IMAGE_MIME.test(mime);\n    const isSpreadsheet = !isImage && (SPREADSHEET_EXT.test(name) || SPREADSHEET_MIME.test(mime));\n\n    if (isSpreadsheet) {\n      out.push({\n        json: {\n          binaryKey,\n          fileName: name,\n          mimeType: mime,\n          messageId: item.json.id || item.json.messageId || null,\n          threadId: item.json.threadId || null,\n          subject: item.json.subject || '',\n          from: item.json.from || '',\n        },\n        binary: { [binaryKey]: binary },\n      });\n    } else {\n      skipped.push(name || binaryKey);\n    }\n  }\n}\n\nif (skipped.length) {\n  console.log(`Select Spreadsheets: kept ${out.length}, skipped ${skipped.length} non-spreadsheet part(s): ${skipped.join(', ')}`);\n}\n\nreturn out;\n"
+        },
+        "id": "4214e36b-2e4e-4173-931e-f68a532ee334",
+        "name": "Select Spreadsheets",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          224,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "xlsx",
+          "binaryPropertyName": "={{ $json.binaryKey }}",
+          "options": {
+            "headerRow": false,
+            "includeEmptyCells": true,
+            "rawData": true
+          }
+        },
+        "id": "dd4508e4-e63a-4f39-94b4-34bf73c0259e",
+        "name": "Extract From File",
+        "type": "n8n-nodes-base.extractFromFile",
+        "typeVersion": 1,
+        "position": [
+          448,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "/**\n * n8n Code node — \"Read Workbook\"\n * Mode: Run Once for All Items\n */\n\nconst GMAIL_NODE = 'Gmail Trigger';\n\nlet meta = {};\ntry {\n  const g = $(GMAIL_NODE).first().json;\n  const body = String(g.text || g.textAsHtml || g.html || g.snippet || '');\n  const envelope = extractEmail(g.from ?? g.From ?? '');\n  const forwarded = forwardedSender(body);\n  const effective = (forwarded && forwarded.address) || envelope.address || '';\n  const domain = (effective.split('@')[1] || '').toLowerCase();\n  meta = {\n    sourceMessageId: g.id || g.messageId || null,\n    threadId: g.threadId || null,\n    fromAddress: effective,\n    envelopeFrom: envelope.address || '',\n    forwardedFrom: forwarded ? forwarded.address : '',\n    senderName: (forwarded && forwarded.name) || envelope.name || '',\n    senderDomain: domain,\n    senderFromForward: Boolean(forwarded),\n    externalSender: Boolean(effective) && /@/.test(effective) && !/@akay\\.ie$/i.test(effective),\n    subject: g.subject || g.Subject || '',\n  };\n} catch (e) {\n  meta = { sourceMessageId: null, threadId: null, fromAddress: '', envelopeFrom: '', forwardedFrom: '', senderName: '', senderDomain: '', senderFromForward: false, externalSender: false, subject: '' };\n}\n\nconst items = $input.all();\nif (items.length === 0) return [];\n\nconst rows = items.map((item) => toCellArray(item.json)).filter((r) => r.length > 0);\nif (rows.length < 2) return [];\n\nwhile (rows.length && rows[rows.length - 1].every((c) => String(c ?? '').trim() === '')) rows.pop();\n\nreturn [{\n  json: {\n    ...meta,\n    fileName: fileNameFor(items[0]),\n    sheetName: sheetNameFor(),\n    rows,\n    rowCount: rows.length,\n  },\n}];\n\nfunction toCellArray(json) {\n  if (!json || typeof json !== 'object') return [];\n\n  if (Array.isArray(json.row)) return json.row.map(cell);\n\n  const indexed = Object.keys(json)\n    .map((k) => ({ k, i: parseIndex(k) }))\n    .filter((x) => x.i !== null)\n    .sort((a, b) => a.i - b.i);\n\n  if (indexed.length) {\n    const out = [];\n    for (const { k, i } of indexed) out[i] = cell(json[k]);\n    return Array.from(out, (v) => v ?? '');\n  }\n\n  return Object.values(json).map(cell);\n}\n\nfunction parseIndex(key) {\n  const m = String(key).match(/^(?:row_|col_|column_)?(\\d+)$/i);\n  return m ? Number(m[1]) : null;\n}\n\nfunction cell(v) {\n  if (v === null || v === undefined) return '';\n  if (v instanceof Date) return v;\n  return String(v);\n}\n\nfunction fileNameFor(item) {\n  const j = item.json || {};\n  if (j.fileName) return j.fileName;\n  const bin = item.binary && Object.values(item.binary)[0];\n  if (bin && bin.fileName) return bin.fileName;\n  try {\n    const g = $(GMAIL_NODE).first();\n    const gb = g.binary && Object.values(g.binary)[0];\n    if (gb && gb.fileName) return gb.fileName;\n  } catch (e) { /* trigger unavailable — fall through */ }\n  return 'unknown.xlsx';\n}\n\nfunction sheetNameFor() {\n  try {\n    const n = $('Extract From File');\n    const name = n.params && (n.params.options?.sheetName || n.params.sheetName);\n    if (name) return String(name);\n  } catch (e) { /* not resolvable at runtime */ }\n  return 'Sheet1';\n}\n\n/**\n * Envelope sender as { address, name }. Gmail Trigger (simple:false) delivers\n * `from` as an OBJECT ({ value:[{address,name}], text, html }); the old code\n * String()-ified that to \"[object object]\", so supplier resolution by sender\n * never matched. Both the object and the raw \"Name <addr>\" string are handled.\n */\nfunction extractEmail(raw) {\n  if (raw && typeof raw === 'object') {\n    const v = Array.isArray(raw.value) ? raw.value[0] : null;\n    if (v && v.address) return { address: String(v.address).trim().toLowerCase(), name: String(v.name || '').trim() };\n    return parseAddr(String(raw.text || raw.html || ''));\n  }\n  return parseAddr(String(raw));\n}\n\nfunction parseAddr(s) {\n  const m = String(s).match(/<([^>]+)>/);\n  const address = (m ? m[1] : String(s)).trim().toLowerCase();\n  let name = '';\n  const nm = String(s).match(/^\\s*\"?([^\"<]+?)\"?\\s*</);\n  if (nm) name = nm[1].trim();\n  return { address, name };\n}\n\n/**\n * Real supplier from a FORWARDED body header. Offers arrive forwarded into\n * ak@akay.ie / offers@akay.ie, so the envelope sender is the forwarder, not the\n * supplier — the supplier sits in the \"From:\" line under the forward marker.\n * Returns { address, name } or null; null when the address is our own akay.ie\n * (a forward of our own mail is not a supplier), so we never auto-create from it.\n */\nfunction forwardedSender(text) {\n  const src = String(text);\n  const fwd = src.match(/-{2,}\\s*(?:Forwarded|Original)\\s*message\\s*-{2,}/i)\n           || src.match(/Begin forwarded message:/i);\n  if (!fwd || fwd.index === undefined) return null;\n  const header = src.slice(fwd.index, fwd.index + 800);\n  const m = header.match(/\\n\\s*\\*?\\s*From:\\s*\\*?\\s*(.*?)([^\\s<>\"]+@[^\\s<>\"]+\\.[a-z]{2,})/i);\n  if (!m) return null;\n  const address = m[2].toLowerCase().replace(/[.,;>]+$/, '');\n  if (/@akay\\.ie$/i.test(address)) return null;\n  const name = String(m[1] || '').replace(/[<\"]/g, '').replace(/[-–\\s]+$/, '').trim();\n  return { address, name };\n}\n"
+        },
+        "id": "edd7282d-be06-4232-a2c7-1453661c8f69",
+        "name": "Read Workbook",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          672,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "/**\n * n8n Code node — \"Detect Header\"\n * Mode: Run Once for All Items\n *\n * Splits each worksheet into SECTIONS and emits one item per section.\n */\n\nconst HEADER_MIN_SCORE = 3;\nconst MAX_CONTINUATION_ROWS = 2;\n\nconst HEADER_HINTS = [\n  'product', 'description', 'brand', 'article', 'item', 'name',\n  'price', 'eur', 'usd', 'cost', 'ppc', 'euro',\n  'case', 'carton', 'ctn', 'pcs', 'units', 'pack', 'qty', 'quantity', 'stock', 'available',\n  'volume', 'size', 'cl', 'ml', 'ltr', 'litre', 'content',\n  'abv', 'alc', 'vol',\n  'origin', 'country', 'ean', 'barcode', 'sku', 'code',\n  'bond', 'customs', 'status', 't1', 't2', 'duty', 'incoterm', 'warehouse', 'delivery',\n  'bbd', 'expiry', 'best before', 'moq', 'pallet', 'lead', 'variant', 'comment',\n];\n\nconst out = [];\n\nfor (const input of $input.all()) {\n  const item = input.json;\n  const rows = item.rows || [];\n\n  const sections = [];\n  let i = 0;\n  while (i < rows.length) {\n    if (scoreAsHeader(rows[i], rows[i + 1]) < HEADER_MIN_SCORE) { i++; continue; }\n\n    let headerCells = (rows[i] || []).map((c) => String(c ?? '').trim());\n    let consumed = i;\n    for (let n = 1; n <= MAX_CONTINUATION_ROWS; n++) {\n      if (!isContinuationRow(rows[i + n], headerCells)) break;\n      headerCells = mergeHeaderRow(headerCells, rows[i + n]);\n      consumed = i + n;\n    }\n\n    sections.push({ start: i, consumed, headerCells });\n    i = consumed + 1;\n  }\n\n  if (sections.length === 0) {\n    out.push({ json: { ...item, rows: undefined, headerFound: false,\n      exceptionReason: `No header row detected in \"${item.sheetName}\"` } });\n    continue;\n  }\n\n  sections.forEach(({ start, consumed, headerCells }, s) => {\n    const end = s + 1 < sections.length ? sections[s + 1].start : rows.length;\n    const dataRows = rows.slice(consumed + 1, end)\n      .filter((r) => r.some((c) => String(c ?? '').trim() !== ''));\n\n    if (dataRows.length === 0) return;\n\n    if (!hasPriceColumn(headerCells)) {\n      out.push({ json: { ...item, rows: undefined, headerFound: false,\n        sectionLabel: sectionLabel(headerCells),\n        headerSample: headerCells.filter(Boolean).join(' | '),\n        exceptionReason: `Section at row ${start} of \"${item.sheetName}\" has no price column — treated as a non-offer block` } });\n      return;\n    }\n\n    out.push({\n      json: {\n        ...item,\n        rows: undefined,\n        headerFound: true,\n        sectionIndex: s,\n        sectionCount: sections.length,\n        sectionLabel: sectionLabel(headerCells),\n        headerRowIndex: start,\n        dataStartRow: consumed + 1,\n        headerCells,\n        dataRows,\n        rowCount: dataRows.length,\n        fingerprint: fingerprint(headerCells),\n        headerSample: headerCells.filter(Boolean).join(' | '),\n        sampleRows: dataRows.slice(0, 5),\n      },\n    });\n  });\n}\n\nreturn out;\n\nfunction scoreAsHeader(row, next) {\n  if (!Array.isArray(row)) return 0;\n\n  const cells = row.map((c) => String(c ?? '').trim()).filter(Boolean);\n  if (cells.length < 3) return 0;\n\n  const numeric = cells.filter(isNumericish).length;\n  if (numeric >= 2) return 0;\n\n  let score = Math.min(cells.length, 8) * 0.5;\n\n  for (const cell of cells) {\n    const lower = cell.toLowerCase();\n    if (HEADER_HINTS.some((h) => lower.includes(h))) score += 1.5;\n  }\n\n  score -= numeric * 1.5;\n\n  if (Array.isArray(next)) {\n    const nextCells = next.map((c) => String(c ?? '').trim()).filter(Boolean);\n    if (nextCells.length >= 3 && nextCells.some(isNumericish)) score += 2;\n  }\n\n  return score;\n}\n\nfunction isContinuationRow(row, header) {\n  if (!Array.isArray(row)) return false;\n\n  const cells = row.map((c) => String(c ?? '').trim());\n  const filled = cells.filter(Boolean);\n  if (filled.length < 2) return false;\n  if (filled.length > header.filter(Boolean).length) return false;\n  if (filled.some(isNumericish)) return false;\n\n  return filled.filter((c) => c.length <= 15).length >= Math.ceil(filled.length / 2);\n}\n\nfunction mergeHeaderRow(header, contRow) {\n  const cont = (contRow || []).map((c) => String(c ?? '').trim());\n  const width = Math.max(header.length, cont.length);\n  const merged = [];\n\n  for (let i = 0; i < width; i++) {\n    const base = header[i] || '';\n    const sub = cont[i] || '';\n    merged.push(sub && sub.length <= 15 ? `${base} ${sub}`.trim() : base);\n  }\n  return merged;\n}\n\nfunction sectionLabel(headerCells) {\n  const generic = /^(qty|quantity|cartons?|available|description|product|item)\\b/i;\n  const candidate = headerCells.find((c) => c && c.length <= 30 && !generic.test(c) && !/^\\d/.test(c));\n  return candidate || headerCells.find(Boolean) || '';\n}\n\nfunction hasPriceColumn(headerCells) {\n  const PRICE_TOKENS = ['price', 'euro', 'eur', 'usd', 'gbp', 'cost', 'prijs', 'prezzo', '€', '$', '£'];\n  return headerCells.some((c) => {\n    const lower = String(c || '').toLowerCase();\n    return PRICE_TOKENS.some((t) => lower.includes(t));\n  });\n}\n\nfunction isNumericish(v) {\n  const s = String(v).replace(/[\\s€$£,]/g, '');\n  return s !== '' && !Number.isNaN(Number(s.replace(',', '.')));\n}\n\nfunction fingerprint(cells) {\n  const norm = cells\n    .filter((c) => c && !isNumericish(c))\n    .map((c) => c.toLowerCase().replace(/[^a-z0-9]/g, ''))\n    .filter(Boolean)\n    .sort();\n  return 'h' + djb2(norm.join('~')).toString(16).padStart(8, '0');\n}\n\nfunction djb2(str) {\n  let h = 5381;\n  for (let i = 0; i < str.length; i++) {\n    h = ((h << 5) + h + str.charCodeAt(i)) >>> 0;\n  }\n  return h;\n}\n"
+        },
+        "id": "e08789d1-001a-47f1-b32c-6a7d2b04143b",
+        "name": "Detect Header",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          880,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "search",
+          "base": {
+            "__rl": true,
+            "value": "appaDSdZkAE9PGkjT",
+            "mode": "id"
+          },
+          "table": {
+            "__rl": true,
+            "value": "tblnsxQlNDzpHhwfV",
+            "mode": "id"
+          },
+          "filterByFormula": "=AND({Status}=\"Active\",{Confidence}=\"High\")",
+          "options": {}
+        },
+        "id": "a8de4005-bdf6-4619-9485-03489f940d60",
+        "name": "Find Sheet Profile",
+        "type": "n8n-nodes-base.airtable",
+        "typeVersion": 2,
+        "position": [
+          1104,
+          0
+        ],
+        "executeOnce": true,
+        "alwaysOutputData": true
+      },
+      {
+        "parameters": {
+          "jsCode": "/**\n * n8n Code node — \"Match Profile\"\n * Mode: Run Once for All Items\n */\n\nconst sections = $('Detect Header').all();\nconst profileItems = $input.all();\n\nconst byFingerprint = new Map();\nfor (const p of profileItems) {\n  const rec = p.json || {};\n  const fp = rec['Header Fingerprint'];\n  if (fp && !byFingerprint.has(fp)) byFingerprint.set(fp, rec);\n}\n\nconst out = [];\nfor (const s of sections) {\n  const item = s.json || {};\n\n  if (!item.headerFound || !item.fingerprint) {\n    out.push({ json: { ...item, profileFound: false } });\n    continue;\n  }\n\n  const rec = byFingerprint.get(item.fingerprint);\n  if (!rec) {\n    out.push({ json: { ...item, profileFound: false } });\n    continue;\n  }\n\n  let columnMap = {};\n  let profileDefaults = {};\n  try { columnMap = JSON.parse(rec['Column Map'] || '{}'); } catch (e) {}\n  try { profileDefaults = JSON.parse(rec['Defaults'] || '{}'); } catch (e) {}\n\n  const supplierLink = rec['Supplier'];\n  const supplierRecordId = Array.isArray(supplierLink) && supplierLink.length ? supplierLink[0] : null;\n\n  out.push({\n    json: {\n      ...item,\n      profileFound: true,\n      profileId: rec.id || null,\n      columnMap,\n      profileDefaults,\n      supplierRecordId,\n      supplierValidityDays: rec['Validity Days'] ?? null,\n    },\n  });\n}\n\nreturn out;\n"
+        },
+        "id": "5cebc245-0a10-4369-a112-7c0e1856c40c",
+        "name": "Match Profile",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1216,
+          128
+        ],
+        "notesInFlow": true,
+        "notes": "Re-joins section data (from Detect Header) with the profiles fetched by Find Sheet Profile. The Airtable search replaces the item, so this restores dataRows/headerCells and attaches columnMap/profileDefaults."
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "profile-found",
+                "leftValue": "={{ $json.profileFound }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "id": "1c83e1b1-af91-4978-a79b-9de0aca70d08",
+        "name": "Profile Found?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2,
+        "position": [
+          1328,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "mode": "runOnceForEachItem",
+          "jsCode": "/**\n * n8n Code node — \"Normalize Rows\"\n * Mode: Run Once for Each Item\n */\n\nconst OPTIONS = {\n  currency: ['EUR', 'USD', 'GBP', 'AED', 'SGD', 'Other'],\n  unitType: ['Bottle', 'Can', 'Jar', 'Pack', 'Piece', 'Other'],\n  priceType: ['Per Case', 'Per Bottle', 'Per Can', 'Per Piece', 'Per Pack', 'Per Jar'],\n  bond: ['Bonded', 'T1', 'T2', 'Duty Paid', 'On Floor', 'Other'],\n  incoterm: ['EXW', 'FCA', 'FOB', 'CFR', 'CIF', 'DAP', 'DDP', 'Other'],\n  warehouse: ['Loendersloot', 'NL', 'Dubai', 'Poland', 'Riga', 'Spain', 'Vietnam',\n              'Greece', 'Indonesia', 'Czech', 'Other', 'NewCorp', 'Vergèze', 'Bergamo'],\n  category: ['Beer', 'Spirits', 'Champagne', 'Grocery', 'Confectionery',\n             'Toiletries', 'Soft Drinks', 'Other FMCG'],\n};\n\nconst VOLUME_UNIT_FACTOR = { ml: 1, cc: 1, cl: 10, dl: 100, l: 1000, ltr: 1000, litre: 1000 };\n\nconst pad = (v) => String(v).padStart(2, '0');\n\nconst SYNONYMS = {\n  currency: {\n    '€': 'EUR', eur: 'EUR', euro: 'EUR', euros: 'EUR',\n    $: 'USD', usd: 'USD', dollar: 'USD', usdollar: 'USD',\n    '£': 'GBP', gbp: 'GBP', pound: 'GBP', sterling: 'GBP',\n    aed: 'AED', dirham: 'AED', sgd: 'SGD',\n  },\n  bond: {\n    bond: 'Bonded', bonded: 'Bonded', underbond: 'Bonded', inbond: 'Bonded',\n    t1: 'T1', t2: 'T2', export: 'T1', eu: 'T2', community: 'T2',\n    dutypaid: 'Duty Paid', dp: 'Duty Paid', taxpaid: 'Duty Paid',\n    onfloor: 'On Floor', floor: 'On Floor', exstock: 'On Floor',\n  },\n  unitType: {\n    bottle: 'Bottle', btl: 'Bottle', flasche: 'Bottle', bouteille: 'Bottle',\n    can: 'Can', cans: 'Can', tin: 'Can',\n    jar: 'Jar', pack: 'Pack', pouch: 'Pack', piece: 'Piece', pcs: 'Piece', unit: 'Piece',\n  },\n  category: {\n    beer: 'Beer', lager: 'Beer', ale: 'Beer', cider: 'Beer',\n    spirit: 'Spirits', spirits: 'Spirits', whisky: 'Spirits', whiskey: 'Spirits',\n    vodka: 'Spirits', gin: 'Spirits', rum: 'Spirits', liqueur: 'Spirits',\n    cognac: 'Spirits', brandy: 'Spirits', tequila: 'Spirits',\n    champagne: 'Champagne', wine: 'Champagne', wines: 'Champagne',\n    prosecco: 'Champagne', sparkling: 'Champagne', cava: 'Champagne', bordeaux: 'Champagne',\n    softdrink: 'Soft Drinks', softdrinks: 'Soft Drinks', water: 'Soft Drinks',\n    juice: 'Soft Drinks', energy: 'Soft Drinks', soda: 'Soft Drinks',\n    grocery: 'Grocery', food: 'Grocery',\n    confectionery: 'Confectionery', chocolate: 'Confectionery', sweets: 'Confectionery',\n    candy: 'Confectionery', biscuit: 'Confectionery',\n    toiletries: 'Toiletries', cosmetics: 'Toiletries', personalcare: 'Toiletries',\n  },\n};\n\nconst item = $input.item.json;\nconst map = item.columnMap || {};\nconst defaults = item.profileDefaults || {};\nconst headers = item.headerCells || [];\n\n// No usable column map (the LLM mapping failed / needs review, or a stored\n// profile is malformed). Emit ONE visible exception instead of silently\n// dropping every row as 0 — so Build Airtable Payload surfaces it and the\n// section is routed to review rather than vanishing.\nif (map.productName === undefined || map.buyPrice === undefined) {\n  return {\n    json: {\n      fileName: item.fileName,\n      sheetName: item.sheetName,\n      sourceMessageId: item.sourceMessageId,\n      fromAddress: item.fromAddress,\n      supplierRecordId: item.supplierRecordId || null,\n      profileId: item.profileId || null,\n      fingerprint: item.fingerprint,\n      parsedCount: 0,\n      exceptionCount: 1,\n      offers: [],\n      exceptions: [{\n        sheetRow: item.headerRowIndex ?? null,\n        productName: '',\n        exceptionReason: item.exceptionReason\n          || 'No usable column map (needs review): LLM mapping did not yield productName + buyPrice for this section',\n        sourceSheet: `${item.fileName} :: ${item.sheetName}`,\n      }],\n      needsReview: true,\n    },\n  };\n}\n\nconst offers = [];\nconst exceptions = [];\n\n(item.dataRows || []).forEach((row, i) => {\n  const sheetRow = (item.headerRowIndex ?? 0) + 2 + i;\n  const get = (field) => {\n    const idx = map[field];\n    if (idx === undefined || idx === null) return '';\n    return String(row[idx] ?? '').trim();\n  };\n\n  const productName = get('productName');\n  const rawPrice = get('buyPrice');\n\n  if (!productName && !rawPrice) return;\n\n  const problems = [];\n\n  const price = parsePriceCell(rawPrice);\n  if (!productName) problems.push('missing product name');\n  if (price.value === null) problems.push(`unparseable price \"${rawPrice}\"`);\n  else if (price.ambiguous) problems.push(`ambiguous decimal separator in \"${rawPrice}\"`);\n\n  const pack = parsePack(get('packFormat') || get('volumeMl') || productName);\n\n  const volume = parseVolume(get('volumeMl'), defaults.volumeUnit)\n    ?? pack.volumeMl\n    ?? parseVolume(productName, defaults.volumeUnit);\n  const pcsCase = parseNumber(get('pcsCase')).value ?? pack.pcsCase;\n  const abv = parseAbv(get('abv')) ?? pack.abv ?? parseAbv(productName);\n  const weightKg = pack.weightG !== null ? pack.weightG / 1000 : null;\n\n  const bond = coerce('bond', get('bondStatus') || defaults.bondStatus);\n  // Currency actually STATED on the row/sheet (symbol on the price, or a\n  // dedicated currency column) vs. merely inherited from the profile default.\n  // When nothing is stated, the resolved supplier's Default Currency should win\n  // downstream (Build Airtable Payload), so track which case this is.\n  const statedCurrency = price.currency || coerce('currency', get('currency'));\n  const currency = statedCurrency || coerce('currency', defaults.currency);\n  const currencyStated = Boolean(statedCurrency);\n  if (!currency) problems.push('no currency on row or profile default');\n\n  const brand = get('brand') || guessBrand(productName);\n\n  const record = {\n    sheetRow,\n    sourceSheet: `${item.fileName} :: ${item.sheetName}`,\n    sourceMessageId: item.sourceMessageId,\n\n    brand,\n    productName,\n    variant: get('variant') || '',\n    category: coerce('category', get('category') || defaults.category),\n    volumeMl: volume,\n    pcsCase: pcsCase ?? defaults.pcsCase ?? null,\n    unitType: coerce('unitType', get('unitType') || defaults.unitType) || 'Bottle',\n    abv,\n    originCountry: get('originCountry') || defaults.originCountry || '',\n    bondStatus: bond,\n    buyPrice: price.value,\n    currency,\n    priceType: price.basis\n      || coerce('priceType', get('priceType') || defaults.priceType)\n      || 'Per Case',\n    priceBasisStated: Boolean(price.basis),\n    currencyStated,\n    weightKg,\n    stockCases: toCases(parseNumber(get('stockCases')).value, pcsCase, defaults.stockUnit),\n    casesPerPallet: parseNumber(get('casesPerPallet')).value,\n    piecesPerPallet: parseNumber(get('piecesPerPallet')).value,\n    language: get('language') || '',\n    moq: get('moq') || '',\n    leadTime: get('leadTime') || '',\n    eanUnit: cleanEan(get('eanUnit')),\n    eanCase: cleanEan(get('eanCase')),\n    bbd: parseDate(get('bbd')),\n    incoterm: coerce('incoterm', get('incoterm') || defaults.incoterm),\n    warehouse: coerce('warehouse', get('warehouse') || defaults.warehouse),\n\n    productKey: buildProductKey(brand, productName, volume, bond),\n  };\n\n  if (problems.length) {\n    exceptions.push({ ...record, exceptionReason: problems.join('; ') });\n  } else {\n    offers.push(record);\n  }\n});\n\nreturn {\n  json: {\n    fileName: item.fileName,\n    sheetName: item.sheetName,\n    sourceMessageId: item.sourceMessageId,\n    fromAddress: item.fromAddress,\n    supplierRecordId: item.supplierRecordId || null,\n    profileId: item.profileId || null,\n    fingerprint: item.fingerprint,\n    parsedCount: offers.length,\n    exceptionCount: exceptions.length,\n    offers,\n    exceptions,\n  },\n};\n\nfunction parseNumber(raw) {\n  if (raw === null || raw === undefined) return { value: null, ambiguous: false };\n  let s = String(raw).trim();\n  if (!s) return { value: null, ambiguous: false };\n\n  s = s.replace(/euros?|dollars?|pounds?|usd|gbp|aed|sgd|eur|[€$£\\s]/gi, '').trim();\n  if (!s) return { value: null, ambiguous: false };\n\n  if (/[a-z]/i.test(s)) return { value: null, ambiguous: false };\n\n  const hasDot = s.includes('.');\n  const hasComma = s.includes(',');\n  let ambiguous = false;\n\n  if (hasDot && hasComma) {\n    if (s.lastIndexOf(',') > s.lastIndexOf('.')) s = s.replace(/\\./g, '').replace(',', '.');\n    else s = s.replace(/,/g, '');\n  } else if (hasComma) {\n    const after = s.split(',')[1] ?? '';\n    if (s.split(',').length > 2) s = s.replace(/,/g, '');\n    else if (after.length === 3) ambiguous = true;\n    else s = s.replace(',', '.');\n    if (ambiguous) s = s.replace(',', '.');\n  }\n\n  const cleaned = s.replace(/[^0-9.\\-]/g, '');\n  if (!/\\d/.test(cleaned)) return { value: null, ambiguous: false };\n\n  const n = Number(cleaned);\n  return Number.isFinite(n) ? { value: n, ambiguous } : { value: null, ambiguous: false };\n}\n\nfunction parsePriceCell(raw) {\n  const s = String(raw ?? '').trim();\n  if (!s) return { value: null, currency: null, basis: null, ambiguous: false };\n\n  let currency = null;\n  if (/€|\\beur(o|os)?\\b/i.test(s)) currency = 'EUR';\n  else if (/£|\\bgbp\\b|\\bpounds?\\b/i.test(s)) currency = 'GBP';\n  else if (/\\$|\\busd\\b|\\bdollars?\\b/i.test(s)) currency = 'USD';\n  else if (/\\baed\\b/i.test(s)) currency = 'AED';\n  else if (/\\bsgd\\b/i.test(s)) currency = 'SGD';\n\n  let basis = null;\n  const m = s.match(/\\/\\s*(btl|bottle|cs|case|ctn|carton|pc|pcs|piece|pack|can|jar|unit)\\b/i);\n  if (m) {\n    const k = m[1].toLowerCase();\n    if (/^(cs|case|ctn|carton)$/.test(k)) basis = 'Per Case';\n    else if (/^(btl|bottle)$/.test(k)) basis = 'Per Bottle';\n    else if (/^(pc|pcs|piece|unit)$/.test(k)) basis = 'Per Piece';\n    else if (k === 'pack') basis = 'Per Pack';\n    else if (k === 'can') basis = 'Per Can';\n    else if (k === 'jar') basis = 'Per Jar';\n  }\n\n  const numeric = parseNumber(s.replace(/\\/\\s*[a-z]+\\b/gi, ''));\n\n  return { value: numeric.value, currency, basis, ambiguous: numeric.ambiguous };\n}\n\nfunction parsePack(raw) {\n  const s = String(raw ?? '').trim();\n  const out = { pcsCase: null, volumeMl: null, abv: null, weightG: null };\n  if (!s) return out;\n\n  let m = s.match(/(\\d+)\\s*[x×\\/]\\s*(\\d+(?:[.,]\\d+)?)\\s*(g|gr|gram|kg)\\b/i);\n  if (m) {\n    out.pcsCase = Number(m[1]);\n    const n = Number(m[2].replace(',', '.'));\n    out.weightG = /^kg$/i.test(m[3]) ? n * 1000 : n;\n    return out;\n  }\n\n  m = s.match(/(\\d+)\\s*[x×\\/]\\s*(\\d+(?:[.,]\\d+)?)\\s*(ml|cl|dl|l|ltr)\\b/i);\n  if (m) {\n    out.pcsCase = Number(m[1]);\n    out.volumeMl = parseVolume(`${m[2]}${m[3]}`);\n    const abv = s.match(/(\\d+(?:[.,]\\d+)?)\\s*%/);\n    if (abv) out.abv = Number(abv[1].replace(',', '.'));\n    return out;\n  }\n\n  m = s.match(/(\\d+)\\s*\\/\\s*(\\d+(?:[.,]\\d+)?)\\s*(?:\\/\\s*(\\d+(?:[.,]\\d+)?))?/);\n  if (m) {\n    out.pcsCase = Number(m[1]);\n    const mid = Number(m[2].replace(',', '.'));\n    out.volumeMl = mid >= 200 ? Math.round(mid) : Math.round(mid * 10);\n    if (m[3]) {\n      const a = Number(m[3].replace(',', '.'));\n      if (a > 0 && a <= 100) out.abv = a;\n    }\n  }\n  return out;\n}\n\nfunction parseVolume(raw, unitHint) {\n  const s = String(raw ?? '').toLowerCase();\n  if (!s) return null;\n\n  let m = s.match(/(\\d+(?:[.,]\\d+)?)\\s*(ml|cl|dl|l|ltr|litre|liter|cc)\\b/);\n  if (!m) {\n    const bare = parseNumber(s).value;\n    if (bare === null) return null;\n\n    const factor = VOLUME_UNIT_FACTOR[String(unitHint || '').toLowerCase()];\n    if (factor) return Math.round(bare * factor);\n\n    return bare > 0 && bare < 10 ? Math.round(bare * 1000) : Math.round(bare);\n  }\n\n  const n = Number(m[1].replace(',', '.'));\n  switch (m[2]) {\n    case 'ml': case 'cc': return Math.round(n);\n    case 'cl': return Math.round(n * 10);\n    case 'dl': return Math.round(n * 100);\n    default: return Math.round(n * 1000);\n  }\n}\n\nfunction toCases(value, pcsCase, stockUnit) {\n  if (value === null || value === undefined) return null;\n  if (String(stockUnit || '').toLowerCase() !== 'pcs') return value;\n  if (!pcsCase || pcsCase <= 0) return null;\n  return Math.floor(value / pcsCase);\n}\n\nfunction parseAbv(raw) {\n  const s = String(raw ?? '');\n  const m = s.match(/(\\d+(?:[.,]\\d+)?)\\s*%/) || s.match(/^(\\d+(?:[.,]\\d+)?)$/);\n  if (!m) return null;\n  const n = Number(m[1].replace(',', '.'));\n  return n > 0 && n <= 100 ? n : null;\n}\n\nfunction parseDate(raw) {\n  if (!raw) return null;\n  if (raw instanceof Date && !isNaN(raw)) return raw.toISOString().slice(0, 10);\n\n  const s = String(raw).trim();\n  if (!s) return null;\n\n  if (/^\\d{5}$/.test(s)) {\n    const ms = (Number(s) - 25569) * 86400 * 1000;\n    return new Date(ms).toISOString().slice(0, 10);\n  }\n\n  let m = s.match(/^(\\d{4})-(\\d{1,2})-(\\d{1,2})$/);\n  if (m) return `${m[1]}-${pad(m[2])}-${pad(m[3])}`;\n\n  m = s.match(/^([a-z]{3,9})\\.?\\s+(\\d{4})$/i);\n  if (m) {\n    const months = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];\n    const idx = months.indexOf(m[1].slice(0, 3).toLowerCase());\n    if (idx >= 0) return `${m[2]}-${pad(idx + 1)}-01`;\n  }\n\n  m = s.match(/^(\\d{1,2})[\\/.\\-](\\d{1,2})[\\/.\\-](\\d{2,4})$/);\n  if (m) {\n    let [, a, b, y] = m;\n    if (y.length === 2) y = '20' + y;\n    const dayFirst = Number(a) > 12 || Number(b) <= 12;\n    const day = dayFirst ? a : b;\n    const month = dayFirst ? b : a;\n    return `${y}-${pad(month)}-${pad(day)}`;\n  }\n\n  const d = new Date(s);\n  return isNaN(d) ? null : d.toISOString().slice(0, 10);\n}\n\nfunction coerce(kind, raw) {\n  const s = String(raw ?? '').trim();\n  if (!s) return null;\n\n  const exact = OPTIONS[kind].find((o) => o.toLowerCase() === s.toLowerCase());\n  if (exact) return exact;\n\n  const key = s.toLowerCase().replace(/[^a-z0-9€$£]/g, '');\n  const syn = (SYNONYMS[kind] || {})[key];\n  if (syn) return syn;\n\n  for (const [k, v] of Object.entries(SYNONYMS[kind] || {})) {\n    if (key.includes(k)) return v;\n  }\n\n  return OPTIONS[kind].includes('Other') ? 'Other' : null;\n}\n\nfunction cleanEan(raw) {\n  const digits = String(raw ?? '').replace(/\\D/g, '');\n  return /^\\d{8}$|^\\d{12,14}$/.test(digits) ? digits : '';\n}\n\nfunction guessBrand(name) {\n  const first = String(name).trim().split(/\\s+/)[0] || '';\n  return first.length > 1 ? first : '';\n}\n\nfunction buildProductKey(brand, name, volumeMl, bond) {\n  const n = (v) => String(v ?? '').toLowerCase().replace(/[^a-z0-9]/g, '');\n  return [n(brand), n(name), volumeMl ?? '', n(bond)].join('|');\n}\n"
+        },
+        "id": "28cdc6d8-f2ee-43c2-9045-85dba186ce96",
+        "name": "Normalize Rows",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1552,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "search",
+          "base": {
+            "__rl": true,
+            "value": "appaDSdZkAE9PGkjT",
+            "mode": "id"
+          },
+          "table": {
+            "__rl": true,
+            "value": "tbl1m5HfC2yzWECGb",
+            "mode": "id"
+          },
+          "options": {
+            "fields": [
+              "Brand",
+              "Product Name",
+              "Volume ML",
+              "Bond/Customs Status"
+            ]
+          }
+        },
+        "id": "7eb2b471-dca3-4eb7-b41b-191f59356fb6",
+        "name": "Fetch Products",
+        "type": "n8n-nodes-base.airtable",
+        "typeVersion": 2,
+        "position": [
+          1760,
+          0
+        ],
+        "executeOnce": true,
+        "alwaysOutputData": true
+      },
+      {
+        "parameters": {
+          "jsCode": "/**\n * n8n Code node — \"Build Airtable Payload\"\n * Mode: Run Once for All Items\n *\n * Turns normalised spreadsheet rows into Airtable Offers records.\n *\n * ── PRODUCT MATCH KEY FIXED 2026-08-03 ──────────────────────────────────────\n * This node used to key the product index on\n *     Brand | Product Name | Volume | Bond status\n * and that is why roughly 89% of offers ended up with no Products link and were\n * therefore invisible to price comparison (Is Cheapest, Cheaper By 5%+).\n *\n * The reason is data, not logic: BRAND IS EMPTY ON THE LARGE MAJORITY OF PRODUCT\n * RECORDS, and Bond/Customs Status is blank on most of them too. Meanwhile the\n * offer side has no brand column on most sheets either, so Normalize Rows falls\n * back to guessBrand() - the FIRST WORD of the product name. So the offer key\n * carried a brand like \"ardbeg\" while the product key carried an empty string,\n * the two never matched, and every lookup missed. The linking was always being\n * attempted; the key was simply unmatchable.\n *\n * Matching is now on NORMALISED PRODUCT NAME + VOLUME, which are the two fields\n * the Products table actually populates (Product Key there is just the lowercased\n * product name). Brand and Bond are deliberately excluded rather than\n * \"improved\": including a field that is blank on one side of the comparison can\n * only ever destroy matches.\n *\n * Volume stays IN the key. Dropping it would merge a 70cl and a 1L of the same\n * label into one product and attach offers to the wrong pack size, which is a\n * worse failure than not matching at all.\n *\n * Offer.productKey from Normalize Rows is still carried through for the Notes\n * message and the in-run duplicate guard, but is no longer used for lookup.\n *\n * ── EARLIER CHANGES (2026-07-31, Anil) ─────────────────────────────────────\n *  1. DEFAULT VALIDITY IS NOW 30 DAYS (was 14).\n *  2. RE-INGESTION GUARD. Nothing previously stopped the same email being\n *     parsed twice.\n *  3. SUPPLIER RESOLUTION BY SENDER EMAIL. Previously the supplier came ONLY\n *     from the Sheet Profile's link, so any offer parsed on the LLM\n *     profile-miss path was written with no Supplier at all.\n *  4. EMAIL PROVENANCE ON THE RECORD. Sender, subject and thread are now\n *     written into Notes.\n *\n * Also: offers whose Product does not match are CREATED rather than discarded.\n * They previously went to a toReview array that nothing ever wrote, so with\n * Create Offers enabled they would have been silently dropped. The Products link\n * is left blank and the offer is flagged in Notes; the hourly \"Link Offers To\n * Products\" workflow then picks it up and can create the Product if needed.\n */\n\n// Raised from 14 to 30 by Anil, 2026-07-31. Used only when the resolved\n// supplier has no Default Validity Days of its own.\nconst FALLBACK_VALIDITY_DAYS = 30;\n\n// Formula and lookup fields — writing to any of these errors the batch.\n// Supplier Email/Country/Trust are LOOKUPS through the Supplier link, so\n// linking the supplier is what populates them; they must never be written.\nconst READ_ONLY = new Set([\n  'Sell Price', 'Pack Format', 'Is Expired', 'Auto Expiry Date', 'Send Eligible',\n  'Public Listing', 'Public Product Description', 'Public Spec', 'Price Display',\n  'Public Terms', 'Stock Display', 'whatsapp link',\n  'Supplier Name', 'Supplier Email', 'Supplier Country',\n  'Supplier Trust Level', 'Supplier Payment Terms',\n]);\n\nconst products  = nodeRows('Fetch Products');\nconst suppliers = nodeRows('Fetch Suppliers');\nconst ingested  = nodeRows('Fetch Ingested Message IDs');\nconst sections  = $('Normalize Rows').all().map((s) => s.json || {});\n\nconst today = new Date().toISOString().slice(0, 10);\n\nconst productIndex   = buildProductIndex(products);\nconst supplierByMail = buildSupplierIndex(suppliers);\nconst alreadyIngested = new Set(\n  ingested.map((r) => normaliseMessageId((r.fields || r)['Source Message ID'])).filter(Boolean)\n);\n\nconst toCreate   = [];\nconst skipped    = [];\nconst exceptions = [];\nconst summaries  = [];\n\n// Guards against the same row being emitted twice inside ONE run — possible\n// when two detected sections overlap on the same block of the sheet.\nconst seenInRun = new Set();\n\nfor (const item of sections) {\n  const msgId = normaliseMessageId(item.sourceMessageId);\n\n  // ---- Re-ingestion guard -------------------------------------------------\n  // The ID set was read once at the start of this run, so it reflects what was\n  // in Airtable BEFORE this execution. A message ID already present therefore\n  // means this email was ingested on an earlier run, and the whole section is\n  // skipped. It does NOT mean \"this row is a duplicate of another row in the\n  // same workbook\" — one email legitimately produces many offers sharing one\n  // message ID, which is exactly why this check happens per SECTION and not\n  // per offer.\n  if (msgId && alreadyIngested.has(msgId)) {\n    skipped.push({\n      fileName: item.fileName,\n      sheetName: item.sheetName,\n      sourceMessageId: item.sourceMessageId,\n      offersSkipped: (item.offers || []).length,\n      reason: `Message ${msgId} is already present in Offers — email previously ingested, nothing created`,\n    });\n    summaries.push(`${item.fileName} :: ${item.sheetName} — SKIPPED, already ingested`);\n    continue;\n  }\n\n  // ---- Supplier resolution ------------------------------------------------\n  const resolved = resolveSupplier(item, supplierByMail);\n\n  // Validity comes from the supplier record when we have one. The old code read\n  // rec['Validity Days'] off the Sheet Profile, a field that does not exist\n  // there — the real one is Suppliers.Default Validity Days — so every offer\n  // silently fell back to the default.\n  const validityDays = Number(resolved.validityDays) > 0\n    ? Number(resolved.validityDays)\n    : FALLBACK_VALIDITY_DAYS;\n\n  let created = 0;\n  let unlinked = 0;\n\n  for (const offer of item.offers || []) {\n    const rowKey = [msgId, offer.productKey, offer.buyPrice].join('~');\n    if (seenInRun.has(rowKey)) continue;\n    seenInRun.add(rowKey);\n\n    // Name + volume, NOT the brand/bond key — see the header note.\n    const matchKey = productMatchKey(offer.productName, offer.volumeMl);\n    const productId = productIndex.get(matchKey) || null;\n\n    // Currency fallback: when the sheet stated no currency, apply the resolved\n    // supplier's Default Currency (e.g. Halitlar = USD). A stated currency\n    // always wins; with no stated currency and no supplier default, the\n    // profile default carried on the offer stands.\n    const offerCurrency = (!offer.currencyStated && resolved.defaultCurrency)\n      ? resolved.defaultCurrency\n      : offer.currency;\n\n    const fields = {\n      'Offer Name': buildOfferName(offer, resolved.supplierName),\n      'Status': 'Live',\n      'Offer Date': today,\n      'Auto Expiry Days': validityDays,\n\n      'Brand': offer.brand || '',\n      'Product Name': offer.productName,\n      'Variant': offer.variant || '',\n      'Volume ML': offer.volumeMl,\n      'PCS/Case': offer.pcsCase,\n      'Unit Type': offer.unitType,\n      'ABV': offer.abv,\n      'Origin Country': offer.originCountry || '',\n      'Bond/Customs Status': offer.bondStatus,\n      'Buy Price': offer.buyPrice,\n      'Currency': offerCurrency,\n      'Price Type': offer.priceType,\n      'Stock Cases': offer.stockCases,\n      'Weight KG': offer.weightKg,\n      'Cases per Pallet': offer.casesPerPallet,\n      'Pieces per Pallet': offer.piecesPerPallet,\n      'Language': offer.language || '',\n      'MOQ': offer.moq || '',\n      'Lead Time': offer.leadTime || '',\n      'EAN Unit': offer.eanUnit || '',\n      'EAN Case': offer.eanCase || '',\n      'BBD': offer.bbd,\n      'Incoterm': offer.incoterm,\n      'Warehouse': offer.warehouse,\n\n      'Source Sheet': offer.sourceSheet,\n      'Source Message ID': item.sourceMessageId || '',\n      'Notes': buildNotes(item, offer, resolved, productId, matchKey, today),\n    };\n\n    if (offer.category) fields['Category'] = offer.category;\n\n    // Linking the Supplier is also what populates the read-only Supplier Email,\n    // Supplier Country and Supplier Trust Level lookups on the offer.\n    if (resolved.supplierRecordId) fields['Supplier'] = [resolved.supplierRecordId];\n\n    if (productId) fields['Products'] = [productId];\n    else unlinked++;\n\n    toCreate.push({ fields: stripEmpty(fields) });\n    created++;\n  }\n\n  for (const e of item.exceptions || []) {\n    exceptions.push({\n      sheetRow: e.sheetRow,\n      productName: e.productName,\n      reason: e.exceptionReason,\n      sourceSheet: e.sourceSheet,\n    });\n  }\n\n  summaries.push(\n    `${item.fileName} :: ${item.sheetName} — ${created} offers ` +\n    `(${unlinked} without a Product link), ` +\n    `${(item.exceptions || []).length} bad rows, ` +\n    `supplier: ${resolved.supplierName || 'UNRESOLVED'} via ${resolved.via}, ` +\n    `expiry ${validityDays}d`\n  );\n}\n\nreturn [{\n  json: {\n    createCount: toCreate.length,\n    skippedCount: skipped.length,\n    exceptionCount: exceptions.length,\n    toCreate,\n    skipped,\n    exceptions,\n    summary: summaries.join(' | ') || 'nothing to do',\n  },\n}];\n\n// ── helpers ──────────────────────────────────────────────────────────\n\n/** Rows from a named Airtable node, or [] when it did not run. */\nfunction nodeRows(name) {\n  try { return $(name).all().map((i) => i.json || {}); }\n  catch (e) { return []; }\n}\n\n/**\n * Strip the mailbox prefix from a Gmail message ID before comparing.\n *\n * The base holds BOTH \"19fadb488e2d3ea9\" and\n * \"gmail:offers@akay.ie:19fadb488e2d3ea9\" for the same message. They do not\n * string-match, so an exact comparison silently misses one of the two formats —\n * this is the confirmed cause of the CSE Ltd. Jameson, Newport Global, EZATA\n * Drinks and Yael Dahan duplicate batches. Take the last colon-separated\n * segment and lowercase it.\n */\nfunction normaliseMessageId(v) {\n  const s = String(v ?? '').trim();\n  if (!s) return '';\n  const parts = s.split(':');\n  return parts[parts.length - 1].trim().toLowerCase();\n}\n\n/**\n * The single definition of how an Offer is matched to a Product.\n *\n * Punctuation and spacing are stripped entirely, so \"Aberlour A'Bunadh Batch 77\"\n * and \"Aberlour ABunadh Batch 77\" agree - supplier sheets are inconsistent about\n * apostrophes, hyphens and double spaces, and those differences are never\n * meaningful. Volume is kept as a plain number so 700 and \"700\" agree.\n */\nfunction productMatchKey(name, volumeMl) {\n  const n = String(name ?? '').toLowerCase().replace(/[^a-z0-9]/g, '');\n  const v = (volumeMl === null || volumeMl === undefined || volumeMl === '') ? '' : Number(volumeMl);\n  return n + '|' + v;\n}\n\nfunction buildProductIndex(rows) {\n  const index = new Map();\n  for (const p of rows) {\n    const f = p.fields || p;\n    if (!p.id) continue;\n    const key = productMatchKey(f['Product Name'], f['Volume ML']);\n    if (!index.has(key)) index.set(key, p.id);\n  }\n  return index;\n}\n\n/** Suppliers keyed by full email address AND by bare domain. */\nfunction buildSupplierIndex(rows) {\n  const byAddress = new Map();\n  const byDomain = new Map();\n\n  for (const s of rows) {\n    const f = s.fields || s;\n    if (!s.id) continue;\n    const email = String(f['Email'] || '').trim().toLowerCase();\n    if (!email) continue;\n\n    const rec = {\n      id: s.id,\n      name: f['Supplier Name'] || null,\n      validityDays: f['Default Validity Days'] ?? null,\n      defaultCurrency: selectName(f['Default Currency']) || null,\n      status: f['Status'] || null,\n      skip: Boolean(f['Skip Offer Ingestion']),\n    };\n\n    if (!byAddress.has(email)) byAddress.set(email, rec);\n\n    const domain = email.split('@')[1];\n    // A domain is only a usable key while exactly one supplier uses it. Two\n    // suppliers on one domain (or a shared host like gmail.com) makes the\n    // domain ambiguous, so it is removed rather than guessed at.\n    if (domain) {\n      if (byDomain.has(domain)) byDomain.set(domain, null);\n      else byDomain.set(domain, rec);\n    }\n  }\n  return { byAddress, byDomain };\n}\n\n/**\n * Work out which supplier this workbook belongs to.\n *\n * Order matters. The Sheet Profile's own Supplier link is authoritative because\n * a human (or a reviewed LLM mapping) tied that header fingerprint to that\n * supplier. Only when there is no profile link do we fall back to the sending\n * address — which is the case that used to produce offers with no supplier at\n * all, on the profile-miss path.\n *\n * Generic mailbox domains are deliberately NOT domain-matched: several\n * suppliers use hotmail/gmail addresses, so a domain hit there means nothing.\n */\nfunction resolveSupplier(item, index) {\n  const GENERIC = new Set([\n    'gmail.com', 'hotmail.com', 'hotmail.fr', 'outlook.com', 'yahoo.com',\n    'yahoo.co.uk', 'live.com', 'icloud.com', 'aol.com', 'protonmail.com', 'gmx.com',\n  ]);\n\n  if (item.supplierRecordId) {\n    // Enrich from the fetched supplier list when we can, for validity days and\n    // the name used in the internal Offer Name.\n    const match = [...index.byAddress.values()].find((s) => s.id === item.supplierRecordId);\n    return {\n      supplierRecordId: item.supplierRecordId,\n      supplierName: match ? match.name : null,\n      validityDays: match ? match.validityDays : null,\n      defaultCurrency: match ? match.defaultCurrency : null,\n      via: 'sheet profile link',\n    };\n  }\n\n  const from = String(item.fromAddress || '').trim().toLowerCase();\n  if (from) {\n    const exact = index.byAddress.get(from);\n    if (exact) {\n      return {\n        supplierRecordId: exact.id,\n        supplierName: exact.name,\n        validityDays: exact.validityDays,\n        defaultCurrency: exact.defaultCurrency,\n        via: `sender address ${from}`,\n      };\n    }\n\n    const domain = from.split('@')[1];\n    if (domain && !GENERIC.has(domain)) {\n      const byDom = index.byDomain.get(domain);\n      if (byDom) {\n        return {\n          supplierRecordId: byDom.id,\n          supplierName: byDom.name,\n          validityDays: byDom.validityDays,\n          defaultCurrency: byDom.defaultCurrency,\n          via: `sender domain ${domain}`,\n        };\n      }\n    }\n  }\n\n  // Resolve-or-auto-create fallback. A supplier matched from — or auto-created\n  // for — the forwarded sender at run level by the Resolve Supplier / Create\n  // Missing Supplier / Merge Supplier branch. Reached only when neither the\n  // Sheet Profile link nor a direct sender match found one. When this is also\n  // empty the sender was our own akay.ie (or otherwise not external): the offer\n  // is left UNRESOLVED with a NEEDS ATTENTION note rather than inventing a\n  // supplier from our own address.\n  const run = runSupplier();\n  if (run && run.supplierRecordId) {\n    return {\n      supplierRecordId: run.supplierRecordId,\n      supplierName: run.supplierName || null,\n      validityDays: run.validityDays ?? null,\n      defaultCurrency: run.defaultCurrency || null,\n      via: run.via || 'resolve-or-auto-create',\n    };\n  }\n\n  return { supplierRecordId: null, supplierName: null, validityDays: null, defaultCurrency: null, via: 'UNRESOLVED' };\n}\n\n/**\n * Internal provenance for the offer. Notes is flagged INTERNAL ONLY on this\n * table and must never be mapped into Softr, which is why the sender address\n * and thread ID can live here. Public text belongs in Public Note.\n */\nfunction buildNotes(item, offer, resolved, productId, matchKey, today) {\n  const lines = [\n    `Ingested from spreadsheet ${offer.sourceSheet} row ${offer.sheetRow} on ${today}.`,\n    `Email: from ${item.fromAddress || '(sender unknown)'}` +\n      `${item.subject ? `, subject \"${item.subject}\"` : ''}` +\n      `${item.threadId ? `, thread ${item.threadId}` : ''}.`,\n    `Supplier resolved via ${resolved.via}` +\n      `${resolved.supplierName ? ` (${resolved.supplierName})` : ''}.`,\n  ];\n\n  if (!resolved.supplierRecordId) {\n    lines.push('NEEDS ATTENTION: no Supplier could be matched from the Sheet Profile or the sending address. Set the Supplier link by hand — without it this offer has no supplier email, country or trust level.');\n  }\n  if (!productId) {\n    lines.push(`No Product matched name+volume key \"${matchKey}\", so the Products link is blank and this offer is not yet visible to price comparison. The hourly Link Offers To Products workflow will match it, or create the Product if the offer has both a name and a volume.`);\n  }\n  return lines.join(' ');\n}\n\n/**\n * Offer Name is the primary field and is explicitly INTERNAL, so it may carry\n * the supplier name. Public display uses Public Product Description.\n */\nfunction buildOfferName(offer, supplierName) {\n  const parts = [offer.brand, offer.productName, offer.variant].filter(Boolean);\n  const spec = offer.volumeMl ? `${offer.volumeMl}ml` : '';\n  const supplier = supplierName ? ` - ${supplierName}` : '';\n  return `${parts.join(' ')}${spec ? ' ' + spec : ''}${supplier} ${new Date().toISOString().slice(0, 10)}`.trim();\n}\n\n/** Airtable rejects null on some field types; omit rather than send empties. */\nfunction stripEmpty(fields) {\n  const out = {};\n  for (const [k, v] of Object.entries(fields)) {\n    if (READ_ONLY.has(k)) continue;\n    if (v === null || v === undefined || v === '') continue;\n    out[k] = v;\n  }\n  return out;\n}\n\n/**\n * Run-level supplier from the Resolve/Create/Merge branch (Merge Supplier).\n * Empty when that branch produced no supplier — e.g. an internal-only sender.\n */\nfunction runSupplier() {\n  try { return $('Merge Supplier').first().json || null; }\n  catch (e) { return null; }\n}\n\n/** Airtable singleSelect value: {id,name} object over the REST client, or a\n * bare string. Return the plain name either way. */\nfunction selectName(v) {\n  const a = Array.isArray(v) ? v[0] : v;\n  if (a === null || a === undefined) return null;\n  return typeof a === 'object' ? (a.name || null) : String(a);\n}\n"
+        },
+        "id": "fefca4d2-8cdf-413e-8f71-7fb213289875",
+        "name": "Build Airtable Payload",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1984,
+          0
+        ],
+        "notes": "Reads offers from Normalize Rows and products from Fetch Products via $('...').all() (the Airtable search replaces the item). Outputs an aggregate toCreate/toReview/exceptions for dry-run inspection."
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "has-creates",
+                "leftValue": "={{ $json.createCount }}",
+                "rightValue": 0,
+                "operator": {
+                  "type": "number",
+                  "operation": "gt"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "id": "1de671d3-4501-46a2-a19c-c9098bf3c102",
+        "name": "Has Creates?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2,
+        "position": [
+          2096,
+          0
+        ],
+        "notesInFlow": true,
+        "notes": "Only create records when there are matched offers. Both branches end at Mark Excel Done so the thread is labelled once per run — after the Airtable write when creates exist."
+      },
+      {
+        "parameters": {
+          "jsCode": "/**\n * n8n Code node — \"Expand Offers\"\n * Mode: Run Once for All Items\n *\n * Expands the matched toCreate[] into one flat record item each for\n * Create Offers (autoMapInputData), and stamps the trust-driven Offer\n * Approval Status on every record (Anil, 2026-08-04):\n *\n *   supplier Trust Score High, Medium or Low  -> Approved\n *   Trust = Hold, or no resolvable supplier   -> Awaiting Approval\n *\n * Offer Approval Status is a PROCESSING status feeding Send Eligible and the\n * Public Listing formula. It is NOT a human control point — the two human\n * approvals (Listing Approved on the website, Gate 2 dispatch approval, each\n * by Anil or Annika) are never written by ingestion, so an auto-approved\n * offer still cannot reach the public site or a client inbox on its own.\n *\n * Trust is read per record via the Supplier link id against the run's\n * Fetch Suppliers snapshot. A Supplier id NOT in that snapshot was created\n * THIS run by Create Missing Supplier, which always writes Trust = Medium\n * (Hard Rule 8) -> Approved.\n */\n\nconst AUTO_APPROVE = new Set(['high', 'medium', 'low']);\n\n// Supplier id -> Trust Score name, from the run's supplier snapshot.\nconst trustById = new Map();\ntry {\n  for (const s of $('Fetch Suppliers').all()) {\n    const j = s.json || {};\n    const f = j.fields || j;\n    if (j.id) trustById.set(j.id, selectName(f['Trust Score']));\n  }\n} catch (e) { /* snapshot unavailable — falls through to Awaiting Approval */ }\n\nconst out = [];\nfor (const it of $input.all()) {\n  const recs = (it.json && it.json.toCreate) || [];\n  for (const r of recs) {\n    const rec = r.fields || r;\n\n    const supplierId = Array.isArray(rec['Supplier']) && rec['Supplier'].length\n      ? rec['Supplier'][0] : null;\n\n    let trust = supplierId ? trustById.get(supplierId) : null;\n    // Not in the snapshot but linked => auto-created this run at Medium.\n    if (supplierId && trust === undefined) trust = 'Medium';\n\n    const approved = AUTO_APPROVE.has(String(trust || '').toLowerCase());\n    rec['Offer Approval Status'] = approved ? 'Approved' : 'Awaiting Approval';\n    if (!approved) {\n      rec['Notes'] = `${rec['Notes'] || ''} HELD at Awaiting Approval: supplier trust is ${trust || 'unknown/unresolved'} — only Hold or unknown suppliers hold since 2026-08-04.`.trim();\n    }\n\n    out.push({ json: rec });\n  }\n}\nreturn out;\n\n/** Airtable singleSelect: {id,name} object or bare string — return the name. */\nfunction selectName(v) {\n  const a = Array.isArray(v) ? v[0] : v;\n  if (a === null || a === undefined) return null;\n  return typeof a === 'object' ? (a.name || null) : String(a);\n}\n"
+        },
+        "id": "b48fa01e-f51d-4a1a-a4be-cdb97c270883",
+        "name": "Expand Offers",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2096,
+          128
+        ],
+        "notesInFlow": true,
+        "notes": "Expands the matched toCreate[] into one flat record item each for Create Offers (autoMapInputData). Emits nothing when there are no matched offers."
+      },
+      {
+        "parameters": {
+          "operation": "create",
+          "base": {
+            "__rl": true,
+            "value": "appaDSdZkAE9PGkjT",
+            "mode": "id"
+          },
+          "table": {
+            "__rl": true,
+            "value": "tbljBgWrnIMZzkSAr",
+            "mode": "id"
+          },
+          "columns": {
+            "mappingMode": "autoMapInputData",
+            "value": {}
+          },
+          "options": {
+            "typecast": false
+          }
+        },
+        "id": "47acb6c3-4d4a-4323-b47d-15aef9db2c01",
+        "name": "Create Offers",
+        "type": "n8n-nodes-base.airtable",
+        "typeVersion": 2,
+        "position": [
+          2208,
+          0
+        ],
+        "disabled": false
+      },
+      {
+        "parameters": {
+          "resource": "thread",
+          "operation": "addLabels",
+          "threadId": "={{ $('Read Workbook').first().json.threadId }}",
+          "labelIds": [
+            "Label_6"
+          ]
+        },
+        "id": "399035dc-9fe3-43de-abfa-7a7719af8762",
+        "name": "Mark Excel Done",
+        "type": "n8n-nodes-base.gmail",
+        "typeVersion": 2,
+        "position": [
+          2432,
+          0
+        ],
+        "executeOnce": true,
+        "webhookId": "31a69f40-702d-453f-84b3-e448252efa80"
+      },
+      {
+        "parameters": {
+          "mode": "runOnceForEachItem",
+          "jsCode": "/**\n * n8n Code node — \"Build Mapping Prompt\" (profile-miss path only)\n * Mode: Run Once for Each Item\n */\n\nconst item = $input.item.json;\n\nconst TARGET_FIELDS = [\n  ['productName',   'REQUIRED. Product/article/description column.'],\n  ['brand',         'Brand or producer, if a separate column exists.'],\n  ['variant',       'Variant/type qualifier, e.g. \"Blue Label\", \"Extra Dry\".'],\n  ['category',      'Beer / Spirits / Wine / Soft Drinks / Grocery etc.'],\n  ['volumeMl',      'Unit volume. May read 70cl, 0.7L, 700ml.'],\n  ['pcsCase',       'Units per case. Often \"PCS\", \"P/C\", \"units\", \"x\".'],\n  ['unitType',      'Bottle / Can / Jar / Pack / Piece.'],\n  ['abv',           'Alcohol by volume percentage.'],\n  ['originCountry', 'Country of origin.'],\n  ['bondStatus',    'Bond/customs status: Bonded, T1, T2, Duty Paid, On Floor.'],\n  ['buyPrice',      'REQUIRED. The price WE PAY the supplier. If several price columns exist, choose the supplier/cost price, never a retail or RRP column.'],\n  ['currency',      'Currency column, if separate from the price.'],\n  ['priceType',     'Whether the price is per case, per bottle, per piece.'],\n  ['stockCases',    'Available stock in cases.'],\n  ['moq',           'Minimum order quantity.'],\n  ['leadTime',      'Lead time / delivery time.'],\n  ['eanUnit',       'EAN/barcode for the unit.'],\n  ['eanCase',       'EAN/barcode for the case.'],\n  ['bbd',           'Best before date / expiry.'],\n  ['incoterm',      'EXW / FCA / FOB / CIF / DAP / DDP.'],\n  ['warehouse',     'Warehouse or stock location.'],\n];\n\nconst headerTable = (item.headerCells || [])\n  .map((h, i) => `  [${i}] ${h || '(blank)'}`)\n  .join('\\n');\n\nconst sampleTable = (item.sampleRows || [])\n  .map((r, i) => `  row ${i + 1}: ${JSON.stringify(r.slice(0, 30))}`)\n  .join('\\n');\n\nconst prompt = `You are mapping a supplier price-list spreadsheet to a fixed schema.\n\nCOLUMN HEADERS (index in brackets):\n${headerTable}\n\nSAMPLE DATA ROWS:\n${sampleTable}\n\nTARGET FIELDS:\n${TARGET_FIELDS.map(([k, d]) => `  ${k}: ${d}`).join('\\n')}\n\nReturn ONLY a single JSON object, no prose, no code fence, no commentary, and\nno corrections or second attempts. Your entire output must start with { and end\nwith }. If you reconsider, output ONLY your final corrected object. Of the form:\n{\"columnMap\": {\"productName\": 2, \"buyPrice\": 7}, \"defaults\": {\"currency\": \"EUR\"}, \"confidence\": \"high\", \"notes\": \"\"}\n\nRules:\n- Values in columnMap are the integer column indices shown above.\n- Omit any target field with no corresponding column. Do not guess.\n- If a value is constant for the whole sheet rather than a column (e.g. the\n  currency appears only in the header text), put it in \"defaults\" instead.\n- productName and buyPrice are required. If either cannot be identified with\n  confidence, set \"confidence\" to \"low\" and explain in \"notes\".\n- Where several columns could be the price, prefer the one we pay the supplier.\n  Never map a retail, RRP, or client-facing price to buyPrice.`;\n\nreturn { json: { ...item, mappingPrompt: prompt } };\n"
+        },
+        "id": "7f4fe3ed-4c2b-4b3d-b775-b51054ffbf37",
+        "name": "Build Mapping Prompt",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1552,
+          208
+        ]
+      },
+      {
+        "parameters": {
+          "modelId": {
+            "__rl": true,
+            "mode": "id",
+            "value": "claude-sonnet-4-5-20250929"
+          },
+          "messages": {
+            "values": [
+              {
+                "content": "={{ $json.mappingPrompt }}"
+              }
+            ]
+          },
+          "simplify": false,
+          "options": {
+            "maxTokens": 1024,
+            "temperature": 0
+          }
+        },
+        "id": "e176ab0d-dbc5-4b41-9dc7-d91ba648986b",
+        "name": "Map Columns (LLM)",
+        "type": "@n8n/n8n-nodes-langchain.anthropic",
+        "typeVersion": 1,
+        "position": [
+          1760,
+          208
+        ]
+      },
+      {
+        "parameters": {
+          "mode": "runOnceForEachItem",
+          "jsCode": "/**\n * n8n Code node — \"Save Profile\"\n * Mode: Run Once for Each Item\n */\n\nconst item = $input.item.json;\n\nconst raw = item.content?.[0]?.text ?? item.text ?? item.message?.content ?? item.response ?? '';\n\nconst parsed = parseMappingResponse(raw);\n\nif (!parsed.ok) {\n  return {\n    json: {\n      ...item,\n      profileSaved: false,\n      needsReview: true,\n      exceptionReason: `Column mapping not usable: ${parsed.reason}`,\n      reviewHeaderSample: item.headerSample,\n      reviewSampleRows: JSON.stringify(item.sampleRows || []).slice(0, 5000),\n      modelReply: String(raw).slice(0, 2000),\n    },\n  };\n}\n\nconst profileName = [\n  item.fileName ? String(item.fileName).replace(/\\.[^.]+$/, '') : 'Unknown file',\n  item.sectionLabel ? `— ${item.sectionLabel}` : '',\n].join(' ').trim();\n\nreturn {\n  json: {\n    ...item,\n    profileSaved: true,\n    needsReview: false,\n\n    'Profile Name': profileName,\n    'Header Fingerprint': item.fingerprint,\n    'Section Label': item.sectionLabel || '',\n    'Header Sample': item.headerSample || '',\n    'Column Map': JSON.stringify(parsed.columnMap),\n    'Defaults': JSON.stringify(withRequiredDefaults(parsed.defaults)),\n    'Confidence': 'High',\n    'Created By': 'LLM',\n    'Times Used': 0,\n    'Status': 'Active',\n    'Notes': [\n      `Auto-mapped from ${item.fileName || 'an attachment'} on first sight.`,\n      parsed.notes ? `Model notes: ${parsed.notes}` : '',\n      'REVIEW BEFORE RELYING ON IT: volumeUnit, stockUnit and priceType are',\n      'assumptions unless the sheet states them. priceType in particular is a',\n      '6-48x error if wrong — drinks lists price per case, FMCG per piece.',\n    ].filter(Boolean).join(' '),\n\n    columnMap: parsed.columnMap,\n    profileDefaults: withRequiredDefaults(parsed.defaults),\n  },\n};\n\nfunction withRequiredDefaults(defaults) {\n  const d = { ...(defaults || {}) };\n  if (!d.currency) d.currency = 'EUR';\n  if (!d.volumeUnit) d.volumeUnit = 'ml';\n  if (!d.stockUnit) d.stockUnit = 'cases';\n  if (!d.priceType) d.priceType = 'Per Case';\n  return d;\n}\n\n/**\n * Robust extraction of the column mapping from the model reply.\n *\n * claude-sonnet-4-5 sometimes returns a CHATTY reply: MULTIPLE ```json blocks\n * separated by prose (\"Wait, let me correct that:\"), the last block being its\n * corrected answer. The old parser stripped a single fence pair then, on\n * failure, grabbed /\\{[\\s\\S]*\\}/ — a greedy span from the first { to the last }\n * that glued both objects AND the prose between them into one blob that never\n * JSON.parses. Confirmed cause of parsedCount 0 in execution 9377.\n *\n * We now collect every candidate object — each ```json/``` fenced block, then\n * every brace-balanced { ... } span in the raw text — JSON.parse each, and keep\n * the LAST one that both parses and carries a usable map (productName +\n * buyPrice, not low confidence). On total failure we return { ok:false } so the\n * caller routes the section to review with a clear note rather than emitting 0.\n */\nfunction parseMappingResponse(rawText) {\n  const text = String(rawText ?? '');\n  const candidates = [];\n\n  const fence = /```(?:json)?\\s*([\\s\\S]*?)```/gi;\n  let fm;\n  while ((fm = fence.exec(text)) !== null) {\n    const body = fm[1] && fm[1].trim();\n    if (body) candidates.push(body);\n  }\n\n  for (const span of balancedObjects(text)) candidates.push(span);\n\n  let reason = 'model did not return JSON';\n  let best = null;\n  for (const cand of candidates) {\n    let obj;\n    try { obj = JSON.parse(cand); } catch { reason = 'model returned malformed JSON'; continue; }\n    if (!obj || typeof obj !== 'object') continue;\n    const map = obj.columnMap || {};\n    if (map.productName === undefined || map.buyPrice === undefined) {\n      reason = 'mapping missing productName or buyPrice';\n      continue;\n    }\n    if (String(obj.confidence).toLowerCase() === 'low') {\n      reason = `low confidence — ${obj.notes || 'unspecified'}`;\n      continue;\n    }\n    best = obj; // keep scanning — the LAST usable block wins (the correction)\n  }\n\n  if (!best) return { ok: false, reason };\n\n  const clean = {};\n  for (const [k, v] of Object.entries(best.columnMap || {})) {\n    if (Number.isInteger(v) && v >= 0) clean[k] = v;\n  }\n  return { ok: true, columnMap: clean, defaults: best.defaults || {}, notes: best.notes || '' };\n}\n\n/**\n * Every top-level brace-balanced { ... } span in the text, in order. A depth\n * scan (string-aware) so two adjacent objects can never be glued into one\n * unparseable blob the way a single greedy regex does.\n */\nfunction balancedObjects(text) {\n  const s = String(text);\n  const out = [];\n  let depth = 0, start = -1, inStr = false, quote = '', esc = false;\n  for (let i = 0; i < s.length; i++) {\n    const c = s[i];\n    if (inStr) {\n      if (esc) esc = false;\n      else if (c === '\\\\') esc = true;\n      else if (c === quote) inStr = false;\n      continue;\n    }\n    if (c === '\"' || c === \"'\") { inStr = true; quote = c; continue; }\n    if (c === '{') { if (depth === 0) start = i; depth++; }\n    else if (c === '}') {\n      if (depth > 0) { depth--; if (depth === 0 && start >= 0) { out.push(s.slice(start, i + 1)); start = -1; } }\n    }\n  }\n  return out;\n}\n"
+        },
+        "id": "0174f60e-a15e-4751-9824-20893695a70f",
+        "name": "Save Profile",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1984,
+          208
+        ]
+      },
+      {
+        "id": "97f92599-2c57-4909-a6c7-5eb501dded8d",
+        "name": "Fetch Suppliers",
+        "type": "n8n-nodes-base.airtable",
+        "typeVersion": 2,
+        "position": [
+          1872,
+          0
+        ],
+        "parameters": {
+          "base": {
+            "__rl": true,
+            "mode": "id",
+            "value": "appaDSdZkAE9PGkjT"
+          },
+          "operation": "search",
+          "options": {
+            "fields": [
+              "Supplier Name",
+              "Email",
+              "Default Validity Days",
+              "Trust Score",
+              "Status",
+              "Skip Offer Ingestion",
+              "Default Currency"
+            ]
+          },
+          "table": {
+            "__rl": true,
+            "mode": "id",
+            "value": "tblQkV5h5zuJD13w7"
+          }
+        },
+        "alwaysOutputData": true,
+        "executeOnce": true
+      },
+      {
+        "id": "58ac28fe-c5de-4387-866d-ef07fad15a5f",
+        "name": "Fetch Ingested Message IDs",
+        "type": "n8n-nodes-base.airtable",
+        "typeVersion": 2,
+        "position": [
+          1872,
+          160
+        ],
+        "parameters": {
+          "base": {
+            "__rl": true,
+            "mode": "id",
+            "value": "appaDSdZkAE9PGkjT"
+          },
+          "operation": "search",
+          "options": {
+            "fields": [
+              "Source Message ID"
+            ]
+          },
+          "table": {
+            "__rl": true,
+            "mode": "id",
+            "value": "tbljBgWrnIMZzkSAr"
+          }
+        },
+        "alwaysOutputData": true,
+        "executeOnce": true
+      },
+      {
+        "id": "b1000000-0000-4000-8000-000000000101",
+        "name": "Resolve Supplier",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1904,
+          340
+        ],
+        "parameters": {
+          "jsCode": "/**\n * n8n Code node — \"Resolve Supplier\"\n * Mode: Run Once for All Items\n *\n * Added 2026-08-04. Run-level supplier resolution for the (possibly forwarded)\n * sender. Read Workbook now yields a real fromAddress — the forwarded sender is\n * preferred over the akay.ie forwarder — plus an externalSender flag.\n *\n * Existing suppliers are matched BY EMAIL first, then by a non-generic DOMAIN,\n * so a re-forwarded email from a supplier we already hold (e.g. Halıtlar,\n * sales5@halitlar.com) resolves to the existing record and is never duplicated.\n * Only when no existing supplier matches AND the sender is a plausible external\n * address do we flag needCreate — never for our own akay.ie / offers@akay.ie\n * envelope, which is routed to review (left unresolved) instead.\n */\n\nconst GENERIC = new Set([\n  'gmail.com', 'hotmail.com', 'hotmail.fr', 'outlook.com', 'yahoo.com',\n  'yahoo.co.uk', 'live.com', 'icloud.com', 'aol.com', 'protonmail.com', 'gmx.com',\n]);\n\nlet meta = {};\ntry { meta = $('Read Workbook').first().json || {}; } catch (e) { meta = {}; }\n\nconst fromAddress = String(meta.fromAddress || '').trim().toLowerCase();\nconst senderName = String(meta.senderName || '').trim();\nconst senderDomain = String(meta.senderDomain || (fromAddress.split('@')[1] || '')).toLowerCase();\nconst externalSender = Boolean(meta.externalSender);\n\n// Suppliers keyed by full email and by unambiguous domain.\nconst byAddress = new Map();\nconst byDomain = new Map();\nlet suppliers = [];\ntry { suppliers = $('Fetch Suppliers').all().map((i) => i.json || {}); } catch (e) { suppliers = []; }\n\nfor (const s of suppliers) {\n  const f = s.fields || s;\n  if (!s.id) continue;\n  const email = String(f['Email'] || '').trim().toLowerCase();\n  if (!email) continue;\n  const rec = { id: s.id, name: f['Supplier Name'] || null, validityDays: f['Default Validity Days'] ?? null, defaultCurrency: selectName(f['Default Currency']) || null };\n  if (!byAddress.has(email)) byAddress.set(email, rec);\n  const d = email.split('@')[1];\n  if (d) { if (byDomain.has(d)) byDomain.set(d, null); else byDomain.set(d, rec); }\n}\n\nlet existing = null;\nlet via = 'unresolved';\nif (fromAddress) {\n  existing = byAddress.get(fromAddress) || null;\n  if (existing) via = `existing supplier by email ${fromAddress}`;\n  else if (senderDomain && !GENERIC.has(senderDomain)) {\n    const d = byDomain.get(senderDomain);\n    if (d) { existing = d; via = `existing supplier by domain ${senderDomain}`; }\n  }\n}\n\nconst needCreate = !existing && externalSender && /@/.test(fromAddress);\nconst createName = senderName || senderDomain || fromAddress;\n\nreturn [{\n  json: {\n    fromAddress,\n    senderName,\n    senderDomain,\n    externalSender,\n    envelopeFrom: meta.envelopeFrom || '',\n    existingSupplierId: existing ? existing.id : null,\n    existingSupplierName: existing ? existing.name : null,\n    existingValidityDays: existing ? existing.validityDays : null,\n    existingDefaultCurrency: existing ? existing.defaultCurrency : null,\n    needCreate,\n    createEmail: fromAddress,\n    createName,\n    via: existing\n      ? via\n      : needCreate\n        ? `auto-create external supplier ${fromAddress}`\n        : `no external sender to resolve (envelope ${meta.envelopeFrom || 'unknown'}) — left for review`,\n  },\n}];\n\nfunction selectName(v) {\n  const a = Array.isArray(v) ? v[0] : v;\n  if (a === null || a === undefined) return null;\n  return typeof a === 'object' ? (a.name || null) : String(a);\n}\n"
+        }
+      },
+      {
+        "id": "b1000000-0000-4000-8000-000000000102",
+        "name": "Need Supplier?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          2064,
+          340
+        ],
+        "parameters": {
+          "conditions": {
+            "combinator": "and",
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "need-create",
+                "leftValue": "={{ $json.needCreate }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ]
+          },
+          "options": {}
+        }
+      },
+      {
+        "id": "b1000000-0000-4000-8000-000000000103",
+        "name": "Create Missing Supplier",
+        "type": "n8n-nodes-base.airtable",
+        "typeVersion": 2.2,
+        "position": [
+          2224,
+          260
+        ],
+        "parameters": {
+          "resource": "record",
+          "operation": "create",
+          "base": {
+            "__rl": true,
+            "mode": "id",
+            "value": "appaDSdZkAE9PGkjT"
+          },
+          "table": {
+            "__rl": true,
+            "mode": "id",
+            "value": "tblQkV5h5zuJD13w7"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "Supplier Name": "={{ $json.createName }}",
+              "Email": "={{ $json.createEmail }}",
+              "Status": "Active",
+              "Trust Score": "Medium",
+              "Notes": "=Auto-created by Claude on {{ $now.toISODate() }} from a first-time forwarded Excel offer (sender {{ $json.createEmail }}). Trust Score Medium; column mapping not yet verified."
+            }
+          },
+          "options": {
+            "typecast": true
+          }
+        }
+      },
+      {
+        "id": "b1000000-0000-4000-8000-000000000104",
+        "name": "Merge Supplier",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2384,
+          340
+        ],
+        "parameters": {
+          "jsCode": "/**\n * n8n Code node — \"Merge Supplier\"\n * Mode: Run Once for All Items\n *\n * Added 2026-08-04. Collapses the resolve/create branch back to a single\n * run-level supplier for Build Airtable Payload. Reads the resolution from\n * Resolve Supplier and, when the auto-create branch ran, the freshly created\n * Supplier record from Create Missing Supplier (a created id wins).\n */\n\nlet resolved = {};\ntry { resolved = $('Resolve Supplier').first().json || {}; } catch (e) { resolved = {}; }\n\nlet supplierRecordId = resolved.existingSupplierId || null;\nlet supplierName = resolved.existingSupplierName || null;\nlet validityDays = resolved.existingValidityDays ?? null;\nlet defaultCurrency = resolved.existingDefaultCurrency || null;\nlet via = resolved.via || 'unresolved';\n\ntry {\n  const created = $('Create Missing Supplier').first().json;\n  if (created && created.id) {\n    supplierRecordId = created.id;\n    const f = created.fields || created;\n    supplierName = f['Supplier Name'] || resolved.createName || null;\n    validityDays = f['Default Validity Days'] ?? null;\n    via = `auto-created supplier ${resolved.createEmail || ''} (Trust Score Medium)`;\n  }\n} catch (e) { /* auto-create branch did not run — keep the resolved values */ }\n\nreturn [{\n  json: {\n    supplierRecordId,\n    supplierName,\n    validityDays,\n    defaultCurrency,\n    via,\n    fromAddress: resolved.fromAddress || '',\n    externalSender: Boolean(resolved.externalSender),\n  },\n}];\n"
+        }
+      }
+    ],
+    "connections": {
+      "Gmail Trigger": {
+        "main": [
+          [
+            {
+              "node": "Select Spreadsheets",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Select Spreadsheets": {
+        "main": [
+          [
+            {
+              "node": "Extract From File",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Extract From File": {
+        "main": [
+          [
+            {
+              "node": "Read Workbook",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Read Workbook": {
+        "main": [
+          [
+            {
+              "node": "Detect Header",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Detect Header": {
+        "main": [
+          [
+            {
+              "node": "Find Sheet Profile",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Find Sheet Profile": {
+        "main": [
+          [
+            {
+              "node": "Match Profile",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Match Profile": {
+        "main": [
+          [
+            {
+              "node": "Profile Found?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Profile Found?": {
+        "main": [
+          [
+            {
+              "node": "Normalize Rows",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Build Mapping Prompt",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Normalize Rows": {
+        "main": [
+          [
+            {
+              "node": "Fetch Products",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build Airtable Payload": {
+        "main": [
+          [
+            {
+              "node": "Has Creates?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Has Creates?": {
+        "main": [
+          [
+            {
+              "node": "Expand Offers",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Mark Excel Done",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Expand Offers": {
+        "main": [
+          [
+            {
+              "node": "Create Offers",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create Offers": {
+        "main": [
+          [
+            {
+              "node": "Mark Excel Done",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build Mapping Prompt": {
+        "main": [
+          [
+            {
+              "node": "Map Columns (LLM)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Map Columns (LLM)": {
+        "main": [
+          [
+            {
+              "node": "Save Profile",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Save Profile": {
+        "main": [
+          [
+            {
+              "node": "Normalize Rows",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Fetch Products": {
+        "main": [
+          [
+            {
+              "node": "Fetch Suppliers",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Fetch Suppliers": {
+        "main": [
+          [
+            {
+              "node": "Fetch Ingested Message IDs",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Fetch Ingested Message IDs": {
+        "main": [
+          [
+            {
+              "node": "Resolve Supplier",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Resolve Supplier": {
+        "main": [
+          [
+            {
+              "node": "Need Supplier?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Need Supplier?": {
+        "main": [
+          [
+            {
+              "node": "Create Missing Supplier",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Merge Supplier",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create Missing Supplier": {
+        "main": [
+          [
+            {
+              "node": "Merge Supplier",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Merge Supplier": {
+        "main": [
+          [
+            {
+              "node": "Build Airtable Payload",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": []
+  },
+  "tags": [],
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "parentFolderId": null,
+  "scopes": [
+    "execution:reveal",
+    "workflow:create",
+    "workflow:delete",
+    "workflow:disableRedaction",
+    "workflow:enableRedaction",
+    "workflow:execute",
+    "workflow:execute-chat",
+    "workflow:export",
+    "workflow:import",
+    "workflow:list",
+    "workflow:move",
+    "workflow:publish",
+    "workflow:read",
+    "workflow:share",
+    "workflow:unpublish",
+    "workflow:unshare",
+    "workflow:update"
+  ],
+  "canExecute": true
+}
