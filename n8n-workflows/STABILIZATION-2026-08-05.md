@@ -47,15 +47,29 @@ an unpublished fix does nothing, which was itself a major root cause).
 - Offer Dispatch — Akay — published & healthy. The no-BCC / per-recipient mail-merge / Resend / Capsule-tag + country filtering rule is correctly implemented; the long "wait" is the **human approval gate** (Await Approval), working as designed, not an error.
 - Supersede Supplier Price Lists, PDF/Image Offer Ingestion, Bounce & Reply, Backup — Export One Table, Timewaster Governance Report — published, no draft drift.
 
-## Open items (need a decision — not done in this pass)
+## Complete reference audit (added — full sweep, not sampling)
 
-1. **Offers → Products link field is missing.** Recreating it (a linked-record
-   field on Offers → Products) would let **Link Offers To Products** (currently
-   inactive) repopulate the ~1,600-offer backlog and let ingestion link new
-   offers. It's a schema change + reactivating a bulk-writer, so left for a
-   go/no-go. Price Intelligence no longer depends on it.
+Established ground truth from Airtable (**14 tables**) and mechanically checked
+**every** Airtable node in **every** workflow — table IDs, read `fields`, write
+`columns`, and `filterByFormula` — against the live schema.
 
-2. **Website "ready in Airtable but not published" (#6).** The public site
+- **Dead TABLE references:** none remaining. Every workflow points only at the
+  14 live tables. (The dead `tblSfenvu7iuvO4Ha` WhatsApp Log ID is gone from all
+  workflows; the backup's phantom `Portal Login Registry` was removed.)
+- **Dead FIELD references:** exactly one across the whole system —
+  **`Offers.Products`** (the link field was missing). It was referenced by all
+  four ingestion writers (Excel/Email/PDF/WhatsApp `fields['Products']=[…]`) and
+  by Link Offers To Products (read + write). **Fixed by recreating the field**
+  (`Products`, link → Products table, id `fldCcXqZAOmB4gUBL`), which resolves all
+  five at once. **Link Offers To Products has been reactivated** so it clears the
+  ~1,600-offer backlog (batched 150/run, idempotent).
+- Every other field reference (Suppliers, Products, Sheet Profiles, Enquiries,
+  Clients, WhatsApp Log, Offers Sent Log, Communications Log, Backup Registry,
+  Contacts) validated clean.
+
+## Open items
+
+1. **Website "ready in Airtable but not published" (#6).** The public site
    (`offers.akay.ie`) is a static Astro build that reads Airtable at build time,
    and `Public Listing` also requires the manual **Listing Approved** tick +
    `Offer Approval Status = Approved`. So "everything looks ready" but not shown
