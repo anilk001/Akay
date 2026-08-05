@@ -1,0 +1,1274 @@
+{
+  "id": "8oPUD8d9NPVBEime",
+  "name": "Email Body Offer Ingestion — Akay",
+  "active": true,
+  "versionId": "7bdee087-1bef-4af7-8ddf-02995687c5e0",
+  "activeVersionId": "7bdee087-1bef-4af7-8ddf-02995687c5e0",
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": true
+  },
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Extract Body Blocks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Body Blocks": {
+      "main": [
+        [
+          {
+            "node": "Has Offer Content?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Offer Content?": {
+      "main": [
+        [
+          {
+            "node": "Flatten Block",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Route to Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Email Profiles": {
+      "main": [
+        [
+          {
+            "node": "Attach Profiles",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resolve Body Profile": {
+      "main": [
+        [
+          {
+            "node": "Parse This One?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse This One?": {
+      "main": [
+        [
+          {
+            "node": "Normalize Rows",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "New Sender or Skip?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Rows": {
+      "main": [
+        [
+          {
+            "node": "Fetch Products",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Products": {
+      "main": [
+        [
+          {
+            "node": "Restore Offers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Airtable Payload": {
+      "main": [
+        [
+          {
+            "node": "Products to Create",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Products to Create": {
+      "main": [
+        [
+          {
+            "node": "Create Products",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Products": {
+      "main": [
+        [
+          {
+            "node": "Offers to Create",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route to Review": {
+      "main": [
+        [
+          {
+            "node": "Mark Reviewed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Flatten Block": {
+      "main": [
+        [
+          {
+            "node": "Find Email Profiles",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Attach Profiles": {
+      "main": [
+        [
+          {
+            "node": "Resolve Body Profile",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Restore Offers": {
+      "main": [
+        [
+          {
+            "node": "Build Airtable Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Offers": {
+      "main": [
+        [
+          {
+            "node": "Emails to Mark Done",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Emails to Mark Done": {
+      "main": [
+        [
+          {
+            "node": "Mark Email Done",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "New Sender or Skip?": {
+      "main": [
+        [
+          {
+            "node": "Route to Review",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Search Existing Sheet Profile by Sender",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create New Supplier": {
+      "main": [
+        [
+          {
+            "node": "Create Low-Confidence Sheet Profile",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Low-Confidence Sheet Profile": {
+      "main": [
+        [
+          {
+            "node": "LLM Extract Offers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LLM Extract Offers": {
+      "main": [
+        [
+          {
+            "node": "Attach New Supplier & Finalize Offers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Attach New Supplier & Finalize Offers": {
+      "main": [
+        [
+          {
+            "node": "Fetch Products",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Model — Offer Extraction": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "LLM Extract Offers",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Working Column Map?": {
+      "main": [
+        [
+          {
+            "node": "Flag Working Profile Mismatch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Search Existing Supplier if No Email Profile",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Flag Working Profile Mismatch": {
+      "main": [
+        [
+          {
+            "node": "Route to Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Need New Supplier?": {
+      "main": [
+        [
+          {
+            "node": "LLM Extract Offers",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create New Supplier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Existing Supplier if No Email Profile": {
+      "main": [
+        [
+          {
+            "node": "Carry Existing Supplier Id Forward",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Carry Existing Supplier Id Forward": {
+      "main": [
+        [
+          {
+            "node": "Need New Supplier?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Existing Sheet Profile by Sender": {
+      "main": [
+        [
+          {
+            "node": "Merge Original Fields Back",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Original Fields Back": {
+      "main": [
+        [
+          {
+            "node": "Has Working Column Map?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Offers to Create": {
+      "main": [
+        [
+          {
+            "node": "Apply Default Margin",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Apply Default Margin": {
+      "main": [
+        [
+          {
+            "node": "Essential Fields Gate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Essential Fields Gate": {
+      "main": [
+        [
+          {
+            "node": "Create Offers",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Flag Needs-Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Flag Needs-Review": {
+      "main": [
+        [
+          {
+            "node": "Create Needs-Review Offers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Needs-Review Offers": {
+      "main": [
+        [
+          {
+            "node": "Emails to Mark Done",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {
+          "q": "label:Process_Akay -label:Akay/Email-Done -label:Akay/Needs-Review -has:attachment"
+        }
+      },
+      "name": "Gmail Trigger",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "b608457f-ba5e-4be6-a30c-3621d31c550c"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "/**\n * n8n Code node — \"Extract Body Blocks\"\n * Mode: Run Once for Each Item\n *\n * Pulls offer content out of an EMAIL BODY, as opposed to an attachment.\n *\n * Emits blocks of two shapes, because supplier emails come in both:\n *\n *   table   — a grid, from an HTML <table> or from delimited plain text.\n *             Bluebird, Brockagh, Rio Mare, Fairy, the drinks list.\n *   labels  — vertical \"Label: value\" pairs describing ONE product.\n *             Marco Polo writes offers this way; there is no table at all.\n *\n * It also returns the surrounding PROSE, which is not decoration. These emails\n * routinely state offer-wide terms in sentences around the grid rather than in\n * columns — \"Terms: T2 | EXW Loendersloot\", \"Lead Time: Approximately 2 weeks\",\n * \"MOQ 1 pallet/line\", \"This is ex-works Virginia\". A parser that reads only\n * the table silently drops the incoterm, the warehouse and the lead time.\n *\n * Signature blocks are removed first. Brockagh's footer carries a street\n * address and two phone numbers, which is exactly the kind of thing a\n * delimited-text reader will happily treat as a data row.\n */\n\nconst item = $input.item.json;\n\n// ── The attachment always wins ──────────────────────────────────────────────\n// An email may carry BOTH a spreadsheet and a summary table in the body. The\n// spreadsheet is authoritative — it is the full list, while the body is\n// usually an excerpt — so the body is not parsed when one is present. Without\n// this, the Excel workflow and this one both ingest the same offer.\nconst SPREADSHEET = /\\.(xlsx|xlsm|xltx|xls|csv|tsv)$/i;\nconst attached = Object.values($input.item.binary || {})\n  .map((b) => String(b.fileName || ''))\n  .filter((n) => SPREADSHEET.test(n));\n\nif (attached.length) {\n  return { json: { ...item, blocksFound: 0, blocks: [], prose: '',\n    skipReason: `Spreadsheet attached (${attached.join(', ')}) — the Excel workflow handles this email` } };\n}\n\nconst html = String(item.bodyHtml || item.html || '');\nconst plain = String(item.bodyPlain || item.text || item.body || item.snippet || '');\n\nconst source = html || plain;\nif (!source.trim()) {\n  return { json: { ...item, blocksFound: 0, blocks: [], prose: '',\n    exceptionReason: 'Email body is empty' } };\n}\n\n// ── 1. Trim quoted history and the signature ────────────────────────────────\nconst asText = html ? htmlToText(html) : plain;\nconst trimmed = stripSignature(stripQuoted(asText));\n\n// ── 1b. Who actually sent the offer ─────────────────────────────────────────\n// Offers arrive FORWARDED into offers@akay.ie, so the envelope sender is\n// always the forwarder, not the supplier. Keying profiles on it would match\n// one address for every supplier in the business. The real sender sits in the\n// forwarded header block.\nconst forwarded = forwardedSender(asText);\nconst envelope = extractEmail(item.from || item.fromAddress || '');\nconst effective = forwarded || envelope;\n\n// ── 2. Tables ───────────────────────────────────────────────────────────────\nconst blocks = [];\n\nif (html) {\n  // Scan only the forwarded portion. Everything before the marker is the\n  // forwarder's own message, and an email signature is itself built from\n  // <table> for layout — left in, it is extracted as a two-column price list.\n  for (const grid of htmlTables(afterForward(html))) {\n    if (grid.length >= 2) blocks.push({ type: 'table', rows: grid });\n  }\n}\n\n// Plain-text grids. Only attempted when HTML yielded nothing, so a well-formed\n// HTML table is never also parsed a second time from its text rendering.\nif (blocks.length === 0) {\n  for (const grid of textTables(trimmed)) {\n    if (grid.length >= 2) blocks.push({ type: 'table', rows: grid });\n  }\n}\n\n// ── 3. Label:value blocks ───────────────────────────────────────────────────\n// Only when no table was found. An email with a grid may still contain\n// \"Lead Time: 2 weeks\" lines, and those are offer-wide prose, not a product.\nif (blocks.length === 0) {\n  const labels = labelValueBlock(trimmed);\n  if (labels) blocks.push({ type: 'labels', ...labels });\n}\n\nreturn {\n  json: {\n    ...item,\n    blocksFound: blocks.length,\n    blocks,\n    // Handed to the profile so offer-wide terms can be lifted from sentences.\n    //\n    // Grid lines are removed first. Left in, the table's own column headings\n    // are read as prose: a \"MOQ\" heading matches the MOQ rule and captures the\n    // rest of the header row (\"HS Code / Inner / Outer\") as the offer-wide\n    // minimum order. Harmless when MOQ is also mapped per row, since the row\n    // value wins — silently wrong when it is not.\n    prose: proseOnly(trimmed).slice(0, 8000),\n    fromAddress: effective,\n    senderDomain: (effective.split('@')[1] || ''),\n    envelopeFrom: envelope,\n    forwardedFrom: forwarded,\n    // True when the supplier was recovered from a forwarded header rather than\n    // the envelope. Useful when a profile fails to match and someone is\n    // working out why.\n    senderFromForward: Boolean(forwarded),\n    exceptionReason: blocks.length ? null\n      : 'No table or label:value block found in the email body',\n  },\n};\n\n// ── helpers ──────────────────────────────────────────────────────────────────\n\n/** HTML from the forwarded marker onward, or all of it when not a forward. */\nfunction afterForward(src) {\n  const m = src.match(/-{2,}\\s*(?:Forwarded|Original)\\s*message\\s*-{2,}/i)\n         || src.match(/Begin forwarded message:/i);\n  return m && m.index !== undefined ? src.slice(m.index) : src;\n}\n\n/**\n * A layout table used for a signature, not a price list. Signatures carry\n * contact links and images; offer tables carry neither.\n */\nfunction isSignatureTable(t) {\n  return /<img\\b/i.test(t) || /href\\s*=\\s*[\"']?(?:tel:|mailto:)/i.test(t);\n}\n\n/** Rows of cells from every <table> in the HTML. */\nfunction htmlTables(src) {\n  const out = [];\n  const tables = src.match(/<table[\\s\\S]*?<\\/table>/gi) || [];\n\n  for (const t of tables) {\n    if (isSignatureTable(t)) continue;\n    const rows = [];\n    for (const tr of t.match(/<tr[\\s\\S]*?<\\/tr>/gi) || []) {\n      const cells = (tr.match(/<t[dh][\\s\\S]*?<\\/t[dh]>/gi) || []).map(cellText);\n      if (cells.some((c) => c !== '')) rows.push(cells);\n    }\n    if (rows.length) out.push(rows);\n  }\n  return out;\n}\n\nfunction cellText(cell) {\n  return decode(cell.replace(/<[^>]+>/g, ' ')).replace(/\\s+/g, ' ').trim();\n}\n\n/**\n * Grids in plain text. A run of consecutive lines sharing the same delimiter\n * and a consistent column count is treated as one table.\n *\n * Tabs are tried before multi-space, because a tab-delimited line also contains\n * runs of spaces inside product names (\"Absolut Blue Original\") and splitting\n * on those would shred the row.\n */\nfunction textTables(text) {\n  const lines = text.split('\\n').map((l) => l.replace(/\\s+$/, ''));\n  const out = [];\n  let current = null;\n\n  for (const line of lines) {\n    const cells = splitRow(line);\n\n    if (cells && cells.length >= 2) {\n      if (current && current[0].length === cells.length) current.push(cells);\n      else { if (current && current.length >= 2) out.push(current); current = [cells]; }\n    } else {\n      if (current && current.length >= 2) out.push(current);\n      current = null;\n    }\n  }\n  if (current && current.length >= 2) out.push(current);\n  return out;\n}\n\n/**\n * Drop lines that are grid rows, keeping only the sentences around the table.\n * A line that splits into two or more cells is part of the table, not prose.\n */\nfunction proseOnly(text) {\n  return text\n    .split('\\n')\n    .filter((line) => {\n      const cells = splitRow(line);\n      return !(cells && cells.length >= 2);\n    })\n    .join('\\n');\n}\n\nfunction splitRow(line) {\n  if (!line.trim()) return null;\n  if (line.includes('\\t')) return line.split('\\t').map((c) => c.trim());\n\n  // Two or more spaces as a column break — how pasted grids usually survive.\n  const parts = line.split(/ {2,}/).map((c) => c.trim()).filter(Boolean);\n  return parts.length >= 2 ? parts : null;\n}\n\n/**\n * \"Label: value\" lines describing a single product.\n *\n * Returns the labels as a header row and the values as one data row, so the\n * SAME downstream mapping applies — a profile maps a field to a column index\n * either way, and nothing after this node needs to know which shape it was.\n */\nfunction labelValueBlock(text) {\n  const labels = [];\n  const values = [];\n  let title = '';\n\n  for (const rawLine of text.split('\\n')) {\n    const line = rawLine.trim();\n    if (!line) continue;\n\n    const m = line.match(/^([A-Za-z][A-Za-z0-9 \\/&().'-]{1,40}?)\\s*:\\s*(.+)$/);\n    if (!m) {\n      // A line ending in a colon with nothing after it is a heading. Keep the\n      // LAST one seen before the pairs begin, not the first: these emails open\n      // with a prose lead-in that also ends in a colon (\"Please see the\n      // following offers for ...:\"), and the product heading sits below it,\n      // directly above the values it describes.\n      if (labels.length === 0 && /:$/.test(line) && line.length > 8) {\n        title = line.replace(/:$/, '').trim();\n      }\n      continue;\n    }\n\n    const label = m[1].trim();\n    const value = m[2].trim();\n\n    // Contact-detail labels are not product attributes.\n    if (/^(tel|fax|mobile|office|email|e-?mail|phone|web|www|http)/i.test(label)) continue;\n\n    labels.push(label);\n    values.push(value);\n  }\n\n  if (labels.length < 2) return null;\n\n  if (title) { labels.unshift('Product'); values.unshift(title); }\n  return { rows: [labels, values], title };\n}\n\n/**\n * Separate the message we care about from the surrounding conversation.\n *\n * A FORWARD and a REPLY need opposite treatment, and getting it backwards\n * deletes the offer:\n *\n *   forward — the offer is what follows the marker. Everything BEFORE it is\n *             the forwarder's own signature and covering note, so drop that.\n *   reply   — the offer, if any, is what precedes the marker. Everything\n *             after is the earlier message, so drop that.\n *\n * The previous version treated a bare \"From:\" line as a reply marker, which\n * cut at the forwarded header and removed the entire forwarded offer.\n */\nfunction stripQuoted(text) {\n  const fwd = text.match(/^-{2,}\\s*Forwarded message\\s*-{2,}\\s*$/im)\n           || text.match(/^-{2,}\\s*Original Message\\s*-{2,}\\s*$/im)\n           || text.match(/^\\s*Begin forwarded message:\\s*$/im);\n\n  let body = text;\n  if (fwd && fwd.index !== undefined) {\n    // Skip past the forwarded header block (From/Date/Subject/To lines).\n    const after = body.slice(fwd.index + fwd[0].length);\n    const headerEnd = after.search(/\\n\\s*\\n/);\n    body = headerEnd >= 0 ? after.slice(headerEnd) : after;\n  }\n\n  const reply = body.match(/^\\s*On .+ wrote:\\s*$/m) || body.match(/^_{5,}\\s*$/m);\n  return reply && reply.index !== undefined ? body.slice(0, reply.index) : body;\n}\n\n/**\n * The supplier's address from a forwarded header block. Taken only from the\n * lines directly under the forward marker, so a mailto: elsewhere in the body\n * cannot be mistaken for the sender.\n */\nfunction forwardedSender(text) {\n  const fwd = text.match(/^-{2,}\\s*(?:Forwarded|Original)\\s*message\\s*-{2,}\\s*$/im)\n           || text.match(/^\\s*Begin forwarded message:\\s*$/im);\n  if (!fwd || fwd.index === undefined) return null;\n\n  const header = text.slice(fwd.index, fwd.index + 600);\n  const m = header.match(/^\\s*From:\\s*.*?([^\\s<>\"]+@[^\\s<>\"]+\\.[a-z]{2,})/im);\n  if (!m) return null;\n\n  const addr = m[1].toLowerCase().replace(/[.,;>]+$/, '');\n  // A forward of our own mail is not a supplier.\n  return /@akay\\.ie$/i.test(addr) ? null : addr;\n}\n\n/**\n * Drop the sign-off and everything after it. Supplier footers carry street\n * addresses and phone numbers that a delimited-text reader treats as rows.\n */\nfunction stripSignature(text) {\n  const re = /^\\s*(kind regards|best regards|regards|many thanks|thanks and regards|br|yours (sincerely|faithfully))\\s*[,.]?\\s*$/im;\n  const m = text.match(re);\n  return m && m.index !== undefined ? text.slice(0, m.index) : text;\n}\n\nfunction htmlToText(src) {\n  return decode(\n    src\n      .replace(/<(script|style)[\\s\\S]*?<\\/\\1>/gi, '')\n      .replace(/<\\/(p|div|tr|h[1-6]|li)>/gi, '\\n')\n      .replace(/<br\\s*\\/?>/gi, '\\n')\n      .replace(/<\\/t[dh]>/gi, '\\t')\n      .replace(/<[^>]+>/g, '')\n  ).replace(/[ \\t]+\\n/g, '\\n');\n}\n\nfunction decode(s) {\n  const named = { amp: '&', lt: '<', gt: '>', quot: '\"', apos: \"'\", nbsp: ' ', euro: '€', pound: '£' };\n  return String(s)\n    .replace(/&#(\\d+);/g, (_m, d) => String.fromCharCode(Number(d)))\n    .replace(/&#x([0-9a-f]+);/gi, (_m, h) => String.fromCharCode(parseInt(h, 16)))\n    .replace(/&([a-z]+);/gi, (m, n) => named[n.toLowerCase()] ?? m);\n}\n\nfunction extractEmail(raw) {\n  const m = String(raw).match(/<([^>]+)>/);\n  return (m ? m[1] : String(raw)).trim().toLowerCase();\n}\n"
+      },
+      "name": "Extract Body Blocks",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        0
+      ],
+      "id": "08312936-f8ca-4085-8e38-187e1394b90e"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "leftValue": "={{ $json.blocksFound > 0 }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Has Offer Content?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        448,
+        0
+      ],
+      "id": "a1c898ce-72e8-44ce-beb8-3d0d02b45668"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appaDSdZkAE9PGkjT",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblnsxQlNDzpHhwfV",
+          "mode": "id"
+        },
+        "filterByFormula": "AND(OR({Profile Type}=\"Email Table\",{Profile Type}=\"Email Label-Value\"),{Status}=\"Active\")",
+        "options": {}
+      },
+      "name": "Find Email Profiles",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2,
+      "position": [
+        672,
+        0
+      ],
+      "executeOnce": true,
+      "id": "111300fb-22d3-4e6a-a799-12bd0844c9ce"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "/**\n * n8n Code node — \"Resolve Body Profile\"\n * Mode: Run Once for Each Item\n *\n * Picks the Sheet Profile for an email offer, and lifts offer-wide terms out\n * of the surrounding prose.\n *\n * KEYED ON SENDER, NOT ON A HEADER FINGERPRINT.\n * Spreadsheet profiles fingerprint the header row, which works because the file\n * is machine-generated and the header is stable. Email tables are typed by hand\n * into Outlook: of six real supplier emails, one had no product-name header,\n * one had a blank price header, one was three stacked tables and one had no\n * table at all. There is nothing dependable to fingerprint. The supplier is the\n * stable thing, so that is the key.\n *\n * This also sidesteps the price-column gate. A sender-keyed profile states that\n * the price is column 3 because it is Brockagh — no header word required.\n *\n * TERMS IN PROSE.\n * These emails put per-offer terms in sentences rather than columns:\n *   \"Terms: T2 | EXW Loendersloot\"\n *   \"This is ex-works Virginia.\"\n *   \"Prices EXW in EUR - Zielona Góra, Poland\"\n *   \"Lead Time: Approximately 2 weeks\"\n * Reading only the grid silently drops the incoterm, warehouse and lead time,\n * so the prose is parsed and merged UNDER the profile's own defaults — an\n * explicit profile setting always wins over something inferred from a sentence.\n */\n\nconst WAREHOUSES = ['Loendersloot', 'NL', 'Dubai', 'Poland', 'Riga', 'Spain', 'Vietnam',\n                    'Greece', 'Indonesia', 'Czech', 'NewCorp', 'Vergèze', 'Bergamo'];\nconst INCOTERMS = ['EXW', 'FCA', 'FOB', 'CFR', 'CIF', 'DAP', 'DDP'];\n\nconst item = $input.item.json;\n\n// Airtable search results for Sheet Profiles where Profile Type is an email type.\nconst candidates = (item.profileCandidates || []).map((p) => p.fields || p);\n\nconst from = String(item.fromAddress || '').toLowerCase();\nconst domain = String(item.senderDomain || '').toLowerCase();\n\n// Exact address beats domain: a supplier may have one contact who sends a\n// different layout from the rest of the office.\nlet chosen = candidates.find((p) => match(p['Sender Match']) === from)\n          || candidates.find((p) => match(p['Sender Match']) === domain);\n\nconst prose = parseProse(String(item.prose || ''));\n\nif (!chosen) {\n  return {\n    json: {\n      ...item,\n      profileFound: false,\n      proseTerms: prose.terms,\n      proseNotes: prose.notes,\n      exceptionReason:\n        `No email profile for ${from || '(unknown sender)'}` +\n        `${domain ? ` or domain ${domain}` : ''} — routed for manual mapping`,\n    },\n  };\n}\n\n// ── Ingestion gate ──────────────────────────────────────────────────────────\n// Two separate reasons to skip, deliberately kept apart:\n//   Supplier Status Blacklisted/Inactive/Archived — we do not trade with them\n//   Skip Offer Ingestion ticked — we do trade, but their prices are routinely\n//                                 too high for parsing to be worth it\n//\n// Neither deletes or hides anything. The email is left exactly as it is and\n// simply not ingested, so a person can still read it, and unticking the box\n// makes the next offer parse normally.\nconst supplierStatus = firstName(chosen['Supplier Status']);\nconst supplierSkip = firstBool(chosen['Supplier Skip']);\nconst BLOCKING = ['Blacklisted', 'Inactive', 'Archived'];\n\nif (supplierSkip || BLOCKING.includes(supplierStatus)) {\n  return {\n    json: {\n      ...item,\n      profileFound: true,\n      skipIngestion: true,\n      profileName: chosen['Profile Name'],\n      skipReason: supplierSkip\n        ? `${chosen['Profile Name']}: Skip Offer Ingestion is ticked on the supplier — offers not parsed on price grounds`\n        : `${chosen['Profile Name']}: supplier Status is ${supplierStatus} — offers not parsed`,\n    },\n  };\n}\n\nlet columnMap = {};\nlet profileDefaults = {};\ntry { columnMap = JSON.parse(chosen['Column Map'] || '{}'); } catch (e) { /* reported below */ }\ntry { profileDefaults = JSON.parse(chosen['Defaults'] || '{}'); } catch (e) { /* reported below */ }\n\n// A Column Map may address columns by INDEX or by LABEL NAME. Label names are\n// the right choice for Label:value profiles — the position of \"Price\" depends\n// on which other labels the supplier happened to include that day, so a single\n// added line would shift every index. Names are resolved against the extracted\n// header here, so everything downstream still sees plain indices.\nconst headerCells = (item.headerCells || []).map((h) => String(h ?? '').trim().toLowerCase());\nif (headerCells.length) {\n  const resolved = {};\n  const unresolved = [];\n  for (const [field, ref] of Object.entries(columnMap)) {\n    if (Number.isInteger(ref)) { resolved[field] = ref; continue; }\n    const idx = headerCells.indexOf(String(ref).trim().toLowerCase());\n    if (idx >= 0) resolved[field] = idx;\n    else unresolved.push(`${field} -> \"${ref}\"`);\n  }\n  columnMap = resolved;\n  if (unresolved.length) {\n    return { json: { ...item, profileFound: false, proseTerms: prose.terms,\n      exceptionReason:\n        `Profile \"${chosen['Profile Name']}\" references labels absent from this email: ` +\n        `${unresolved.join(', ')}. Labels present: ${headerCells.filter(Boolean).join(', ')}` } };\n  }\n}\n\nif (!Object.keys(columnMap).length) {\n  return { json: { ...item, profileFound: false,\n    exceptionReason: `Profile \"${chosen['Profile Name']}\" has an unreadable Column Map` } };\n}\n\nreturn {\n  json: {\n    ...item,\n    profileFound: true,\n    profileName: chosen['Profile Name'],\n    profileType: name(chosen['Profile Type']),\n\n    // The profile's linked Supplier, forwarded so 04 can link the offer and\n    // read the trust level. Without this the email path created every offer\n    // with no Supplier at all — the fields all looked right and nothing said\n    // who to buy from.\n    supplierRecordId: linkId(chosen['Supplier']),\n    supplierName: linkName(chosen['Supplier']),\n    // High auto-approves the PUBLIC LISTING only. The send to clients still\n    // waits for a person, on every supplier.\n    supplierTrust: firstName(chosen['Supplier Trust']),\n\n    columnMap,\n    // Prose terms fill gaps the profile leaves; they never override it.\n    profileDefaults: { ...prose.terms, ...profileDefaults },\n    proseTerms: prose.terms,\n    proseNotes: prose.notes,\n  },\n};\n\n// ── helpers ──────────────────────────────────────────────────────────────────\n\nfunction match(v) { return String(v ?? '').trim().toLowerCase(); }\nfunction name(v) { return v && typeof v === 'object' ? v.name : v; }\n\n/** Airtable lookups always return arrays, even for a single linked record. */\nfunction firstName(v) {\n  const a = Array.isArray(v) ? v[0] : v;\n  return a && typeof a === 'object' ? a.name : (a ?? null);\n}\nfunction firstBool(v) {\n  const a = Array.isArray(v) ? v[0] : v;\n  return Boolean(a);\n}\n\n/**\n * A linked-record field, which Airtable returns as bare record-ID strings over\n * the REST API but as { id, name } objects through some clients. Both shapes\n * are handled so the supplier link survives either.\n */\nfunction linkId(v) {\n  const a = Array.isArray(v) ? v[0] : v;\n  if (!a) return null;\n  return typeof a === 'object' ? (a.id || null) : String(a);\n}\nfunction linkName(v) {\n  const a = Array.isArray(v) ? v[0] : v;\n  return a && typeof a === 'object' ? (a.name || null) : null;\n}\n\n/**\n * Pull offer-wide terms out of the prose around the table.\n *\n * Deliberately conservative: a term is only taken when its wording is\n * unambiguous. Anything recognised but unmappable is reported in `notes` for a\n * human rather than guessed into a field.\n */\nfunction parseProse(text) {\n  const terms = {};\n  const notes = [];\n  const t = text.replace(/\\s+/g, ' ');\n\n  // Incoterm — \"EXW Loendersloot\", \"ex-works Virginia\", \"DAP Holland\"\n  const inco = t.match(/\\b(ex[\\s-]?works?|exw|fca|fob|cfr|cif|dap|ddp)\\b/i);\n  if (inco) {\n    const raw = inco[1].toLowerCase().replace(/[\\s-]/g, '');\n    terms.incoterm = /^ex(works?)?$/.test(raw) ? 'EXW' : inco[1].toUpperCase();\n  }\n\n  // Warehouse — matched against the Airtable option list only.\n  for (const w of WAREHOUSES) {\n    if (new RegExp(`\\\\b${escapeRe(w)}\\\\b`, 'i').test(t)) { terms.warehouse = w; break; }\n  }\n\n  // A location was clearly stated but is not one of our warehouses. Reported\n  // rather than forced to \"Other\", because the name matters to a human:\n  // \"ex-works Virginia\" is Virginia in Co. Cavan, not the US state, and\n  // guessing wrong puts the goods on another continent.\n  if (!terms.warehouse && inco) {\n    const after = t.slice(inco.index + inco[0].length).match(/^\\s*[:\\-]?\\s*([A-ZÀ-Ý][\\w'’-]*(?:\\s+[A-ZÀ-Ý][\\w'’-]*){0,3})/);\n    if (after) notes.push(`Stated location \"${after[1].trim()}\" is not a known warehouse — set it by hand`);\n  }\n\n  // Bond / customs status\n  if (/\\bT1\\b/.test(t)) terms.bondStatus = 'T1';\n  else if (/\\bT2\\b/.test(t)) terms.bondStatus = 'T2';\n  else if (/\\bduty[\\s-]?paid\\b/i.test(t)) terms.bondStatus = 'Duty Paid';\n  else if (/\\b(under )?bond(ed)?\\b/i.test(t)) terms.bondStatus = 'Bonded';\n\n  // Currency stated in prose — \"Prices EXW in EUR\"\n  const cur = t.match(/\\bprices?\\b[^.]{0,40}?\\b(eur|euro|usd|gbp|aed|sgd)\\b/i);\n  if (cur) terms.currency = cur[1].toUpperCase().replace('EURO', 'EUR');\n\n  // Lead time and MOQ are matched PER LINE, and stopped at the next known\n  // keyword. Flattened whole-text matching runs straight past the end of the\n  // value: one real email reads \"Lead time 2 weeks / MOQ 1 pallet per line /\n  // Price is EXW Athens\" on consecutive lines, and a greedy match captured all\n  // three as the lead time.\n  const STOP = /\\b(moq|lead\\s*time|price|prices|terms|warehouse|incoterm|delivery|payment)\\b/i;\n\n  for (const line of text.split('\\n').map((l) => l.trim()).filter(Boolean)) {\n    if (!terms.leadTime) {\n      const lead = line.match(/lead[\\s-]?time\\s*[:\\-]?\\s*(?:approx(?:imately)?\\.?\\s*)?(.+)$/i);\n      if (lead) terms.leadTime = clip(lead[1], STOP);\n    }\n    if (!terms.moq) {\n      const moq = line.match(/\\bmoq\\b\\s*[:\\-]?\\s*(.+)$/i);\n      if (moq) terms.moq = clip(moq[1], STOP);\n    }\n  }\n\n  return { terms, notes };\n}\n\n/** Trim a captured value at the next keyword, sentence end or pipe. */\nfunction clip(value, stop) {\n  let v = String(value).split(/[.|]/)[0].trim();\n  const m = v.match(stop);\n  if (m && m.index > 0) v = v.slice(0, m.index).trim();\n  return v.replace(/[,;\\/\\s]+$/, '').slice(0, 60);\n}\n\nfunction escapeRe(s) { return String(s).replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&'); }\n"
+      },
+      "name": "Resolve Body Profile",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        0
+      ],
+      "id": "2a420280-55ae-4987-af3b-54d11ffc88bd"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "leftValue": "={{ $json.profileFound === true && $json.skipIngestion !== true }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Parse This One?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1104,
+        0
+      ],
+      "id": "998d78ac-222c-4a31-a4fa-6496adc752ca"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "/**\n * n8n Code node — \"Normalize Rows\"\n * Mode: Run Once for Each Item\n *\n * Applies a Sheet Profile's column map to the raw data rows and coerces every\n * value into something the Airtable Offers table will actually accept.\n *\n * This node writes NO approval fields. Ingested offers land as\n * \"Awaiting Approval\" and are gated by the existing human sign-off.\n */\n\n// ── Airtable single-select options (base appaDSdZkAE9PGkjT, table Offers) ────\n// Airtable rejects writes containing an unknown option, so every free-text\n// value is coerced into one of these or dropped to a flagged exception.\nconst OPTIONS = {\n  currency: ['EUR', 'USD', 'GBP', 'AED', 'SGD', 'Other'],\n  unitType: ['Bottle', 'Can', 'Jar', 'Pack', 'Piece', 'Other'],\n  priceType: ['Per Case', 'Per Bottle', 'Per Can', 'Per Piece', 'Per Pack', 'Per Jar'],\n  bond: ['Bonded', 'T1', 'T2', 'Duty Paid', 'On Floor', 'Other'],\n  incoterm: ['EXW', 'FCA', 'FOB', 'CFR', 'CIF', 'DAP', 'DDP', 'Other'],\n  warehouse: ['Loendersloot', 'NL', 'Dubai', 'Poland', 'Riga', 'Spain', 'Vietnam',\n              'Greece', 'Indonesia', 'Czech', 'Other', 'NewCorp', 'Vergèze', 'Bergamo'],\n  // Offers.Category has no \"Wine\" option — it was renamed to \"Champagne\" on\n  // 2026-07-29, since still wine is not a category Akay trades in volume.\n  // Everything vinous therefore lands in Champagne, sparkling or not.\n  // NOTE: Products.Category still carries BOTH Wine and Champagne. That does\n  // not affect product matching, whose key is Brand + Name + Volume +\n  // Bond/Customs Status and does not include category.\n  category: ['Beer', 'Spirits', 'Champagne', 'Grocery', 'Confectionery',\n             'Toiletries', 'Soft Drinks', 'Other FMCG'],\n};\n\n// Declared here rather than beside parseVolume: the row loop runs before the\n// helper block, and `const` does not hoist the way a function declaration does.\nconst VOLUME_UNIT_FACTOR = { ml: 1, cc: 1, cl: 10, dl: 100, l: 1000, ltr: 1000, litre: 1000 };\n\n// Same reason as above. parseDate calls this from inside the row loop, which\n// runs before the helper block below is evaluated. Latent until a profile\n// mapped a BBD column — none of the first five did, so it never fired.\nconst pad = (v) => String(v).padStart(2, '0');\n\nconst SYNONYMS = {\n  currency: {\n    '€': 'EUR', eur: 'EUR', euro: 'EUR', euros: 'EUR',\n    $: 'USD', usd: 'USD', dollar: 'USD', usdollar: 'USD',\n    '£': 'GBP', gbp: 'GBP', pound: 'GBP', sterling: 'GBP',\n    aed: 'AED', dirham: 'AED', sgd: 'SGD',\n  },\n  bond: {\n    bond: 'Bonded', bonded: 'Bonded', underbond: 'Bonded', inbond: 'Bonded',\n    t1: 'T1', t2: 'T2', export: 'T1', eu: 'T2', community: 'T2',\n    dutypaid: 'Duty Paid', dp: 'Duty Paid', taxpaid: 'Duty Paid',\n    onfloor: 'On Floor', floor: 'On Floor', exstock: 'On Floor',\n  },\n  unitType: {\n    bottle: 'Bottle', btl: 'Bottle', flasche: 'Bottle', bouteille: 'Bottle',\n    can: 'Can', cans: 'Can', tin: 'Can',\n    jar: 'Jar', pack: 'Pack', pouch: 'Pack', piece: 'Piece', pcs: 'Piece', unit: 'Piece',\n  },\n  category: {\n    beer: 'Beer', lager: 'Beer', ale: 'Beer', cider: 'Beer',\n    spirit: 'Spirits', spirits: 'Spirits', whisky: 'Spirits', whiskey: 'Spirits',\n    vodka: 'Spirits', gin: 'Spirits', rum: 'Spirits', liqueur: 'Spirits',\n    cognac: 'Spirits', brandy: 'Spirits', tequila: 'Spirits',\n    champagne: 'Champagne', wine: 'Champagne', wines: 'Champagne',\n    prosecco: 'Champagne', sparkling: 'Champagne', cava: 'Champagne', bordeaux: 'Champagne',\n    softdrink: 'Soft Drinks', softdrinks: 'Soft Drinks', water: 'Soft Drinks',\n    juice: 'Soft Drinks', energy: 'Soft Drinks', soda: 'Soft Drinks',\n    grocery: 'Grocery', food: 'Grocery',\n    confectionery: 'Confectionery', chocolate: 'Confectionery', sweets: 'Confectionery',\n    candy: 'Confectionery', biscuit: 'Confectionery',\n    toiletries: 'Toiletries', cosmetics: 'Toiletries', personalcare: 'Toiletries',\n  },\n};\n\nconst item = $input.item.json;\nconst map = item.columnMap || {};       // { targetField: headerCellIndex }\nconst defaults = item.profileDefaults || {}; // supplier-level fallbacks\nconst headers = item.headerCells || [];\n\nconst offers = [];\n\n// Seeded with anything the extractor already rejected before reaching here.\n// The WhatsApp path refuses some lines outright — a price range, an average —\n// and those reasons are far more useful than the \"unparseable price\" this node\n// would produce from the same text. Empty on the spreadsheet and email paths.\nconst exceptions = (item.preParseExceptions || []).map((e) => ({\n  sheetRow: e.sheetRow ?? null,\n  productName: e.productName || '',\n  sourceSheet: `${item.fileName} :: ${item.sheetName}`,\n  exceptionReason: e.exceptionReason,\n}));\n\n(item.dataRows || []).forEach((row, i) => {\n  const sheetRow = (item.headerRowIndex ?? 0) + 2 + i; // 1-based, as seen in Excel\n  const get = (field) => {\n    const idx = map[field];\n    if (idx === undefined || idx === null) return '';\n    return String(row[idx] ?? '').trim();\n  };\n\n  const productName = get('productName');\n  const rawPrice = get('buyPrice');\n\n  // A row without a product name or a price is a spacer, subtotal or footer.\n  // Skipping silently is correct here — these are not failures.\n  if (!productName && !rawPrice) return;\n\n  const problems = [];\n\n  // Email price cells carry their own currency and per-unit basis; spreadsheet\n  // cells are bare numbers and fall back to the profile for both.\n  const price = parsePriceCell(rawPrice);\n  if (!productName) problems.push('missing product name');\n  if (price.value === null) problems.push(`unparseable price \"${rawPrice}\"`);\n  else if (price.ambiguous) problems.push(`ambiguous decimal separator in \"${rawPrice}\"`);\n\n  // Pack notation lives in its own column on some sheets and inside the\n  // product name on others (\"Poliakov 6/70cl\", \"Absolut 120x5cl\").\n  const pack = parsePack(get('packFormat') || get('volumeMl') || productName);\n\n  const volume = parseVolume(get('volumeMl'), defaults.volumeUnit)\n    ?? pack.volumeMl\n    ?? parseVolume(productName, defaults.volumeUnit);\n  const pcsCase = parseNumber(get('pcsCase')).value ?? pack.pcsCase;\n  const abv = parseAbv(get('abv')) ?? pack.abv ?? parseAbv(productName);\n  const weightKg = pack.weightG !== null ? pack.weightG / 1000 : null;\n\n  const bond = coerce('bond', get('bondStatus') || defaults.bondStatus);\n  const currency = price.currency || coerce('currency', get('currency') || defaults.currency);\n  if (!currency) problems.push('no currency on row or profile default');\n\n  const brand = get('brand') || guessBrand(productName);\n\n  const record = {\n    sheetRow,\n    sourceSheet: `${item.fileName} :: ${item.sheetName}`,\n    sourceMessageId: item.sourceMessageId,\n\n    brand,\n    productName,\n    variant: get('variant') || '',\n    category: coerce('category', get('category') || defaults.category),\n    volumeMl: volume,\n    pcsCase: pcsCase ?? defaults.pcsCase ?? null,\n    unitType: coerce('unitType', get('unitType') || defaults.unitType) || 'Bottle',\n    abv,\n    originCountry: get('originCountry') || defaults.originCountry || '',\n    bondStatus: bond,\n    buyPrice: price.value,\n    currency,\n    // A basis stated in the price cell always wins — it is per row, whereas\n    // the profile default is per supplier.\n    priceType: price.basis\n      || coerce('priceType', get('priceType') || defaults.priceType)\n      || 'Per Case',\n    priceBasisStated: Boolean(price.basis),\n    weightKg,\n    stockCases: toCases(parseNumber(get('stockCases')).value, pcsCase, defaults.stockUnit),\n    casesPerPallet: parseNumber(get('casesPerPallet')).value,\n    piecesPerPallet: parseNumber(get('piecesPerPallet')).value,\n    language: get('language') || '',\n    moq: get('moq') || '',\n    leadTime: get('leadTime') || '',\n    eanUnit: cleanEan(get('eanUnit')),\n    eanCase: cleanEan(get('eanCase')),\n    bbd: parseDate(get('bbd')),\n    incoterm: coerce('incoterm', get('incoterm') || defaults.incoterm),\n    warehouse: coerce('warehouse', get('warehouse') || defaults.warehouse),\n\n    // Identity key per the Product Matching policy:\n    // Brand + Name + Volume + Bond/Customs Status\n    productKey: buildProductKey(brand, productName, volume, bond),\n  };\n\n  if (problems.length) {\n    exceptions.push({ ...record, exceptionReason: problems.join('; ') });\n  } else {\n    offers.push(record);\n  }\n});\n\nreturn {\n  json: {\n    fileName: item.fileName,\n    sheetName: item.sheetName,\n    sourceMessageId: item.sourceMessageId,\n    fromAddress: item.fromAddress,\n    supplierRecordId: item.supplierRecordId || null,\n    // Carried through explicitly. 04 reads both, and this node sits between the\n    // supplier lookup and 04 on all three ingestion paths — dropping them here\n    // silently costs every offer its supplier-specific validity (falling back to\n    // 14 days) and leaves the supplier off the internal Offer Name.\n    supplierName: item.supplierName || null,\n    supplierValidityDays: item.supplierValidityDays ?? null,\n    // Drives auto-approval of the PUBLIC LISTING in 04. Not the send approval,\n    // which no automated path writes.\n    supplierTrust: item.supplierTrust || null,\n    profileId: item.profileId || null,\n    fingerprint: item.fingerprint,\n    parsedCount: offers.length,\n    exceptionCount: exceptions.length,\n    offers,\n    exceptions,\n  },\n};\n\n// ── helpers ──────────────────────────────────────────────────────────────────\n\n/**\n * Parse a number written by any European or Anglophone supplier.\n * The dangerous case is \"1,234\" — either 1234 or 1.234 depending on locale.\n * Rule: when both separators appear, the rightmost is the decimal point.\n * When only a comma appears with exactly 3 trailing digits, it is ambiguous\n * and is flagged rather than guessed, because guessing wrong is a 1000x\n * price error that would reach a client.\n */\nfunction parseNumber(raw) {\n  if (raw === null || raw === undefined) return { value: null, ambiguous: false };\n  let s = String(raw).trim();\n  if (!s) return { value: null, ambiguous: false };\n\n  // Longest form first: stripping \"eur\" out of \"Euro\" would leave a stray \"o\"\n  // and the letter check below would then reject an otherwise valid price.\n  // Premium Brands writes a literal \"Euro\" column, so this is not hypothetical\n  // — it only escaped notice because that sheet keeps it in its own column.\n  s = s.replace(/euros?|dollars?|pounds?|usd|gbp|aed|sgd|eur|[€$£\\s]/gi, '').trim();\n  if (!s) return { value: null, ambiguous: false };\n\n  // Anything with letters left is prose, not a price — a comment column such as\n  // \"200 MORE 31ST JULY\" or \"750 DUE 31ST JULY\". Stripping to digits would yield\n  // 20031 and 75031 and quote them as prices, so reject outright. This is the\n  // main defence when a column map is misaligned against a shifted section.\n  if (/[a-z]/i.test(s)) return { value: null, ambiguous: false };\n\n  const hasDot = s.includes('.');\n  const hasComma = s.includes(',');\n  let ambiguous = false;\n\n  if (hasDot && hasComma) {\n    if (s.lastIndexOf(',') > s.lastIndexOf('.')) s = s.replace(/\\./g, '').replace(',', '.');\n    else s = s.replace(/,/g, '');\n  } else if (hasComma) {\n    const after = s.split(',')[1] ?? '';\n    if (s.split(',').length > 2) s = s.replace(/,/g, '');       // 1,234,567\n    else if (after.length === 3) ambiguous = true;               // 1,234 — unresolvable\n    else s = s.replace(',', '.');                                // 12,50\n    if (ambiguous) s = s.replace(',', '.');                      // best guess, flagged\n  }\n\n  const cleaned = s.replace(/[^0-9.\\-]/g, '');\n  // Text like \"n/a\", \"TBC\" or \"POA\" strips down to nothing, and Number('') is 0\n  // — which would price the row at zero. Reject rather than return a free product.\n  if (!/\\d/.test(cleaned)) return { value: null, ambiguous: false };\n\n  const n = Number(cleaned);\n  return Number.isFinite(n) ? { value: n, ambiguous } : { value: null, ambiguous: false };\n}\n\n/**\n * Read a price cell that carries its own currency and per-unit basis.\n *\n * Spreadsheets keep these in separate columns, so the profile can state them\n * once. Email offers write them inline, and the BASIS VARIES ROW BY ROW —\n * one real offer lists \"Euro 2,5/btl\" directly above \"Euro 48,7/cs\". Taking\n * the basis from the profile there would be a 6-12x error on half the rows.\n *\n * Returns { value, currency, basis } with currency and basis null when the\n * cell does not state them, so the profile default still applies.\n */\nfunction parsePriceCell(raw) {\n  const s = String(raw ?? '').trim();\n  if (!s) return { value: null, currency: null, basis: null, ambiguous: false };\n\n  let currency = null;\n  if (/€|\\beur(o|os)?\\b/i.test(s)) currency = 'EUR';\n  else if (/£|\\bgbp\\b|\\bpounds?\\b/i.test(s)) currency = 'GBP';\n  else if (/\\$|\\busd\\b|\\bdollars?\\b/i.test(s)) currency = 'USD';\n  else if (/\\baed\\b/i.test(s)) currency = 'AED';\n  else if (/\\bsgd\\b/i.test(s)) currency = 'SGD';\n\n  // Trailing \"/btl\", \"/cs\", \"/case\", \"/pc\" and friends.\n  let basis = null;\n  const m = s.match(/\\/\\s*(btl|bottle|cs|case|ctn|carton|pc|pcs|piece|pack|can|jar|unit)\\b/i);\n  if (m) {\n    const k = m[1].toLowerCase();\n    if (/^(cs|case|ctn|carton)$/.test(k)) basis = 'Per Case';\n    else if (/^(btl|bottle)$/.test(k)) basis = 'Per Bottle';\n    else if (/^(pc|pcs|piece|unit)$/.test(k)) basis = 'Per Piece';\n    else if (k === 'pack') basis = 'Per Pack';\n    else if (k === 'can') basis = 'Per Can';\n    else if (k === 'jar') basis = 'Per Jar';\n  }\n\n  // Strip the basis suffix before reading the number, or \"/btl\" leaves letters\n  // behind and the prose guard rejects a perfectly good price.\n  const numeric = parseNumber(s.replace(/\\/\\s*[a-z]+\\b/gi, ''));\n\n  return { value: numeric.value, currency, basis, ambiguous: numeric.ambiguous };\n}\n\n/**\n * Read a trade pack notation into its parts.\n *\n * Four notations appear across real supplier emails:\n *   \"6/70cl\"          6 bottles x 70cl\n *   \"120x5cl\"         120 miniatures x 5cl\n *   \"12/1000/40\"      12 x 1000(ml) x 40% abv\n *   \"20 x 250g\"       20 units x 250g   (weight, not volume)\n *\n * THE MIDDLE NUMBER'S UNIT IS AMBIGUOUS in the bare \"12/1000/40\" form: 1000\n * means millilitres, while \"6/100/35\" means 100 CENTILITRES — both are 1 litre.\n * Resolved by magnitude, since 1000cl would be a ten-litre bottle and 100ml\n * would be a miniature sold by the case of six. The cut-off sits at 200.\n */\nfunction parsePack(raw) {\n  const s = String(raw ?? '').trim();\n  const out = { pcsCase: null, volumeMl: null, abv: null, weightG: null };\n  if (!s) return out;\n\n  // Weight-based: \"20 x 250g\"\n  let m = s.match(/(\\d+)\\s*[x×\\/]\\s*(\\d+(?:[.,]\\d+)?)\\s*(g|gr|gram|kg)\\b/i);\n  if (m) {\n    out.pcsCase = Number(m[1]);\n    const n = Number(m[2].replace(',', '.'));\n    out.weightG = /^kg$/i.test(m[3]) ? n * 1000 : n;\n    return out;\n  }\n\n  // Explicit volume unit: \"6/70cl\", \"120x5cl\", \"24/20/13.5%\"\n  m = s.match(/(\\d+)\\s*[x×\\/]\\s*(\\d+(?:[.,]\\d+)?)\\s*(ml|cl|dl|l|ltr)\\b/i);\n  if (m) {\n    out.pcsCase = Number(m[1]);\n    out.volumeMl = parseVolume(`${m[2]}${m[3]}`);\n    const abv = s.match(/(\\d+(?:[.,]\\d+)?)\\s*%/);\n    if (abv) out.abv = Number(abv[1].replace(',', '.'));\n    return out;\n  }\n\n  // Bare numeric triple: \"12/1000/40\", \"6/100/35\"\n  m = s.match(/(\\d+)\\s*\\/\\s*(\\d+(?:[.,]\\d+)?)\\s*(?:\\/\\s*(\\d+(?:[.,]\\d+)?))?/);\n  if (m) {\n    out.pcsCase = Number(m[1]);\n    const mid = Number(m[2].replace(',', '.'));\n    out.volumeMl = mid >= 200 ? Math.round(mid) : Math.round(mid * 10);\n    if (m[3]) {\n      const a = Number(m[3].replace(',', '.'));\n      if (a > 0 && a <= 100) out.abv = a;\n    }\n  }\n  return out;\n}\n\n/**\n * Normalise any volume expression to millilitres.\n *\n * `unitHint` comes from the Sheet Profile and is what the column means when the\n * cell carries a bare number. This is not optional detail: one supplier's\n * \"content\" column reads 70 for a 70cl bottle while another's \"ML/BTL\" reads\n * 1000 for the same size of bottle. Guessing from magnitude alone turns a 70cl\n * bottle into 70ml.\n */\nfunction parseVolume(raw, unitHint) {\n  const s = String(raw ?? '').toLowerCase();\n  if (!s) return null;\n\n  let m = s.match(/(\\d+(?:[.,]\\d+)?)\\s*(ml|cl|dl|l|ltr|litre|liter|cc)\\b/);\n  if (!m) {\n    const bare = parseNumber(s).value;\n    if (bare === null) return null;\n\n    const factor = VOLUME_UNIT_FACTOR[String(unitHint || '').toLowerCase()];\n    if (factor) return Math.round(bare * factor);\n\n    // No hint: a bare number is millilitres unless it is implausibly small,\n    // in which case it is almost certainly litres.\n    return bare > 0 && bare < 10 ? Math.round(bare * 1000) : Math.round(bare);\n  }\n\n  const n = Number(m[1].replace(',', '.'));\n  switch (m[2]) {\n    case 'ml': case 'cc': return Math.round(n);\n    case 'cl': return Math.round(n * 10);\n    case 'dl': return Math.round(n * 100);\n    default: return Math.round(n * 1000); // l / ltr / litre / liter\n  }\n}\n\n/**\n * Airtable stores stock in CASES, so every profile is normalised to cases\n * regardless of what its source column holds — the unit must be consistent\n * across suppliers or the numbers cannot be compared to each other.\n *\n * `stockUnit` is declared per profile: FMCG lists quote stock in pieces\n * (Rexona \"Quantity\" 18046, ROEM \"Stock / pcs\" 520), drinks lists in cases.\n *\n * Floored, because a part case is not sellable. Returns null when the source is\n * in pieces but the pack size is unknown — an unconverted piece count sitting\n * in a field labelled \"cases\" reads as far more stock than exists.\n */\nfunction toCases(value, pcsCase, stockUnit) {\n  if (value === null || value === undefined) return null;\n  if (String(stockUnit || '').toLowerCase() !== 'pcs') return value;\n  if (!pcsCase || pcsCase <= 0) return null;\n  return Math.floor(value / pcsCase);\n}\n\nfunction parseAbv(raw) {\n  const s = String(raw ?? '');\n  const m = s.match(/(\\d+(?:[.,]\\d+)?)\\s*%/) || s.match(/^(\\d+(?:[.,]\\d+)?)$/);\n  if (!m) return null;\n  const n = Number(m[1].replace(',', '.'));\n  return n > 0 && n <= 100 ? n : null;\n}\n\n/**\n * Dates arrive as JS Date (cellDates), Excel serial numbers, or text.\n * Text is read day-first — these are European supplier sheets — but a value\n * that can only be month-first (e.g. 03/25/2026) is still handled.\n */\nfunction parseDate(raw) {\n  if (!raw) return null;\n  if (raw instanceof Date && !isNaN(raw)) return raw.toISOString().slice(0, 10);\n\n  const s = String(raw).trim();\n  if (!s) return null;\n\n  if (/^\\d{5}$/.test(s)) {\n    const ms = (Number(s) - 25569) * 86400 * 1000; // Excel epoch → Unix\n    return new Date(ms).toISOString().slice(0, 10);\n  }\n\n  let m = s.match(/^(\\d{4})-(\\d{1,2})-(\\d{1,2})$/);\n  if (m) return `${m[1]}-${pad(m[2])}-${pad(m[3])}`;\n\n  // \"Feb 2027\" / \"February 2027\" — a best-before month with no day. The first\n  // of the month is the conservative reading: it expires no later than stated.\n  m = s.match(/^([a-z]{3,9})\\.?\\s+(\\d{4})$/i);\n  if (m) {\n    const months = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];\n    const idx = months.indexOf(m[1].slice(0, 3).toLowerCase());\n    if (idx >= 0) return `${m[2]}-${pad(idx + 1)}-01`;\n  }\n\n  // \"04/2028\" — month and year only, no day. Extremely common on WhatsApp and\n  // in email bodies (\"bbd 04/2028\", \"BBD 05/2027\"). Read as the first of the\n  // month for the same reason as the \"Feb 2027\" case above: it is the\n  // conservative end of the range the supplier actually stated.\n  m = s.match(/^(\\d{1,2})[\\/.\\-](\\d{4})$/);\n  if (m && Number(m[1]) >= 1 && Number(m[1]) <= 12) return `${m[2]}-${pad(m[1])}-01`;\n\n  m = s.match(/^(\\d{1,2})[\\/.\\-](\\d{1,2})[\\/.\\-](\\d{2,4})$/);\n  if (m) {\n    let [, a, b, y] = m;\n    if (y.length === 2) y = '20' + y;\n    const dayFirst = Number(a) > 12 || Number(b) <= 12;\n    const day = dayFirst ? a : b;\n    const month = dayFirst ? b : a;\n    return `${y}-${pad(month)}-${pad(day)}`;\n  }\n\n  const d = new Date(s);\n  return isNaN(d) ? null : d.toISOString().slice(0, 10);\n}\n\nfunction coerce(kind, raw) {\n  const s = String(raw ?? '').trim();\n  if (!s) return null;\n\n  const exact = OPTIONS[kind].find((o) => o.toLowerCase() === s.toLowerCase());\n  if (exact) return exact;\n\n  const key = s.toLowerCase().replace(/[^a-z0-9€$£]/g, '');\n  const syn = (SYNONYMS[kind] || {})[key];\n  if (syn) return syn;\n\n  for (const [k, v] of Object.entries(SYNONYMS[kind] || {})) {\n    if (key.includes(k)) return v;\n  }\n\n  return OPTIONS[kind].includes('Other') ? 'Other' : null;\n}\n\nfunction cleanEan(raw) {\n  const digits = String(raw ?? '').replace(/\\D/g, '');\n  return /^\\d{8}$|^\\d{12,14}$/.test(digits) ? digits : '';\n}\n\n/** Fallback when the sheet has no brand column: first word of the product name. */\nfunction guessBrand(name) {\n  const first = String(name).trim().split(/\\s+/)[0] || '';\n  return first.length > 1 ? first : '';\n}\n\nfunction buildProductKey(brand, name, volumeMl, bond) {\n  const n = (v) => String(v ?? '').toLowerCase().replace(/[^a-z0-9]/g, '');\n  return [n(brand), n(name), volumeMl ?? '', n(bond)].join('|');\n}\n"
+      },
+      "name": "Normalize Rows",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1328,
+        0
+      ],
+      "id": "42a5b2f3-79ed-4fce-8416-a5c72c82d3e7"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appaDSdZkAE9PGkjT",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl1m5HfC2yzWECGb",
+          "mode": "id"
+        },
+        "options": {
+          "fields": [
+            "Brand",
+            "Product Name",
+            "Volume ML",
+            "Bond/Customs Status"
+          ]
+        }
+      },
+      "name": "Fetch Products",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2,
+      "position": [
+        1552,
+        0
+      ],
+      "executeOnce": true,
+      "alwaysOutputData": true,
+      "id": "10b92065-efc9-4fdd-9e70-e788032d8fc1"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "/**\n * n8n Code node — \"Build Airtable Payload\"\n * Mode: Run Once for Each Item\n *\n * Turns normalised rows into Airtable Offers records, splitting matched from\n * unmatched products.\n *\n * Two invariants this node exists to enforce:\n *\n * 1. EVERY offer carries Offer Date + Auto Expiry Days.\n *    Is Expired = IF(TODAY() > {Auto Expiry Date}, \"Yes\", \"No\"). Airtable treats\n *    a blank date as earlier than today, so an offer written without expiry data\n *    computes as expired, fails Send Eligible, and sits in the base looking\n *    healthy while never dispatching. Silent, so it is enforced here.\n *\n * 2. INGESTION NEVER SATISFIES A HUMAN APPROVAL.\n *    Since 2026-08-04 human control lives in exactly two places, and this node\n *    writes NEITHER: Listing Approved (the tick by Anil or Annika that puts an\n *    offer on offers.akay.ie) and dispatch approval (Gate 2, Anil or Annika,\n *    per specific dispatch). Otherwise a parser's reading of a price becomes a\n *    quote on the site or in a client's inbox with nobody having looked at it.\n *\n *    Offer Approval Status is a PROCESSING status (Anil, 2026-08-04): Trust\n *    Score High, Medium or Low all write Approved on ingestion; only Trust =\n *    Hold or an unknown/unresolved supplier holds the offer at Awaiting\n *    Approval. It feeds Send Eligible and the Public Listing formula but is no\n *    longer a human control point. (Replaces the 2026-07-30 High-only rule.)\n */\n\nconst FALLBACK_VALIDITY_DAYS = 14;\n\n// Declared up here, not beside buildProductIndex which uses it: `const` does not\n// hoist, and buildProductIndex is called from the top of the node body, before\n// the helper block below has been evaluated. Latent until the Products lookup\n// returned anything — with an empty list the loop never runs and never touches\n// this — so it would have thrown on the first real file rather than in testing.\nconst norm = (v) => String(v ?? '').toLowerCase().replace(/[^a-z0-9]/g, '');\n\n// Formula and lookup fields — writing to any of these errors the batch.\nconst READ_ONLY = new Set([\n  'Sell Price', 'Pack Format', 'Is Expired', 'Auto Expiry Date', 'Send Eligible',\n  'Public Listing', 'Public Product Description', 'Public Spec', 'Price Display',\n  'Public Terms', 'Stock Display', 'whatsapp link',\n  'Supplier Name', 'Supplier Email', 'Supplier Country',\n  'Supplier Trust Level', 'Supplier Payment Terms',\n]);\n\nconst item = $input.item.json;\n\nconst today = new Date().toISOString().slice(0, 10);\nconst validityDays = Number(item.supplierValidityDays) > 0\n  ? Number(item.supplierValidityDays)\n  : FALLBACK_VALIDITY_DAYS;\n\n// An Airtable node REPLACES the items flowing through it rather than adding to\n// them, so a product lookup wired in-line does not arrive as a field on this\n// item. Reading the node by name is the reliable form; the item field is kept\n// as a fallback for the case where an upstream Code node did merge it in.\n// Without this the index is empty, every product \"fails\" to match and a whole\n// file lands in review looking like a catalogue problem.\nconst productIndex = buildProductIndex(\n  item.productLookup || nodeRecords('Fetch Products')\n);\n\n// Trust-driven approval on ingestion (Anil, 2026-08-04): High, Medium AND Low\n// all auto-approve. Only Trust = Hold, or an unknown/unresolved supplier\n// (blank trust), holds the offer. See the approval block below.\nconst trustLevel = String(item.supplierTrust || '').toLowerCase();\nconst autoApproved = ['high', 'medium', 'low'].includes(trustLevel);\n\nconst toCreate = [];\nconst toReview = [];\nconst productsToCreate = [];\nconst seenNewKeys = new Set();\n\nfor (const offer of item.offers || []) {\n  const productId = productIndex.get(offer.productKey) || null;\n\n  const fields = {\n    'Offer Name': buildOfferName(offer, item),\n    'Status': 'Live',\n    'Offer Date': today,\n    'Auto Expiry Days': validityDays,   // invariant 1\n\n    'Brand': offer.brand || '',\n    'Product Name': offer.productName,\n    'Variant': offer.variant || '',\n    'Volume ML': offer.volumeMl,\n    'PCS/Case': offer.pcsCase,\n    'Unit Type': offer.unitType,\n    'ABV': offer.abv,\n    'Origin Country': offer.originCountry || '',\n    'Bond/Customs Status': offer.bondStatus,\n    'Buy Price': offer.buyPrice,\n    'Currency': offer.currency,\n    'Price Type': offer.priceType,\n    'Stock Cases': offer.stockCases,\n    'Weight KG': offer.weightKg,\n    'Cases per Pallet': offer.casesPerPallet,\n    'Pieces per Pallet': offer.piecesPerPallet,\n    'Language': offer.language || '',\n    'MOQ': offer.moq || '',\n    'Lead Time': offer.leadTime || '',\n    'EAN Unit': offer.eanUnit || '',\n    'EAN Case': offer.eanCase || '',\n    'BBD': offer.bbd,\n    'Incoterm': offer.incoterm,\n    'Warehouse': offer.warehouse,\n\n    'Source Sheet': offer.sourceSheet,\n    'Source Message ID': offer.sourceMessageId || '',\n    'Notes': `Ingested from ${offer.sourceSheet} row ${offer.sheetRow} on ${today}.`,\n  };\n\n  if (offer.category) fields['Category'] = offer.category;\n  if (item.supplierRecordId) fields['Supplier'] = [item.supplierRecordId];\n\n  // Price Level gates dispatch: Send Eligible requires Sharp or Normal, and a\n  // BLANK value fails it as hard as High does. Left unset it silently parked\n  // 1,232 of 1,728 live offers. Normal is the neutral reading; Sharp and High\n  // are the deliberate calls a trader makes afterwards.\n  fields['Price Level'] = 'Normal';\n\n  // ── Trust-driven processing approval (Anil, 2026-08-04) ───────────────────\n  // Offer Approval Status is a PROCESSING status: Approved for supplier Trust\n  // High/Medium/Low, Awaiting Approval only for Trust = Hold or an unresolved\n  // supplier. It is NOT a human control point. The human approvals live\n  // elsewhere and are NEVER written by ingestion: Listing Approved (website\n  // tick, Anil or Annika) and Gate 2 dispatch approval (Anil or Annika). So an\n  // auto-approved offer still cannot reach the public site or a client inbox\n  // without a person acting.\n  fields['Offer Approval Status'] = autoApproved ? 'Approved' : 'Awaiting Approval';\n  if (!autoApproved) {\n    fields['Notes'] += ` HELD at Awaiting Approval: supplier trust is ${item.supplierTrust || 'unknown/unresolved'} — only Hold or unknown suppliers hold since 2026-08-04.`;\n  }\n\n  // A product we have not seen is created rather than parked. Near-duplicate\n  // catalogue entries are a tidy-up job; 1,103 live offers with no product link\n  // was a stoppage. New records are flagged Needs Review so the duplicates stay\n  // findable, and the offer links by Product Key — Airtable resolves a link\n  // field written as its primary-field value when the node has typecast on.\n  if (productId) {\n    fields['Products'] = [productId];\n  } else {\n    fields['Products'] = [offer.productKey];\n    if (!seenNewKeys.has(offer.productKey)) {\n      seenNewKeys.add(offer.productKey);\n      productsToCreate.push({ fields: stripEmpty({\n        'Product Key': offer.productKey,\n        'Brand': offer.brand || '',\n        'Product Name': offer.productName,\n        'Variant': offer.variant || '',\n        'Category': offer.category,\n        'Volume ML': offer.volumeMl,\n        'PCS/Case': offer.pcsCase,\n        'Unit Type': offer.unitType,\n        'ABV': offer.abv,\n        'Origin Country': offer.originCountry || '',\n        'Bond/Customs Status': offer.bondStatus,\n        'EAN Unit': offer.eanUnit || '',\n        'EAN Case': offer.eanCase || '',\n        'Status': 'Needs Review',\n        'Notes': `Created automatically from ${offer.sourceSheet} on ${today}. `\n               + 'Check it is not a duplicate of an existing product spelled differently.',\n      }) });\n    }\n  }\n\n  toCreate.push({ fields: stripEmpty(fields) });\n}\n\nconst exceptions = (item.exceptions || []).map((e) => ({\n  sheetRow: e.sheetRow,\n  productName: e.productName,\n  reason: e.exceptionReason,\n  sourceSheet: e.sourceSheet,\n}));\n\nreturn {\n  json: {\n    fileName: item.fileName,\n    sheetName: item.sheetName,\n    supplierRecordId: item.supplierRecordId,\n    createCount: toCreate.length,\n    reviewCount: toReview.length,\n    newProductCount: productsToCreate.length,\n    exceptionCount: exceptions.length,\n    toCreate,\n    toReview,\n    productsToCreate,\n    exceptions,\n    summary:\n      `${item.fileName} :: ${item.sheetName} — ` +\n      `${toCreate.length} offers, ${productsToCreate.length} new products, ` +\n      `${exceptions.length} bad rows`,\n  },\n};\n\n// ── helpers ──────────────────────────────────────────────────────────────────\n\n/**\n * Records from a named upstream node. Returns [] rather than throwing when the\n * node is absent, so the same file works in a workflow that does not have it.\n */\nfunction nodeRecords(name) {\n  try {\n    return $(name).all().map((i) => i.json);\n  } catch (e) {\n    return [];\n  }\n}\n\nfunction buildProductIndex(products) {\n  const index = new Map();\n  for (const p of products) {\n    const f = p.fields || p;\n    const key = [\n      norm(f['Brand']),\n      norm(f['Product Name']),\n      f['Volume ML'] ?? '',\n      norm(f['Bond/Customs Status']),\n    ].join('|');\n    if (!index.has(key)) index.set(key, p.id);\n  }\n  return index;\n}\n\n/**\n * Offer Name is the primary field and is explicitly internal — it may carry the\n * supplier name. Public display uses Public Product Description instead.\n */\nfunction buildOfferName(offer, ctx) {\n  const parts = [offer.brand, offer.productName, offer.variant].filter(Boolean);\n  const spec = offer.volumeMl ? `${offer.volumeMl}ml` : '';\n  const supplier = ctx.supplierName ? ` - ${ctx.supplierName}` : '';\n  return `${parts.join(' ')}${spec ? ' ' + spec : ''}${supplier} ${new Date().toISOString().slice(0, 10)}`.trim();\n}\n\n/** Airtable rejects null on some field types; omit rather than send empties. */\nfunction stripEmpty(fields) {\n  const out = {};\n  for (const [k, v] of Object.entries(fields)) {\n    if (READ_ONLY.has(k)) continue;\n    if (v === null || v === undefined || v === '') continue;\n    out[k] = v;\n  }\n  return out;\n}\n"
+      },
+      "name": "Build Airtable Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        0
+      ],
+      "id": "cc6a32e5-1fa2-462b-9bbd-8f00e3bacecc"
+    },
+    {
+      "parameters": {
+        "jsCode": "/**\n * n8n Code node — \"Products to Create\"\n * Mode: Run Once for All Items\n *\n * Emits one item per NEW product, for the Airtable create node that follows.\n *\n * These are products the catalogue has never seen. Until 2026-07-30 an offer\n * whose product did not match was parked for a human instead, on the reasoning\n * that auto-creating products is how a catalogue fills with near-duplicates.\n * That reasoning was right about the mechanism and wrong about the cost: it had\n * left 1,103 of 1,728 live offers with no product link, which is a stoppage\n * rather than a safeguard. Every record created here carries\n * Status = \"Needs Review\" so the duplicates stay findable and can be merged.\n *\n * Deduplicated in 04 by Product Key, so two rows of the same new SKU in one\n * file produce one product, not two.\n *\n * Emitted FLAT rather than wrapped in { fields: ... } — the Airtable node's\n * \"Map Automatically\" mode reads the item's top-level keys as column names.\n */\n\nconst products = [];\n\nfor (const item of $('Build Airtable Payload').all()) {\n  for (const record of item.json.productsToCreate || []) {\n    products.push({ json: record.fields || record });\n  }\n}\n\nreturn products;\n"
+      },
+      "name": "Products to Create",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1872,
+        160
+      ],
+      "id": "c00a7275-0450-426e-be94-4238670cd07e"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appaDSdZkAE9PGkjT",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl1m5HfC2yzWECGb",
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {}
+        },
+        "options": {
+          "typecast": false
+        }
+      },
+      "name": "Create Products",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2,
+      "position": [
+        1984,
+        0
+      ],
+      "id": "f0d8a6c2-e4d6-446e-9f18-d3369321360d"
+    },
+    {
+      "parameters": {
+        "jsCode": "/**\n * n8n Code node — \"Offers to Create\"\n * Mode: Run Once for All Items\n *\n * Sits between \"Create Products\" and \"Create Offers\" and emits one item per\n * offer record.\n *\n * It exists because of an ordering constraint, not because there is any work to\n * do here. An offer whose product is new links to it by Product Key, and that\n * link only resolves once the Product row exists — so \"Create Products\" has to\n * run first. But an Airtable node REPLACES the items flowing through it, so by\n * the time the newly created products come out the other side, the offer\n * payloads are gone. This reaches back to the payload builder by name and puts\n * them back on the wire.\n *\n * \"Create Products\" is set to always output data, so a batch where every\n * product already existed still reaches this node instead of ending the branch.\n */\n\n// Emitted FLAT, not wrapped in { fields: ... }. The Airtable node's\n// \"Map Automatically\" mode reads the item's top-level keys as column names, so\n// a nested wrapper would be written as a single column called \"fields\".\nconst offers = [];\n\nfor (const item of $('Build Airtable Payload').all()) {\n  for (const record of item.json.toCreate || []) {\n    offers.push({ json: record.fields || record });\n  }\n}\n\nreturn offers;\n"
+      },
+      "name": "Offers to Create",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2208,
+        0
+      ],
+      "id": "81d83ca0-d0ee-4f0b-bbfa-b6d1a404bd59"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appaDSdZkAE9PGkjT",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbljBgWrnIMZzkSAr",
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {}
+        },
+        "options": {
+          "typecast": true
+        }
+      },
+      "name": "Create Offers",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2,
+      "position": [
+        1904,
+        -160
+      ],
+      "id": "c02a37ce-966e-4f9f-ae17-eee1dd81f932"
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.messageId }}",
+        "labelIds": [
+          "Label_8"
+        ]
+      },
+      "name": "Mark Email Done",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [
+        2480,
+        0
+      ],
+      "webhookId": "26955b2d-4e68-4133-b353-1c15a5afa6e8",
+      "id": "5a3dfda1-0efd-409c-8b2f-487e72f4392c"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "/**\n * n8n Code node — \"Route to Review\"\n * Mode: Run Once for Each Item\n *\n * The hand-off point. Every email this pipeline cannot parse ends up here with\n * a plain-English reason, ready for a person to map or key in by hand.\n *\n * At 5-10 offers a day with someone available to handle the remainder, an\n * unparsed email is a hand-off, not a failure. What matters is that the reason\n * is specific enough to act on without reopening the original — \"no profile\"\n * is useless, \"no profile for cse.ltd@cytanet.com.cy\" tells you exactly what\n * to create.\n *\n * Nothing here deletes, hides or alters the email.\n */\n\nconst item = $input.item.json;\n\nconst sender = item.fromAddress || item.envelopeFrom || '(unknown sender)';\nconst subject = item.subject || '(no subject)';\n\nlet category;\nlet reason;\nlet action;\n\nif (item.skipReason && /Spreadsheet attached/i.test(item.skipReason)) {\n  // Not a failure at all — the Excel workflow owns this one.\n  category = 'Handled elsewhere';\n  reason = item.skipReason;\n  action = 'None. The Excel workflow ingests this email.';\n\n} else if (item.skipIngestion) {\n  category = 'Skipped on purpose';\n  reason = item.skipReason || 'Supplier is gated out of ingestion';\n  action = 'None, unless the commercial position has changed — untick Skip Offer Ingestion, or change the supplier Status.';\n\n} else if (item.blocksFound === 0) {\n  category = 'Nothing to parse';\n  reason = item.exceptionReason || 'No table or label:value block found in the body';\n  action = 'Read it. If it is an offer, it is in a shape the parser does not yet handle — key it in, or send it over so the shape can be added.';\n\n} else if (item.profileFound === false && /references labels absent/i.test(item.exceptionReason || '')) {\n  category = 'Profile no longer fits';\n  reason = item.exceptionReason;\n  action = 'The supplier changed their layout. Update the Column Map on their Sheet Profile.';\n\n} else if (item.profileFound === false) {\n  category = 'No profile for this sender';\n  reason = item.exceptionReason || `No email profile matches ${sender}`;\n  action = `Key this one in, then create a Sheet Profile with Sender Match = ${domainOf(sender) || sender} so the next one parses automatically.`;\n\n} else {\n  category = 'Unclassified';\n  reason = item.exceptionReason || 'Could not be parsed, reason not recorded';\n  action = 'Read it and decide.';\n}\n\nreturn {\n  json: {\n    ...item,\n    reviewCategory: category,\n    reviewReason: reason,\n    reviewAction: action,\n    reviewSender: sender,\n    reviewSubject: subject,\n    // Single line for the execution log, so a skim of recent runs shows what\n    // is being handed off and why without opening each one.\n    reviewSummary: `[${category}] ${subject} — from ${sender}. ${reason}`,\n    // Carried explicitly: the label step needs it, and on the no-blocks path\n    // the earlier nodes may not have populated the usual fields.\n    threadId: item.threadId || null,\n  },\n};\n\nfunction domainOf(address) {\n  const m = String(address).match(/@([^\\s>]+)$/);\n  return m ? m[1].toLowerCase() : null;\n}\n"
+      },
+      "name": "Route to Review",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1328,
+        272
+      ],
+      "id": "bb503c00-a274-4d9f-83a6-7cd15e09e23d"
+    },
+    {
+      "parameters": {
+        "resource": "thread",
+        "operation": "addLabels",
+        "threadId": "={{ $json.threadId }}",
+        "labelIds": [
+          "Label_9"
+        ]
+      },
+      "name": "Mark Reviewed",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [
+        1552,
+        272
+      ],
+      "webhookId": "dbedf8a3-bdf3-4ca7-925c-97529d4dcd7b",
+      "id": "b9c978a6-df09-45bf-9d2a-861e3bc6f93c"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// n8n Code node — \"Flatten Block\" (Run Once for Each Item)\n// Turns the first extracted block into the headerCells + dataRows shape the\n// SHARED Normalize Rows / Resolve Body Profile code expects, and stamps the\n// source identifiers the email path never set.\nconst item = $input.item.json;\nconst blocks = Array.isArray(item.blocks) ? item.blocks : [];\nconst first = blocks[0] || null; // first/primary block only, by design\n\nlet headerCells = [];\nlet dataRows = [];\nif (first && Array.isArray(first.rows) && first.rows.length) {\n  headerCells = first.rows[0] || [];\n  dataRows = first.rows.slice(1);\n}\n\nconst subject = item.subject || '(no subject)';\nreturn {\n  json: {\n    ...item,\n    headerCells,\n    dataRows,\n    fileName: `Email: ${subject}`,\n    sheetName: first && first.type === 'labels' ? 'Body (labels)' : 'Body',\n    sourceMessageId: item.id || item.messageId || item.sourceMessageId || null,\n    blockType: first ? first.type : null,\n  },\n};\n"
+      },
+      "id": "a1111111-1111-4111-8111-111111111111",
+      "name": "Flatten Block",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -448,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// n8n Code node — \"Attach Profiles\" (Run Once for All Items)\n// The Airtable lookup above REPLACES the items on the wire, so the email items\n// are read back by name and the full profile candidate list is joined onto\n// every one — keeping one item per email.\nconst profiles = $('Find Email Profiles').all()\n  .map((i) => i.json)\n  .filter((p) => p && (p.id || Object.keys(p).length > 0));\n\nreturn $('Flatten Block').all().map((entry) => ({\n  json: { ...entry.json, profileCandidates: profiles },\n}));\n"
+      },
+      "id": "a2222222-2222-4222-8222-222222222222",
+      "name": "Attach Profiles",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -240,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// n8n Code node — \"Restore Offers\" (Run Once for All Items)\n// The Products lookup above REPLACES the items on the wire. Re-emit the\n// per-email offer batches so Build Airtable Payload sees item.offers again.\n// Two possible upstream sources now exist depending on which branch the email\n// took: the profile-matched path (Normalize Rows) or the new-supplier LLM\n// path (Attach New Supplier & Finalize Offers). Only one of the two will\n// actually have execution data for any given run, so each is read defensively.\nlet fromProfile = [];\ntry { fromProfile = $('Normalize Rows').all().map((entry) => ({ json: entry.json })); } catch (e) { /* did not run this branch */ }\n\nlet fromNewSupplier = [];\ntry { fromNewSupplier = $('Attach New Supplier & Finalize Offers').all().map((entry) => ({ json: entry.json })); } catch (e) { /* did not run this branch */ }\n\nreturn [...fromProfile, ...fromNewSupplier];\n"
+      },
+      "id": "a3333333-3333-4333-8333-333333333333",
+      "name": "Restore Offers",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        -176
+      ]
+    },
+    {
+      "id": "fc90c017-a722-4f3b-a527-0b9826be463c",
+      "name": "Emails to Mark Done",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2320,
+        128
+      ],
+      "parameters": {
+        "jsCode": "// \"Emails to Mark Done\" -- emits ONE item per distinct source email, carrying\n// the Gmail message ID that \"Mark Email Done\" needs to apply the done-label.\n// Two possible upstream sources of one-item-per-email data now exist: the\n// profile-matched path (Normalize Rows) or the new-supplier LLM path (Attach\n// New Supplier & Finalize Offers). Every Airtable node between here and\n// either of those REPLACES the items on the wire, so both are read\n// defensively and only whichever one actually ran contributes.\nlet fromProfile = [];\ntry { fromProfile = $('Normalize Rows').all(); } catch (e) { /* did not run this branch */ }\n\nlet fromNewSupplier = [];\ntry { fromNewSupplier = $('Attach New Supplier & Finalize Offers').all(); } catch (e) { /* did not run this branch */ }\n\nconst seen = new Set();\nconst out = [];\n\nfor (const entry of [...fromProfile, ...fromNewSupplier]) {\n  const id = entry.json.sourceMessageId;\n  if (!id || seen.has(id)) continue;\n  seen.add(id);\n  out.push({ json: { messageId: String(id), offerCount: entry.json.parsedCount ?? null } });\n}\n\nreturn out;\n"
+      }
+    },
+    {
+      "id": "a8028c6c-4961-4b58-8d34-bdd5bd5555d1",
+      "name": "New Sender or Skip?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1100,
+        500
+      ],
+      "parameters": {
+        "conditions": {
+          "combinator": "and",
+          "conditions": [
+            {
+              "leftValue": "={{ $json.skipIngestion === true }}",
+              "operator": {
+                "operation": "true",
+                "singleValue": true,
+                "type": "boolean"
+              },
+              "rightValue": true
+            }
+          ],
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          }
+        }
+      }
+    },
+    {
+      "id": "aea783e5-6cff-48b7-a139-62873a95fb43",
+      "name": "Create New Supplier",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        1350,
+        600
+      ],
+      "parameters": {
+        "base": {
+          "__rl": true,
+          "mode": "id",
+          "value": "appaDSdZkAE9PGkjT"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Email": "={{ $json.fromAddress }}",
+            "Notes": "=Auto-created by Claude on {{ $now.toISODate() }} from a first-time forwarded offer email. Column mapping not yet verified — Annika to confirm/correct the linked Sheet Profile.",
+            "Status": "Active",
+            "Supplier Name": "={{ $json.senderDomain || $json.fromAddress }}",
+            "Trust Score": "Medium"
+          }
+        },
+        "operation": "create",
+        "options": {
+          "typecast": true
+        },
+        "resource": "record",
+        "table": {
+          "__rl": true,
+          "mode": "id",
+          "value": "tblQkV5h5zuJD13w7"
+        }
+      }
+    },
+    {
+      "id": "6ac0722d-a249-488c-b0fc-6cf4f0b96a5f",
+      "name": "Create Low-Confidence Sheet Profile",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        1600,
+        600
+      ],
+      "parameters": {
+        "base": {
+          "__rl": true,
+          "mode": "id",
+          "value": "appaDSdZkAE9PGkjT"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Confidence": "Low",
+            "Created By": "Claude",
+            "Notes": "=Auto-created by Claude on {{ $now.toISODate() }}. This email was parsed by LLM extraction, not a column map, because no profile existed for this sender. Annika: please review the extracted offer(s) in Airtable and, once confirmed, fill in Column Map from the raw email and raise Confidence to High so future emails from this sender parse deterministically.",
+            "Profile Name": "={{ $('Carry Existing Supplier Id Forward').all()[$itemIndex].json.senderDomain || $('Carry Existing Supplier Id Forward').all()[$itemIndex].json.fromAddress }} — auto (LLM)",
+            "Profile Type": "Email Table",
+            "Sender Match": "={{ $('Carry Existing Supplier Id Forward').all()[$itemIndex].json.fromAddress }}",
+            "Supplier": "={{ [$('Create New Supplier').item.json.id] }}"
+          }
+        },
+        "operation": "create",
+        "options": {
+          "typecast": true
+        },
+        "resource": "record",
+        "table": {
+          "__rl": true,
+          "mode": "id",
+          "value": "tblnsxQlNDzpHhwfV"
+        }
+      }
+    },
+    {
+      "id": "751e7e28-b8c5-4475-9392-ee89ac09b801",
+      "name": "LLM Extract Offers",
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        1850,
+        600
+      ],
+      "parameters": {
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"offers\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"brand\": {\"type\": \"string\"},\n          \"productName\": {\"type\": \"string\"},\n          \"variant\": {\"type\": \"string\"},\n          \"volumeMl\": {\"type\": \"number\"},\n          \"pcsCase\": {\"type\": \"number\"},\n          \"unitType\": {\"type\": \"string\"},\n          \"abv\": {\"type\": \"number\"},\n          \"originCountry\": {\"type\": \"string\"},\n          \"bondStatus\": {\"type\": \"string\"},\n          \"buyPrice\": {\"type\": \"number\"},\n          \"currency\": {\"type\": \"string\"},\n          \"priceType\": {\"type\": \"string\"},\n          \"stockCases\": {\"type\": \"number\"},\n          \"moq\": {\"type\": \"string\"},\n          \"leadTime\": {\"type\": \"string\"},\n          \"eanUnit\": {\"type\": \"string\"},\n          \"eanCase\": {\"type\": \"string\"},\n          \"incoterm\": {\"type\": \"string\"},\n          \"warehouse\": {\"type\": \"string\"},\n          \"category\": {\"type\": \"string\"}\n        },\n        \"required\": [\"productName\", \"buyPrice\", \"currency\"]\n      }\n    }\n  },\n  \"required\": [\"offers\"]\n}",
+        "options": {},
+        "schemaType": "manual",
+        "text": "=Extract every distinct product offer from this supplier email. This is a first-time sender with no known column layout, so read the raw content directly.\n\nSubject: {{ $('Resolve Body Profile').all()[$itemIndex].json.subject }}\nSender: {{ $('Resolve Body Profile').all()[$itemIndex].json.fromAddress }}\n\nProse/context (may contain terms like Incoterm, warehouse, lead time, MOQ that apply to ALL offers below unless a line overrides them):\n{{ $('Resolve Body Profile').all()[$itemIndex].json.prose }}\n\nRaw content blocks:\n{{ JSON.stringify($('Resolve Body Profile').all()[$itemIndex].json.blocks) }}\n\nReturn one entry per distinct product/price combination. Use these exact enum values where applicable:\n- currency: EUR, USD, GBP, AED, SGD, Other\n- unitType: Bottle, Can, Jar, Pack, Piece, Other\n- priceType: Per Case, Per Bottle, Per Can, Per Piece, Per Pack, Per Jar\n- bondStatus: Bonded, T1, T2, Duty Paid, On Floor, Other\n- incoterm: EXW, FCA, FOB, CFR, CIF, DAP, DDP, Other\n- category: Beer, Spirits, Champagne, Grocery, Confectionery, Toiletries, Soft Drinks, Other FMCG\n\nIf a field is genuinely not stated anywhere, leave it blank/null rather than guessing. Never invent a price or product name.\n"
+      }
+    },
+    {
+      "id": "542529fe-b980-471e-bdc9-d25b6b845946",
+      "name": "Anthropic Model — Offer Extraction",
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.5,
+      "position": [
+        1850,
+        780
+      ],
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "cachedResultName": "Claude Sonnet 4.6",
+          "mode": "list",
+          "value": "claude-sonnet-4-6"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "c74812eb-cb38-4359-86a6-eb0c178d135c",
+      "name": "Attach New Supplier & Finalize Offers",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2100,
+        600
+      ],
+      "parameters": {
+        "jsCode": "let original;\ntry {\n  original = $('Carry Existing Supplier Id Forward').all()[$itemIndex].json;\n} catch (e) {\n  original = $('New Sender or Skip?').all()[$itemIndex].json;\n}\nconst extracted = $('LLM Extract Offers').item.json;\n\nlet supplierId = null;\nlet supplierName = null;\ntry {\n  const created = $('Create New Supplier').item.json;\n  supplierId = created.id;\n  supplierName = created.fields ? created.fields['Supplier Name'] : created['Supplier Name'];\n} catch (e) {\n  supplierId = original.existingSupplierId || null;\n  supplierName = original.senderDomain || original.fromAddress || null;\n}\n\nfunction key(o) {\n  const n = (v) => String(v ?? '').toLowerCase().replace(/[^a-z0-9]/g, '');\n  return [n(o.brand), n(o.productName), o.volumeMl ?? '', n(o.bondStatus)].join('|');\n}\n\nconst rawOffers = (extracted.output && extracted.output.offers) || extracted.offers || [];\nconst offers = rawOffers\n  .filter((o) => o.productName && o.buyPrice != null && o.currency)\n  .map((o, idx) => ({\n    ...o,\n    productKey: key(o),\n    sourceSheet: 'Email (LLM extraction, new sender)',\n    sourceMessageId: original.messageId || '',\n    sheetRow: idx + 1,\n  }));\n\nreturn {\n  json: {\n    ...original,\n    offers,\n    supplierRecordId: supplierId,\n    supplierName,\n    supplierTrust: 'Medium',\n    supplierValidityDays: 14,\n  },\n};",
+        "mode": "runOnceForEachItem"
+      }
+    },
+    {
+      "id": "d5ae562e-8b48-4dda-8d23-26dfca28cda9",
+      "name": "Search Existing Sheet Profile by Sender",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        1350,
+        350
+      ],
+      "parameters": {
+        "base": {
+          "__rl": true,
+          "mode": "id",
+          "value": "appaDSdZkAE9PGkjT"
+        },
+        "filterByFormula": "=LOWER({Sender Match}) = LOWER(\"{{ $json.fromAddress }}\")",
+        "operation": "search",
+        "options": {},
+        "resource": "record",
+        "table": {
+          "__rl": true,
+          "mode": "id",
+          "value": "tblnsxQlNDzpHhwfV"
+        },
+        "alwaysOutputData": true
+      },
+      "alwaysOutputData": true
+    },
+    {
+      "id": "8c94e98e-bcd4-40fa-bf0d-e062e17f6a7e",
+      "name": "Has Working Column Map?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1600,
+        350
+      ],
+      "parameters": {
+        "conditions": {
+          "combinator": "and",
+          "conditions": [
+            {
+              "leftValue": "={{ (() => { try { return Object.keys(JSON.parse($json.profileSearchResult && $json.profileSearchResult.fields ? ($json.profileSearchResult.fields['Column Map'] || '{}') : '{}')).length > 0; } catch (e) { return false; } })() }}",
+              "operator": {
+                "operation": "true",
+                "singleValue": true,
+                "type": "boolean"
+              },
+              "rightValue": true
+            }
+          ],
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          }
+        }
+      }
+    },
+    {
+      "id": "b11188b5-4b95-4b0c-bd53-828a9448a5c1",
+      "name": "Flag Working Profile Mismatch",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1850,
+        250
+      ],
+      "parameters": {
+        "jsCode": "// A Sheet Profile exists for this sender WITH a real Column Map, but the\n// email still reached the no-profile branch -- a data inconsistency worth a\n// human look, not something safe to auto-fix.\nconst original = $json;\nconst existing = original.profileSearchResult;\nreturn {\n  json: {\n    ...original,\n    exceptionReason: `A working Sheet Profile (\"${existing && existing.fields ? existing.fields['Profile Name'] : ''}\") already exists for ${original.fromAddress}, but this email did not match it -- check Sender Match spelling/case and the Column Map's header labels rather than creating a duplicate.`,\n  },\n};",
+        "mode": "runOnceForEachItem"
+      }
+    },
+    {
+      "id": "1849c9c4-ec86-4f11-9c14-abc97928755c",
+      "name": "Need New Supplier?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2100,
+        450
+      ],
+      "parameters": {
+        "conditions": {
+          "combinator": "and",
+          "conditions": [
+            {
+              "leftValue": "={{ $json.existingSupplierId }}",
+              "operator": {
+                "operation": "exists",
+                "singleValue": true,
+                "type": "string"
+              },
+              "rightValue": ""
+            }
+          ],
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          }
+        }
+      }
+    },
+    {
+      "id": "dd43b973-a0fd-4087-a806-21d75e2c2258",
+      "name": "Search Existing Supplier if No Email Profile",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        1750,
+        500
+      ],
+      "parameters": {
+        "base": {
+          "__rl": true,
+          "mode": "id",
+          "value": "appaDSdZkAE9PGkjT"
+        },
+        "filterByFormula": "=LOWER({Email}) = LOWER(\"{{ $json.fromAddress }}\")",
+        "operation": "search",
+        "options": {},
+        "resource": "record",
+        "table": {
+          "__rl": true,
+          "mode": "id",
+          "value": "tblQkV5h5zuJD13w7"
+        },
+        "alwaysOutputData": true
+      },
+      "alwaysOutputData": true
+    },
+    {
+      "id": "57398895-e659-4d08-9126-8ac81a4a8406",
+      "name": "Carry Existing Supplier Id Forward",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2000,
+        500
+      ],
+      "parameters": {
+        "jsCode": "// A Supplier with this email may already exist even though no Email-type\n// Sheet Profile matched -- e.g. a supplier we already trade with via\n// Spreadsheet-type profiles, now also emailing offers directly in the\n// message body for the first time. Not a duplicate case: just needs a new\n// Email-type profile alongside their existing one.\n// IMPORTANT: $input.item.json here is the SUPPLIER search result (or a\n// synthetic {} via alwaysOutputData), not the original email -- spreading it\n// directly would overwrite fromAddress/subject/blocks/prose with Supplier\n// fields. Read the original email fields from the incoming item's own\n// carried-forward state instead (merged in upstream by 'Merge Original\n// Fields Back'), which flowed through 'Has Working Column Map?' unchanged.\nconst supplierSearchResult = $input.item.json;\nconst original = $('Merge Original Fields Back').all()[$itemIndex].json;\nconst existingSupplierId = supplierSearchResult && supplierSearchResult.id ? supplierSearchResult.id : null;\nreturn {\n  json: {\n    ...original,\n    existingSupplierId,\n    existingProfileId: null,\n  },\n};",
+        "mode": "runOnceForEachItem"
+      }
+    },
+    {
+      "id": "61feecf3-634f-42b3-81a6-0ad95396ced2",
+      "name": "Merge Original Fields Back",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1500,
+        350
+      ],
+      "parameters": {
+        "jsCode": "// 'Search Existing Sheet Profile by Sender' replaces the item with the\n// Airtable search result (or a synthetic {} via alwaysOutputData). Re-attach\n// the original email fields by INDEX rather than paired-item lookup --\n// alwaysOutputData's synthetic items break n8n's normal item-pairing\n// resolution ('Multiple matches found'), so $('Node').item is unsafe here.\n// From this point on, everything downstream reads fields directly off $json\n// instead of reaching back to named nodes, which sidesteps the ambiguity\n// entirely for the rest of the chain.\nconst searchResult = $input.item.json;\nconst original = $('New Sender or Skip?').all()[$itemIndex].json;\nreturn {\n  json: {\n    ...original,\n    profileSearchResult: searchResult,\n  },\n};",
+        "mode": "runOnceForEachItem"
+      }
+    },
+    {
+      "id": "b3000000-0000-4000-8000-000000000301",
+      "name": "Apply Default Margin",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2208,
+        200
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "language": "javaScript",
+        "jsCode": "// Enforce a 5% default margin when the source stated none (Anil, 2026-08-05).\n// Feeds the Sell Price formula (Buy Price uplifted by Margin %).\nconst j = $json;\nif (j['Margin %'] === undefined || j['Margin %'] === null || j['Margin %'] === '') {\n  j['Margin %'] = 0.05;\n}\nreturn { json: j };\n"
+      }
+    },
+    {
+      "id": "b3000000-0000-4000-8000-000000000302",
+      "name": "Essential Fields Gate",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2360,
+        200
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "ef-1",
+              "leftValue": "={{ $json['Product Name'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "ef-2",
+              "leftValue": "={{ $json['PCS/Case'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "ef-3",
+              "leftValue": "={{ $json['Buy Price'] }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            },
+            {
+              "id": "ef-4",
+              "leftValue": "={{ $json['Currency'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "b3000000-0000-4000-8000-000000000303",
+      "name": "Flag Needs-Review",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2540,
+        340
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "language": "javaScript",
+        "jsCode": "// Offers that failed the essential-fields gate: hold and route to trader review\n// instead of publishing them Live.\nconst j = $json;\nconst missing = [];\nif (!j['Product Name']) missing.push('product_name');\nif (j['PCS/Case'] === undefined || j['PCS/Case'] === null || j['PCS/Case'] === '') missing.push('pack_size');\nif (!(Number(j['Buy Price']) > 0)) missing.push('buy_price');\nif (!j['Currency']) missing.push('currency');\nj['Status'] = 'Hold';\nj['Claude Review Status'] = 'Pending Review';\nj['Notes'] = ((j['Notes'] || '') + ' NEEDS REVIEW: missing/invalid essential field(s): ' + (missing.join(', ') || 'unknown') + '.').trim();\nreturn { json: j };\n"
+      }
+    },
+    {
+      "id": "b3000000-0000-4000-8000-000000000304",
+      "name": "Create Needs-Review Offers",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2,
+      "position": [
+        2720,
+        340
+      ],
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "mode": "id",
+          "value": "appaDSdZkAE9PGkjT"
+        },
+        "table": {
+          "__rl": true,
+          "mode": "id",
+          "value": "tbljBgWrnIMZzkSAr",
+          "cachedResultName": "Offers"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {}
+        },
+        "options": {
+          "typecast": true
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,101 @@
+{
+  "id": "zyLl5wt2UHZ7Deki",
+  "name": "Category Request Handler",
+  "active": true,
+  "settings": { "executionOrder": "v1", "availableInMCP": true },
+  "connections": {
+    "Category Request Webhook": { "main": [[{ "node": "Matching Offers", "type": "main", "index": 0 }]] },
+    "Matching Offers": { "main": [[{ "node": "Compose Category Email", "type": "main", "index": 0 }]] },
+    "Compose Category Email": { "main": [[{ "node": "Log Enquiry for Review", "type": "main", "index": 0 }]] },
+    "Log Enquiry for Review": { "main": [[{ "node": "Notify Reviewer (ak@akay.ie)", "type": "main", "index": 0 }]] }
+  },
+  "nodes": [
+    {
+      "id": "ad20042d-9ad4-4ce8-a022-06aff9ba0425",
+      "name": "Category Request Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [0, 0],
+      "parameters": { "httpMethod": "POST", "path": "category-request", "responseMode": "lastNode", "responseData": "firstEntryJson", "options": {} },
+      "webhookId": "71907212-6830-4914-b56c-0fb89d93eda2"
+    },
+    {
+      "id": "acdd2447-2707-4afe-8bae-150597fb339b",
+      "name": "Matching Offers",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [224, 0],
+      "parameters": {
+        "resource": "record",
+        "operation": "search",
+        "base": { "__rl": true, "mode": "id", "value": "appaDSdZkAE9PGkjT" },
+        "table": { "__rl": true, "mode": "id", "value": "tbljBgWrnIMZzkSAr", "cachedResultName": "Offers" },
+        "filterByFormula": "={{ $json.body.category === \"Special Offers\" ? \"AND(OR({Is Cheapest}=1,{Cheaper By 5%+}=1),{Send Eligible}='Yes')\" : \"AND({Category}='\" + $json.body.category + \"',{Send Eligible}='Yes')\" }}",
+        "returnAll": true,
+        "options": { "fields": ["Public Product Description", "Public Spec", "Price Per Unit & Case", "Public Terms", "Stock Display"] }
+      }
+    },
+    {
+      "id": "39abb5ab-1340-461a-8bfc-05eac65f07e4",
+      "name": "Compose Category Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [448, 0],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const trigger = $('Category Request Webhook').first().json;\nconst body = trigger.body || {};\nconst category = body.category || 'Offers';\nconst toEmail = String(body.email||'').trim();\nconst note = String(body.note||'').trim();\n\nconst af = it => { const j=(it&&it.json)||{}; return { id:j.id, f:(j.fields||j) }; };\nconst offers = $input.all().map(af).filter(x=>x.id);\nconst LIMIT = 25;\nconst shown = offers.slice(0, LIMIT);\n\nlet lines = [];\nshown.forEach(({f})=>{\n  const name = f['Public Product Description']||'(product)';\n  const spec = f['Public Spec']||'';\n  const price = f['Price Per Unit & Case']||'';\n  const terms = f['Public Terms']||'';\n  const stock = f['Stock Display']||'';\n  lines.push(name + (spec?(' - '+spec):'') + (price?(' - '+price):'') + (terms?(' - '+terms):'') + (stock?(' ['+stock+']'):''));\n});\n\nconst bodyText = shown.length\n  ? ('Here are our current ' + category + ' offers:\\n\\n' + lines.join('\\n') + '\\n\\nInterested in any of these, or want to discuss quantities? Just reply to this email.\\n\\nBest regards,\\nAkay Irl Ltd')\n  : ('Thanks for your interest in ' + category + '. We do not have live offers in this category right now, but we have logged your request and someone will follow up.\\n\\nBest regards,\\nAkay Irl Ltd');\n\nreturn [{ json: {\n  toEmail,\n  category,\n  note,\n  subject: 'Your requested ' + category + ' offers',\n  bodyText,\n  matchCount: shown.length,\n  hasNote: Boolean(note)\n} }];\n"
+      }
+    },
+    {
+      "id": "da1e4f0e-6579-45de-b70c-043e6a067bd2",
+      "name": "Log Enquiry for Review",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [1120, 0],
+      "parameters": {
+        "resource": "record",
+        "operation": "create",
+        "base": { "__rl": true, "mode": "id", "value": "appaDSdZkAE9PGkjT" },
+        "table": { "__rl": true, "mode": "id", "value": "tblgZUj1JeGyHXmcx", "cachedResultName": "Enquiries" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Channel": "Website",
+            "Status": "New",
+            "Claude Review Status": "Pending Review",
+            "Enquiry Date": "={{ $now.toISO() }}",
+            "Client Email (Cache)": "={{ $('Compose Category Email').first().json.toEmail }}",
+            "Requested Brands": "={{ $('Compose Category Email').first().json.category }}",
+            "Enquiry Notes": "={{ \"Category: \" + $('Compose Category Email').first().json.category + \" | Auto-matched offers: \" + $('Compose Category Email').first().json.matchCount + \" | Free-text: \" + $('Compose Category Email').first().json.note }}",
+            "Review Brief": "={{ \"DRAFT — NOT auto-sent. Review, then send manually if appropriate.\\n\\nTo: \" + $('Compose Category Email').first().json.toEmail + \"\\nSubject: \" + $('Compose Category Email').first().json.subject + \"\\n\\n\" + $('Compose Category Email').first().json.bodyText }}",
+            "Raw Message": "={{ JSON.stringify($('Category Request Webhook').first().json.body) }}"
+          }
+        },
+        "options": { "typecast": true }
+      }
+    },
+    {
+      "id": "c1000000-0000-4000-8000-000000000001",
+      "name": "Notify Reviewer (ak@akay.ie)",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [1344, 0],
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "sendTo": "ak@akay.ie",
+        "subject": "={{ \"[Review needed] Website category request: \" + $('Compose Category Email').first().json.category }}",
+        "emailType": "text",
+        "message": "={{ \"A website category request needs review before any reply is sent to the client.\\n\\nClient: \" + $('Compose Category Email').first().json.toEmail + \"\\nCategory: \" + $('Compose Category Email').first().json.category + \"\\nAuto-matched offers: \" + $('Compose Category Email').first().json.matchCount + \"\\n\\nReview & send from Airtable:\\nhttps://airtable.com/appaDSdZkAE9PGkjT/tblgZUj1JeGyHXmcx/\" + $('Log Enquiry for Review').first().json.id + \"\\n\\n--- DRAFT REPLY (not sent) ---\\nSubject: \" + $('Compose Category Email').first().json.subject + \"\\n\\n\" + $('Compose Category Email').first().json.bodyText }}",
+        "options": { "appendAttribution": false }
+      },
+      "credentials": { "gmailOAuth2": { "id": "qunIwKuc11bYHBVr", "name": "offers n8n" } }
+    }
+  ],
+  "_meta": {
+    "activeVersionId": "4a55258e-fc5b-41b7-ae08-b362e9f04654",
+    "capturedAt": "2026-08-05",
+    "note": "Post-change published state after applying item-1 safety fix (Resend auto-reply removed; draft logged to Enquiries as Pending Review; ak@akay.ie notified)."
+  }
+}
