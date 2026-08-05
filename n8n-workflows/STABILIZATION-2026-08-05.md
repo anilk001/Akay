@@ -101,9 +101,14 @@ The manual publish gate is retained by choice.
    choice. If trusted offers should ever publish hands-free, have ingestion tick
    `Listing Approved` for auto-approved offers — not done, by request.
 
-2. **(optional) Approval-at-ingestion check.** The 33 slipped through with a blank
-   Offer Approval Status on 2026-08-04; worth confirming ingestion reliably sets
-   it for trusted suppliers so the queue doesn't refill from the same bug. The public site
+2. **Approval-at-ingestion — traced & verified (no action needed).** All four
+   ingestion workflows' *published* code stamps `Offer Approval Status` at creation:
+   Excel/PDF/Email auto-approve Trust High/Medium/Low (else Awaiting Approval);
+   WhatsApp auto-approves Trust High. The 33 blanks were a one-time rollout gap —
+   created 2026-08-04 07:14–07:29 as that rule was being introduced, so they
+   predated the working logic. Post-backfill check: **0 Live offers with blank
+   approval**; the 224 remaining blanks are all non-Live/historical (harmless).
+   The publish queue will not refill from this bug. The public site
    (`offers.akay.ie`) is a static Astro build that reads Airtable at build time,
    and `Public Listing` also requires the manual **Listing Approved** tick +
    `Offer Approval Status = Approved`. So "everything looks ready" but not shown
