@@ -4,6 +4,11 @@ import { getOffers } from '../data/airtable.mjs';
 const WA = '353872382368';
 const { offers, source } = await getOffers();
 
+// Google Analytics 4 for offers.akay.ie. The Measurement ID is a public,
+// client-side value (safe to commit). PUBLIC_GA4_ID overrides it at build time
+// if you ever need to point at a different property without a code change.
+const GA4_ID = import.meta.env.PUBLIC_GA4_ID || 'G-FW42J5609V';
+
 // ---- derive per-offer view data (basis split so the price never repeats) ----
 function priceParts(detail = '') {
   const parts = detail.split('·').map((s) => s.trim());
@@ -50,6 +55,17 @@ const stats = [
   <title>AKAY — Trade Offers</title>
   <meta name="description" content="AKAY wholesale beverage offers — spirits and beer by the case, live trade pricing, pack specs and duty tier on every line." />
   <link rel="icon" href="/akay-bird.png" />
+  {GA4_ID && (
+    <>
+      <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${GA4_ID}`}></script>
+      <script is:inline define:vars={{ GA4_ID }}>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){ dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', GA4_ID);
+      </script>
+    </>
+  )}
   <style>
     :root{
       --paper:#F7F5F0; --paper-2:#EFEDE4; --card:#FFFFFF; --ink:#17140F; --ink-soft:#41473F;
@@ -322,7 +338,9 @@ const stats = [
           </div>
           <div class="c-foot">
             <span class="incoterm">{o.terms}</span>
-            <a class="enquire" href={o.wa} target="_blank" rel="noopener">
+            <a class="enquire" href={o.wa} target="_blank" rel="noopener"
+               data-offer={o.name} data-brand={o.brand} data-category={o.category}
+               data-currency={o.currency} data-amount={o.amount}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.5A10 10 0 1 0 12 2Zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-1.7-.1-.4-.1-.9-.3-1.6-.6-2.8-1.2-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8 0-1.3.7-2 .9-2.2.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5.2.6.8 2 .9 2.1.1.1.1.3 0 .5-.1.2-.1.3-.3.5l-.4.5c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.4 1.5.3.1.5.1.6-.1.2-.2.7-.8.9-1.1.2-.3.4-.2.6-.1l1.8.9c.3.1.5.2.5.3.1.2.1.7-.1 1.4Z"/></svg>
               Enquire
             </a>
@@ -345,6 +363,21 @@ const stats = [
   <script>
     const grid = document.getElementById('grid');
     const cards = Array.from(grid.children);
+
+    // GA4: record which offers drive WhatsApp enquiries. Delegated so it also
+    // covers cards re-ordered by the filter/sort logic below.
+    grid.addEventListener('click', (e) => {
+      const a = e.target.closest('a.enquire');
+      if (!a || typeof window.gtag !== 'function') return;
+      const amt = parseFloat(a.dataset.amount);
+      window.gtag('event', 'whatsapp_enquiry', {
+        offer_name: a.dataset.offer,
+        brand: a.dataset.brand,
+        category: a.dataset.category,
+        currency: a.dataset.currency || undefined,
+        value: Number.isFinite(amt) ? amt : undefined,
+      });
+    });
     const q = document.getElementById('q');
     const cats = document.getElementById('cats');
     const sortSel = document.getElementById('sort');
