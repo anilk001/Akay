@@ -4,9 +4,10 @@ import { getOffers } from '../data/airtable.mjs';
 const WA = '353872382368';
 const { offers, source } = await getOffers();
 
-// Google Analytics 4. Inert unless PUBLIC_GA4_ID (a "G-…" Measurement ID) is set
-// at build time — set it in Netlify → Site configuration → Environment variables.
-const GA4_ID = import.meta.env.PUBLIC_GA4_ID;
+// Google Analytics 4 for offers.akay.ie. The Measurement ID is a public,
+// client-side value (safe to commit). PUBLIC_GA4_ID overrides it at build time
+// if you ever need to point at a different property without a code change.
+const GA4_ID = import.meta.env.PUBLIC_GA4_ID || 'G-FW42J5609V';
 
 // ---- derive per-offer view data (basis split so the price never repeats) ----
 function priceParts(detail = '') {
