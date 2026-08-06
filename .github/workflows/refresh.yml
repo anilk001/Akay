@@ -2,17 +2,28 @@ name: Scheduled catalogue refresh
 
 # Keeps offers.akay.ie current with Airtable.
 #
-# The site is a static build, so it reflects Airtable as of the last deploy.
-# Netlify redeploys automatically on every push, so this workflow makes an
-# empty commit on a schedule — each one triggers a fresh Netlify build that
-# re-fetches the full live catalogue. No dashboard, no secrets, no build hook.
+# The site is a STATIC build. It can only show what is committed in
+# src/data/offers-snapshot.json at deploy time. Netlify's own build does not
+# hold an Airtable token, so a plain rebuild just re-emits the same snapshot.
 #
-# Runs hourly (24x/day). Adjust the cron below to refresh more or less often.
-# You can also trigger it by hand from the Actions tab (Run workflow).
+# Therefore this workflow does the real work: it re-fetches the live catalogue
+# from Airtable (GitHub runners have open egress, unlike Netlify's build), and
+# commits the refreshed snapshot ONLY when it actually changed. That commit is
+# what triggers Netlify to redeploy — so every Airtable edit reaches the site
+# automatically, within one refresh cycle.
+#
+# REQUIRED: add a repository secret named AIRTABLE_TOKEN
+#   (Settings -> Secrets and variables -> Actions -> New repository secret).
+#   Use a read-only Airtable Personal Access Token
+#   (scopes: data.records:read, schema.bases:read).
+#
+# Runs hourly. Trigger by hand any time from the Actions tab (Run workflow),
+# or wire an Airtable automation to the workflow_dispatch API / a Netlify build
+# hook for near-instant updates.
 
 on:
   schedule:
-    - cron: '0 * * * *'   # every hour (24x/day) — check this stays within Netlify's free build minutes
+    - cron: '0 * * * *'   # every hour (24x/day)
   workflow_dispatch: {}
 
 permissions:
@@ -32,9 +43,33 @@ jobs:
         with:
           ref: claude/softr-webflow-migration-50kj20
 
-      - name: Trigger a rebuild via an empty commit
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Re-bake snapshot from live Airtable, commit if changed
+        env:
+          AIRTABLE_TOKEN: ${{ secrets.AIRTABLE_TOKEN }}
         run: |
+          if [ -z "$AIRTABLE_TOKEN" ]; then
+            echo "::warning::AIRTABLE_TOKEN secret is not set — cannot refresh from Airtable."
+            echo "::warning::Add it in Settings -> Secrets and variables -> Actions. Skipping this run."
+            exit 0
+          fi
+
+          # sync-offers refuses to overwrite unless the live fetch succeeds,
+          # so a transient Airtable/network error can never blank the catalogue.
+          npm run sync-offers
+
           git config user.name "akay-refresh-bot"
           git config user.email "actions@users.noreply.github.com"
-          git commit --allow-empty -m "chore: scheduled catalogue refresh"
-          git push origin HEAD:claude/softr-webflow-migration-50kj20
+
+          if git diff --quiet -- src/data/offers-snapshot.json; then
+            echo "Catalogue unchanged since last refresh — nothing to deploy."
+          else
+            git add src/data/offers-snapshot.json
+            git commit -m "chore: refresh catalogue snapshot from Airtable"
+            git push origin HEAD:claude/softr-webflow-migration-50kj20
+            echo "Committed a refreshed catalogue — Netlify will redeploy."
+          fi
