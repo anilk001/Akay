@@ -17,13 +17,18 @@ name: Scheduled catalogue refresh
 #   Use a read-only Airtable Personal Access Token
 #   (scopes: data.records:read, schema.bases:read).
 #
-# Runs hourly. Trigger by hand any time from the Actions tab (Run workflow),
-# or wire an Airtable automation to the workflow_dispatch API / a Netlify build
-# hook for near-instant updates.
+# Runs every 5 minutes (the tightest interval GitHub's scheduler allows), so an
+# Airtable edit reaches the site within a few minutes. This is cheap: the job
+# only COMMITS — and only triggers a Netlify build — when the catalogue actually
+# changed, so idle checks cost no Netlify build minutes. GitHub Actions minutes
+# are free on public repos. For guaranteed ~90s updates, wire an Airtable
+# automation to a Netlify build hook instead (event-driven, not polled).
+#
+# Trigger by hand any time from the Actions tab (Run workflow).
 
 on:
   schedule:
-    - cron: '0 * * * *'   # every hour (24x/day)
+    - cron: '*/5 * * * *'   # every 5 minutes (GitHub's minimum interval)
   workflow_dispatch: {}
 
 permissions:
