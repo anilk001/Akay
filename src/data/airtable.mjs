@@ -16,7 +16,7 @@ const TABLE = process.env.AIRTABLE_OFFERS_TABLE || 'Offers';
 
 // Public-safe fields only. Anything not listed here is never pulled.
 const FIELDS = [
-  'Public Product Description', 'Brand', 'Category', 'Public Spec',
+  'Public Product Description', 'Variant', 'Brand', 'Category', 'Public Spec',
   'Price Display', 'Currency', 'Price Per Unit & Case',
   'Stock Display', 'Stock Cases', 'Public Terms',
   'Bond/Customs Status', 'Origin Country', 'Public Listing', 'Featured',
@@ -37,22 +37,72 @@ function parseAmount(priceDisplay = '', currencyField = '') {
   return { currency, amount };
 }
 
+// "EUR 9.24/case (12pk) · EUR 0.77/unit" -> [{currency,amount,basis}, ...]
+// The headline figure must come from the SAME string that supplies the basis,
+// otherwise a per-unit number ends up printed under a "/ case" label.
+function parsePriceParts(detail = '') {
+  return String(detail)
+    .split('·')
+    .map((part) => {
+      const m = part.match(/([A-Z]{3})?\s*([\d.,]+)\s*\/\s*(case|unit|btl|bottle|pack|can|jar|piece)?/i);
+      if (!m) return null;
+      return {
+        currency: m[1] || '',
+        amount: parseFloat(m[2].replace(/,/g, '')),
+        basis: (m[3] || '').toLowerCase(),
+      };
+    })
+    .filter((p) => p && Number.isFinite(p.amount));
+}
+
+// Splits a trailing variant list out of the product name:
+// "Nivea Roll On 50ml — Bright & Dry, Silk Touch, Pearl" -> name + variants.
+// Only splits when the tail really is a list (two or more commas), so real
+// product names with a single dash stay intact.
+function splitVariants(rawName = '', variantField = '') {
+  const name = String(rawName).trim();
+  if (variantField) return { name, variants: String(variantField).trim() };
+  const idx = name.search(/\s+[—–-]\s+/);
+  if (idx > 0) {
+    const head = name.slice(0, idx).trim();
+    const tail = name.slice(idx).replace(/^\s+[—–-]\s+/, '').trim();
+    if ((tail.match(/,/g) || []).length >= 2 && head.length >= 8) return { name: head, variants: tail };
+  }
+  return { name, variants: '' };
+}
+
 function isTestRow(name = '') {
   return /^testbrand|^testproduct/i.test(name.trim());
 }
 
 function normalize(fields) {
-  const { currency, amount } = parseAmount(fields['Price Display'], fields['Currency']);
+  const detail = fields['Price Per Unit & Case'] || fields['Price Display'] || '';
+  const parts = parsePriceParts(detail);
+  const fallback = parseAmount(fields['Price Display'], fields['Currency']);
+  const headline = parts[0] || null;
+  const perUnit = parts.find((p) => /unit|btl|bottle|can|piece|jar/.test(p.basis));
+  // Headline amount and its basis now always come from the same string.
+  const amount = headline ? headline.amount : fallback.amount;
+  const currency = fields['Currency'] || (headline && headline.currency) || fallback.currency || '';
+  // Sorting compares like with like: a per-unit figure for every offer.
+  const unitAmount = perUnit ? perUnit.amount
+    : headline && !/case|pack/.test(headline.basis) ? headline.amount
+    : fallback.amount;
+  const { name, variants } = splitVariants(fields['Public Product Description'], fields['Variant']);
+  const rawQty = fields['Stock Cases'];
   return {
-    name: fields['Public Product Description'] || '',
+    name,
+    variants,
     brand: fields['Brand'] || '',
     category: fields['Category'] || 'Other',
     spec: fields['Public Spec'] || '',
     currency,
     amount,
-    priceDetail: fields['Price Per Unit & Case'] || fields['Price Display'] || '',
+    unitAmount,
+    priceDetail: detail,
     stock: stockCode(fields['Stock Display']),
-    qty: typeof fields['Stock Cases'] === 'number' ? fields['Stock Cases'] : null,
+    // Cases are whole units — a fractional count means units were entered as cases.
+    qty: typeof rawQty === 'number' ? Math.round(rawQty) : null,
     terms: fields['Public Terms'] || '',
     tier: fields['Bond/Customs Status'] || '',
     origin: fields['Origin Country'] || '',
@@ -84,6 +134,27 @@ async function fetchLive() {
   return out;
 }
 
+// The committed snapshot was baked by an earlier version of normalize(), and a
+// fresh deploy serves it until the next refresh runs. Applying the same
+// corrections on read keeps both paths — live and snapshot — showing identical
+// figures, so a fallback build can never resurrect the old per-unit/per-case mix-up.
+function renormalizeSnapshotOffer(o) {
+  const parts = parsePriceParts(o.priceDetail || '');
+  const headline = parts[0] || null;
+  const perUnit = parts.find((p) => /unit|btl|bottle|can|piece|jar/.test(p.basis));
+  const { name, variants } = splitVariants(o.name, o.variants);
+  return {
+    ...o,
+    name,
+    variants,
+    amount: headline ? headline.amount : o.amount,
+    unitAmount: perUnit ? perUnit.amount
+      : headline && !/case|pack/.test(headline.basis) ? headline.amount
+      : o.amount,
+    qty: typeof o.qty === 'number' ? Math.round(o.qty) : o.qty,
+  };
+}
+
 export async function getOffers() {
   if (TOKEN) {
     try {
@@ -99,29 +170,10 @@ export async function getOffers() {
   } else {
     console.warn('[airtable] no AIRTABLE_TOKEN set — using snapshot');
   }
-  return { offers: snapshot.offers, source: 'snapshot' };
+  return { offers: snapshot.offers.map(renormalizeSnapshotOffer), source: 'snapshot' };
 }
 
-// Featured offers — a second, isolated query over the SAME connection.
-// Server-side filter: Featured checked AND publicly listed AND send-eligible.
-// Reads only the public-safe display fields (same FIELDS list). Any failure
-// (missing token, missing "Featured" field, network) returns [] so the main
-// catalogue is never affected and the section simply hides when empty.
-export async function getFeaturedOffers() {
-  if (!TOKEN) return [];
-  try {
-    const url = new URL(`https://api.airtable.com/v0/${BASE}/${encodeURIComponent(TABLE)}`);
-    url.searchParams.set('filterByFormula', "AND({Featured}=1,{Public Listing}='Yes',{Send Eligible}='Yes')");
-    url.searchParams.set('pageSize', '50');
-    FIELDS.forEach((f) => url.searchParams.append('fields[]', f));
-    const res = await fetch(url, { headers: { Authorization: `Bearer ${TOKEN}` } });
-    if (!res.ok) throw new Error(`Airtable ${res.status}: ${(await res.text()).slice(0, 100)}`);
-    const data = await res.json();
-    const out = data.records.map((r) => normalize(r.fields)).filter((o) => o.name && !isTestRow(o.name));
-    console.log(`[airtable] fetched ${out.length} featured offers`);
-    return out;
-  } catch (err) {
-    console.warn(`[airtable] featured fetch skipped (${err.message.slice(0, 100)})`);
-    return [];
-  }
-}
+// Featured offers are flagged per-record by the `Featured` field and rendered
+// from the main catalogue query (see index.astro). A separate Airtable query
+// for them existed here and was never imported — removed to keep one source
+// of truth for what the page shows.
