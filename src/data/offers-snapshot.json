@@ -10531,21 +10531,6 @@
    "featured": false
   },
   {
-   "name": "Absolut Vodka 700ml 50%",
-   "brand": "Absolut",
-   "category": "Other",
-   "spec": "70cl x 50% alc",
-   "currency": "EUR",
-   "amount": 5.78,
-   "priceDetail": "EUR 5.78/bottle",
-   "stock": "in",
-   "qty": 100,
-   "terms": "EXW Loendersloot",
-   "tier": "",
-   "origin": "",
-   "featured": false
-  },
-  {
    "name": "Benrinnes 15y Release 2021",
    "brand": "Benrinnes",
    "category": "Spirits",
@@ -12043,21 +12028,6 @@
    "terms": "EXW Greece",
    "tier": "",
    "origin": "Greece",
-   "featured": false
-  },
-  {
-   "name": "Absolut Vodka 700ml 40%",
-   "brand": "Absolut",
-   "category": "Other",
-   "spec": "70cl x 40% alc",
-   "currency": "EUR",
-   "amount": 5.78,
-   "priceDetail": "EUR 5.78/bottle",
-   "stock": "in",
-   "qty": 100,
-   "terms": "EXW Loendersloot",
-   "tier": "",
-   "origin": "",
    "featured": false
   },
   {
@@ -21977,5 +21947,5 @@
   }
  ],
  "source": "snapshot",
- "generated": "2026-08-07"
+ "generated": "2026-08-08"
 }
