@@ -17,7 +17,7 @@ const TABLE = process.env.AIRTABLE_OFFERS_TABLE || 'Offers';
 // Public-safe fields only. Anything not listed here is never pulled.
 const FIELDS = [
   'Public Product Description', 'Variant', 'Brand', 'Category', 'Public Spec',
-  'Price Display', 'Currency', 'Price Per Unit & Case',
+  'Price Display', 'Currency', 'Price Per Unit & Case', 'PCS/Case',
   'Stock Display', 'Stock Cases', 'Public Terms',
   'Bond/Customs Status', 'Origin Country', 'Public Listing', 'Featured',
 ];
@@ -55,6 +55,17 @@ function parsePriceParts(detail = '') {
     .filter((p) => p && Number.isFinite(p.amount));
 }
 
+// "EUR 112.44/case (6pk)" -> 6, or "6 x 70cl" -> 6. Used to derive a per-unit
+// figure for offers that only publish a case price, so price sorting compares
+// every offer in the same unit.
+function packSize(detail = '', spec = '') {
+  const pk = String(detail).match(/\((\d+)\s*pk\)/i);
+  if (pk) return parseInt(pk[1], 10);
+  const sp = String(spec).match(/^\s*(\d+)\s*[x×]/i);
+  if (sp) return parseInt(sp[1], 10);
+  return null;
+}
+
 // Splits a trailing variant list out of the product name:
 // "Nivea Roll On 50ml — Bright & Dry, Silk Touch, Pearl" -> name + variants.
 // Only splits when the tail really is a list (two or more commas), so real
@@ -85,9 +96,15 @@ function normalize(fields) {
   const amount = headline ? headline.amount : fallback.amount;
   const currency = fields['Currency'] || (headline && headline.currency) || fallback.currency || '';
   // Sorting compares like with like: a per-unit figure for every offer.
+  // Case-only prices are divided by the pack size; if the pack is unknown the
+  // case figure stays (imperfect, but never worse than the pre-fix behaviour).
+  const spec = fields['Public Spec'] || '';
+  const pack = packSize(detail, spec) || (typeof fields['PCS/Case'] === 'number' && fields['PCS/Case'] > 1 ? fields['PCS/Case'] : null);
   const unitAmount = perUnit ? perUnit.amount
-    : headline && !/case|pack/.test(headline.basis) ? headline.amount
-    : fallback.amount;
+    : headline && /case|pack/.test(headline.basis)
+      ? (pack ? +(headline.amount / pack).toFixed(4) : headline.amount)
+      : headline ? headline.amount
+      : fallback.amount;
   const { name, variants } = splitVariants(fields['Public Product Description'], fields['Variant']);
   const rawQty = fields['Stock Cases'];
   return {
@@ -142,6 +159,7 @@ function renormalizeSnapshotOffer(o) {
   const parts = parsePriceParts(o.priceDetail || '');
   const headline = parts[0] || null;
   const perUnit = parts.find((p) => /unit|btl|bottle|can|piece|jar/.test(p.basis));
+  const pack = packSize(o.priceDetail, o.spec);
   const { name, variants } = splitVariants(o.name, o.variants);
   return {
     ...o,
@@ -149,8 +167,10 @@ function renormalizeSnapshotOffer(o) {
     variants,
     amount: headline ? headline.amount : o.amount,
     unitAmount: perUnit ? perUnit.amount
-      : headline && !/case|pack/.test(headline.basis) ? headline.amount
-      : o.amount,
+      : headline && /case|pack/.test(headline.basis)
+        ? (pack ? +(headline.amount / pack).toFixed(4) : headline.amount)
+        : headline ? headline.amount
+        : o.amount,
     qty: typeof o.qty === 'number' ? Math.round(o.qty) : o.qty,
   };
 }
