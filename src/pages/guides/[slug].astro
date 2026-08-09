@@ -1,0 +1,366 @@
+---
+import { guides, getGuideBySlug, getAllGuidesSlugs } from '../../data/guides.mjs';
+import { articleSchema, organizationSchema } from '../../lib/schema.mjs';
+
+export async function getStaticPaths() {
+  return guides.map((guide) => ({
+    params: { slug: guide.slug },
+    props: { guide },
+  }));
+}
+
+const { guide } = Astro.props;
+const orgSchema = organizationSchema();
+const articleData = articleSchema(guide.title, guide.content, guide.slug);
+
+const pageTitle = `${guide.title} | AKAY Trade Guides`;
+const pageDesc = guide.excerpt;
+---
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{pageTitle}</title>
+  <meta name="description" content={pageDesc} />
+  <link rel="icon" href="/akay-bird.png" />
+  <link rel="canonical" href={`https://offers.akay.ie/guides/${guide.slug}/`} />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="AKAY Trade" />
+  <meta property="og:url" content={`https://offers.akay.ie/guides/${guide.slug}/`} />
+  <meta property="og:title" content={guide.title} />
+  <meta property="og:description" content={pageDesc} />
+  <meta property="og:image" content="https://offers.akay.ie/akay-bird.png" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content={guide.title} />
+  <meta name="twitter:description" content={pageDesc} />
+  <meta name="robots" content="max-snippet:-1, max-image-preview:large" />
+
+  <script type="application/ld+json" set:html={JSON.stringify(orgSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(articleData)} />
+
+  <style>
+    :root {
+      --paper: #F7F5F0;
+      --paper-2: #EFEDE4;
+      --card: #FFFFFF;
+      --ink: #17140F;
+      --ink-soft: #41473F;
+      --muted: #767E72;
+      --line: #E4E0D4;
+      --brass: #B4231F;
+      --shadow: 0 1px 2px rgba(20, 33, 26, 0.06), 0 6px 20px -8px rgba(20, 33, 26, 0.14);
+      --radius: 14px;
+      --serif: "Hoefler Text", "Iowan Old Style", Palatino, Georgia, "Times New Roman", serif;
+      --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --mono: ui-monospace, "SF Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --paper: #0C140F;
+        --paper-2: #081009;
+        --card: #13201A;
+        --ink: #F1EFE7;
+        --ink-soft: #C6CEC4;
+        --muted: #8A968A;
+        --line: #243029;
+        --brass: #EC5A52;
+        --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 28px -12px rgba(0, 0, 0, 0.6);
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      background: var(--paper);
+      color: var(--ink);
+      font: 16px / 1.6 var(--sans);
+    }
+
+    h1 {
+      font: 600 2.2em var(--serif);
+      margin: 1em 0 0.3em;
+      color: var(--ink);
+    }
+
+    h2 {
+      font: 600 1.5em var(--serif);
+      margin: 1.5em 0 0.5em;
+      color: var(--ink-soft);
+    }
+
+    h3 {
+      font: 600 1.2em var(--serif);
+      margin: 1.2em 0 0.4em;
+      color: var(--ink-soft);
+    }
+
+    a {
+      color: var(--brass);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    p {
+      margin: 1em 0;
+    }
+
+    code {
+      background: var(--paper-2);
+      padding: 0.2em 0.4em;
+      border-radius: 4px;
+      font: 0.9em var(--mono);
+      color: var(--ink);
+    }
+
+    pre {
+      background: var(--paper-2);
+      padding: 1em;
+      border-radius: 8px;
+      overflow-x: auto;
+      font: 0.9em / 1.5 var(--mono);
+      border-left: 3px solid var(--brass);
+    }
+
+    pre code {
+      background: none;
+      padding: 0;
+      color: inherit;
+    }
+
+    strong {
+      font-weight: 700;
+    }
+
+    em {
+      font-style: italic;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5em 0;
+    }
+
+    th,
+    td {
+      padding: 0.75em;
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+    }
+
+    th {
+      background: var(--paper-2);
+      font-weight: 600;
+      color: var(--ink-soft);
+    }
+
+    ul,
+    ol {
+      margin: 1em 0;
+      padding-left: 2em;
+    }
+
+    li {
+      margin: 0.5em 0;
+    }
+
+    .container {
+      max-width: 780px;
+      margin: 0 auto;
+    }
+
+    .breadcrumb {
+      font-size: 0.9em;
+      color: var(--muted);
+      margin-bottom: 1.5em;
+    }
+
+    .breadcrumb a {
+      color: var(--brass);
+    }
+
+    .article-meta {
+      color: var(--muted);
+      font-size: 0.95em;
+      margin-bottom: 2em;
+      padding-bottom: 1.5em;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .article-content {
+      line-height: 1.8;
+    }
+
+    .article-content > *:first-child {
+      margin-top: 0;
+    }
+
+    .footer {
+      margin-top: 3em;
+      padding-top: 2em;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.9em;
+    }
+
+    .footer a {
+      color: var(--brass);
+    }
+
+    .related-guides {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 1.5em;
+      margin: 3em 0;
+      box-shadow: var(--shadow);
+    }
+
+    .related-guides h3 {
+      margin-top: 0;
+    }
+
+    .related-guides ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .related-guides li {
+      margin: 0.8em 0;
+    }
+
+    .related-guides a {
+      font-weight: 500;
+    }
+
+    .cta {
+      background: var(--card);
+      border: 2px solid var(--brass);
+      border-radius: var(--radius);
+      padding: 2em;
+      margin: 2em 0;
+      text-align: center;
+    }
+
+    .cta h3 {
+      margin-top: 0;
+      color: var(--brass);
+    }
+
+    .cta-button {
+      display: inline-block;
+      background: var(--brass);
+      color: white;
+      padding: 0.8em 1.6em;
+      border-radius: 6px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      margin: 0.5em;
+    }
+
+    .cta-button:hover {
+      opacity: 0.9;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="/">Home</a> / <a href="/#guides">Guides</a> / {guide.title}
+    </div>
+
+    <article>
+      <h1>{guide.title}</h1>
+
+      <div class="article-meta">
+        From the AKAY Trade guides library. Last updated 2024.
+      </div>
+
+      <div class="article-content" set:html={guide.content.split('\n').map((line) => {
+        // Simple markdown to HTML converter
+        if (line.startsWith('## ')) {
+          return `<h2>${line.slice(3)}</h2>`;
+        }
+        if (line.startsWith('### ')) {
+          return `<h3>${line.slice(4)}</h3>`;
+        }
+        if (line.startsWith('**') && line.endsWith('**')) {
+          return `<strong>${line.slice(2, -2)}</strong>`;
+        }
+        if (line.startsWith('```')) {
+          return '';
+        }
+        if (line.trim() === '') {
+          return '';
+        }
+        return `<p>${line}</p>`;
+      }).join('')} />
+
+      <!-- Re-render content properly -->
+      <div class="article-content">
+        {guide.content.split('\n\n').map((paragraph) => {
+          if (paragraph.trim().startsWith('## ')) {
+            const title = paragraph.replace(/^## /, '').trim();
+            return `<h2>${title}</h2>`;
+          }
+          if (paragraph.trim().startsWith('### ')) {
+            const title = paragraph.replace(/^### /, '').trim();
+            return `<h3>${title}</h3>`;
+          }
+          if (paragraph.trim().startsWith('```')) {
+            const code = paragraph.replace(/^```\n?/, '').replace(/\n?```$/, '');
+            return `<pre><code>${code}</code></pre>`;
+          }
+          if (paragraph.trim().startsWith('-') || paragraph.trim().startsWith('*')) {
+            const items = paragraph.split('\n').filter((l) => l.trim());
+            const list = items.map((item) => `<li>${item.replace(/^[-*]\s+/, '')}</li>`).join('');
+            return `<ul>${list}</ul>`;
+          }
+          return `<p>${paragraph.trim()}</p>`;
+        })}
+      </div>
+    </article>
+
+    <div class="cta">
+      <h3>Ready to order?</h3>
+      <p>Browse our live catalogue and get a quote for wholesale pricing.</p>
+      <a href="/" class="cta-button">Browse Offers</a>
+      <a href="https://wa.me/353872382368" class="cta-button">WhatsApp Enquiry</a>
+    </div>
+
+    <div class="related-guides">
+      <h3>More Guides</h3>
+      <ul>
+        {guides
+          .filter((g) => g.slug !== guide.slug)
+          .map((g) => (
+            <li>
+              <a href={`/guides/${g.slug}/`}>{g.title}</a>
+              <p style="margin: 0.3em 0 0; font-size: 0.9em; color: var(--muted);">{g.excerpt}</p>
+            </li>
+          ))}
+      </ul>
+    </div>
+
+    <div class="footer">
+      <p>
+        <strong>Questions?</strong> Contact us at <a href="mailto:offers@akay.ie">offers@akay.ie</a> or{' '}
+        <a href="https://wa.me/353872382368" target="_blank">WhatsApp +353 87 238 2368</a>.
+      </p>
+      <p>
+        <a href="/">← Back to catalogue</a> | <a href="/about/">About AKAY</a>
+      </p>
+    </div>
+  </div>
+</body>
+</html>

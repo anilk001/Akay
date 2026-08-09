@@ -1,0 +1,400 @@
+---
+import { getOffers } from '../../data/airtable.mjs';
+import { generateSlug, dedupeSlug } from '../../lib/slug.mjs';
+import { productOfferSchema, breadcrumbSchema, organizationSchema } from '../../lib/schema.mjs';
+
+const WA = '353872382368';
+
+// Get all valid slugs for static generation
+export async function getStaticPaths() {
+  const { offers } = await getOffers();
+
+  // Build slug map
+  const slugMap = new Map();
+  const slugs = [];
+  for (const offer of offers) {
+    let slug = generateSlug(offer.name, offer.spec);
+    slug = dedupeSlug(slug, slugs);
+    slugs.push(slug);
+    slugMap.set(offer.id || `${offer.brand}-${offer.name}`, { ...offer, slug });
+  }
+
+  const allOffers = Array.from(slugMap.values());
+
+  return allOffers.map((offer) => ({
+    params: { slug: offer.slug },
+    props: { offer, allOffers },
+  }));
+}
+
+const { offer, allOffers } = Astro.props;
+const slug = offer.slug;
+
+// Helper functions
+function priceParts(detail = '') {
+  const parts = detail.split('·').map((s) => s.trim());
+  const first = parts[0] || '';
+  const basis = /\/\s*bottle/i.test(first) ? '/ btl'
+    : /\/\s*case/i.test(first) ? '/ case'
+    : /\/\s*unit/i.test(first) ? '/ unit' : '';
+  const msg = basis === '/ btl' ? 'per bottle' : basis === '/ case' ? 'per case' : basis === '/ unit' ? 'per unit' : '';
+  const other = parts.slice(1).join(' · ');
+  return { basis, other, msg };
+}
+
+function waLink(o, msg) {
+  const amt = o.amount != null ? o.amount.toFixed(2) : '';
+  const txt = `Hi, I'd like a quote for ${o.name} ${o.spec ? `(${o.spec})` : ''} listed at ${o.currency} ${amt}${msg ? ' ' + msg : ''}.`;
+  return `https://wa.me/${WA}?text=${encodeURIComponent(txt)}`;
+}
+
+const STOCK = { in: ['ok', 'In stock'], warn: ['warn', 'Limited'], enq: ['neu', 'Enquire'] };
+
+const { basis, other, msg } = priceParts(offer.priceDetail);
+const st = STOCK[offer.stock] || STOCK.enq;
+const wa = waLink(offer, msg);
+
+// Category slug for linking
+const categorySlug = offer.category.toLowerCase().replace(/\s+/g, '-');
+
+// Related offers (same category, max 4)
+const relatedOffers = allOffers
+  .filter(
+    (o) => o.category === offer.category &&
+            (o.id || `${o.brand}-${o.name}`) !== (offer.id || `${offer.brand}-${offer.name}`)
+  )
+  .sort(() => Math.random() - 0.5)
+  .slice(0, 4);
+
+// Build schemas
+const orgSchema = organizationSchema();
+const productSchema = productOfferSchema(offer, slug);
+const breadcrumbData = breadcrumbSchema(offer.name, offer.category, slug);
+
+// Title and meta
+const pageTitle = `${offer.name} ${offer.spec || ''} wholesale — ${offer.currency}${offer.amount?.toFixed(2) || '—'}/case | AKAY Trade`;
+const pageDesc = `${offer.name} ${offer.spec || ''} wholesale: ${offer.currency}${offer.amount?.toFixed(2) || '—'}/case, ${offer.tier || 'trade pricing'}, ${offer.terms || 'terms available'}. Buy by the case from AKAY Trade.`;
+
+// Determine availability status for display
+let stockStatus = 'Enquire on request';
+let stockDetail = '';
+if (offer.stock === 'in') {
+  stockStatus = 'In stock';
+  if (offer.qty) {
+    stockDetail = `${offer.qty.toLocaleString()} cases available`;
+  }
+} else if (offer.stock === 'warn') {
+  stockStatus = 'Limited availability';
+}
+---
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{pageTitle}</title>
+  <meta name="description" content={pageDesc} />
+  <link rel="icon" href="/akay-bird.png" />
+  <link rel="canonical" href={`https://offers.akay.ie/offers/${slug}/`} />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="AKAY Trade" />
+  <meta property="og:url" content={`https://offers.akay.ie/offers/${slug}/`} />
+  <meta property="og:title" content={offer.name} />
+  <meta property="og:description" content={pageDesc} />
+  <meta property="og:image" content="https://offers.akay.ie/akay-bird.png" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content={offer.name} />
+  <meta name="twitter:description" content={pageDesc} />
+  <meta name="robots" content="max-snippet:-1, max-image-preview:large" />
+
+  <script type="application/ld+json" set:html={JSON.stringify(orgSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(productSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+
+  <style>
+    :root {
+      --paper: #F7F5F0;
+      --paper-2: #EFEDE4;
+      --card: #FFFFFF;
+      --ink: #17140F;
+      --ink-soft: #41473F;
+      --muted: #767E72;
+      --line: #E4E0D4;
+      --brass: #B4231F;
+      --ok: #0E7A3B;
+      --ok-bg: #E2F0E5;
+      --warn: #9A6A12;
+      --warn-bg: #F5E9CE;
+      --neu: #5C6A78;
+      --neu-bg: #E9ECEF;
+      --shadow: 0 1px 2px rgba(20, 33, 26, 0.06), 0 6px 20px -8px rgba(20, 33, 26, 0.14);
+      --radius: 14px;
+      --serif: "Hoefler Text", "Iowan Old Style", Palatino, Georgia, "Times New Roman", serif;
+      --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --paper: #0C140F;
+        --paper-2: #081009;
+        --card: #13201A;
+        --ink: #F1EFE7;
+        --ink-soft: #C6CEC4;
+        --muted: #8A968A;
+        --line: #243029;
+        --brass: #EC5A52;
+        --ok: #5FC97E;
+        --ok-bg: #123021;
+        --warn: #E0B65C;
+        --warn-bg: #31280F;
+        --neu: #9AA7B4;
+        --neu-bg: #1B2530;
+        --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 28px -12px rgba(0, 0, 0, 0.6);
+      }
+    }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      background: var(--paper);
+      color: var(--ink);
+      font: 16px / 1.5 var(--sans);
+    }
+    h1 {
+      font: 600 2em var(--serif);
+      margin: 1em 0 0.5em;
+    }
+    h2 {
+      font: 600 1.3em var(--serif);
+      margin: 1.5em 0 0.5em;
+      color: var(--ink-soft);
+    }
+    a {
+      color: var(--brass);
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    .breadcrumb {
+      font-size: 0.9em;
+      color: var(--muted);
+      margin-bottom: 2em;
+    }
+    .breadcrumb a {
+      color: var(--brass);
+    }
+
+    .offer-header {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 2em;
+      margin-bottom: 2em;
+      box-shadow: var(--shadow);
+    }
+
+    .price-display {
+      font: 600 1.8em var(--serif);
+      color: var(--brass);
+      margin: 0.5em 0;
+    }
+
+    .stock-badge {
+      display: inline-block;
+      padding: 0.4em 0.8em;
+      border-radius: 6px;
+      font-size: 0.9em;
+      font-weight: 600;
+      margin: 0.5em 0;
+    }
+
+    .stock-ok {
+      background: var(--ok-bg);
+      color: var(--ok);
+    }
+    .stock-warn {
+      background: var(--warn-bg);
+      color: var(--warn);
+    }
+    .stock-neu {
+      background: var(--neu-bg);
+      color: var(--neu);
+    }
+
+    .spec-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.8em 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .spec-row:last-child {
+      border-bottom: none;
+    }
+
+    .spec-label {
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .spec-value {
+      text-align: right;
+      color: var(--ink);
+    }
+
+    .cta-button {
+      display: inline-block;
+      background: var(--brass);
+      color: white;
+      padding: 0.8em 1.6em;
+      border-radius: 6px;
+      font-weight: 600;
+      margin: 1em 0.5em 1em 0;
+      border: none;
+      cursor: pointer;
+    }
+    .cta-button:hover {
+      background: var(--brass);
+      text-decoration: none;
+      opacity: 0.9;
+    }
+
+    .cta-secondary {
+      background: var(--paper-2);
+      color: var(--ink);
+      border: 1px solid var(--line);
+    }
+
+    .related-offers {
+      margin: 3em 0 0;
+    }
+
+    .offer-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5em;
+      margin-top: 1em;
+    }
+
+    .offer-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 1.5em;
+      box-shadow: var(--shadow);
+    }
+
+    .offer-card h3 {
+      margin: 0 0 0.5em;
+      font: 600 1.1em var(--serif);
+      color: var(--ink);
+    }
+
+    .offer-card .price {
+      font: 600 1.3em var(--serif);
+      color: var(--brass);
+      margin: 0.5em 0;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 2em 0;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.9em;
+      margin-top: 3em;
+    }
+
+    .footer a {
+      color: var(--brass);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="/">Home</a> / <a href={`/category/${categorySlug}/`}>{offer.category}</a> / {offer.name}
+    </div>
+
+    <div class="offer-header">
+      <h1>{offer.name}</h1>
+      {offer.spec && <p style="margin: 0; color: var(--muted); font-size: 0.95em;">{offer.spec}</p>}
+
+      <div class="price-display">
+        {offer.currency}{offer.amount?.toFixed(2) || '—'}{basis}
+        {other && <span style="font-size: 0.7em; font-weight: normal; display: block; margin-top: 0.3em;">{other}</span>}
+      </div>
+
+      <div class={`stock-badge stock-${st[0]}`}>
+        {st[1]}
+        {stockDetail && ` — ${stockDetail}`}
+      </div>
+
+      <div style="margin-top: 1.5em; border-top: 1px solid var(--line); padding-top: 1em;">
+        <div class="spec-row">
+          <span class="spec-label">Duty Status</span>
+          <span class="spec-value">{offer.tier || 'Not specified'}</span>
+        </div>
+        {offer.terms && (
+          <div class="spec-row">
+            <span class="spec-label">Incoterm</span>
+            <span class="spec-value">{offer.terms}</span>
+          </div>
+        )}
+        {offer.origin && (
+          <div class="spec-row">
+            <span class="spec-label">Origin</span>
+            <span class="spec-value">{offer.origin}</span>
+          </div>
+        )}
+        {offer.spec && (
+          <div class="spec-row">
+            <span class="spec-label">Pack Size</span>
+            <span class="spec-value">{offer.spec}</span>
+          </div>
+        )}
+      </div>
+
+      <div style="margin-top: 1.5em;">
+        <a href={wa} class="cta-button">WhatsApp Enquiry</a>
+        <a href={`mailto:offers@akay.ie?subject=Interest in ${offer.name}`} class="cta-button cta-secondary">Email</a>
+      </div>
+
+      <p style="font-size: 0.85em; color: var(--muted); margin-top: 1.5em; margin-bottom: 0;">
+        Trade pricing for B2B wholesale buyers. Prices updated daily.
+      </p>
+    </div>
+
+    {relatedOffers.length > 0 && (
+      <div class="related-offers">
+        <h2>Related {offer.category} Offers</h2>
+        <div class="offer-grid">
+          {relatedOffers.map((rel) => (
+            <div class="offer-card">
+              <h3><a href={`/offers/${rel.slug}/`}>{rel.name}</a></h3>
+              {rel.spec && <p style="margin: 0.5em 0; color: var(--muted); font-size: 0.9em;">{rel.spec}</p>}
+              <div class="price">{rel.currency}{rel.amount?.toFixed(2) || '—'} / case</div>
+              <a href={`/offers/${rel.slug}/`} style="font-weight: 600;">View offer →</a>
+            </div>
+          ))}
+        </div>
+      </div>
+    )}
+
+    <div class="footer">
+      <p>
+        <a href={`/category/${categorySlug}/`}>← View all {offer.category} offers</a> |
+        <a href="/">← Back to catalogue</a>
+      </p>
+      <p>
+        AKAY Trade — <a href="https://wa.me/353872382368" target="_blank">WhatsApp +353 87 238 2368</a> | offers@akay.ie
+      </p>
+    </div>
+  </div>
+</body>
+</html>

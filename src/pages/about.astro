@@ -1,0 +1,386 @@
+---
+import { organizationSchema } from '../lib/schema.mjs';
+
+const orgSchema = organizationSchema();
+const pageTitle = 'About AKAY Trade — 36 Years in Wholesale';
+const pageDesc = 'AKAY Trade: Ireland-based B2B wholesale trading company specializing in spirits, beer, soft drinks and FMCG for 1,000+ suppliers and 6,000+ clients worldwide.';
+---
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{pageTitle}</title>
+  <meta name="description" content={pageDesc} />
+  <link rel="icon" href="/akay-bird.png" />
+  <link rel="canonical" href="https://offers.akay.ie/about/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="AKAY Trade" />
+  <meta property="og:url" content="https://offers.akay.ie/about/" />
+  <meta property="og:title" content="About AKAY Trade" />
+  <meta property="og:description" content={pageDesc} />
+  <meta property="og:image" content="https://offers.akay.ie/akay-bird.png" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="About AKAY Trade" />
+  <meta name="twitter:description" content={pageDesc} />
+  <meta name="robots" content="max-snippet:-1, max-image-preview:large" />
+
+  <script type="application/ld+json" set:html={JSON.stringify(orgSchema)} />
+
+  <style>
+    :root {
+      --paper: #F7F5F0;
+      --paper-2: #EFEDE4;
+      --card: #FFFFFF;
+      --ink: #17140F;
+      --ink-soft: #41473F;
+      --muted: #767E72;
+      --line: #E4E0D4;
+      --brass: #B4231F;
+      --shadow: 0 1px 2px rgba(20, 33, 26, 0.06), 0 6px 20px -8px rgba(20, 33, 26, 0.14);
+      --radius: 14px;
+      --serif: "Hoefler Text", "Iowan Old Style", Palatino, Georgia, "Times New Roman", serif;
+      --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --paper: #0C140F;
+        --paper-2: #081009;
+        --card: #13201A;
+        --ink: #F1EFE7;
+        --ink-soft: #C6CEC4;
+        --muted: #8A968A;
+        --line: #243029;
+        --brass: #EC5A52;
+        --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 28px -12px rgba(0, 0, 0, 0.6);
+      }
+    }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      background: var(--paper);
+      color: var(--ink);
+      font: 16px / 1.6 var(--sans);
+    }
+
+    h1 {
+      font: 600 2.2em var(--serif);
+      margin: 1em 0 0.5em;
+    }
+
+    h2 {
+      font: 600 1.5em var(--serif);
+      margin: 1.5em 0 0.5em;
+      color: var(--ink-soft);
+    }
+
+    a {
+      color: var(--brass);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .container {
+      max-width: 780px;
+      margin: 0 auto;
+    }
+
+    .breadcrumb {
+      font-size: 0.9em;
+      color: var(--muted);
+      margin-bottom: 2em;
+    }
+
+    .header {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 2em;
+      margin-bottom: 2em;
+      box-shadow: var(--shadow);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5em;
+      margin: 2em 0;
+    }
+
+    .stat {
+      text-align: center;
+      padding: 1em;
+    }
+
+    .stat-number {
+      font: 600 2em var(--serif);
+      color: var(--brass);
+      display: block;
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 0.9em;
+      margin-top: 0.3em;
+    }
+
+    .section {
+      margin: 2em 0;
+      padding: 1.5em;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .cta-button {
+      display: inline-block;
+      background: var(--brass);
+      color: white;
+      padding: 0.8em 1.6em;
+      border-radius: 6px;
+      font-weight: 600;
+      margin: 0.5em 0.5em 0.5em 0;
+      border: none;
+      cursor: pointer;
+    }
+
+    .cta-button:hover {
+      opacity: 0.9;
+    }
+
+    .cta-secondary {
+      background: var(--paper-2);
+      color: var(--ink);
+      border: 1px solid var(--line);
+    }
+
+    .footer {
+      text-align: center;
+      padding: 2em 0;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.9em;
+      margin-top: 3em;
+    }
+
+    .footer a {
+      color: var(--brass);
+    }
+
+    .contact-info {
+      background: var(--paper-2);
+      padding: 1em;
+      border-radius: 6px;
+      margin: 1em 0;
+    }
+
+    .contact-info p {
+      margin: 0.3em 0;
+      font-size: 0.95em;
+    }
+
+    ul {
+      margin: 1em 0;
+      padding-left: 1.5em;
+    }
+
+    li {
+      margin: 0.5em 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="/">Home</a> / About
+    </div>
+
+    <div class="header">
+      <h1>About AKAY Trade</h1>
+      <p style="color: var(--muted); font-size: 1.1em; margin-top: 0;">
+        36 years in wholesale. Ireland-based. Serving 1,000+ suppliers and 6,000+ clients across four continents.
+      </p>
+
+      <div class="stats">
+        <div class="stat">
+          <span class="stat-number">36</span>
+          <span class="stat-label">Years in trade</span>
+        </div>
+        <div class="stat">
+          <span class="stat-number">1,000+</span>
+          <span class="stat-label">Suppliers verified</span>
+        </div>
+        <div class="stat">
+          <span class="stat-number">6,000+</span>
+          <span class="stat-label">Active clients</span>
+        </div>
+        <div class="stat">
+          <span class="stat-number">4</span>
+          <span class="stat-label">Continents served</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Who We Are</h2>
+      <p>
+        AKAY Trade (Akay Irl Ltd) is a B2B wholesale trading company based in Shannon, Ireland. We specialize in sourcing and supplying spirits, beer, soft drinks, and FMCG products by the case, pallet, and container to commercial buyers worldwide.
+      </p>
+      <p>
+        We don't sell to the public. We work exclusively with restaurants, bars, hotels, retail chains, wholesalers, and duty-free operators who buy in bulk. Our buyers are licensed traders with business needs—not individual consumers.
+      </p>
+    </div>
+
+    <div class="section">
+      <h2>What We Sell</h2>
+      <ul>
+        <li>
+          <strong>Spirits:</strong> Vodka, whiskey, rum, gin, brandy, liqueurs—from global brands and EU producers
+        </li>
+        <li>
+          <strong>Beer:</strong> Lagers, stouts, craft, ciders—bulk quantities with flexible delivery
+        </li>
+        <li>
+          <strong>Soft Drinks:</strong> Mixers, energy drinks, juices, waters—branded and premium
+        </li>
+        <li>
+          <strong>FMCG:</strong> Toiletries, confectionery, grocery—supplementary to drinks orders
+        </li>
+      </ul>
+      <p>All goods are genuine, sourced directly from suppliers or verified distributors, and supplied with full documentation (invoices, pedigree certificates, where applicable).</p>
+    </div>
+
+    <div class="section">
+      <h2>How We Source</h2>
+      <ul>
+        <li>Direct relationships with 1,000+ EU distilleries, breweries, and distributors</li>
+        <li>Verified supplier vetting for authenticity and compliance</li>
+        <li>Real-time pricing—our catalogue updates daily as costs and availability change</li>
+        <li>Flexible terms—EXW, FCA, DAP, or FOB depending on shipment size and destination</li>
+        <li>Customs expertise—we advise on T1 (under-bond) vs T2 (duty-paid), VAT, duty, and export requirements</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2>Who We Serve</h2>
+      <p>
+        <strong>Restaurants & Bars:</strong> Case orders, multi-category assortments, regular supply on-demand
+      </p>
+      <p>
+        <strong>Retail Chains:</strong> Pallet volumes, scheduled deliveries, competitive unit pricing
+      </p>
+      <p>
+        <strong>Wholesalers & Exporters:</strong> Container quantities, T1 under-bond options, international logistics
+      </p>
+      <p>
+        <strong>Hotels & Resorts:</strong> Mixed cases, delivery-schedule flexibility, duty-paid stock
+      </p>
+      <p>
+        <strong>Duty-Free & Travel Retail:</strong> Under-bond sourcing, parallel trading expertise, premium pricing
+      </p>
+    </div>
+
+    <div class="section">
+      <h2>Our Standards</h2>
+      <ul>
+        <li>
+          <strong>Authenticity:</strong> All products are genuine. No grey market or counterfeit goods.
+        </li>
+        <li>
+          <strong>Transparency:</strong> Live pricing updated daily. No hidden fees. Clear terms on every quote.
+        </li>
+        <li>
+          <strong>Documentation:</strong> Invoices, pedigree certificates (spirits), phytosanitary docs (FMCG) provided.
+        </li>
+        <li>
+          <strong>Shelf Life:</strong> Beverages stored in optimal conditions. FMCG within acceptable windows.
+        </li>
+        <li>
+          <strong>Compliance:</strong> All trades comply with excise, VAT, and import regulations for destination country.
+        </li>
+        <li>
+          <strong>Speed:</strong> Quote within 24 hours. Typical delivery EU 3–7 days; overseas 4–8 weeks by sea.
+        </li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2>Markets We Serve</h2>
+      <p>
+        <strong>Europe:</strong> Ireland, UK, France, Spain, Italy, Germany, Belgium, Netherlands, Poland, Nordic countries, and beyond. VAT reverse-charged within the EU.
+      </p>
+      <p>
+        <strong>Middle East & North Africa:</strong> Full export logistics, FOB Shannon or CIF destination terms. Customs paperwork support.
+      </p>
+      <p>
+        <strong>Africa:</strong> Sub-Saharan markets. Established relationships with import agents and distributors.
+      </p>
+      <p>
+        <strong>Asia:</strong> South Asia, Southeast Asia. Container shipments, FOB or CIF, full documentation.
+      </p>
+      <p>
+        <strong>Caribbean & Atlantic:</strong> Bermuda, Caribbean, Atlantic islands. Duty-paid and export options.
+      </p>
+    </div>
+
+    <div class="section">
+      <h2>Duty Status: T1 vs T2</h2>
+      <p>
+        <strong>T1 (Under-Bond):</strong> Goods in customs suspension—no excise or import duty paid. Requires licensed importer or exporter. 15–40% cheaper. Ideal for registered wholesalers and parallel traders.
+      </p>
+      <p>
+        <strong>T2 (Duty-Paid):</strong> Excise and import duty already settled. Ready to sell immediately. Premium pricing. Standard for most EU retail and wholesalers.
+      </p>
+      <p>We offer both. Your business model and destination determine which is right for you. Ask us to advise.</p>
+    </div>
+
+    <div class="section">
+      <h2>Why Choose AKAY?</h2>
+      <ul>
+        <li><strong>Experience:</strong> 36 years in wholesale—we know the market, the suppliers, and the regulations.</li>
+        <li><strong>Scale:</strong> 1,000+ suppliers, 6,000+ clients—we have reach and negotiating power for you.</li>
+        <li><strong>Transparency:</strong> Live pricing, no markup surprises, clear terms on every deal.</li>
+        <li><strong>Speed:</strong> Quote within 24 hours, ship within 48–72 hours, deliver in 3–7 days (EU).</li>
+        <li><strong>Expertise:</strong> Customs, duty, VAT, export regulations—we advise so you comply.</li>
+        <li><strong>Reliability:</strong> Authentic goods from verified suppliers. Documentation complete. No shortfalls.</li>
+      </ul>
+    </div>
+
+    <div class="section" style="background: var(--paper-2); border: 2px solid var(--brass);">
+      <h2 style="margin-top: 0; color: var(--brass);">How to Enquire</h2>
+      <p>
+        Browse the live catalogue at <a href="/">offers.akay.ie</a>, prepare a requirement list (brand, product, quantity), and send it to us.
+      </p>
+      <div class="contact-info">
+        <p>
+          <strong>Email:</strong> <a href="mailto:offers@akay.ie">offers@akay.ie</a>
+        </p>
+        <p>
+          <strong>WhatsApp:</strong> <a href="https://wa.me/353872382368" target="_blank">+353 87 238 2368</a>
+        </p>
+        <p>
+          <strong>Hours:</strong> Monday–Friday, 9am–5pm GMT
+        </p>
+      </div>
+      <p style="margin-bottom: 0;">
+        We'll reply within 24 hours with pricing, stock status, delivery terms, and next steps.
+      </p>
+    </div>
+
+    <div class="footer">
+      <p>
+        <a href="/">← Back to catalogue</a> | <a href="/#guides">Read our guides</a>
+      </p>
+      <p>
+        AKAY Trade — Shannon, Ireland. Licensed B2B wholesale trader serving Europe, Middle East, Africa, and Asia.
+      </p>
+    </div>
+  </div>
+</body>
+</html>

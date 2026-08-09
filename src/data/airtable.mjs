@@ -86,7 +86,7 @@ function isTestRow(name = '') {
   return /^testbrand|^testproduct/i.test(name.trim());
 }
 
-function normalize(fields) {
+function normalize(fields, recordId = null) {
   const detail = fields['Price Per Unit & Case'] || fields['Price Display'] || '';
   const parts = parsePriceParts(detail);
   const fallback = parseAmount(fields['Price Display'], fields['Currency']);
@@ -108,6 +108,7 @@ function normalize(fields) {
   const { name, variants } = splitVariants(fields['Public Product Description'], fields['Variant']);
   const rawQty = fields['Stock Cases'];
   return {
+    id: recordId,
     name,
     variants,
     brand: fields['Brand'] || '',
@@ -143,7 +144,7 @@ async function fetchLive() {
     if (!res.ok) throw new Error(`Airtable ${res.status}: ${await res.text()}`);
     const data = await res.json();
     for (const rec of data.records) {
-      const o = normalize(rec.fields);
+      const o = normalize(rec.fields, rec.id);
       if (o.name && !isTestRow(o.name)) out.push(o);
     }
     offset = data.offset;
@@ -155,7 +156,7 @@ async function fetchLive() {
 // fresh deploy serves it until the next refresh runs. Applying the same
 // corrections on read keeps both paths — live and snapshot — showing identical
 // figures, so a fallback build can never resurrect the old per-unit/per-case mix-up.
-function renormalizeSnapshotOffer(o) {
+function renormalizeSnapshotOffer(o, index) {
   const parts = parsePriceParts(o.priceDetail || '');
   const headline = parts[0] || null;
   const perUnit = parts.find((p) => /unit|btl|bottle|can|piece|jar/.test(p.basis));
@@ -163,6 +164,7 @@ function renormalizeSnapshotOffer(o) {
   const { name, variants } = splitVariants(o.name, o.variants);
   return {
     ...o,
+    id: o.id || `snapshot-${index}`,
     name,
     variants,
     amount: headline ? headline.amount : o.amount,
@@ -190,7 +192,7 @@ export async function getOffers() {
   } else {
     console.warn('[airtable] no AIRTABLE_TOKEN set — using snapshot');
   }
-  return { offers: snapshot.offers.map(renormalizeSnapshotOffer), source: 'snapshot' };
+  return { offers: snapshot.offers.map((o, i) => renormalizeSnapshotOffer(o, i)), source: 'snapshot' };
 }
 
 // Featured offers are flagged per-record by the `Featured` field and rendered
