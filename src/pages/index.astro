@@ -89,7 +89,7 @@ const stats = [
       --ok:#0E7A3B; --ok-bg:#E2F0E5; --warn:#9A6A12; --warn-bg:#F5E9CE; --neu:#5C6A78; --neu-bg:#E9ECEF;
       --shadow:0 1px 2px rgba(20,33,26,.06),0 6px 20px -8px rgba(20,33,26,.14);
       --radius:14px;
-      --serif:"Hoefler Text","Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+      --serif:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
       --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
       --mono:ui-monospace,"SF Mono","SFMono-Regular",Menlo,Consolas,monospace;
     }
@@ -135,19 +135,19 @@ const stats = [
       radial-gradient(90% 120% at 0 100%,color-mix(in srgb,var(--brass) 7%,transparent),transparent 60%)}
     .hero-in{padding-top:34px;padding-bottom:26px}
     .eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--brass);margin:0 0 12px}
-    h1{font-family:var(--serif);font-weight:600;font-size:clamp(30px,5vw,46px);line-height:1.04;margin:0;max-width:16ch;text-wrap:balance;letter-spacing:-.01em}
+    h1{font-family:var(--serif);font-weight:700;font-size:clamp(30px,5vw,46px);line-height:1.04;margin:0;max-width:16ch;text-wrap:balance;letter-spacing:-.02em}
     .lede{margin:14px 0 0;max-width:56ch;color:var(--ink-soft);font-size:16px}
-    .ticker{display:flex;flex-wrap:wrap;gap:26px;margin-top:24px;padding-top:20px;border-top:1px solid var(--line-soft)}
+    .ticker{display:flex;flex-wrap:wrap;gap:24px;margin-top:24px;padding-top:16px;border-top:1px solid var(--line-soft)}
     .stat .n{font-family:var(--mono);font-size:22px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
     .stat .l{font-size:12px;color:var(--muted);letter-spacing:.03em}
 
     /* Category request form */
     .req{border-bottom:1px solid var(--line);background:color-mix(in srgb,var(--forest) 5%,transparent)}
-    .req-in{padding-top:20px;padding-bottom:20px;display:flex;flex-wrap:wrap;align-items:center;gap:16px 22px}
+    .req-in{padding-top:24px;padding-bottom:24px;display:flex;flex-wrap:wrap;align-items:center;gap:16px 24px}
     .req-copy{flex:1;min-width:230px}
     .req-copy h2{font-family:var(--serif);font-size:20px;font-weight:600;margin:0 0 3px;color:var(--ink);text-wrap:balance}
     .req-copy p{margin:0;color:var(--ink-soft);font-size:13.5px;max-width:44ch}
-    .req-form{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+    .req-form{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
     .req-form select,.req-form input{height:42px;border:1px solid var(--line);background:var(--card);color:var(--ink);
       border-radius:10px;padding:0 12px;font-size:14px;font-family:var(--sans)}
     .req-form select{min-width:180px;cursor:pointer}
@@ -204,7 +204,7 @@ const stats = [
     main.wrap{padding:26px 20px 40px}
     .count{font-family:var(--mono);font-size:12.5px;color:var(--muted);margin:0 0 16px;letter-spacing:.03em}
     .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
-    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px;
+    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;
       display:flex;flex-direction:column;gap:0;box-shadow:var(--shadow);transition:.16s;position:relative;overflow:hidden;
       /* Off-screen cards cost nothing to render — keeps the single-page catalogue
          fast on phones even if the base grows back past 1,000 offers. */
@@ -297,9 +297,10 @@ const stats = [
             <option value={c}>{c}</option>
           ))}
         </select>
-        <input type="email" id="reqEmail" name="email" placeholder="you@company.com" required aria-label="Your email" />
+        <input type="email" id="reqEmail" name="email" placeholder="you@company.com" required aria-label="Your email" aria-describedby="email-help" />
         <input type="text" id="reqNote" name="note" placeholder="Anything specific? (optional)" aria-label="Optional note" />
         <button type="submit" id="reqBtn">Email me offers</button>
+        <small id="email-help" style="flex-basis:100%;font-size:12px;color:var(--muted);margin:-8px 0 0">We'll send our current offers in this category to your email — no spam, ever.</small>
         <p class="req-msg" id="reqMsg" role="status" hidden></p>
       </form>
       <div class="requirement-list-note">
