@@ -10639,24 +10639,6 @@
    "featured": false
   },
   {
-   "id": "recPq0M5cxL9Un4Z7",
-   "name": "HNK Beer — 0.33L NRB",
-   "variants": "0.33L NRB",
-   "brand": "HNK",
-   "category": "Beer",
-   "spec": "24 x 33cl x 5% alc",
-   "currency": "EUR",
-   "amount": 11.28,
-   "unitAmount": 0.47,
-   "priceDetail": "EUR 11.28/case (24pk) · EUR 0.47/unit",
-   "stock": "in",
-   "qty": 21840,
-   "terms": "EXW",
-   "tier": "",
-   "origin": "Bulgaria",
-   "featured": true
-  },
-  {
    "id": "recPvpnXM4blMpmIx",
    "name": "Rio Mare Salmon Fillet Naturale — 150GR",
    "variants": "150GR",
@@ -15551,24 +15533,6 @@
    "tier": "",
    "origin": "GB",
    "featured": false
-  },
-  {
-   "id": "recaAYfmWyfwmnaHn",
-   "name": "HNK Beer — 0.50L NRB (Glass)",
-   "variants": "0.50L NRB (Glass)",
-   "brand": "HNK",
-   "category": "Beer",
-   "spec": "15 x 50cl x 5% alc",
-   "currency": "EUR",
-   "amount": 10.05,
-   "unitAmount": 0.67,
-   "priceDetail": "EUR 10.05/case (15pk) · EUR 0.67/unit",
-   "stock": "in",
-   "qty": 38880,
-   "terms": "EXW",
-   "tier": "",
-   "origin": "Poland",
-   "featured": true
   },
   {
    "id": "recaBtfMVbSAsAua8",
@@ -26714,5 +26678,5 @@
   }
  ],
  "source": "snapshot",
- "generated": "2026-08-09"
+ "generated": "2026-08-10"
 }
