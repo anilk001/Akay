@@ -1,4 +1,15 @@
 {
+  "enableAllProjectMcpServers": true,
+  "permissions": {
+    "allow": [
+      "mcp__airtable",
+      "mcp__airtable__*",
+      "mcp__Airtable",
+      "mcp__Airtable__*",
+      "mcp__6e9d83e7-6938-4e03-83ce-df1415356523",
+      "mcp__6e9d83e7-6938-4e03-83ce-df1415356523__*"
+    ]
+  },
   "extraKnownMarketplaces": {
     "superpowers-marketplace": {
       "source": {
