@@ -1,0 +1,83 @@
+---
+import Site from '../../layouts/Site.astro';
+
+const SITE = 'https://offers.akay.ie';
+const path = '/guides/t1-vs-t2-duty-status/';
+const title = 'T1 vs T2: Duty Status Explained for Beverage Trading | AKAY';
+const description = 'What T1 (under-bond/export) and T2 (EU duty-paid) mean on a wholesale drinks offer, who buys each, and how duty status changes the price you pay.';
+
+const faq = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'What does T1 mean on a drinks offer?',
+      acceptedAnswer: { '@type': 'Answer', text: 'T1 means the goods are under bond: excise duty and import VAT have not been paid in the EU. T1 stock moves between bonded warehouses or leaves the EU for export. It is cheaper per case than duty-paid stock, but only buyers who can receive bonded goods — an approved bonded warehouse or an exporter — can take it.' },
+    },
+    {
+      '@type': 'Question',
+      name: 'What does T2 mean on a drinks offer?',
+      acceptedAnswer: { '@type': 'Answer', text: 'T2 means the goods are in free circulation in the EU — customs formalities are settled, so the stock can be sold and moved within the single market. Excise handling still follows each destination country’s rules, which is why T2 pricing is quoted with the delivery terms attached.' },
+    },
+    {
+      '@type': 'Question',
+      name: 'Why is T1 stock cheaper than T2?',
+      acceptedAnswer: { '@type': 'Answer', text: 'Because unpaid excise duty and VAT are not in the price. On spirits, excise is often a large share of the duty-paid cost, so the same case can be significantly cheaper as T1. The buyer then pays duty in the destination market, or exports the goods outside the EU where EU duty never falls due.' },
+    },
+    {
+      '@type': 'Question',
+      name: 'Who should buy T1 and who should buy T2?',
+      acceptedAnswer: { '@type': 'Answer', text: 'Exporters and traders with bonded-warehouse access buy T1. Distributors, wholesalers and retailers selling inside the EU without bonded facilities buy T2. If you are unsure which you can receive, ask before ordering — the paperwork differs and a wrong tier costs time and money.' },
+    },
+  ],
+};
+---
+
+<Site {title} {description} {path} schema={[faq]}>
+  <p class="crumbs"><a href="/">Home</a> › Guides › T1 vs T2</p>
+  <h1>T1 vs T2: duty status explained for beverage trading</h1>
+  <p class="lede">Every offer on our catalogue carries a duty tier. It changes who can buy the stock and what it costs — here is the two-minute version.</p>
+
+  <h2>What does T1 mean?</h2>
+  <p>
+    T1 stock is <strong>under bond</strong>: EU excise duty and import VAT have not been paid.
+    The goods sit in, or move between, bonded warehouses under customs supervision, or leave the
+    EU as exports. Because the duty isn't in the price, T1 is the cheaper way to buy — but you
+    can only receive it if you operate or rent space in a bonded warehouse, or you're exporting
+    the goods outside the EU.
+  </p>
+
+  <h2>What does T2 mean?</h2>
+  <p>
+    T2 stock is in <strong>free circulation in the EU</strong> — customs formalities are settled
+    and the goods can be sold and moved within the single market. Excise handling still follows
+    each destination country's rules, which is why T2 offers always state their delivery terms.
+    T2 is what most EU distributors, wholesalers and retailers buy.
+  </p>
+
+  <h2>Why is T1 cheaper?</h2>
+  <p>
+    On spirits especially, excise duty is a large share of the duty-paid price. Buying T1 defers
+    that duty: an exporter shipping outside the EU never pays it, and an EU buyer pays it in
+    their own market at their own rate, which is often more efficient than buying duty
+    already paid somewhere else.
+  </p>
+
+  <h2>Which should you buy?</h2>
+  <p>
+    <strong>Buy T1</strong> if you export, or you have bonded-warehouse access (your own
+    authorisation or rented space with a bonded operator such as those in Loendersloot or Riga).
+    <strong>Buy T2</strong> if you sell within the EU and don't handle bonded movements.
+    If in doubt, tell us where the goods are going and we'll quote the right tier.
+  </p>
+
+  <h2>How this shows on our catalogue</h2>
+  <p>
+    Each line on <a href="/">offers.akay.ie</a> is tagged T1 or T2 next to the pack spec, with
+    the incoterm and location alongside (see <a href="/guides/incoterms-exw-dap-cfr/">incoterms
+    explained</a>). Prices are indicative per the listing basis and confirmed on enquiry.
+  </p>
+
+  <p><a class="btn" href="/category/spirits/">Browse spirits offers</a>&nbsp;<a class="btn ghost" href="/category/beer/">Browse beer offers</a></p>
+</Site>

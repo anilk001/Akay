@@ -1,0 +1,56 @@
+---
+import Site from '../layouts/Site.astro';
+
+const SITE = 'https://offers.akay.ie';
+const path = '/about/';
+const title = 'About AKAY — 36 Years in Wholesale Beverage & FMCG Trade | AKAY';
+const description = 'Akay Irl Ltd is an Ireland-based B2B wholesale trader — 36 years in business, 1,000+ suppliers, 6,000+ clients. Spirits, beer, soft drinks and FMCG by the case, pallet and container, duty-paid and under-bond.';
+
+const aboutSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'AboutPage',
+  name: 'About AKAY',
+  url: SITE + path,
+  mainEntity: { '@id': `${SITE}/#org` },
+};
+---
+
+<Site {title} {description} {path} schema={[aboutSchema]}>
+  <p class="crumbs"><a href="/">Home</a> › About</p>
+  <h1>About AKAY</h1>
+  <p class="lede">Akay Irl Ltd is a B2B wholesale trading company based in Shannon, Ireland — 36 years in the trade.</p>
+
+  <h2>What we do</h2>
+  <p>
+    We trade spirits, beer, soft drinks, grocery, confectionery and FMCG products by the case,
+    pallet and container. Stock is offered both <strong>duty-paid (T2)</strong> for sale within
+    the EU and <strong>under-bond (T1)</strong> for export and bonded movement — every line on
+    the <a href="/">live catalogue</a> states its tier, pack spec, price basis and delivery terms.
+  </p>
+
+  <h2>Who we work with</h2>
+  <p>
+    A supplier network of <strong>1,000+</strong> producers, distributors and bonded operators,
+    and a client base of <strong>6,000+</strong> trade buyers across Europe, Asia, the Caribbean,
+    the Middle East and Africa. We are a trade-only business: distributors, wholesalers,
+    retailers, bonded operators and exporters.
+  </p>
+
+  <h2>What we publish — and what we don't</h2>
+  <p>
+    The catalogue shows live, indicative trade pricing with pack specs and duty status, updated
+    continuously from our trading desk. We never publish supplier identity, buy prices or
+    margins — the counterparties on both sides of a trade stay confidential. Prices are
+    confirmed on enquiry.
+  </p>
+
+  <h2>How to reach us</h2>
+  <p>
+    WhatsApp <a href="https://wa.me/353872382368" rel="noopener">+353 87 238 2368</a> for a quote
+    on any listed line, or email <a href="mailto:offers@akay.ie">offers@akay.ie</a> — including
+    full <a href="/guides/requirement-list-format/">requirement lists</a>. General enquiries:
+    <a href="mailto:hello@akay.ie">hello@akay.ie</a>. Akay Irl Ltd, Shannon, Co. Clare, Ireland.
+  </p>
+
+  <p><a class="btn" href="/">Browse the live catalogue</a></p>
+</Site>

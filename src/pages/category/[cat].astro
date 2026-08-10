@@ -1,0 +1,89 @@
+---
+// One page per category (SEO brief §1): a crawlable list of every live offer
+// in the category, each linking to its own page, with CollectionPage/ItemList
+// JSON-LD so answer engines can enumerate the catalogue.
+import Site from '../../layouts/Site.astro';
+import { getOffers } from '../../data/airtable.mjs';
+import { withSlugs, categorySlug } from '../../lib/slug.mjs';
+
+export async function getStaticPaths() {
+  const { offers } = await getOffers();
+  const slugged = withSlugs(offers.filter((o) => o.name));
+  const categories = Array.from(new Set(slugged.map((o) => o.category))).sort();
+  return categories.map((category) => ({
+    params: { cat: categorySlug(category) },
+    props: {
+      category,
+      items: slugged.filter((o) => o.category === category),
+      categories,
+    },
+  }));
+}
+
+const { category, items, categories } = Astro.props;
+const SITE = 'https://offers.akay.ie';
+const built = new Date().toISOString().slice(0, 10);
+const path = `/category/${categorySlug(category)}/`;
+
+const priced = items.filter((o) => o.amount != null);
+const currencies = Array.from(new Set(priced.map((o) => o.currency).filter(Boolean))).sort();
+const brands = new Set(items.map((o) => o.brand).filter(Boolean)).size;
+
+const title = `Wholesale ${category} Offers — Trade Pricing | AKAY`;
+const description = `${items.length} live wholesale ${category.toLowerCase()} offers from AKAY Trade — case pricing${currencies.length ? ` in ${currencies.join('/')}` : ''}, pack specs and duty status (T1/T2) on every line. Trade buyers only; enquire via WhatsApp or email.`;
+
+const listSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: `Wholesale ${category} Offers`,
+  url: SITE + path,
+  mainEntity: {
+    '@type': 'ItemList',
+    numberOfItems: items.length,
+    itemListElement: items.map((o, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: o.name,
+      url: `${SITE}/offers/${o.slug}/`,
+    })),
+  },
+};
+const breadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE}/` },
+    { '@type': 'ListItem', position: 2, name: category, item: SITE + path },
+  ],
+};
+---
+
+<Site {title} {description} {path} schema={[listSchema, breadcrumbSchema]} {categories}>
+  <p class="crumbs"><a href="/">Home</a> › {category}</p>
+  <h1>Wholesale {category} Offers</h1>
+  <p class="lede">
+    {items.length} live {category.toLowerCase()} line{items.length === 1 ? '' : 's'} from {brands || 'multiple'} brand{brands === 1 ? '' : 's'},
+    wholesale by the case{currencies.length ? `, priced in ${currencies.join(' / ')}` : ''}.
+    Every line shows pack spec and duty status — <a href="/guides/t1-vs-t2-duty-status/">T1 (under-bond) vs T2 (duty-paid)</a>.
+  </p>
+  <p class="updated">Prices updated {built}. Trade buyers only.</p>
+
+  <div class="grid">
+    {items.map((o) => (
+      <div class="card">
+        <a class="title" href={`/offers/${o.slug}/`}>{o.name}</a>
+        {o.spec && <span class="spec">{o.spec}</span>}
+        {o.amount != null ? <span class="price">{o.currency} {o.amount.toFixed(2)}</span> : <span class="meta">price on request</span>}
+        <span class="meta">{[o.tier, o.terms].filter(Boolean).join(' · ')}</span>
+      </div>
+    ))}
+  </div>
+
+  <h2>Buying {category.toLowerCase()} wholesale from AKAY</h2>
+  <p>
+    Minimums are by the case or pallet depending on the line; full-truck and container quantities
+    can usually be arranged. Prices are indicative and confirmed on enquiry — see
+    <a href="/guides/how-to-buy-wholesale-spirits-eu/">how buying works</a>, or send a
+    <a href="/guides/requirement-list-format/">requirement list</a> and we'll price everything that matches current stock.
+  </p>
+</Site>

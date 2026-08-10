@@ -1,0 +1,70 @@
+---
+import Site from '../../layouts/Site.astro';
+
+const path = '/guides/incoterms-exw-dap-cfr/';
+const title = 'Incoterms in Wholesale Drinks: EXW, DAP, CFR, FOB, FCA, CIF | AKAY';
+const description = 'What EXW, FCA, FOB, CFR, CIF and DAP mean on a wholesale beverage offer, who pays for which leg of transport, and how AKAY quotes terms like EXW Loendersloot.';
+
+const faq = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    { '@type': 'Question', name: 'What does EXW (Ex Works) mean?', acceptedAnswer: { '@type': 'Answer', text: 'EXW means the price covers the goods made available at the named location — e.g. EXW Loendersloot is collection from the Loendersloot warehouse in the Netherlands. The buyer arranges and pays for all transport, insurance and export formalities from that point.' } },
+    { '@type': 'Question', name: 'What does DAP (Delivered At Place) mean?', acceptedAnswer: { '@type': 'Answer', text: 'DAP means the seller delivers to the named destination and bears the transport cost and risk to that point; the buyer handles import clearance and any duties. DAP Riga, for example, includes carriage to Riga.' } },
+    { '@type': 'Question', name: 'What is the difference between CFR and CIF?', acceptedAnswer: { '@type': 'Answer', text: 'Both are sea-freight terms where the seller pays freight to the destination port. Under CIF the seller must also insure the cargo; under CFR insurance is the buyer’s responsibility. Risk transfers to the buyer when the goods are on board either way.' } },
+    { '@type': 'Question', name: 'Why do wholesale drinks prices differ by incoterm?', acceptedAnswer: { '@type': 'Answer', text: 'The incoterm decides how much logistics is inside the price. The same pallet is cheapest EXW, more under FOB or CFR, and most under DAP — you are paying for the extra transport legs and risk the seller takes on.' } },
+  ],
+};
+---
+
+<Site {title} {description} {path} schema={[faq]}>
+  <p class="crumbs"><a href="/">Home</a> › Guides › Incoterms</p>
+  <h1>Incoterms in wholesale drinks: EXW, DAP, CFR, FOB, FCA, CIF explained</h1>
+  <p class="lede">The terms column on an offer tells you who pays for which leg of the journey. Direct answers below, using the locations you'll actually see on our catalogue.</p>
+
+  <h2>What does EXW mean?</h2>
+  <p>
+    <strong>EXW (Ex Works)</strong> — the price is for goods made available at the named place;
+    everything after that is yours. <em>EXW Loendersloot</em>, the commonest term on our spirits
+    lines, means collection from the Loendersloot bonded warehouse (NL). Cheapest headline price,
+    most buyer responsibility.
+  </p>
+
+  <h2>What does FCA mean?</h2>
+  <p>
+    <strong>FCA (Free Carrier)</strong> — the seller hands the goods to your nominated carrier at
+    the named point, export-cleared. Similar buyer economics to EXW, but the seller does the
+    export formalities — often the practical choice when collecting from a bonded site.
+  </p>
+
+  <h2>What does FOB mean?</h2>
+  <p>
+    <strong>FOB (Free On Board)</strong> — sea freight only: the seller delivers the goods on
+    board the vessel at the named port, export-cleared. From that moment cost and risk are the
+    buyer's. Common for container business to Asia, Africa and the Caribbean.
+  </p>
+
+  <h2>What is the difference between CFR and CIF?</h2>
+  <p>
+    <strong>CFR (Cost and Freight)</strong> — seller pays ocean freight to the destination port;
+    risk passes on loading; insurance is the buyer's. <strong>CIF</strong> is CFR plus the seller
+    must insure the cargo. Same freight, different insurance obligation.
+  </p>
+
+  <h2>What does DAP mean?</h2>
+  <p>
+    <strong>DAP (Delivered At Place)</strong> — the seller carries cost and risk to the named
+    destination; the buyer clears import and pays local duties. <em>DAP Riga</em> on a beer line
+    means the trucks are in the price as far as Riga.
+  </p>
+
+  <h2>How AKAY quotes terms</h2>
+  <p>
+    Every line on <a href="/">the catalogue</a> shows its incoterm and, where relevant, the
+    warehouse (EXW Loendersloot, DAP Riga, …) next to the duty tier — see
+    <a href="/guides/t1-vs-t2-duty-status/">T1 vs T2</a>. Want the same stock on different terms?
+    Ask — repricing EXW stock to DAP your warehouse is routine.
+  </p>
+
+  <p><a class="btn" href="/">Browse the live catalogue</a></p>
+</Site>

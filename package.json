@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "node scripts/gen-redirects.mjs && astro build",
     "preview": "astro preview",
     "sync-offers": "node src/lib/fetch-offers.mjs"
   },

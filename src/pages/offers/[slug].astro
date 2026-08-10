@@ -1,0 +1,221 @@
+---
+// One static page per live offer (SEO brief §1) + "no longer available" pages
+// for offers that recently went off-sale (registry-driven; never 404 a URL
+// that engines may have indexed — 410 only after ~90 days, via _redirects).
+import Site from '../../layouts/Site.astro';
+import { getOffers } from '../../data/airtable.mjs';
+import { withSlugs, categorySlug } from '../../lib/slug.mjs';
+import { loadRegistry, offSaleEntries } from '../../lib/registry.mjs';
+
+export async function getStaticPaths() {
+  const { offers } = await getOffers();
+  const slugged = withSlugs(offers.filter((o) => o.name));
+  const categories = Array.from(new Set(slugged.map((o) => o.category))).sort();
+
+  // 3–4 related offers per page: the next peers in the same category,
+  // wrapping around so early and late entries both get a full set.
+  const byCat = new Map();
+  for (const o of slugged) {
+    if (!byCat.has(o.category)) byCat.set(o.category, []);
+    byCat.get(o.category).push(o);
+  }
+  const live = slugged.map((offer) => {
+    const peers = byCat.get(offer.category);
+    const at = peers.indexOf(offer);
+    const related = [];
+    for (let k = 1; k <= peers.length - 1 && related.length < 4; k++) {
+      related.push(peers[(at + k) % peers.length]);
+    }
+    return { params: { slug: offer.slug }, props: { offer, related, categories } };
+  });
+
+  const { discontinued } = offSaleEntries(loadRegistry(), slugged.map((o) => o.slug));
+  const gonePages = discontinued.map((entry) => ({
+    params: { slug: entry.slug },
+    props: { offer: null, entry, related: [], categories },
+  }));
+
+  return [...live, ...gonePages];
+}
+
+const { offer, entry, related, categories } = Astro.props;
+const { slug } = Astro.params;
+
+const SITE = 'https://offers.akay.ie';
+const WA = '353872382368';
+const built = new Date().toISOString().slice(0, 10);
+const priceValidUntil = new Date(Date.now() + 14 * 86400000).toISOString().slice(0, 10);
+
+const o = offer;
+const catName = (o?.category || entry?.category || 'Other');
+const catPath = `/category/${categorySlug(catName)}/`;
+const title = o
+  ? `${o.name}${o.spec ? ` ${o.spec.split(' x ').slice(0, 2).join(' x ')}` : ''} wholesale — ${o.amount != null ? `${o.currency} ${o.amount.toFixed(2)}` : 'trade pricing'} | AKAY Trade`
+  : `${entry.name} — no longer available | AKAY Trade`;
+const description = o
+  ? `${o.name} wholesale by the case${o.spec ? ` — ${o.spec}` : ''}. ${o.amount != null ? `${o.currency} ${o.amount.toFixed(2)} per the listing basis. ` : ''}${o.tier ? `${o.tier} ${o.tier === 'T1' ? '(export / under-bond)' : o.tier === 'T2' ? '(EU duty-paid)' : ''}. ` : ''}${o.terms || ''} Trade buyers only — enquire via WhatsApp or email.`.trim()
+  : `${entry.name} is no longer available from AKAY Trade. See current ${catName} wholesale offers.`;
+
+const tierExplain = { T1: 'export / under-bond — sold without EU duty paid, for export or bonded movement', T2: 'EU duty-paid — free to sell within the EU' };
+
+// WhatsApp enquiry prefilled with the listing context (same pattern as homepage).
+const waText = o
+  ? `Hi Anil, I'd like a quote for ${o.name}${o.spec ? ` (${o.spec})` : ''}${o.amount != null ? ` listed at ${o.currency} ${o.amount.toFixed(2)}` : ''}.`
+  : '';
+const waHref = `https://wa.me/${WA}?text=${encodeURIComponent(waText)}`;
+
+const stockPill = o
+  ? (o.stock === 'in' ? ['ok', o.qty ? `In stock — ${o.qty.toLocaleString()} cases` : 'In stock']
+    : o.stock === 'warn' ? ['warn', 'Limited stock'] : ['neu', 'Enquire for availability'])
+  : null;
+
+// ---- JSON-LD (brief §4): Product + Offer, availability mapped from stock code;
+// Offer block skipped entirely when there is no public price. -----------------
+const availability = o?.stock === 'in' ? 'https://schema.org/InStock'
+  : o?.stock === 'warn' ? 'https://schema.org/LimitedAvailability' : null;
+
+const productSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Product',
+  name: o?.name || entry?.name,
+  ...(o?.brand ? { brand: { '@type': 'Brand', name: o.brand } } : {}),
+  category: catName,
+  description: o
+    ? `${o.name}${o.spec ? `, ${o.spec}` : ''}${o.tier ? `, ${o.tier}${o.tier === 'T2' ? ' (EU duty-paid)' : o.tier === 'T1' ? ' (export/under-bond)' : ''}` : ''}${o.origin ? `, ${o.origin} origin` : ''}. Wholesale by the case from AKAY Trade.`
+    : `${entry.name}. Previously offered wholesale by AKAY Trade; no longer available.`,
+  url: `${SITE}/offers/${slug}/`,
+  ...(o && o.amount != null
+    ? {
+        offers: {
+          '@type': 'Offer',
+          price: o.amount.toFixed(2),
+          priceCurrency: o.currency || 'EUR',
+          ...(availability ? { availability } : {}),
+          itemCondition: 'https://schema.org/NewCondition',
+          businessFunction: 'http://purl.org/goodrelations/v1#Sell',
+          eligibleCustomerType: 'http://purl.org/goodrelations/v1#Business',
+          eligibleQuantity: { '@type': 'QuantitativeValue', unitText: 'case', minValue: 1 },
+          seller: { '@id': `${SITE}/#org` },
+          priceValidUntil,
+        },
+      }
+    : {}),
+  ...(!o
+    ? {
+        offers: {
+          '@type': 'Offer',
+          availability: 'https://schema.org/Discontinued',
+          seller: { '@id': `${SITE}/#org` },
+        },
+      }
+    : {}),
+  additionalProperty: [
+    o?.spec && { '@type': 'PropertyValue', name: 'Pack spec', value: o.spec },
+    (o?.tier || entry) && (o?.tier ? { '@type': 'PropertyValue', name: 'Duty status', value: `${o.tier}${tierExplain[o.tier] ? ` (${o.tier === 'T1' ? 'export/under-bond' : 'EU duty-paid'})` : ''}` } : null),
+    o?.terms && { '@type': 'PropertyValue', name: 'Incoterm', value: o.terms },
+    o?.origin && { '@type': 'PropertyValue', name: 'Origin', value: o.origin },
+    o?.qty && { '@type': 'PropertyValue', name: 'Stock', value: `${o.qty.toLocaleString()} cases` },
+  ].filter(Boolean),
+};
+
+const breadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE}/` },
+    { '@type': 'ListItem', position: 2, name: catName, item: `${SITE}${catPath}` },
+    { '@type': 'ListItem', position: 3, name: o?.name || entry?.name, item: `${SITE}/offers/${slug}/` },
+  ],
+};
+---
+
+<Site {title} {description} path={`/offers/${slug}/`} schema={[productSchema, breadcrumbSchema]} {categories}>
+  <p class="crumbs"><a href="/">Home</a> › <a href={catPath}>{catName}</a> › {o?.name || entry?.name}</p>
+
+  {o ? (
+    <>
+      <h1>{o.name}{o.spec ? ` — ${o.spec}` : ''}</h1>
+      {o.brand && <p class="lede">{o.brand} · {catName} · wholesale by the case, trade buyers only.</p>}
+
+      <div class="facts">
+        <dl>
+          {o.amount != null && (
+            <>
+              <dt>Price</dt>
+              <dd><strong>{o.currency} {o.amount.toFixed(2)}</strong>{o.priceDetail && o.priceDetail !== `${o.currency} ${o.amount.toFixed(2)}` ? ` — ${o.priceDetail}` : ''}</dd>
+            </>
+          )}
+          {o.amount == null && (
+            <>
+              <dt>Price</dt>
+              <dd>On request — enquire below</dd>
+            </>
+          )}
+          {stockPill && (
+            <>
+              <dt>Stock</dt>
+              <dd><span class={`pill ${stockPill[0]}`}>{stockPill[1]}</span></dd>
+            </>
+          )}
+          {o.tier && (
+            <>
+              <dt>Duty status</dt>
+              <dd><strong>{o.tier}</strong> — {tierExplain[o.tier] || o.tier}. <a href="/guides/t1-vs-t2-duty-status/">What does this mean?</a></dd>
+            </>
+          )}
+          {o.terms && (
+            <>
+              <dt>Terms</dt>
+              <dd>{o.terms} · <a href="/guides/incoterms-exw-dap-cfr/">Incoterms explained</a></dd>
+            </>
+          )}
+          {o.origin && (
+            <>
+              <dt>Origin</dt>
+              <dd>{o.origin}</dd>
+            </>
+          )}
+        </dl>
+      </div>
+
+      <p>
+        <a class="btn" href={waHref} rel="noopener" target="_blank">Enquire on WhatsApp</a>
+        &nbsp;
+        <a class="btn ghost" href={`mailto:offers@akay.ie?subject=${encodeURIComponent(`Enquiry: ${o.name}`)}`}>Email offers@akay.ie</a>
+      </p>
+      <p class="updated">Prices updated {built}. Indicative trade pricing — confirm on enquiry.</p>
+
+      {related.length > 0 && (
+        <>
+          <h2>More {catName} offers</h2>
+          <div class="grid">
+            {related.map((r) => (
+              <div class="card">
+                <a class="title" href={`/offers/${r.slug}/`}>{r.name}</a>
+                {r.spec && <span class="spec">{r.spec}</span>}
+                {r.amount != null && <span class="price">{r.currency} {r.amount.toFixed(2)}</span>}
+                {r.terms && <span class="meta">{r.terms}</span>}
+              </div>
+            ))}
+          </div>
+          <p style="margin-top:16px"><a href={catPath}>All {catName} offers →</a></p>
+        </>
+      )}
+    </>
+  ) : (
+    <>
+      <h1>{entry.name}</h1>
+      <p class="lede">This offer is no longer available.</p>
+      <p>
+        Wholesale stock moves fast — this line sold through or its pricing lapsed
+        (last listed {entry.lastSeen}). Current {catName} stock is on the live catalogue,
+        and we can often source the same product again on request.
+      </p>
+      <p>
+        <a class="btn" href={catPath}>See current {catName} offers</a>
+        &nbsp;
+        <a class="btn ghost" href={`mailto:offers@akay.ie?subject=${encodeURIComponent(`Sourcing request: ${entry.name}`)}`}>Ask us to source it</a>
+      </p>
+    </>
+  )}
+</Site>

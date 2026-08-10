@@ -1,0 +1,72 @@
+---
+import Site from '../../layouts/Site.astro';
+
+const SITE = 'https://offers.akay.ie';
+const path = '/guides/how-to-buy-wholesale-spirits-eu/';
+const title = 'How to Buy Wholesale Spirits and Beer in the EU | AKAY';
+const description = 'How wholesale drinks buying works: minimum quantities by case, pallet and container, how trade pricing is quoted, what a requirement list is, and how to enquire.';
+
+const article = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: 'How to buy wholesale spirits and beer in the EU',
+  description,
+  url: SITE + path,
+  author: { '@id': `${SITE}/#org` },
+  publisher: { '@id': `${SITE}/#org` },
+};
+---
+
+<Site {title} {description} {path} schema={[article]}>
+  <p class="crumbs"><a href="/">Home</a> › Guides › How to buy</p>
+  <h1>How to buy wholesale spirits and beer in the EU</h1>
+  <p class="lede">Trade-only, by the case and up. Here's how quantities, pricing and enquiries work on our catalogue.</p>
+
+  <h2>What are the minimum quantities?</h2>
+  <p>
+    Minimums depend on the line. Spirits are typically sold by the <strong>case</strong>
+    (6 or 12 bottles); beer and soft drinks by the <strong>pallet</strong>; fast-moving lines and
+    container programmes by the <strong>full truck (FTL)</strong> or <strong>20/40ft container</strong>.
+    Each offer page states pack spec and, where relevant, pallet quantities. Mixed pallets can
+    often be arranged on slower lines.
+  </p>
+
+  <h2>How does the pricing work?</h2>
+  <p>
+    Prices are quoted per the listing basis — per case or per bottle, always with the currency
+    shown. Two things move a wholesale drinks price:
+    the <a href="/guides/t1-vs-t2-duty-status/">duty tier (T1 under-bond vs T2 duty-paid)</a> and
+    the <a href="/guides/incoterms-exw-dap-cfr/">incoterm</a> (EXW is a warehouse-collection
+    price; DAP includes delivery). Catalogue prices are indicative and confirmed on enquiry —
+    wholesale stock and FX move daily.
+  </p>
+
+  <h2>How do you enquire?</h2>
+  <p>
+    Every offer has a WhatsApp button that opens a pre-filled enquiry to
+    <strong>+353 87 238 2368</strong>, or email <a href="mailto:offers@akay.ie">offers@akay.ie</a>.
+    Tell us the quantity and destination and we'll confirm price, availability and terms. There is
+    no login and no account requirement to see pricing.
+  </p>
+
+  <h2>What is a requirement list?</h2>
+  <p>
+    A requirement list is a simple spreadsheet of what you want to buy — brand, product, quantity —
+    that we price in one pass against live stock. It's the fastest route to a full quotation if
+    you buy across many lines. Format details: <a href="/guides/requirement-list-format/">requirement
+    list format</a>.
+  </p>
+
+  <h2>Who can buy?</h2>
+  <p>
+    Trade buyers only: distributors, wholesalers, retailers, bonded operators and exporters.
+    For T1 (under-bond) stock you need bonded-warehouse access or an export destination;
+    T2 stock any EU trade buyer can take. We supply Europe, Asia, the Caribbean, the Middle East
+    and Africa.
+  </p>
+
+  <p>
+    <a class="btn" href="/category/spirits/">Wholesale spirits offers</a>&nbsp;
+    <a class="btn ghost" href="/category/beer/">Wholesale beer offers</a>
+  </p>
+</Site>

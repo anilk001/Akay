@@ -70,10 +70,13 @@ jobs:
           git config user.name "akay-refresh-bot"
           git config user.email "actions@users.noreply.github.com"
 
-          if git diff --quiet -- src/data/offers-snapshot.json; then
+          # sync-offers also updates the slug registry (src/data/slug-registry.json),
+          # which remembers every published offer URL so off-sale offers keep a
+          # live "discontinued" page instead of 404ing. Commit both together.
+          if git diff --quiet -- src/data/offers-snapshot.json src/data/slug-registry.json; then
             echo "Catalogue unchanged since last refresh — nothing to deploy."
           else
-            git add src/data/offers-snapshot.json
+            git add src/data/offers-snapshot.json src/data/slug-registry.json
             git commit -m "chore: refresh catalogue snapshot from Airtable"
             git push origin HEAD:claude/softr-webflow-migration-50kj20
             echo "Committed a refreshed catalogue — Netlify will redeploy."

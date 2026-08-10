@@ -1,8 +1,31 @@
 ---
 import { getOffers } from '../data/airtable.mjs';
+import { withSlugs, categorySlug } from '../lib/slug.mjs';
 
 const WA = '353872382368';
 const { offers, source } = await getOffers();
+
+// Organization entity (SEO brief §4) — same @id the offer pages' Product
+// schema references as seller.
+const ORG_SCHEMA = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  '@id': 'https://offers.akay.ie/#org',
+  name: 'Akay Irl Ltd',
+  alternateName: 'AKAY Trade',
+  url: 'https://offers.akay.ie/',
+  logo: 'https://offers.akay.ie/akay-bird.png',
+  description:
+    'Ireland-based B2B wholesale trading company dealing in spirits, beer, soft drinks and FMCG products by the case and pallet. Duty-paid and export (under-bond) supply across Europe, Asia and the Caribbean.',
+  email: 'hello@akay.ie',
+  telephone: '+353872382368',
+  address: { '@type': 'PostalAddress', addressLocality: 'Shannon', addressCountry: 'IE' },
+  areaServed: ['Europe', 'Asia', 'Caribbean', 'Middle East', 'Africa'],
+  knowsAbout: [
+    'wholesale spirits', 'wholesale beer', 'FMCG wholesale',
+    'duty-paid trading', 'under-bond trading', 'parallel trading',
+  ],
+};
 
 // Google Analytics 4 for offers.akay.ie. The Measurement ID is a public,
 // client-side value (safe to commit). PUBLIC_GA4_ID overrides it at build time
@@ -31,7 +54,9 @@ function toView(o) {
   const { basis, other, msg } = priceParts(o.priceDetail);
   return { ...o, basis, other, wa: waLink(o, msg), st: STOCK[o.stock] || STOCK.enq };
 }
-const view = offers.map(toView);
+// Slugs let each card link to its own offer page — the crawl path that makes
+// the per-offer URLs discoverable from the homepage.
+const view = withSlugs(offers.filter((o) => o.name)).map(toView);
 // Pin Featured offers to the front of the catalogue; stable sort keeps original order otherwise.
 const gridItems = [...view].sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
 const featuredCount = view.filter((o) => o.featured).length;
@@ -54,7 +79,10 @@ const stats = [
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>AKAY — Trade Offers</title>
   <meta name="description" content="AKAY wholesale beverage offers — spirits and beer by the case, live trade pricing, pack specs and duty tier on every line." />
+  <link rel="canonical" href="https://offers.akay.ie/" />
+  <meta name="robots" content="max-snippet:-1, max-image-preview:large" />
   <link rel="icon" href="/akay-bird.png" />
+  <script type="application/ld+json" set:html={JSON.stringify(ORG_SCHEMA)} />
   {GA4_ID && (
     <>
       <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${GA4_ID}`}></script>
@@ -198,6 +226,11 @@ const stats = [
     .c-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
     .brand{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--brass);margin-bottom:6px}
     .pname{font-family:var(--serif);font-size:19px;font-weight:600;line-height:1.15;margin:0;color:var(--ink);text-wrap:balance}
+    .pname a{color:inherit;text-decoration:none}
+    .pname a:hover{color:var(--brass)}
+    footer .links{display:flex;flex-wrap:wrap;gap:6px 16px;margin:0 0 14px;padding:0;list-style:none}
+    footer .links a{color:var(--ink-soft);text-decoration:none}
+    footer .links a:hover{color:var(--brass)}
     .cat-tag{flex-shrink:0;font-size:10.5px;font-family:var(--mono);letter-spacing:.08em;text-transform:uppercase;
       color:var(--ink-soft);border:1px solid var(--line);border-radius:6px;padding:3px 7px;margin-top:2px}
     .spec{font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);margin:12px 0 0;letter-spacing:.01em}
@@ -316,7 +349,7 @@ const stats = [
           <div class="c-top">
             <div>
               <div class="brand">{o.brand}</div>
-              <h3 class="pname">{o.name}</h3>
+              <h3 class="pname"><a href={`/offers/${o.slug}/`}>{o.name}</a></h3>
             </div>
             <span class="cat-tag">{o.category}</span>
           </div>
@@ -352,6 +385,18 @@ const stats = [
   </main>
 
   <footer>
+    <div class="wrap" style="display:block">
+      <ul class="links">
+        {categories.filter((c) => c !== 'All').map((c) => (
+          <li><a href={`/category/${categorySlug(c)}/`}>{c}</a></li>
+        ))}
+        <li><a href="/guides/t1-vs-t2-duty-status/">T1 vs T2</a></li>
+        <li><a href="/guides/incoterms-exw-dap-cfr/">Incoterms</a></li>
+        <li><a href="/guides/how-to-buy-wholesale-spirits-eu/">How to buy</a></li>
+        <li><a href="/guides/requirement-list-format/">Requirement lists</a></li>
+        <li><a href="/about/">About AKAY</a></li>
+      </ul>
+    </div>
     <div class="wrap">
       <div class="note">
         Live catalogue from AKAY's Airtable. Prices are indicative and shown per the listing basis; supplier identity, buy prices and margins are never published. <strong>T1</strong> = export / under-bond · <strong>T2</strong> = for sale in the EU.

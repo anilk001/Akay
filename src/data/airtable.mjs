@@ -52,6 +52,7 @@ function normalize(fields) {
     amount,
     priceDetail: fields['Price Per Unit & Case'] || fields['Price Display'] || '',
     stock: stockCode(fields['Stock Display']),
+    stockLabel: fields['Stock Display'] || '',
     qty: typeof fields['Stock Cases'] === 'number' ? fields['Stock Cases'] : null,
     terms: fields['Public Terms'] || '',
     tier: fields['Bond/Customs Status'] || '',
@@ -84,7 +85,16 @@ async function fetchLive() {
   return out;
 }
 
-export async function getOffers() {
+// One fetch per build: getOffers() is now called from many pages (catalogue,
+// per-offer, categories, sitemap, llms.txt), so the result is memoised.
+let _offersPromise = null;
+
+export function getOffers() {
+  if (!_offersPromise) _offersPromise = loadOffers();
+  return _offersPromise;
+}
+
+async function loadOffers() {
   if (TOKEN) {
     try {
       const offers = await fetchLive();

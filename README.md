@@ -92,10 +92,57 @@ src/
   data/
     airtable.mjs          live fetch + normalize (public-safe fields only)
     offers-snapshot.json  offline/CI fallback sample
+    slug-registry.json    every offer URL ever published (drives "discontinued" pages)
   lib/
-    fetch-offers.mjs      refresh the snapshot from live data
+    fetch-offers.mjs      refresh the snapshot + slug registry from live data
+    slug.mjs              URL slugs (brand-product-packsize) + category slugs
+    registry.mjs          off-sale URL bookkeeping (discontinued vs 410)
+  layouts/
+    Site.astro            shared head/nav/footer + Organization JSON-LD
   pages/
     index.astro           the catalogue (design + interactivity)
+    offers/[slug].astro   one page per offer (Product/Offer JSON-LD, breadcrumbs)
+    category/[cat].astro  one page per category (ItemList JSON-LD)
+    guides/*.astro        T1/T2, incoterms, how-to-buy, requirement lists
+    about.astro           company entity page
+    sitemap.xml.ts        build-time sitemap (offers + categories + guides)
+    llms.txt.ts           AI-crawler site map
+scripts/
+  gen-redirects.mjs       410s for offers off-sale >90 days (runs before build)
 public/
   akay-bird.png           logo (hummingbird, transparent)
+  robots.txt              open to all crawlers incl. AI bots, names sitemap
+  410.html                target page for long-gone offer URLs
 ```
+
+---
+
+## SEO / AI-search architecture
+
+Implemented per the SEO brief (Aug 2026): the site is citable by AI answer
+engines and rankable for long-tail wholesale queries.
+
+- **Every live offer has its own URL** — `/offers/<brand-product-packsize>/`,
+  generated at build time. Slugs contain **no supplier identity, ever**.
+- **Off-sale offers never 404.** The slug registry remembers every published
+  URL; off-sale pages render "no longer available" (schema availability:
+  `Discontinued`) with a link to the category, and only return **410** after
+  ~90 days (via the generated `public/_redirects`).
+- **Structured data**: `Organization` (every page), `Product` + `Offer` with
+  `eligibleCustomerType: Business` (offer pages — prevents consumer
+  shopping-comparison misclassification), `ItemList` (categories),
+  `FAQPage`/`Article` (guides), `BreadcrumbList`.
+- **Freshness**: the scheduled GitHub Action re-bakes the snapshot every
+  5 minutes and commits only on change; every commit redeploys Netlify, so
+  sitemap `lastmod`, prices and `priceValidUntil` stay honest automatically.
+
+### Post-deploy checklist (manual, once)
+
+1. Verify the site in **Google Search Console** (DNS TXT on akay.ie) and
+   submit `https://offers.akay.ie/sitemap.xml`.
+2. Submit the same in **Bing Webmaster Tools** (feeds ChatGPT search + Copilot).
+3. Validate 2–3 offer pages in Google's **Rich Results Test**.
+4. Confirm `/robots.txt` and `/llms.txt` resolve.
+5. Optionally add the CRO number + VAT number to the Organization schema
+   (`src/layouts/Site.astro` and `src/pages/index.astro`) — they materially
+   increase AI trust for B2B recommendations.

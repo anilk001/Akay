@@ -1,0 +1,56 @@
+---
+import Site from '../../layouts/Site.astro';
+
+const SITE = 'https://offers.akay.ie';
+const path = '/guides/requirement-list-format/';
+const title = 'Requirement List Format — Get a Full Wholesale Quote | AKAY';
+const description = 'Send AKAY an Excel requirement list — three columns: Brand, Product Name, Quantity — to offers@akay.ie and get everything that matches live stock priced automatically.';
+
+const faq = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    { '@type': 'Question', name: 'What format should a requirement list be in?', acceptedAnswer: { '@type': 'Answer', text: 'An Excel file (.xlsx) with three columns: Brand, Product Name, Quantity. One product per row. Email it to offers@akay.ie with "Requirement List" in the subject line.' } },
+    { '@type': 'Question', name: 'What happens after I send a requirement list?', acceptedAnswer: { '@type': 'Answer', text: 'It is matched against AKAY’s live stock automatically; everything that matches is priced and sent back. Lines that don’t match current stock are checked for sourcing — with 1,000+ suppliers, most requested products can be found.' } },
+    { '@type': 'Question', name: 'Should quantities be in bottles or cases?', acceptedAnswer: { '@type': 'Answer', text: 'Cases are preferred (state the pack if you know it, e.g. 6x70cl). If you enter bottles, say so in the column header — ambiguous quantities slow the quote down.' } },
+  ],
+};
+---
+
+<Site {title} {description} {path} schema={[faq]}>
+  <p class="crumbs"><a href="/">Home</a> › Guides › Requirement list</p>
+  <h1>Requirement list format</h1>
+  <p class="lede">The fastest way to a full quotation: one spreadsheet, three columns, priced against live stock automatically.</p>
+
+  <h2>What format should it be in?</h2>
+  <p>
+    An <strong>Excel file</strong> with exactly three columns, one product per row:
+  </p>
+  <div class="facts"><dl>
+    <dt>Column A</dt><dd><strong>Brand</strong> — e.g. Jameson</dd>
+    <dt>Column B</dt><dd><strong>Product Name</strong> — e.g. Irish Whiskey 70cl</dd>
+    <dt>Column C</dt><dd><strong>Quantity</strong> — in cases, e.g. 200</dd>
+  </dl></div>
+  <p>
+    Email it to <a href="mailto:offers@akay.ie?subject=Requirement%20List">offers@akay.ie</a> with
+    <strong>"Requirement List"</strong> in the subject line.
+  </p>
+
+  <h2>What happens next?</h2>
+  <p>
+    The list is matched against live stock automatically and everything that matches comes back
+    priced — typically the same working day. Lines we don't currently stock go to sourcing:
+    with a network of 1,000+ suppliers, most requested products can be found and quoted shortly
+    after.
+  </p>
+
+  <h2>Tips for a faster quote</h2>
+  <p>
+    State pack sizes where you know them (6x70cl vs 12x70cl changes the price), quote quantities
+    in cases, and include your destination country — it determines whether
+    <a href="/guides/t1-vs-t2-duty-status/">T1 or T2</a> stock and which
+    <a href="/guides/incoterms-exw-dap-cfr/">incoterm</a> suits you best.
+  </p>
+
+  <p><a class="btn" href="mailto:offers@akay.ie?subject=Requirement%20List">Send your requirement list</a>&nbsp;<a class="btn ghost" href="/">Browse the live catalogue</a></p>
+</Site>

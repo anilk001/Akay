@@ -13,3 +13,6 @@ dist/
 # os / editor
 .DS_Store
 *.log
+
+# generated at build time by scripts/gen-redirects.mjs
+public/_redirects
