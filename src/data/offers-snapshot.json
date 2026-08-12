@@ -8317,24 +8317,6 @@
    "featured": false
   },
   {
-   "id": "recDVCAQmWk12P7oM",
-   "name": "Jagermeister Orange mini",
-   "variants": "Orange",
-   "brand": "Jagermeister",
-   "category": "Spirits",
-   "spec": "40ml",
-   "currency": "EUR",
-   "amount": 0.69,
-   "unitAmount": 0.69,
-   "priceDetail": "EUR 0.69/bottle",
-   "stock": "enq",
-   "qty": null,
-   "terms": "DAP",
-   "tier": "T2",
-   "origin": "",
-   "featured": false
-  },
-  {
    "id": "recDVKH8ALxnKkoU8",
    "name": "Captain Morgan Spiced Gold 100CL 35%",
    "variants": "",
@@ -8618,24 +8600,6 @@
    "stock": "in",
    "qty": 100,
    "terms": "EXW Loendersloot",
-   "tier": "T2",
-   "origin": "",
-   "featured": false
-  },
-  {
-   "id": "recDw5O1qKBEP684F",
-   "name": "Jagermeister Original mini",
-   "variants": "",
-   "brand": "Jagermeister",
-   "category": "Spirits",
-   "spec": "40ml",
-   "currency": "EUR",
-   "amount": 0.66,
-   "unitAmount": 0.66,
-   "priceDetail": "EUR 0.66/bottle",
-   "stock": "enq",
-   "qty": null,
-   "terms": "DAP",
    "tier": "T2",
    "origin": "",
    "featured": false
@@ -13227,24 +13191,6 @@
    "qty": 180,
    "terms": "EXW",
    "tier": "Bonded",
-   "origin": "",
-   "featured": false
-  },
-  {
-   "id": "recM76DrJGb8FP91O",
-   "name": "Kinder Bueno Milk 43g",
-   "variants": "",
-   "brand": "Kinder",
-   "category": "Confectionery",
-   "spec": "30 x",
-   "currency": "GBP",
-   "amount": 19.14,
-   "unitAmount": 0.64,
-   "priceDetail": "GBP 19.14/case (30pk) · GBP 0.64/unit",
-   "stock": "enq",
-   "qty": null,
-   "terms": "EXW",
-   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -18415,24 +18361,6 @@
    "featured": false
   },
   {
-   "id": "recTkMES9ka6fGRVV",
-   "name": "Jagermeister Orange mini",
-   "variants": "Orange",
-   "brand": "Jagermeister",
-   "category": "Spirits",
-   "spec": "20ml",
-   "currency": "EUR",
-   "amount": 0.47,
-   "unitAmount": 0.47,
-   "priceDetail": "EUR 0.47/bottle",
-   "stock": "enq",
-   "qty": null,
-   "terms": "DAP",
-   "tier": "T2",
-   "origin": "",
-   "featured": false
-  },
-  {
    "id": "recTkZUaWk3l39pe7",
    "name": "Cameron Bridge 26y Special Release 2022",
    "variants": "",
@@ -22569,24 +22497,6 @@
    "qty": 193,
    "terms": "EXW",
    "tier": "Bonded",
-   "origin": "",
-   "featured": false
-  },
-  {
-   "id": "recaBtfMVbSAsAua8",
-   "name": "Kinder Bueno Milk 5 x 43g",
-   "variants": "",
-   "brand": "Kinder",
-   "category": "Confectionery",
-   "spec": "6 x",
-   "currency": "GBP",
-   "amount": 13.4,
-   "unitAmount": 2.23,
-   "priceDetail": "GBP 13.40/case (6pk) · GBP 2.23/unit",
-   "stock": "enq",
-   "qty": null,
-   "terms": "EXW",
-   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -35803,24 +35713,6 @@
    "featured": false
   },
   {
-   "id": "recvVWM7MgYuVOWZs",
-   "name": "Jagermeister Original mini",
-   "variants": "",
-   "brand": "Jagermeister",
-   "category": "Spirits",
-   "spec": "20ml",
-   "currency": "EUR",
-   "amount": 0.47,
-   "unitAmount": 0.47,
-   "priceDetail": "EUR 0.47/bottle",
-   "stock": "enq",
-   "qty": null,
-   "terms": "DAP",
-   "tier": "T2",
-   "origin": "",
-   "featured": false
-  },
-  {
    "id": "recvVfoGToAuoF7KW",
    "name": "Bushmills 16y Rare Triple Distilled",
    "variants": "",
@@ -38684,5 +38576,5 @@
   }
  ],
  "source": "snapshot",
- "generated": "2026-08-11"
+ "generated": "2026-08-12"
 }
