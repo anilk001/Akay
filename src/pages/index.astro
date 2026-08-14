@@ -498,7 +498,7 @@ const stats = [
             body: new URLSearchParams({ category, email, note }).toString(),
           });
           msg.className = 'req-msg ok';
-          msg.textContent = `Done — we've emailed our current ${category} offers to ${email}. Check your inbox (and spam) in a moment.`;
+          msg.textContent = `Thanks — your request for ${category} offers is in. We'll email them to ${email} shortly; if nothing arrives in a few minutes, check spam or email offers@akay.ie.`;
           msg.hidden = false;
           reqForm.reset();
         } catch (err) {
