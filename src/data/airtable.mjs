@@ -118,6 +118,11 @@ function normalize(fields, recordId = null) {
     amount,
     unitAmount,
     priceDetail: detail,
+    // Basis of `amount` (case/pack/unit/bottle/…), taken from the SAME price
+    // part that supplied `amount`, so structured data can label the quantity
+    // correctly. Empty when the price string carried no basis (a bare Price
+    // Display fallback) — in which case consumers must not assert a basis.
+    priceBasis: headline ? (headline.basis || '') : '',
     stock: stockCode(fields['Stock Display']),
     // Cases are whole units — a fractional count means units were entered as cases.
     qty: typeof rawQty === 'number' ? Math.round(rawQty) : null,
@@ -173,6 +178,7 @@ function renormalizeSnapshotOffer(o, index) {
         ? (pack ? +(headline.amount / pack).toFixed(4) : headline.amount)
         : headline ? headline.amount
         : o.amount,
+    priceBasis: headline ? (headline.basis || '') : (o.priceBasis || ''),
     qty: typeof o.qty === 'number' ? Math.round(o.qty) : o.qty,
   };
 }

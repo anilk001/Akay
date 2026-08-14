@@ -39,8 +39,20 @@ function mapAvailability(stock) {
   return null; // Enquire = omit availability field
 }
 
+// The unit `offer.amount` is priced in, derived from the price basis the
+// normalizer parsed. `amount` is the case price only when the basis says so —
+// per-bottle/-can/-piece offers carry a per-unit `amount`, so hardcoding
+// 'case' would misprice the structured data for them. When the basis is
+// unknown (a bare Price Display fallback) we assert no quantity at all.
+function eligibleUnitText(basis) {
+  if (/case|pack/.test(basis)) return 'case';
+  if (/unit|bottle|btl|can|piece|jar/.test(basis)) return 'unit';
+  return null;
+}
+
 export function productOfferSchema(offer, slug) {
   const availability = mapAvailability(offer.stock);
+  const unitText = eligibleUnitText(offer.priceBasis || '');
   const offerBlock =
     offer.amount && offer.currency
       ? {
@@ -51,11 +63,15 @@ export function productOfferSchema(offer, slug) {
           itemCondition: 'https://schema.org/NewCondition',
           businessFunction: 'http://purl.org/goodrelations/v1#Sell',
           eligibleCustomerType: 'http://purl.org/goodrelations/v1#Business',
-          eligibleQuantity: {
-            '@type': 'QuantitativeValue',
-            unitText: 'case',
-            minValue: 1,
-          },
+          ...(unitText
+            ? {
+                eligibleQuantity: {
+                  '@type': 'QuantitativeValue',
+                  unitText,
+                  minValue: 1,
+                },
+              }
+            : {}),
           seller: { '@id': `${SITE_URL}/#org` },
           // Price valid for 14 days from build time
           priceValidUntil: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)
