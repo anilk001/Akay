@@ -39,6 +39,28 @@ function mapAvailability(stock) {
   return null; // Enquire = omit availability field
 }
 
+// Incoterms under which the quoted price already has freight built in, so the
+// buyer pays nothing further (DAP/DDP delivered; CIF/CFR carriage paid to a
+// port). EXW/FCA/FOB leave freight to the buyer's own arrangement — no rate
+// can be honestly stated for those, so shippingDetails is omitted entirely
+// rather than publishing a fabricated figure.
+const FREIGHT_INCLUDED_INCOTERMS = new Set(['DAP', 'DDP', 'CIF', 'CFR']);
+
+// Public Terms reads e.g. "EXW Loendersloot" or "DAP" or "CFR Rotterdam" —
+// the Incoterm is always the leading 3-letter code.
+function shippingDetailsFor(offer) {
+  const incoterm = (String(offer.terms || '').match(/^([A-Z]{3})\b/) || [])[1];
+  if (!incoterm || !FREIGHT_INCLUDED_INCOTERMS.has(incoterm)) return null;
+  return {
+    '@type': 'OfferShippingDetails',
+    shippingRate: {
+      '@type': 'MonetaryAmount',
+      value: '0',
+      currency: offer.currency || 'EUR',
+    },
+  };
+}
+
 export function productOfferSchema(offer, slug) {
   const availability = mapAvailability(offer.stock);
   const offerBlock =
@@ -61,8 +83,18 @@ export function productOfferSchema(offer, slug) {
           priceValidUntil: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)
             .toISOString()
             .split('T')[0],
+          // Wholesale trade offers are not consumer returns
+          hasMerchantReturnPolicy: {
+            '@type': 'MerchantReturnPolicy',
+            returnPolicyCategory: 'https://schema.org/MerchantReturnNotPermitted',
+          },
         }
       : null;
+
+  if (offerBlock) {
+    const shipping = shippingDetailsFor(offer);
+    if (shipping) offerBlock.shippingDetails = shipping;
+  }
 
   const productSchema = {
     '@context': 'https://schema.org',
