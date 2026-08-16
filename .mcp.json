@@ -30,6 +30,18 @@
       "env": {
         "AIRTABLE_API_KEY": "${AIRTABLE_API_KEY}"
       }
+    },
+    "n8n-do": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "n8n-mcp"
+      ],
+      "env": {
+        "MCP_MODE": "stdio",
+        "N8N_API_URL": "${N8N_API_URL}",
+        "N8N_API_KEY": "${N8N_API_KEY}"
+      }
     }
   }
 }
