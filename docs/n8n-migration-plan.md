@@ -12,7 +12,9 @@ n8n API, not assumed.
 | Target | Self-hosted on DigitalOcean droplet `134.122.0.108`, domain `n8n.akay.ie` |
 | Reason | Cloud execution limit was being hit — the whole instance failed for ~9h on 2026-08-13/14 (476+ failed runs, every workflow, including the error handler itself) |
 
-**Source n8n version: 2.33.4.** The target must be pinned to this. The
+**Source n8n version: 2.33.4** — *this figure came from the contractor, not from
+our own check; confirm it in the Cloud UI (bottom-left, or Settings → About)
+before pinning anything to it.* The target must be pinned to this. The
 DigitalOcean 1-Click image installs *latest*, which is not the same thing — a
 version gap can silently break workflow JSON on import via node `typeVersion`
 incompatibilities. Confirm the droplet's actual version before importing.
