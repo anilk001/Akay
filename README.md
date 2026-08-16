@@ -85,6 +85,36 @@ The site is static, so it reflects Airtable as of the last build. To refresh:
 
 ---
 
+## Claude Code tooling (MCP)
+
+[`.mcp.json`](./.mcp.json) registers only the two **local, credential-free** MCP
+servers — `sequential-thinking` and `memory`. They need no tokens and no network
+access, so they work in every session.
+
+**Airtable and GitHub are deliberately not in `.mcp.json`.** They are provided as
+account-level connectors instead, which is why no `AIRTABLE_API_KEY` or
+`GITHUB_MCP_PAT` variable is needed anywhere:
+
+| Capability | Where it comes from | Why not `.mcp.json` |
+|---|---|---|
+| Airtable | Airtable connector (`mcp__Airtable__*`) | The `npx airtable-mcp-server` entry could never work in a Claude Code on the web session — `api.airtable.com` is outside the network egress allowlist. |
+| GitHub | Managed GitHub integration (`mcp__github__*`) | Already authenticated per session; the `${GITHUB_MCP_PAT}` http entry was a duplicate that shadowed nothing and authenticated nobody. |
+
+Both were removed because they were inert *and* because each one duplicated a
+working toolset — two Airtable namespaces differing only by capitalisation
+(`mcp__airtable__*` vs `mcp__Airtable__*`) is an easy way to reach for the broken one.
+
+Note: the `memory` server persists its graph inside the ephemeral `npx` cache, so
+in a web session it is forgotten when the container is reclaimed. Treat it as
+within-session scratch memory, not durable storage.
+
+> **Airtable write access.** The Airtable connector holds `create` permission on
+> the live `Akay Offers` base. That is broader than the read-only PAT this site's
+> build uses (`data.records:read`, `schema.bases:read`) — an agent session can
+> write to the production catalogue. Keep that in mind when granting it.
+
+---
+
 ## Project layout
 
 ```
