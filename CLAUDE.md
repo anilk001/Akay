@@ -55,11 +55,11 @@ because nothing happened in the first minute.
 
 How it works: n8n's Gmail Trigger only fires on **newly arriving** mail, so a
 newly *labelled* old email never looks new to it. `Catch-up Sweep — Process_Akay
-Stranded Mail` (`NlzK9DMrkNmfcZoY`) bridges that — every 30 minutes it finds
+Stranded Mail` (`NlzK9DMrkNmfcZoY`) bridges that — every 15 minutes it finds
 `Process_Akay` mail with no Done/Needs-Review label and **resends it** so the
 triggers see a fresh arrival.
 
-- **Expect up to 30 minutes** for a hand-labelled email. New mail is picked up
+- **Expect up to 15 minutes** for a hand-labelled email. New mail is picked up
   within a minute.
 - **There is exactly one retry.** The resent copy carries `Akay/Resubmitted` and
   the sweep will not resend it again; if ingestion fails on the copy it gets

@@ -145,14 +145,14 @@ never looks new. The `Backfill — Get Message` node's own note states this.
 
 The bridge is **`Catch-up Sweep — Process_Akay Stranded Mail`**
 (`NlzK9DMrkNmfcZoY`), and its sticky note says so explicitly: *"This also makes
-MANUALLY labelling any email with Process_Akay work."* It runs every 30 minutes,
+MANUALLY labelling any email with Process_Akay work."* It runs every 15 minutes,
 finds `Process_Akay` mail with no Done/Needs-Review label that is more than 45
 minutes old, and **resends it to offers@akay.ie** so the triggers see a fresh
 arrival. Verified healthy: 530 executions, every recent one successful.
 
 Two consequences worth knowing:
 
-- **Latency is up to 30 minutes** for hand-labelled mail — the sweep interval. The
+- **Latency is up to 15 minutes** for hand-labelled mail — the sweep interval (was 30; halved 2026-08-18). The
   45-minute rule is measured on when the email *arrived*, not when it was
   labelled, so an old email is already "settled" and only waits for the next tick.
   Genuinely new mail is unaffected: the live trigger polls every minute.
