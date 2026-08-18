@@ -14347,24 +14347,6 @@
    "featured": false
   },
   {
-   "id": "recIXjJtdy9yTqD3b",
-   "name": "Got2b Dry Shampoo Texture",
-   "variants": "",
-   "brand": "Got2b",
-   "category": "Toiletries",
-   "spec": "200ml",
-   "currency": "EUR",
-   "amount": 6.3,
-   "unitAmount": 6.3,
-   "priceDetail": "EUR 6.30/case",
-   "stock": "enq",
-   "qty": null,
-   "terms": "",
-   "tier": "",
-   "origin": "",
-   "featured": false
-  },
-  {
    "id": "recIY407BkgKr5JyE",
    "name": "BALVENIE STORIES SERIES THE CREATION OF A CLASSIC — Stories Series - The Creation of a Classic",
    "variants": "Stories Series - The Creation of a Classic",
@@ -33481,24 +33463,6 @@
    "featured": false
   },
   {
-   "id": "recgpHAIJK220we26",
-   "name": "Got2b Dry Shampoo ExFrsh",
-   "variants": "",
-   "brand": "Got2b",
-   "category": "Toiletries",
-   "spec": "200ml",
-   "currency": "EUR",
-   "amount": 6.3,
-   "unitAmount": 6.3,
-   "priceDetail": "EUR 6.30/case",
-   "stock": "enq",
-   "qty": null,
-   "terms": "",
-   "tier": "",
-   "origin": "",
-   "featured": false
-  },
-  {
    "id": "recgpmP4qC9gUBWqx",
    "name": "Oral-B 3D White Toothpaste 75ml Arctic Fresh Peppermint&Spearmint",
    "variants": "",
@@ -44497,24 +44461,6 @@
    "featured": false
   },
   {
-   "id": "recv52q6mT1nxWmBL",
-   "name": "Got2b Dry Shampoo ExVol",
-   "variants": "",
-   "brand": "Got2b",
-   "category": "Toiletries",
-   "spec": "200ml",
-   "currency": "EUR",
-   "amount": 6.3,
-   "unitAmount": 6.3,
-   "priceDetail": "EUR 6.30/case",
-   "stock": "enq",
-   "qty": null,
-   "terms": "",
-   "tier": "",
-   "origin": "",
-   "featured": false
-  },
-  {
    "id": "recv5EENz1oXWSaE5",
    "name": "Glenfiddich 12y Our Original Twelve (Oloroso Sherry/Boubon Casks)",
    "variants": "",
@@ -48314,5 +48260,5 @@
   }
  ],
  "source": "snapshot",
- "generated": "2026-08-17"
+ "generated": "2026-08-18"
 }
