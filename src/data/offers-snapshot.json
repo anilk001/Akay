@@ -6373,6 +6373,24 @@
    "featured": false
   },
   {
+   "id": "rec8c7XPi2l6hjkM8",
+   "name": "Guinness Draught",
+   "variants": "",
+   "brand": "Guinness",
+   "category": "Beer",
+   "spec": "24 x 440ml",
+   "currency": "EUR",
+   "amount": 22,
+   "unitAmount": 0.92,
+   "priceDetail": "EUR 22.00/case (24pk) · EUR 0.92/unit",
+   "stock": "enq",
+   "qty": null,
+   "terms": "DAP Riga",
+   "tier": "",
+   "origin": "",
+   "featured": false
+  },
+  {
    "id": "rec8ca1bLXSk17iKZ",
    "name": "Naturella Classic Sanitary Towels 7pcs Size 4 Night Wings (Abs.6)",
    "variants": "",
@@ -44224,6 +44242,24 @@
    "terms": "FOB Vietnam",
    "tier": "",
    "origin": "Vietnam",
+   "featured": false
+  },
+  {
+   "id": "recusNZocrpcGumRX",
+   "name": "Kilkenny",
+   "variants": "",
+   "brand": "Kilkenny",
+   "category": "Beer",
+   "spec": "24 x 500ml",
+   "currency": "EUR",
+   "amount": 25.15,
+   "unitAmount": 1.05,
+   "priceDetail": "EUR 25.15/case (24pk) · EUR 1.05/unit",
+   "stock": "enq",
+   "qty": null,
+   "terms": "DAP Riga",
+   "tier": "",
+   "origin": "",
    "featured": false
   },
   {
