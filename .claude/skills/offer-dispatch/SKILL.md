@@ -15,6 +15,31 @@ procedure each time. Follow the order below. Do not improvise a new send path �
 the one-off workflows in n8n (`Spirits T2 Loendersloot…`, `AKAY — Campaign /
 Offer Send`) exist because someone did, and each one skipped a different gate.
 
+## Where to run a dispatch
+
+**Claude Code, in this repo, a fresh session per dispatch.** Not a claude.ai chat.
+
+Steps 4 and 5 of the procedure — the preflight check and the email preview — are
+scripts in this directory. They need a shell, Node and Python, so they only run
+where the repo is checked out. A claude.ai chat can read Airtable and trigger the
+workflow, which means it can queue a send it cannot check first. That is the exact
+gap this skill exists to close, so don't dispatch from there.
+
+One session per dispatch, started fresh: a run sends one dispatch group, and a
+fresh session loads `CLAUDE.md` and this skill cleanly instead of carrying stale
+assumptions from earlier work.
+
+Use claude.ai chat freely for the things that need no tooling — "did the Coffee-Mate
+offer go out?", "who's in the Indv spirits segment?", reading the Offers Sent Log.
+The Airtable `System Instructions` record *OFFER DISPATCH TO CLIENTS — Canonical
+Method* carries the rules for those sessions.
+
+**Note on Claude Code on the web:** the local `airtable-mcp-server` in `.mcp.json`
+reaches `api.airtable.com`, which the remote environment's egress policy may block
+(`Host not in allowlist`). Either add that host to the environment's allowlist, or
+use the hosted Airtable connector, which works either way. The Claude Code CLI on
+your own machine has no such restriction.
+
 ## The five gates, in the order they run
 
 | # | Gate | Where | Fails when |

@@ -20,6 +20,11 @@ two channels you just fixed, and whether the other needs the same change.
 procedure, the five gates in the order they run, and a failure catalogue keyed by
 symptom. Sending offers is a queue-and-gate pipeline, not "write an email".
 
+A dispatch belongs in **Claude Code, in this repo, one fresh session per
+dispatch** — the preflight check and the email preview are scripts here and need a
+shell. A claude.ai chat can queue a send it has no way to check first, so it is
+the wrong place to dispatch from; it is fine for questions that need no tooling.
+
 Non-negotiables, learned the expensive way:
 
 - **Preflight before queueing.** `python3 preflight_dispatch.py dispatch.json`.
