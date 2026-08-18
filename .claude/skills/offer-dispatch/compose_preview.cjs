@@ -129,7 +129,7 @@ function compose(gateAll, onlyOfferIds) {
       }
       // A bare integer is only a price when a currency introduces it.
       if (!found && Number.isInteger(buy)) {
-        const CURRENCY = '(?:eur|usd|gbp|aed|sgd|chf|\\$|\u20ac|\u00a3)';
+        const CURRENCY = '(?:eur|usd|gbp|aed|sgd|chf|[$€£])';
         if (new RegExp(`${CURRENCY}\\s*${escapeRe(String(buy))}(?![0-9.,])`).test(hay)) found = String(buy);
       }
       if (found) leaks.push(`buy price ${found}`);
@@ -192,7 +192,7 @@ function compose(gateAll, onlyOfferIds) {
     if (!line) { keptNoteLines.push(raw); continue; }
     const restatesPrice =
       printedPriceFigures.some((fig) => line.includes(fig)) &&
-      (BASIS_WORD.test(line) || /^\s*(\d+[).]|[-*\u2022])\s/.test(raw));
+      (BASIS_WORD.test(line) || /^\s*(\d+[).]|[-*•])\s/.test(raw));
     const restatesFact = RESTATED_FACT.test(line);
     if (restatesPrice || restatesFact) { noteLinesDropped++; continue; }
     keptNoteLines.push(raw);

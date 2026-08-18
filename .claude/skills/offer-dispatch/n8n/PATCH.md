@@ -4,11 +4,15 @@ Seven changes to **`Offer Dispatch — Akay`** (`dAYMAj6mZD3hTV4T`). Each one is
 defect found with evidence from live executions and Airtable records; the
 evidence is quoted so nobody has to re-derive it.
 
-**Status: NOT YET APPLIED.** These were prepared and tested but the session that
-wrote them was not permitted to write to n8n. Apply steps 1–5 below.
+**Status: APPLIED to the live workflow on 2026-08-18**, across six named versions
+(`Fix backup-gate timing + Resend error handling` → `Drop stray hardcoded record
+id; tidy canvas`). The deployed Code nodes were read back and diffed against the
+files here, and `node test-nodes.cjs` passes 14/14 against the deployed text.
+Roll back any step with `get_workflow_history` / `restore_workflow_version`.
 
-Every change is revertible: `update_workflow` writes a named version, and
-`get_workflow_history` / `restore_workflow_version` roll it back.
+The **one thing still to do is a live proving run** — dispatch one small group and
+confirm `Reconcile._summary` reads `Dispatch complete — N/N sent` before anyone is
+told an offer went out. Nothing here has been exercised against Resend yet.
 
 ---
 
@@ -132,16 +136,17 @@ does not reveal which one `Await Approval` uses.
 
 ---
 
-## How to apply
+## What was applied, in order
 
-Verify the node code first — this is the only test that exists, since the live
-workflow cannot be exercised without emailing real clients:
+Verify the node code before any further change — this is the only test that
+exists, since the live workflow cannot be exercised without emailing real
+clients:
 
 ```bash
 cd .claude/skills/offer-dispatch/n8n && node test-nodes.cjs   # expect 14/14
 ```
 
-**Step 1 — settings, schedule and Resend error handling.**
+**Step 1 — settings, schedule and Resend error handling.** ✅ applied
 
 ```json
 {
@@ -158,12 +163,14 @@ cd .claude/skills/offer-dispatch/n8n && node test-nodes.cjs   # expect 14/14
 }
 ```
 
-**Step 2 — replace the two Code nodes.** Paste `build-recipients.js` and
-`compose-email.js` whole, via `updateNodeParameters` with
+**Step 2 — replace the two Code nodes.** ✅ applied. Paste `build-recipients.js`
+and `compose-email.js` whole, via `updateNodeParameters` with
 `parameters: {"jsCode": "<file contents>"}`. Keep both nodes on **Run Once for
-All Items**.
+All Items**. After pasting, read the nodes back and diff them against these
+files — the escaping in a JSON tool call is easy to get subtly wrong, and the
+files here are the copy the tests run against.
 
-**Step 3 — make halts audible.** Add a Code node after
+**Step 3 — make halts audible.** ✅ applied as node `Fail Loudly on Halt` after
 `Write Clear Flag on Halt`:
 
 ```js
@@ -178,17 +185,26 @@ throw new Error(`Offer dispatch HALTED and sent nothing: ${reason}`);
 
 then `addConnection` from `Write Clear Flag on Halt` to it.
 
-**Step 4 — show the approver what will actually be sent** (optional, structural;
-agree it with Anil first). Today `Await Approval` runs *before* `Compose Email`
-and shows only the product name and price, so nobody reads the email before the
-clients do — every content defect above reached buyers through an approved send.
-Rewiring `Recipients OK?`(false) → `Compose Email` → a new `Composed?` IF →
-`Await Approval` → `Approved?` → `Build Sends` puts the rendered body in the
-approval mail and surfaces composition halts before a human is asked to wait.
+**Step 4 — show the approver what will actually be sent.** ✅ applied on Anil's
+instruction. `Await Approval` used to run *before* `Compose Email` and show only
+the product name and price, so nobody read the email before the clients did —
+every content defect above reached buyers through an approved send. The branch is
+now:
 
-**Step 5 — verify.** Preflight and preview a real offer, then dispatch one small
-group and confirm `Reconcile._summary` reads `Dispatch complete — N/N sent`
-before anyone is told it went out.
+```
+Recipients OK?(false) → Compose Email → Composed?(true) → Await Approval
+                                      → Composed?(false) → Halt — Report Reason
+Approved?(true) → Build Sends → Has Sends?(false) → Send via Resend
+```
+
+The approval mail carries the rendered subject and body with `FIRST_NAME`
+resolved, the group label, the targeting, the recipient and exclusion counts, any
+groups still queued, and how many Public Note lines were dropped as duplicates.
+
+**Step 5 — verify with a live proving run.** ⏳ NOT DONE. Preflight and preview a
+real offer, dispatch one small group, and confirm `Reconcile._summary` reads
+`Dispatch complete — N/N sent` before anyone is told it went out. Until this has
+happened once, treat the pipeline as changed-but-unproven.
 
 ---
 
@@ -206,6 +222,3 @@ before anyone is told it went out.
 - **`executionTimeout` is 1800s** while `Await Approval` waits up to 3 days.
   Long waits have survived (19860 waited 6h22m), but execution 9216 was canceled
   at 29m52s and 10236 at exactly 3 days; worth confirming the interaction.
-- **`Find Sendable Offers` still carries a stray `id: "recmYc4k0uBZDwhWs"`**
-  parameter, ignored by the `search` operation — a leftover from the
-  hardcoded-record era. Harmless, but delete it.

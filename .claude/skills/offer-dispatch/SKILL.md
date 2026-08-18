@@ -22,8 +22,12 @@ Offer Send`) exist because someone did, and each one skipped a different gate.
 | 1 | `Send Eligible` = Yes | Airtable formula, re-checked in `Gate Check` | Status ≠ Live, Is Expired ≠ No, Do Not Broadcast ticked, Offer Approval Status ≠ Approved |
 | 2 | Verified backup **dated today** | `Backup Check` (Europe/Dublin date) | `Daily Backup — Akay` has not landed a Verified Backup Registry row for today |
 | 3 | ≥1 eligible recipient | `Build Recipients` | targeting matches nobody, or bundle members disagree on the audience fields |
-| 4 | Composition + leak guard | `Compose Email` | a required public field is empty, or a supplier name / buy price / internal address appears in a public field |
+| 4 | Composition + leak guard | `Compose Email` → `Composed?` | a required public field is empty, or a supplier name / buy price / internal address appears in a public field |
 | 5 | Human approval | `Await Approval` → ak@akay.ie | not clicked (3-day limit, then the run halts) |
+
+Gate 4 runs **before** gate 5 as of 2026-08-18, so the approval mail contains the
+exact rendered email. Read it before approving — that mail is the last point at
+which a bad offer can be stopped.
 
 `Listing Approved` is **not** one of these. It gates offers.akay.ie only, never
 dispatch. Do not tick it to make a send work.
@@ -75,10 +79,12 @@ dispatch. Do not tick it to make a send work.
    send by hand.
 
 6. **Queue and trigger.** Tick `Queued for Dispatch` on every line of the group,
-   then run the workflow (`execute_workflow` on `dAYMAj6mZD3hTV4T`, or POST the
-   offer id to the `dispatch-offer` webhook). The flag is cleared automatically
-   whether the run sends or halts — a halt does **not** leave it queued for a
-   retry, so a halted offer must be re-queued by hand.
+   then either run the workflow now (`execute_workflow` on `dAYMAj6mZD3hTV4T`, or
+   POST the offer id to the `dispatch-offer` webhook) or leave it for the
+   **08:00 Europe/Dublin** schedule. The flag is cleared automatically whether the
+   run sends or halts — a halt does **not** leave it queued for a retry, so a
+   halted offer must be re-queued by hand. A halt now emails ak@akay.ie with the
+   reason, so silence means the run has not finished, not that it failed.
 
 7. **Confirm, then report.** Do not tell anyone it went out until:
    - the execution status is `success`, and
@@ -109,6 +115,13 @@ same defect was fixed in the `whatsapp link` formula and in
 `Price Per Unit & Case` itself; the dispatch email was the last place it lived
 (see `n8n/PATCH.md` §3).
 
+**Public Note is for information the fields do not carry.** Do not paste the
+price list, MOQ, terms or validity into it — the product block prints all four.
+The composer drops note lines that restate a printed price or fact, and
+preflight warns about them, but a hand-written note drifts out of step with the
+fields and is the reason the 2026-08-17 Coffee-Mate send printed the whole offer
+twice.
+
 ## Changing the workflow
 
 The Code nodes are kept in `n8n/` with a regression suite. Never edit them in the
@@ -122,28 +135,21 @@ There is no other way to test a change: exercising the live workflow means
 emailing real clients. `n8n/PATCH.md` records what changed and why, with the
 execution ids and record ids behind each finding.
 
-**Public Note is for information the fields do not carry.** Do not paste the
-price list, MOQ, terms or validity into it — the product block prints all four.
-The composer drops note lines that restate a printed price or fact, and
-preflight warns about them, but a hand-written note drifts out of step with the
-fields and is the reason the 2026-08-17 Coffee-Mate send printed the whole offer
-twice.
-
 ## Failure catalogue
 
-Items marked **[patch]** are diagnosed and fixed in `n8n/PATCH.md`, which was
-**not yet applied** as of 2026-08-18 — check whether it has been before assuming
-the behaviour is gone.
+Items marked **[fixed]** were repaired in the live workflow on 2026-08-18; the
+evidence and the exact changes are in `n8n/PATCH.md`. They are listed here
+because the symptom is what you will recognise if something like it recurs.
 
 | Symptom | Cause | Fix |
 |---|---|---|
-| Queued, nothing sent, no email to anyone | The run halted. `Halt — Report Reason` is a silent NoOp | Read the execution's `haltReason` in n8n. **[patch]** makes a halt throw so the ERROR HANDLER emails ak@akay.ie |
-| Every scheduled run halts; only hand-triggered sends work | The schedule fires 01:00 UTC, four hours before `Daily Backup` writes today's Verified row at ~05:05 UTC, so gate 2 always fails | **[patch]** pins the timezone and moves it to 08:00 Dublin. Meanwhile: trigger by hand after the backup, and check it landed **Verified**, not Flagged |
-| `LEAK GUARD TRIPPED … buy price 1` on a clean offer | The guard tests the bare integer Buy Price and matches the "1" in "1 pallet/line" | **[patch]**. Meanwhile: change the MOQ wording, or set a Buy Price with decimals |
-| One bad address kills the whole send, no log rows at all | `Send via Resend` has no `onError`/retry, against System Instructions §5 | **[patch]** adds `continueRegularOutput` + 3 retries so failures log as `Dispatch Status = Failed` |
-| Only one of several queued offers went out | One run = one dispatch group, and the group chosen was whatever Airtable returned first | Give multi-line offers a shared `Bundle ID`; otherwise queue one group per run. **[patch]** makes the choice oldest-first and names what was deferred |
-| Client asks whether the price was per bottle or per case | The mail printed bare `Price Display` | **[patch]** switches to `Price Per Unit & Case`. Set `Price Type` on the offer either way |
-| No MOQ or validity in the mail, so the trader hand-writes them into `Public Note` and the offer prints twice | The template omitted both | **[patch]** prints them and de-duplicates the note |
+| Queued, nothing sent, no email to anyone | The run halted. `Halt — Report Reason` is a silent NoOp | Read the execution's `haltReason` in n8n. **[fixed]** makes a halt throw so the ERROR HANDLER emails ak@akay.ie |
+| Every scheduled run halts; only hand-triggered sends work | The schedule fires 01:00 UTC, four hours before `Daily Backup` writes today's Verified row at ~05:05 UTC, so gate 2 always fails | **[fixed]** pins the timezone and moves it to 08:00 Dublin. Meanwhile: trigger by hand after the backup, and check it landed **Verified**, not Flagged |
+| `LEAK GUARD TRIPPED … buy price 1` on a clean offer | The guard tests the bare integer Buy Price and matches the "1" in "1 pallet/line" | **[fixed]**. Meanwhile: change the MOQ wording, or set a Buy Price with decimals |
+| One bad address kills the whole send, no log rows at all | `Send via Resend` has no `onError`/retry, against System Instructions §5 | **[fixed]** adds `continueRegularOutput` + 3 retries so failures log as `Dispatch Status = Failed` |
+| Only one of several queued offers went out | One run = one dispatch group, and the group chosen was whatever Airtable returned first | Give multi-line offers a shared `Bundle ID`; otherwise queue one group per run. **[fixed]** makes the choice oldest-first and names what was deferred |
+| Client asks whether the price was per bottle or per case | The mail printed bare `Price Display` | **[fixed]** switches to `Price Per Unit & Case`. Set `Price Type` on the offer either way |
+| No MOQ or validity in the mail, so the trader hand-writes them into `Public Note` and the offer prints twice | The template omitted both | **[fixed]** prints them and de-duplicates the note |
 | Offer quoted at cost | `Margin %` blank ⇒ `Sell Price` = `Buy Price`. Sent to 377 buyers on 2026-08-14 | Preflight warns. Set `Margin %` unless it is already embedded in Buy Price |
 | `Execution limit reached` at the trigger | n8n Cloud plan execution quota exhausted (2026-08-14 lost both the backup and the dispatch) | No workflow change can fix this — check the plan; re-trigger by hand |
 | Dispatch waited hours | Gate 5 is a human click | Expected. Observed latency 1–6 h; plan sends around it |

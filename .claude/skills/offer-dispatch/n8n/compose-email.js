@@ -2,12 +2,13 @@
  * n8n Code node — "Compose Email"   (Offer Dispatch — Akay, dAYMAj6mZD3hTV4T)
  * Mode: Run Once for All Items
  *
- * PASTE THIS WHOLE FILE into the node. The compose() function below is byte
- * identical to ../compose_preview.cjs, so `node compose_preview.cjs offers.json`
- * previews exactly what this node will send. If you change one, change both.
+ * SOURCE OF TRUTH: repo .claude/skills/offer-dispatch/n8n/compose-email.js.
+ * The compose() function is byte identical to ../compose_preview.cjs, so
+ * `node compose_preview.cjs offers.json` previews exactly what this node sends.
+ * Edit the repo file, run `node test-nodes.cjs`, then paste — never edit here.
  *
- * What changed vs the version live before 2026-08-18 — see ./PATCH.md for the
- * evidence behind each item:
+ * What changed vs the version live before 2026-08-18 — see PATCH.md in the repo
+ * for the evidence behind each item:
  *   1. The price line is "Price Per Unit & Case", which states its basis
  *      ("EUR 18.25/bottle"), not the bare "Price Display". Price Display is
  *      basis-agnostic and its own field description ("Per-case price") is wrong
@@ -154,7 +155,7 @@ function compose(gateAll, onlyOfferIds) {
       }
       // A bare integer is only a price when a currency introduces it.
       if (!found && Number.isInteger(buy)) {
-        const CURRENCY = '(?:eur|usd|gbp|aed|sgd|chf|\\$|\u20ac|\u00a3)';
+        const CURRENCY = '(?:eur|usd|gbp|aed|sgd|chf|[$€£])';
         if (new RegExp(`${CURRENCY}\\s*${escapeRe(String(buy))}(?![0-9.,])`).test(hay)) found = String(buy);
       }
       if (found) leaks.push(`buy price ${found}`);
@@ -217,7 +218,7 @@ function compose(gateAll, onlyOfferIds) {
     if (!line) { keptNoteLines.push(raw); continue; }
     const restatesPrice =
       printedPriceFigures.some((fig) => line.includes(fig)) &&
-      (BASIS_WORD.test(line) || /^\s*(\d+[).]|[-*\u2022])\s/.test(raw));
+      (BASIS_WORD.test(line) || /^\s*(\d+[).]|[-*•])\s/.test(raw));
     const restatesFact = RESTATED_FACT.test(line);
     if (restatesPrice || restatesFact) { noteLinesDropped++; continue; }
     keptNoteLines.push(raw);
@@ -295,3 +296,4 @@ try {
 }
 
 return { json: compose(gateItems, chosenIds) };
+

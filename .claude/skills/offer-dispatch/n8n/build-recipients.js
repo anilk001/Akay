@@ -2,9 +2,10 @@
  * n8n Code node — "Build Recipients"   (Offer Dispatch — Akay, dAYMAj6mZD3hTV4T)
  * Mode: Run Once for All Items
  *
- * PASTE THIS WHOLE FILE into the node.
+ * SOURCE OF TRUTH: repo .claude/skills/offer-dispatch/n8n/build-recipients.js.
+ * Edit the repo file, run `node test-nodes.cjs`, then paste — never edit here.
  *
- * What changed vs the version live before 2026-08-18 — see ./PATCH.md:
+ * What changed vs the version live before 2026-08-18 — see PATCH.md in the repo:
  *   1. Group selection is deterministic. It used to take gateAll[0], i.e.
  *      whichever record Airtable happened to return first, so with several
  *      offers queued the one that got sent was arbitrary and an unlucky offer
@@ -23,7 +24,7 @@ if (!gateAll.length) {
   return [{ json: { recipientCount: 0, recipients: [], halt: true, haltReason: 'No gate-passed offers reached Build Recipients' } }];
 }
 
-// ── Choose ONE dispatch group, deterministically ─────────────────────────────
+// ── Choose ONE dispatch group, deterministically ────────────────────────────
 // A group is one Bundle ID, or a single un-bundled offer. Oldest Offer Date
 // first so a queued offer cannot be passed over run after run.
 const groups = new Map();
@@ -144,3 +145,4 @@ function firstNameOf(raw) {
   if (/^(sales|info|admin|office|purchasing|team|accounts|export|import|contact)$/i.test(first)) return '';
   return first.charAt(0).toUpperCase() + first.slice(1);
 }
+
