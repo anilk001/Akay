@@ -47,6 +47,31 @@ Non-negotiables, learned the expensive way:
   `Reconcile._summary` reads `Dispatch complete — N/N sent`, and `Offers Sent Log`
   has the matching rows.
 
+## n8n has drafts. Saving is not shipping.
+
+This n8n instance uses **draft / published versions**. `update_workflow` writes to
+the **draft**. The live workflow keeps running the published version until someone
+calls `publish_workflow`. A saved fix that was never published is invisible: the
+editor shows your change, the production runs do not have it.
+
+Always finish an n8n edit with:
+
+```
+publish_workflow(workflowId)
+then get_workflow_details and assert versionId === activeVersionId
+```
+
+This is not hypothetical. On 2026-08-18 a check found the labelling fix for
+`PDF/Image Offer Ingestion` sitting unpublished since 2026-08-14 — production had
+been failing that whole time on a bug that was already fixed in the editor — and
+the entire dispatch repair from earlier the same day was also still unpublished
+and therefore not live. `Excel Offer Ingestion — Akay` still has an unpublished
+draft nobody has reviewed.
+
+So when reading a workflow to reason about a failure, read the **published**
+version (`get_workflow_version` with `activeVersionId`), not
+`get_workflow_details`, which returns the draft. They diverge.
+
 ## Airtable field descriptions are the specification
 
 Most fields in the `Akay Offers` base carry a description saying what they are

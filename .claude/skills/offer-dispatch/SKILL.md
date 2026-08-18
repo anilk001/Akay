@@ -156,6 +156,14 @@ n8n UI — edit the file, run the tests, then paste:
 cd n8n && node test-nodes.cjs      # 14 tests over the two real 2026-08 dispatches
 ```
 
+**Then publish, and verify you published.** `update_workflow` writes to the
+*draft*; production keeps running the published version until `publish_workflow`
+is called. Assert `versionId === activeVersionId` afterwards. On 2026-08-18 the
+whole dispatch repair sat unpublished and therefore not live until this was
+checked — and the same trap had hidden a PDF-ingestion fix for four days. When
+reading a workflow to explain a failure, read the **published** version via
+`get_workflow_version(activeVersionId)`; `get_workflow_details` returns the draft.
+
 There is no other way to test a change: exercising the live workflow means
 emailing real clients. `n8n/PATCH.md` records what changed and why, with the
 execution ids and record ids behind each finding.

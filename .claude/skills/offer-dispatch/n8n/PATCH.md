@@ -4,10 +4,16 @@ Seven changes to **`Offer Dispatch — Akay`** (`dAYMAj6mZD3hTV4T`). Each one is
 defect found with evidence from live executions and Airtable records; the
 evidence is quoted so nobody has to re-derive it.
 
-**Status: APPLIED to the live workflow on 2026-08-18**, across six named versions
-(`Fix backup-gate timing + Resend error handling` → `Drop stray hardcoded record
-id; tidy canvas`). The deployed Code nodes were read back and diffed against the
-files here, and `node test-nodes.cjs` passes 14/14 against the deployed text.
+**Status: LIVE on 2026-08-18**, across six named versions (`Fix backup-gate timing
++ Resend error handling` → `Drop stray hardcoded record id; tidy canvas`), then
+**published** at 09:15 UTC. The deployed Code nodes were read back and diffed
+against the files here, and `node test-nodes.cjs` passes 14/14 against the
+deployed text.
+
+⚠️ The six edits landed in the **draft** first and were NOT live until
+`publish_workflow` was called. That was caught only because the same trap was
+found hiding a PDF-ingestion fix for four days. Any future edit here must end with
+`publish_workflow` and an assertion that `versionId === activeVersionId`.
 Roll back any step with `get_workflow_history` / `restore_workflow_version`.
 
 The **one thing still to do is a live proving run** — dispatch one small group and
