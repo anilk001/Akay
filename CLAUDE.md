@@ -113,8 +113,9 @@ This is not hypothetical. On 2026-08-18 a check found the labelling fix for
 `PDF/Image Offer Ingestion` sitting unpublished since 2026-08-14 — production had
 been failing that whole time on a bug that was already fixed in the editor — and
 the entire dispatch repair from earlier the same day was also still unpublished
-and therefore not live. `Excel Offer Ingestion — Akay` still has an unpublished
-draft nobody has reviewed.
+and therefore not live. `Excel Offer Ingestion — Akay` had the same trap. All three
+are published now — and **both** unpublished drafts turned out to need a correction
+before they were safe to ship, so review one before publishing it.
 
 So when reading a workflow to reason about a failure, read the **published**
 version (`get_workflow_version` with `activeVersionId`), not

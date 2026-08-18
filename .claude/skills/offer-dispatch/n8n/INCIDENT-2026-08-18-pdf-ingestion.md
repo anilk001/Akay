@@ -105,9 +105,11 @@ the draft. Production keeps running the published version until
   been failing for four days on a bug already fixed in the editor.
 - The entire dispatch repair earlier the same day was also still unpublished, and
   therefore not live, until this was noticed. It is now published.
-- **`Excel Offer Ingestion — Akay` (`j1NAhQEKz9hzi1T2`) still has an unpublished
-  draft that nobody has reviewed.** Review it before publishing — the PDF draft
-  needed two corrections, and an ingestion workflow writes to Airtable.
+- `Excel Offer Ingestion — Akay` (`j1NAhQEKz9hzi1T2`) had the same trap: the same
+  labelling fix, authored 14 Aug, never published. **Reviewed and published
+  2026-08-18** — and it carried the identical `executeOnce: true` flaw, which was
+  corrected first. Reviewing before publishing was not a formality: two of two
+  unpublished drafts needed a correction.
 
 Anything reading a workflow to explain a failure must read the **published**
 version (`get_workflow_version` with `activeVersionId`). `get_workflow_details`
