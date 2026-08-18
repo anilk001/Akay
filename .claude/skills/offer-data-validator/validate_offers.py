@@ -4,6 +4,9 @@ import sys, csv, io, re
 
 TOL = 0.02
 CURRENCIES = {"EUR", "GBP", "USD"}
+# No real FMCG unit wholesales below this. A "case" price implying less than
+# this per unit is not a cheap case, it is a unit price wearing a case label.
+MIN_UNIT = 0.60
 
 def parse_pack(s):
     m = re.match(r"\s*(\d+)\s*[xX]\s*([\d.,]*)\s*(ml|cl|l|gr|g|kg)?", str(s or ""))
@@ -72,13 +75,23 @@ def validate(rows):
                     "check which figure is wrong"))
         # A blank price basis is published as a CASE price by the Price Per Unit
         # & Case formula. When the supplier actually quoted per unit, the case
-        # figure on the card is understated by the whole pack factor - so an
-        # unstated basis on a multi-unit pack is a price error, not a nitpick.
+        # figure on the card is understated by the whole pack factor.
+        #
+        # Blank is right far more often than not - spirits are quoted per case -
+        # so a bare blank is a warning, not a gate. It becomes a PRICE error when
+        # the resulting case price is one no case could carry: gating on all of
+        # them would bury 50 real errors under 500 correct rows and get ignored.
         if has_basis_col and basis == "" and n and n > 1 and (case_p or unit_p):
             p0 = case_p or unit_p
-            problems.append(("PRICE", i, label,
-                f"price {p0} has no stated basis (Price Type blank) with pack {n}x",
-                f"set Price Type: per case keeps {p0}, per unit makes the case {round(p0 * n, 2)}"))
+            fix = f"set Price Type: per case keeps {p0}, per unit makes the case {round(p0 * n, 2)}"
+            if p0 / n < MIN_UNIT:
+                problems.append(("PRICE", i, label,
+                    f"{p0} shown as a case of {n} = {round(p0 / n, 4)}/unit, too low to be a case price",
+                    fix))
+            else:
+                problems.append(("BASIS", i, label,
+                    f"price {p0} has no stated basis (Price Type blank) with pack {n}x",
+                    fix))
         if qty is not None and abs(qty - round(qty)) > 1e-9:
             problems.append(("STOCK", i, label,
                 f"fractional cases: {qty}", "units entered as cases? divide by pack"))
@@ -97,7 +110,7 @@ def validate(rows):
         if (case_p or unit_p) and not curr:
             problems.append(("CURR", i, label, "price without currency", "set currency"))
 
-    order = {"PRICE": 0, "STOCK": 1, "NAME": 2, "BRAND": 3, "PACK": 4, "CURR": 5}
+    order = {"PRICE": 0, "BASIS": 1, "STOCK": 2, "NAME": 3, "BRAND": 4, "PACK": 5, "CURR": 6}
     problems.sort(key=lambda p: (order[p[0]], p[1]))
     for sev, rownum, label, issue, fix in problems:
         print(f"[{sev}] row {rownum} ({label}): {issue} -> {fix}")

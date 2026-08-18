@@ -19,15 +19,22 @@ row and a suggested fix.
    not a point - a case figure inside that band is not an error. This
    check needs case and unit prices supplied INDEPENDENTLY; it cannot
    detect anything when one was derived from the other.
-2. **Missing price basis** (PRICE severity, gates the publish): a blank
-   Price Type is published as a CASE price by the Price Per Unit & Case
-   formula. If the supplier actually quoted per unit, the case price on
-   the card is understated by the whole pack factor - e.g. H&S 330ml at
-   EUR 1.88 shows as a case of 6 (EUR 0.31/bottle) when EUR 1.88 is the
-   per-bottle price and the case is EUR 11.28. Flagged whenever a
-   Price Type / price basis column is present but empty and pack N > 1.
-   Only runs when the export actually carries that column: an absent
-   column says nothing about the data, an empty cell is a real gap.
+2. **Missing price basis**: a blank Price Type is published as a CASE
+   price by the Price Per Unit & Case formula. If the supplier actually
+   quoted per unit, the case price on the card is understated by the whole
+   pack factor - e.g. H&S 330ml at EUR 1.88 shows as a case of 6
+   (EUR 0.31/bottle) when EUR 1.88 is the per-bottle price and the case is
+   EUR 11.28. Split by how bad the result is:
+   - **PRICE** (gates the publish) when the implied per-unit price falls
+     below `MIN_UNIT` (EUR 0.60) - no real FMCG unit wholesales that low,
+     so the figure cannot be a case price.
+   - **BASIS** (warns only) otherwise. Blank is right more often than not,
+     because spirits are quoted per case; gating on every blank would bury
+     50 real errors under 500 correct rows and get the gate ignored.
+
+   Only runs when the export actually carries a Price Type / price basis
+   column: an absent column says nothing about the data, an empty cell is
+   a real gap.
 3. **Whole cases**: stock quantity in cases must be a whole number.
    Fractional cases (e.g. 12,412.3) mean units were entered as cases.
 4. **Variant lists in product name**: names containing 3+ commas or
@@ -56,5 +63,6 @@ Price Type along with it, or check 2 stays silent.
 
 ## Output format
 One line per problem: `[SEVERITY] row N (Brand - Product): issue ->
-suggested fix`. Severity: PRICE > STOCK > NAME > BRAND > PACK > CURR.
+suggested fix`. Severity: PRICE > BASIS > STOCK > NAME > BRAND > PACK >
+CURR. Only PRICE gates the publish.
 End with a summary count per severity.
