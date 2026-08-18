@@ -168,3 +168,57 @@ The failing run's own summary said `IMG_0306.JPG — 0 offers … 0 rows dropped
 no price`, i.e. the vision parse returned nothing at all from a photo. That is the
 `attention` flag doing its job — the mail genuinely needed a human. The labelling
 was the only broken part.
+
+---
+
+# Estate-wide Gmail credential audit — 2026-08-18
+
+Done after the root cause above. Credentials cannot be read through the n8n API
+(stripped from `get_workflow_details` and from version snapshots, even for ones
+just written), so the audit could not be a read — it had to be a **write**: every
+Gmail node that reads or modifies mail is now pinned explicitly to
+`qunIwKuc11bYHBVr` ("offers n8n"), the credential proven to hold the queue.
+
+Pinning is idempotent for nodes already correct. The point is that nothing can
+drift: n8n auto-assigns "Gmail account" to new Gmail nodes, and that is a
+different mailbox.
+
+| Workflow | Nodes pinned | Was it broken? |
+|---|---|---|
+| PDF/Image Offer Ingestion | Mark Needs Review, Mark PDF Done, Backfill — Get Message | **Yes** — Mark Needs Review, 404 for a week |
+| Excel Offer Ingestion | Mark Excel Done | No (Akay/Excel-Done populated) |
+| Email Body Offer Ingestion | Mark Email Done, Mark Reviewed | No (Akay/Email-Done: 152 msgs) |
+| Catch-up Sweep | all 9 Gmail nodes | No (verified working, exec 20480) |
+| Daily Close Sweep | Find Done Mail, Add Akay_Processed, Remove Process_Akay | No (Akay_Processed: 180 msgs) |
+| Bounce & Reply Handling | Fetch Inbox, Archive Bounce, Mark Bounce Handled, Mark Reply Handled | No (Akay/Bounce-Done: 126 msgs) |
+| Stranded Queue Digest | both nodes | **Yes** — auto-assigned wrong at creation |
+
+All published; `versionId === activeVersionId` verified.
+
+### Deliberately not changed
+
+- **Gmail Trigger nodes** (PDF, Excel, Email Body, Excel Requirement Intake).
+  They demonstrably work, and changing a polling trigger's credential risks
+  disturbing its watermark — which would mean re-polling or skipping mail. Their
+  correctness is established by behaviour: mail arrives and gets processed.
+- **Send-only nodes** outside the sweep — `Await Approval` (dispatch),
+  `Notify Reviewer`, and the digest/alert senders in Awaiting Website Publish,
+  Price Intelligence, ERROR HANDLER and Timewaster Governance Report. A *send*
+  succeeds from either mailbox; the only difference is the From address, and
+  changing that on the dispatch approval mail is a visible change to a working,
+  business-critical flow. Worth making consistent one day, on purpose.
+- The Catch-up Sweep's send nodes **were** pinned, because `Label Copy Into
+  Queue` labels the message `Resend` just created — send and label must share a
+  mailbox or the label 404s.
+
+### Two things found along the way
+
+- **`Excel Requirement Intake` has never executed** — zero runs since 2026-08-02
+  despite an active 15-minute Gmail poll. Benign: a Gmail search confirms no mail
+  matching `subject:"requirement list" has:attachment` has ever arrived, even
+  though every dispatch email invites it. So the feature is advertised and unused,
+  not broken. Its trigger credential is therefore **untested**.
+- **`Map Columns (LLM)` in the Excel workflow** trips the node validator with
+  "Missing discriminator parameters.resource". It works (execution 20428 ran it
+  on 2026-08-18), because the omitted value falls back to a working default. Worth
+  setting explicitly, but not urgent.
