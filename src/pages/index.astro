@@ -24,7 +24,10 @@ function priceParts(detail = '') {
 }
 function waLink(o, msg) {
   const amt = o.amount != null ? o.amount.toFixed(2) : '';
-  const txt = `Hi Anil, I'd like a quote for ${o.name} (${o.spec}) listed at ${o.currency} ${amt}${msg ? ' ' + msg : ''}.`;
+  // Name + variants, because the variant list now lives outside the name (see
+  // splitVariants) — quoting the name alone would send "Glenlivet" with no age.
+  const label = o.variants ? `${o.name} — ${o.variants}` : o.name;
+  const txt = `Hi Anil, I'd like a quote for ${label} (${o.spec}) listed at ${o.currency} ${amt}${msg ? ' ' + msg : ''}.`;
   return `https://wa.me/${WA}?text=${encodeURIComponent(txt)}`;
 }
 const STOCK = { in: ['ok', 'In stock'], warn: ['warn', 'Limited'], enq: ['neu', 'Enquire'] };

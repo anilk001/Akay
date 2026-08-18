@@ -44,7 +44,10 @@ function priceParts(detail = '') {
 
 function waLink(o, msg) {
   const amt = o.amount != null ? o.amount.toFixed(2) : '';
-  const txt = `Hi, I'd like a quote for ${o.name} ${o.spec ? `(${o.spec})` : ''} listed at ${o.currency} ${amt}${msg ? ' ' + msg : ''}.`;
+  // Variants are their own field now (see splitVariants), so quote them
+  // alongside the name — otherwise the enquiry loses which variant is wanted.
+  const label = o.variants ? `${o.name} — ${o.variants}` : o.name;
+  const txt = `Hi, I'd like a quote for ${label} ${o.spec ? `(${o.spec})` : ''} listed at ${o.currency} ${amt}${msg ? ' ' + msg : ''}.`;
   return `https://wa.me/${WA}?text=${encodeURIComponent(txt)}`;
 }
 
@@ -323,6 +326,7 @@ if (offer.stock === 'in') {
 
     <div class="offer-header">
       <h1>{offer.name}</h1>
+      {offer.variants && <p style="margin: 0 0 0.2em; color: var(--muted); font-size: 0.95em;">{offer.variants}</p>}
       {offer.spec && <p style="margin: 0; color: var(--muted); font-size: 0.95em;">{offer.spec}</p>}
 
       <div class="price-display">
@@ -356,6 +360,12 @@ if (offer.stock === 'in') {
           <div class="spec-row">
             <span class="spec-label">Pack Size</span>
             <span class="spec-value">{offer.spec}</span>
+          </div>
+        )}
+        {offer.variants && (
+          <div class="spec-row">
+            <span class="spec-label">Variants</span>
+            <span class="spec-value">{offer.variants}</span>
           </div>
         )}
       </div>

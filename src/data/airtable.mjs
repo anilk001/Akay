@@ -66,13 +66,30 @@ function packSize(detail = '', spec = '') {
   return null;
 }
 
+function escapeRe(s) {
+  return String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 // Splits a trailing variant list out of the product name:
 // "Nivea Roll On 50ml — Bright & Dry, Silk Touch, Pearl" -> name + variants.
 // Only splits when the tail really is a list (two or more commas), so real
 // product names with a single dash stay intact.
 function splitVariants(rawName = '', variantField = '') {
   const name = String(rawName).trim();
-  if (variantField) return { name, variants: String(variantField).trim() };
+  const variant = String(variantField || '').trim();
+  // The Public Product Description formula appends Variant only when it is not
+  // already in Product Name — but when the supplier typed the list into the name
+  // itself, BOTH fields carry it, and the card printed the list twice: once in
+  // the title and again in the .variants line underneath. Strip the duplicated
+  // tail so the title stays a product name and the variants line owns the list.
+  if (variant) {
+    const head = name.replace(new RegExp(`(?:\\s*[—–-]\\s*)?${escapeRe(variant)}\\s*$`), '').trim();
+    const clean = head.length >= 3 ? head : name;
+    // Some variants are a word already inside the name ("I Heart Shiraz 6/75/12%"
+    // + variant "Shiraz"). Removing it mid-string would mangle the name, so drop
+    // the variants line instead — it is already visible in the title.
+    return { name: clean, variants: clean.includes(variant) ? '' : variant };
+  }
   const idx = name.search(/\s+[—–-]\s+/);
   if (idx > 0) {
     const head = name.slice(0, idx).trim();

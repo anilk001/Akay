@@ -28,28 +28,57 @@ def pick(row, *names):
                 return row[k]
     return None
 
+def has_col(row, *names):
+    """True when the input actually carries one of these columns.
+
+    pick() cannot tell a missing column from an empty cell, and the two mean
+    different things: an absent Price Type column says nothing about the data,
+    while an empty one is a real gap. Checks that read meaning INTO a blank must
+    gate on this, or they fire on every row of an export that omits the column.
+    """
+    return any(k and n in k.lower().replace("_", " ") for n in names for k in row)
+
 def validate(rows):
     problems = []
     for i, row in enumerate(rows, start=2):  # 2 = first data row in a sheet
         brand = (pick(row, "brand") or "").strip()
         name = (pick(row, "product name", "product", "name") or "").strip()
         pack_raw = pick(row, "pack", "size", "format") or ""
+        pcs = fnum(pick(row, "pcs/case", "pcs per case", "units per case"))
+        basis = (pick(row, "price type", "price basis") or "").strip()
+        has_basis_col = has_col(row, "price type", "price basis")
         case_p = fnum(pick(row, "price per case", "case price", "price/case", "price case"))
         unit_p = fnum(pick(row, "price per unit", "unit price", "price/unit", "price unit"))
         qty = fnum(pick(row, "cases", "stock", "quantity", "qty"))
         curr = (pick(row, "currency", "curr") or "").strip().upper()
         label = f"{brand or '?'} - {(name[:40] + '...') if len(name) > 40 else (name or '?')}"
         n, size = parse_pack(pack_raw)
+        if n is None and pcs and pcs > 0:
+            n = int(pcs)
 
         if case_p and unit_p and n and n > 1:
+            # A published unit price is rounded to 2dp, so the case price it
+            # implies is a band, not a point. Only a case figure outside that
+            # band AND outside the tolerance is a real inconsistency - without
+            # this, every sub-EUR-1 unit price flags as an error.
+            lo, hi = (unit_p - 0.005) * n, (unit_p + 0.005) * n
             if abs(case_p - unit_p) < 1e-9:
                 problems.append(("PRICE", i, label,
                     f"case price equals unit price ({case_p}) with pack {n}x",
                     f"case should be ~{round(unit_p * n, 2)}"))
-            elif abs(case_p - unit_p * n) / max(case_p, 1e-9) > TOL:
+            elif not (lo <= case_p <= hi) and abs(case_p - unit_p * n) / max(case_p, 1e-9) > TOL:
                 problems.append(("PRICE", i, label,
                     f"case {case_p} != unit {unit_p} x {n} (= {round(unit_p*n,2)})",
                     "check which figure is wrong"))
+        # A blank price basis is published as a CASE price by the Price Per Unit
+        # & Case formula. When the supplier actually quoted per unit, the case
+        # figure on the card is understated by the whole pack factor - so an
+        # unstated basis on a multi-unit pack is a price error, not a nitpick.
+        if has_basis_col and basis == "" and n and n > 1 and (case_p or unit_p):
+            p0 = case_p or unit_p
+            problems.append(("PRICE", i, label,
+                f"price {p0} has no stated basis (Price Type blank) with pack {n}x",
+                f"set Price Type: per case keeps {p0}, per unit makes the case {round(p0 * n, 2)}"))
         if qty is not None and abs(qty - round(qty)) > 1e-9:
             problems.append(("STOCK", i, label,
                 f"fractional cases: {qty}", "units entered as cases? divide by pack"))
