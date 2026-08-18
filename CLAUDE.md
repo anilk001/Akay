@@ -47,6 +47,31 @@ Non-negotiables, learned the expensive way:
   `Reconcile._summary` reads `Dispatch complete — N/N sent`, and `Offers Sent Log`
   has the matching rows.
 
+## Offer ingestion: labelling `Process_Akay` is automatic, but not instant
+
+Applying `Process_Akay` to an email **does** get it ingested without anyone asking
+Claude. Do not build a manual path for this, and do not assume it is broken just
+because nothing happened in the first minute.
+
+How it works: n8n's Gmail Trigger only fires on **newly arriving** mail, so a
+newly *labelled* old email never looks new to it. `Catch-up Sweep — Process_Akay
+Stranded Mail` (`NlzK9DMrkNmfcZoY`) bridges that — every 30 minutes it finds
+`Process_Akay` mail with no Done/Needs-Review label and **resends it** so the
+triggers see a fresh arrival.
+
+- **Expect up to 30 minutes** for a hand-labelled email. New mail is picked up
+  within a minute.
+- **There is exactly one retry.** The resent copy carries `Akay/Resubmitted` and
+  the sweep will not resend it again; if ingestion fails on the copy it gets
+  `Akay/Needs-Review`, which the sweep excludes forever, plus one alert to
+  ak@akay.ie. So *any* ingestion failure permanently strands that email — which is
+  the real reason offers end up needing a human. See
+  `.claude/skills/offer-dispatch/n8n/INCIDENT-2026-08-18-pdf-ingestion.md` for the
+  chain traced end to end.
+
+When an offer "didn't get picked up", check the ingestion workflow's executions
+first. The queue mechanism is almost certainly fine; the ingestion run failed.
+
 ## n8n has drafts. Saving is not shipping.
 
 This n8n instance uses **draft / published versions**. `update_workflow` writes to

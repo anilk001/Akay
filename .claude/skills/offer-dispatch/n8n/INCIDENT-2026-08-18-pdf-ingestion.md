@@ -86,6 +86,55 @@ Anything reading a workflow to explain a failure must read the **published**
 version (`get_workflow_version` with `activeVersionId`). `get_workflow_details`
 returns the draft, and the two diverge.
 
+## Why this made every offer need a human
+
+The 404 does not just fail one node. It breaks the **self-healing loop**, which is
+why a labelled email ends up needing someone to ask Claude to process it.
+
+Traced end to end on the Guinness/Kilkenny offer:
+
+| Time (UTC) | What happened |
+|---|---|
+| 07:58 | Email arrives in `Process_Akay`, message `1a013e0f6d12bd47` |
+| 08:00, 08:05 | PDF ingestion fires on the new arrival and **fails** — the 404. No Done label written |
+| 09:00 | Catch-up Sweep sees it stranded (>45 min old, no Done label), resends it → new message `1a0141a194cb9a68` |
+| 09:01 | Ingestion runs on the copy and **fails again** — the same 404 |
+| next sweep | The copy carries `Akay/Resubmitted`, so it is **not** resent again. It gets `Akay/Needs-Review` and one alert to ak@akay.ie |
+
+The one retry is now spent, and `Akay/Needs-Review` is in the sweep's exclusion
+list (`-label:Akay/Needs-Review`), so **nothing will ever pick that mail up
+again**. A human has to. That is the loop being described as "we always have to
+tell Claude".
+
+So: labelling an email really is automatic (see below), and the automation really
+does work. It is the ingestion failure that consumes the retry budget and strands
+the mail. Fix the credential and this stops.
+
+## Labelling `Process_Akay` by hand: how it actually reaches ingestion
+
+n8n's Gmail Trigger fires only on **newly arriving** mail — it compares
+`internalDate` against a watermark, so an older message that is newly *labelled*
+never looks new. The `Backfill — Get Message` node's own note states this.
+
+The bridge is **`Catch-up Sweep — Process_Akay Stranded Mail`**
+(`NlzK9DMrkNmfcZoY`), and its sticky note says so explicitly: *"This also makes
+MANUALLY labelling any email with Process_Akay work."* It runs every 30 minutes,
+finds `Process_Akay` mail with no Done/Needs-Review label that is more than 45
+minutes old, and **resends it to offers@akay.ie** so the triggers see a fresh
+arrival. Verified healthy: 530 executions, every recent one successful.
+
+Two consequences worth knowing:
+
+- **Latency is up to 30 minutes** for hand-labelled mail — the sweep interval. The
+  45-minute rule is measured on when the email *arrived*, not when it was
+  labelled, so an old email is already "settled" and only waits for the next tick.
+  Genuinely new mail is unaffected: the live trigger polls every minute.
+- **There is exactly one retry.** A resent copy is labelled `Akay/Resubmitted`,
+  and the sweep refuses to resend anything already carrying it. That is the right
+  call against infinite loops, but it means a single ingestion failure permanently
+  strands the mail behind one alert email that is easy to miss. A standing digest
+  of queued `Akay/Needs-Review` mail would make the backlog visible instead.
+
 ## Also worth knowing
 
 The failing run's own summary said `IMG_0306.JPG — 0 offers … 0 rows dropped for
