@@ -72,6 +72,29 @@ triggers see a fresh arrival.
 When an offer "didn't get picked up", check the ingestion workflow's executions
 first. The queue mechanism is almost certainly fine; the ingestion run failed.
 
+## Gmail credentials: n8n auto-assigns the wrong one
+
+Six `gmailOAuth2` credentials exist on this instance ("Gmail account" 1–5 and
+"offers n8n"). **The mailbox everything runs against is `offers n8n`
+(`qunIwKuc11bYHBVr`).** n8n auto-assigns "Gmail account" (`1C9YXLyY85aeKPpf`),
+which is a *different* mailbox — always set the credential explicitly on a new
+Gmail node and never accept the auto-assignment.
+
+This is not cosmetic. A node on the wrong mailbox does not fail at save time:
+
+- On a **write** it 404s — Gmail returns `notFound`, not a permission error, for a
+  thread outside the authenticated mailbox. That was the `Mark Needs Review` bug:
+  a valid thread and a valid label, failing for days.
+- On a **read** it silently returns nothing, which is worse. The stranded-mail
+  digest was auto-assigned the wrong credential and would have reported an empty
+  backlog forever.
+
+**To identify a credential, probe it.** The API will not reveal which credential a
+node uses, but you can point a read-only node at a query whose true answer you
+already know, run it under each candidate, and compare. That is how the above was
+settled: the same Gmail query returned 4 threads under `offers n8n` and 0 under
+"Gmail account", seconds apart.
+
 ## n8n has drafts. Saving is not shipping.
 
 This n8n instance uses **draft / published versions**. `update_workflow` writes to

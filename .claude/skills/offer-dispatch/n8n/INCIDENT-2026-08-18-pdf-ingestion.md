@@ -24,25 +24,52 @@ The obvious causes are all wrong, so don't re-check them:
 - **The sibling node works.** `Mark PDF Done` does the same thread→addLabels and
   succeeded at 08:01 on 18 Aug (thread `1a013e24d37f45bd`, `Label_10`).
 
-## What is left, and it needs 20 seconds in the UI
+## Root cause — proven
 
-Every observation is consistent with **`Mark Needs Review` authenticating as a
-different Gmail account than the trigger and `Mark PDF Done`**. Gmail returns 404,
-not 403, for a thread that is not in the authenticated mailbox — so a wrong
-credential looks exactly like a missing thread.
+**`Mark Needs Review` was authenticated against the wrong mailbox.**
 
-The error snapshot shows `Mark Needs Review` using `gmailOAuth2` credential
-`1C9YXLyY85aeKPpf` ("Gmail account"). The n8n API strips credentials from
-`get_workflow_details` and from version snapshots, so **which credential
-`Mark PDF Done` uses cannot be read through MCP** — only the UI shows it.
+Gmail returns **404 notFound**, not 403, for a thread that is not in the
+authenticated mailbox — so a wrong credential is indistinguishable from a missing
+thread, which is why every "is the thread there?" check came back clean.
 
-> **Action for Anil:** open both `Mark PDF Done` and `Mark Needs Review` and
-> confirm they point at the same Gmail account. There are six `gmailOAuth2`
-> credentials on this instance ("Gmail account" 1–5 and "offers n8n"), and the
-> base already has one credential-hygiene incident on record (the dead duplicate
-> "Bearer Auth account 2", deleted 2026-08-06).
+The n8n API strips credentials from `get_workflow_details` and from version
+snapshots, so the credential could not simply be read. It was established by
+experiment instead: run the **same Gmail query, seconds apart, under each
+candidate credential** and compare against the real mailbox.
 
-This is an inference, not a proof. It is the only hypothesis left standing.
+| Credential | Query `label:Process_Akay label:Akay/Needs-Review -label:Akay_Processed` |
+|---|---|
+| `1C9YXLyY85aeKPpf` "Gmail account" — what the node used | **0 threads** |
+| `qunIwKuc11bYHBVr` "offers n8n" | **4 threads** |
+| Direct Gmail connector (ground truth) | **4 threads** |
+
+`Mark PDF Done` was on the right credential all along, which is exactly why the
+success path always worked and only the review path ever broke.
+
+**Fixed:** `Mark Needs Review` now uses `qunIwKuc11bYHBVr` ("offers n8n").
+
+**Verified end to end.** Execution 20504 replayed the exact message that had
+404'd three times that day (`1a0141a194cb9a68`, via the manual Backfill entry
+point): `Collect Threads (Review)` emitted the one distinct thread, and
+`Mark Needs Review` **succeeded**, returning the thread with `Akay/Needs-Review`
+applied. Whole run green.
+
+That run also settled the business question: all five image attachments yield
+0 offers, so the Guinness/Kilkenny mail genuinely has no machine-readable price
+list and correctly belongs in the review queue — a human has to read it.
+
+### The generalisable technique
+
+Credentials cannot be read through the API, but they can be **probed**: point a
+read-only node at a query whose true answer you already know, run it under each
+candidate, and compare. Six `gmailOAuth2` credentials exist on this instance
+("Gmail account" 1–5, "offers n8n") and n8n **auto-assigns the wrong one** —
+creating the digest workflow silently attached "Gmail account" to both its nodes,
+which would have made it report an empty backlog forever.
+
+> **Worth auditing:** every other Gmail node in the estate. A node on the wrong
+> mailbox does not throw at save time; it 404s on write, or silently returns
+> nothing on read. The second failure mode is the dangerous one.
 
 ## Fixed on 18 Aug, published
 
