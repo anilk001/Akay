@@ -11,11 +11,11 @@
     "Stock Display": "Enquire for availability",
     "Bond/Customs Status": "T2",
     "Public Terms": "EXW Loendersloot",
-    "Price Display": "EUR 109.20",
+    "Price Display": "EUR 107.00",
     "Bundle Title": "Spirits & Aperitifs — T2, EXW Loendersloot & Slovenia",
-    "Price Per Unit & Case": "EUR 109.20/case (12pk) · EUR 9.10/unit",
+    "Price Per Unit & Case": "EUR 107.00/case (12pk) · EUR 8.92/unit",
     "MOQ": "1 FTL",
-    "Sell Price": 109.2,
+    "Sell Price": 107,
     "Supplier Name": [
       "Zentner Handels"
     ],
@@ -35,11 +35,11 @@
     "Stock Display": "Enquire for availability",
     "Bond/Customs Status": "T2",
     "Public Terms": "EXW Loendersloot",
-    "Price Display": "EUR 20.58",
+    "Price Display": "EUR 20.60",
     "Bundle Title": "Spirits & Aperitifs — T2, EXW Loendersloot & Slovenia",
-    "Price Per Unit & Case": "EUR 20.58/case (6pk) · EUR 3.43/unit",
+    "Price Per Unit & Case": "EUR 20.60/case (6pk) · EUR 3.43/unit",
     "MOQ": "2 FTL",
-    "Sell Price": 20.58,
+    "Sell Price": 20.6,
     "Supplier Name": [
       "Zentner Handels"
     ],
@@ -59,17 +59,41 @@
     "Stock Display": "Enquire for availability",
     "Bond/Customs Status": "T2",
     "Public Terms": "EXW Loendersloot",
-    "Price Display": "EUR 34.13",
+    "Price Display": "EUR 33.50",
     "Bundle Title": "Spirits & Aperitifs — T2, EXW Loendersloot & Slovenia",
-    "Price Per Unit & Case": "EUR 34.13/case (6pk) · EUR 5.69/unit",
+    "Price Per Unit & Case": "EUR 33.50/case (6pk) · EUR 5.58/unit",
     "MOQ": "1 FTL",
-    "Sell Price": 34.13,
+    "Sell Price": 33.5,
     "Supplier Name": [
       "Zentner Handels"
     ],
     "Price Type": "Per Case",
     "Public Note": "",
     "Lead Time": ""
+  },
+  {
+    "id": "recrLta5m0Y8jD4Lp",
+    "Offer Name": "Jim Beam White 12x1L — Zentner Handels — 2026-08-19",
+    "Public Product Description": "Jim Beam White",
+    "Public Spec": "12 x 1000ml",
+    "Price Per Unit & Case": "EUR 68.00/case (12pk) · EUR 5.67/unit",
+    "Price Display": "EUR 68.00",
+    "Price Type": "Per Case",
+    "Bond/Customs Status": "T2",
+    "Stock Display": "In Stock",
+    "Availability": "1260 cases in stock",
+    "MOQ": "",
+    "Lead Time": "2 weeks",
+    "Public Terms": "EXW Loendersloot",
+    "Public Note": "",
+    "Auto Expiry Date": "2026-09-18T00:00:00.000Z",
+    "Bundle ID": "SPIRITS-APERITIFS-T2-2026-08-19",
+    "Bundle Title": "Spirits & Aperitifs — T2, EXW Loendersloot & Slovenia",
+    "Supplier Name": [
+      "Zentner Handels"
+    ],
+    "Buy Price": 68,
+    "Sell Price": 68
   },
   {
     "id": "recSkQSulVpkR7xz6",
@@ -83,11 +107,11 @@
     "Stock Display": "Enquire for availability",
     "Bond/Customs Status": "T2",
     "Public Terms": "EXW Intereuropa, Slovenia",
-    "Price Display": "EUR 120.75",
+    "Price Display": "EUR 118.00",
     "Bundle Title": "Spirits & Aperitifs — T2, EXW Loendersloot & Slovenia",
-    "Price Per Unit & Case": "EUR 120.75/case (6pk) · EUR 20.13/unit",
+    "Price Per Unit & Case": "EUR 118.00/case (6pk) · EUR 19.67/unit",
     "MOQ": "1 FTL",
-    "Sell Price": 120.75,
+    "Sell Price": 118,
     "Supplier Name": [
       "Zentner Handels"
     ],
