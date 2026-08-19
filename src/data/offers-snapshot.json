@@ -464,7 +464,7 @@
    "stock": "warn",
    "qty": 5,
    "terms": "EXW Loendersloot",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -1004,7 +1004,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "CFR Major Global Ports",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -1292,7 +1292,7 @@
    "stock": "warn",
    "qty": 2,
    "terms": "EXW Loendersloot",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -1724,7 +1724,7 @@
    "stock": "in",
    "qty": 4260,
    "terms": "EXW Loendersloot",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -3236,7 +3236,7 @@
    "stock": "in",
    "qty": 225,
    "terms": "EXW Loendersloot",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -3290,7 +3290,7 @@
    "stock": "warn",
    "qty": 25,
    "terms": "EXW Loendersloot",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -4298,7 +4298,7 @@
    "stock": "in",
    "qty": 950,
    "terms": "EXW Loendersloot",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -4856,7 +4856,7 @@
    "stock": "warn",
    "qty": 1,
    "terms": "EXW Loendersloot",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -4928,7 +4928,7 @@
    "stock": "warn",
    "qty": 20,
    "terms": "EXW Loendersloot",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -5108,7 +5108,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "CFR Major Global Ports",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -5738,7 +5738,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "CFR Major Global Ports",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -7682,7 +7682,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "CFR Major Global Ports",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -8222,7 +8222,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "CFR Major Global Ports",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -8276,7 +8276,7 @@
    "stock": "warn",
    "qty": 3,
    "terms": "EXW Loendersloot",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -8528,7 +8528,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "CFR Major Global Ports",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -9248,7 +9248,7 @@
    "stock": "in",
    "qty": 356,
    "terms": "EXW Loendersloot",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -9698,7 +9698,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "CFR Major Global Ports",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -9860,7 +9860,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "CFR Major Global Ports",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -9878,7 +9878,7 @@
    "stock": "in",
    "qty": 430,
    "terms": "EXW Loendersloot",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -9932,7 +9932,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "CFR Major Global Ports",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -10526,7 +10526,7 @@
    "stock": "in",
    "qty": 240,
    "terms": "EXW Loendersloot",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -11030,7 +11030,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "CFR Major Global Ports",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -12164,7 +12164,7 @@
    "stock": "in",
    "qty": 1470,
    "terms": "EXW Loendersloot",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -12344,7 +12344,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "CFR Major Global Ports",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -12722,7 +12722,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "CFR Major Global Ports",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -12794,7 +12794,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "CFR Major Global Ports",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -13784,7 +13784,7 @@
    "stock": "in",
    "qty": 80,
    "terms": "EXW Loendersloot",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -15458,7 +15458,7 @@
    "stock": "in",
    "qty": 3565,
    "terms": "EXW Loendersloot",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -16538,7 +16538,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "CFR Major Global Ports",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -16574,7 +16574,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "CFR Major Global Ports",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -17762,7 +17762,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "CFR Major Global Ports",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -17888,7 +17888,7 @@
    "stock": "in",
    "qty": 384,
    "terms": "EXW Loendersloot",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -18356,7 +18356,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "CFR Major Global Ports",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -19364,7 +19364,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "CFR Major Global Ports",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -20138,7 +20138,7 @@
    "stock": "in",
    "qty": 335,
    "terms": "EXW Loendersloot",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -20210,7 +20210,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "CFR Major Global Ports",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -21578,7 +21578,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "CFR Major Global Ports",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -21614,7 +21614,7 @@
    "stock": "in",
    "qty": 1000,
    "terms": "EXW Loendersloot",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -22136,7 +22136,7 @@
    "stock": "in",
    "qty": 250,
    "terms": "EXW Loendersloot",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -22982,7 +22982,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "CFR Major Global Ports",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -24440,7 +24440,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "CFR Major Global Ports",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -24962,7 +24962,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "CFR Major Global Ports",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -25610,7 +25610,7 @@
    "stock": "in",
    "qty": 229,
    "terms": "EXW Loendersloot",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -25772,7 +25772,7 @@
    "stock": "in",
    "qty": 60,
    "terms": "EXW Loendersloot",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -25952,7 +25952,7 @@
    "stock": "warn",
    "qty": 48,
    "terms": "EXW Loendersloot",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -26150,7 +26150,7 @@
    "stock": "in",
    "qty": 344,
    "terms": "EXW Loendersloot",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -26186,7 +26186,7 @@
    "stock": "in",
    "qty": 550,
    "terms": "EXW Loendersloot",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -26330,7 +26330,7 @@
    "stock": "warn",
    "qty": 12,
    "terms": "EXW Loendersloot",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -27446,7 +27446,7 @@
    "stock": "warn",
    "qty": 8,
    "terms": "EXW Loendersloot",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -28508,7 +28508,7 @@
    "stock": "in",
    "qty": 288,
    "terms": "EXW Loendersloot",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -28922,7 +28922,7 @@
    "stock": "in",
    "qty": 2400,
    "terms": "EXW Loendersloot",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -28976,7 +28976,7 @@
    "stock": "in",
    "qty": 180,
    "terms": "EXW Loendersloot",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -29354,7 +29354,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "CFR Major Global Ports",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -30992,7 +30992,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "CFR Major Global Ports",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -31190,7 +31190,7 @@
    "stock": "in",
    "qty": 261,
    "terms": "EXW Loendersloot",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -31370,7 +31370,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "CFR Major Global Ports",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -33134,7 +33134,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "CFR Major Global Ports",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -33314,7 +33314,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "CFR Major Global Ports",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -33782,7 +33782,7 @@
    "stock": "in",
    "qty": 6250,
    "terms": "EXW Loendersloot",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -35906,7 +35906,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "CFR Major Global Ports",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -37958,7 +37958,7 @@
    "stock": "in",
    "qty": 210,
    "terms": "EXW Loendersloot",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -39596,7 +39596,7 @@
    "stock": "in",
    "qty": 840,
    "terms": "EXW Loendersloot",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -43034,7 +43034,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "CFR Major Global Ports",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -43286,7 +43286,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "CFR Major Global Ports",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -43394,7 +43394,7 @@
    "stock": "in",
    "qty": 586,
    "terms": "EXW Loendersloot",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -43844,7 +43844,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "CFR Major Global Ports",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -43988,7 +43988,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "CFR Major Global Ports",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -44006,7 +44006,7 @@
    "stock": "warn",
    "qty": 14,
    "terms": "EXW Loendersloot",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -45428,7 +45428,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "CFR Major Global Ports",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -46652,7 +46652,7 @@
    "stock": "in",
    "qty": 300,
    "terms": "EXW Loendersloot",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -46760,7 +46760,7 @@
    "stock": "warn",
    "qty": 20,
    "terms": "EXW Loendersloot",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -47030,7 +47030,7 @@
    "stock": "warn",
    "qty": 1,
    "terms": "EXW Loendersloot",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -48362,7 +48362,7 @@
    "stock": "in",
    "qty": 80,
    "terms": "EXW Loendersloot",
-   "tier": "T1",
+   "tier": "",
    "origin": "",
    "featured": false
   },
