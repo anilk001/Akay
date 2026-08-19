@@ -43,6 +43,60 @@ AIRTABLE_TOKEN=pat... npm run sync-offers
 
 ---
 
+## Trade assistant (chat)
+
+A **Ask for an offer** button sits on the catalogue. A buyer types what they
+want in plain English — *"Jameson 70, Monkey Shoulder and Smirnoff"* — and the
+assistant answers with our live prices, then offers to send the list to their
+**WhatsApp** or **email**.
+
+```
+browser  ──POST /api/chat──▶  netlify/functions/chat.mjs
+                                 │  ├─ search_offers        → /offers-index.json
+                                 │  ├─ send_whatsapp_quote  → wa.me deep link
+                                 │  └─ request_email_quote  → n8n Chat Quote Handler
+                                 └─ Claude (claude-opus-5)
+```
+
+Three things make this safe to point at a public site:
+
+- **It cannot invent a price.** The model never sees the catalogue as free text.
+  It calls `search_offers`, and every figure it repeats is copied from
+  `/offers-index.json` — the same `getOffers()` data that renders the cards, so
+  the chat and the page can never disagree.
+- **The key stays server-side.** The site is static; the Netlify function is the
+  only place `ANTHROPIC_API_KEY` exists. Conversation history arriving from the
+  browser is rebuilt as plain user/assistant text, so a crafted payload cannot
+  forge tool results.
+- **Nothing is emailed to a buyer automatically.** `request_email_quote` posts to
+  the n8n **Chat Quote Handler**, which logs a draft Enquiry in Airtable as
+  *Pending Review* and notifies `ak@akay.ie` — the same review-first flow as the
+  Category Request Handler. The assistant tells the buyer their quote is with the
+  team, never that it has been sent.
+
+WhatsApp needs no API: the assistant builds a `wa.me` link with the quote already
+written out, and the buyer taps to send it to us.
+
+### Turning it on
+
+1. Set `ANTHROPIC_API_KEY` in Netlify → Site settings → Environment variables.
+2. Set `AKAY_QUOTE_WEBHOOK_URL` to the Chat Quote Handler production webhook
+   (`https://akay-team.app.n8n.cloud/webhook/chat-quote`).
+3. Publish the **Chat Quote Handler — Akay** workflow in n8n (created inactive)
+   and confirm its Airtable and Gmail credentials.
+
+Without step 1 the widget says it is not configured. Without steps 2–3 the search
+and WhatsApp paths still work; the assistant declines the email option and points
+the buyer at WhatsApp instead of pretending it worked.
+
+The search itself lives in [`src/lib/offer-search.mjs`](./src/lib/offer-search.mjs)
+— plain string scoring, no dependencies. It normalises bottle sizes so "Jameson
+70" matches rows written `6 x 700ml`, and when no size is given it returns one
+line per pack format so a 5cl miniature does not outrank the standard bottle on
+price-per-unit.
+
+---
+
 ## Environment variables
 
 | Variable | Purpose |
@@ -50,6 +104,9 @@ AIRTABLE_TOKEN=pat... npm run sync-offers
 | `AIRTABLE_TOKEN` | **Read-only** Personal Access Token (`data.records:read`, `schema.bases:read`). Build-time only; never shipped to the browser. |
 | `AIRTABLE_BASE_ID` | Defaults to the `Akay Offers` base (`appaDSdZkAE9PGkjT`). |
 | `AIRTABLE_OFFERS_TABLE` | Defaults to `Offers`. |
+| `ANTHROPIC_API_KEY` | Powers the trade assistant. **Server-side only** — read by the Netlify function, never exposed to the browser. |
+| `AKAY_QUOTE_WEBHOOK_URL` | n8n Chat Quote Handler webhook. Unset = the assistant declines the email option rather than silently dropping it. |
+| `AKAY_WHATSAPP_NUMBER` | Defaults to `353872382368`. |
 
 Never commit the token — `.env` is git-ignored.
 

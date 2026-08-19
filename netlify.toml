@@ -6,9 +6,18 @@
 [build]
   command = "npm run build"
   publish = "dist"
+  functions = "netlify/functions"
 
 [build.environment]
   NODE_VERSION = "20"
+
+# The trade assistant. The site itself is static; this is the only server-side
+# piece, and it exists so the Anthropic key never reaches the browser. It is
+# reachable at /api/chat (declared in the function's own `config.path`).
+# Set ANTHROPIC_API_KEY and AKAY_QUOTE_WEBHOOK_URL in Site settings ->
+# Environment variables.
+[functions]
+  node_bundler = "esbuild"
 
 # Long-cache the immutable hashed assets and the logo.
 [[headers]]
@@ -20,3 +29,9 @@
   for = "/akay-bird.png"
   [headers.values]
     Cache-Control = "public, max-age=86400"
+
+# The assistant's search index — rebuilt on every deploy, so keep it short-lived.
+[[headers]]
+  for = "/offers-index.json"
+  [headers.values]
+    Cache-Control = "public, max-age=300"

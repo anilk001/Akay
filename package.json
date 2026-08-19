@@ -11,6 +11,7 @@
     "sync-offers": "node src/lib/fetch-offers.mjs"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.119.0",
     "astro": "^4.16.18"
   }
 }
