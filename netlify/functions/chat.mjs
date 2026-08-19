@@ -187,7 +187,7 @@ export async function runTool(name, input, offers, out) {
       note: input.note || '',
       source: 'Website Chat',
       lines: picked.map((o) => ({
-        id: o.id, name: o.name, spec: o.spec, price: o.priceDetail,
+        id: o.id, name: o.name, brand: o.brand, spec: o.spec, price: o.priceDetail,
         currency: o.currency, terms: o.terms, stock: o.stock, qty: o.qty,
       })),
       quoteText: quoteText(picked, { name: input.buyer_name, note: input.note }),
