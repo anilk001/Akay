@@ -20,7 +20,30 @@ const FIELDS = [
   'Price Display', 'Currency', 'Price Per Unit & Case', 'PCS/Case',
   'Stock Display', 'Stock Cases', 'Public Terms',
   'Bond/Customs Status', 'Origin Country', 'Public Listing', 'Featured',
+  // Live-status gates. Fetched to be CHECKED, never rendered and never emitted
+  // to the browser — normalize() deliberately drops them. See isLive() below.
+  'Status', 'Offer Approval Status', 'Is Expired', 'Listing Approved',
 ];
+
+// The four conditions that actually make an offer publishable, per the
+// "Awaiting Website Publish" queue in n8n:
+//   Status=Live, Offer Approval Status=Approved, Is Expired=No, Listing Approved
+//
+// The query already filters on {Public Listing}='Yes', which is meant to encode
+// exactly this. We re-check it here anyway, in JavaScript, because a stale or
+// expired price quoted with confidence is the worst failure this catalogue has —
+// and the assistant quotes these numbers directly at buyers.
+//
+// A missing field PASSES. That keeps this a safety net rather than a new way for
+// the build to silently empty the catalogue if a field is ever renamed.
+export function isLive(f = {}) {
+  const val = (k) => (f[k] === undefined ? undefined : String(f[k]).trim().toLowerCase());
+  if (val('Status') !== undefined && val('Status') !== 'live') return false;
+  if (val('Offer Approval Status') !== undefined && val('Offer Approval Status') !== 'approved') return false;
+  if (val('Is Expired') !== undefined && val('Is Expired') === 'yes') return false;
+  if (f['Listing Approved'] === false) return false;
+  return true;
+}
 
 function stockCode(label = '') {
   const s = String(label).toLowerCase();
@@ -132,6 +155,7 @@ async function fetchLive() {
   const base = `https://api.airtable.com/v0/${BASE}/${encodeURIComponent(TABLE)}`;
   const headers = { Authorization: `Bearer ${TOKEN}` };
   const out = [];
+  let notLive = 0;
   let offset;
   do {
     const url = new URL(base);
@@ -144,11 +168,22 @@ async function fetchLive() {
     if (!res.ok) throw new Error(`Airtable ${res.status}: ${await res.text()}`);
     const data = await res.json();
     for (const rec of data.records) {
+      if (!isLive(rec.fields)) { notLive++; continue; }
       const o = normalize(rec.fields, rec.id);
       if (o.name && !isTestRow(o.name)) out.push(o);
     }
     offset = data.offset;
   } while (offset);
+  // Loud on purpose: if this is ever non-zero, {Public Listing}='Yes' is letting
+  // through rows that are not actually live, and the site was showing them too.
+  if (notLive) console.warn(`[airtable] ${notLive} row(s) passed {Public Listing}='Yes' but failed the live check — excluded`);
+  // If the live check rejected everything, the field vocabulary has changed
+  // (renamed status, new value) rather than the catalogue genuinely being empty.
+  // Throw so getOffers() falls back to the last good snapshot: a safety net must
+  // never be the thing that takes the catalogue down.
+  if (!out.length && notLive) {
+    throw new Error(`live check excluded all ${notLive} rows — Status/Approval field values likely changed`);
+  }
   return out;
 }
 

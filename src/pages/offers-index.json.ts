@@ -13,6 +13,15 @@ import { getOffers } from '../data/airtable.mjs';
 // card. Supplier, buy price and margin are not in the offer object at all.
 export const prerender = true;
 
+// The ONLY keys allowed to reach the browser. This is the last gate before the
+// catalogue becomes a public file the assistant reads, so it is enforced rather
+// than assumed: if anyone ever adds a field to the data layer, the build fails
+// here instead of quietly publishing it.
+const PUBLIC_KEYS = [
+  'id', 'name', 'variants', 'brand', 'category', 'spec', 'currency',
+  'amount', 'unitAmount', 'priceDetail', 'stock', 'qty', 'terms', 'tier', 'origin',
+] as const;
+
 export const GET: APIRoute = async () => {
   const { offers, source } = await getOffers();
 
@@ -33,6 +42,17 @@ export const GET: APIRoute = async () => {
     tier: o.tier,
     origin: o.origin,
   }));
+
+  // Fail loudly rather than publish an unexpected field.
+  for (const row of index) {
+    const stray = Object.keys(row).filter((k) => !PUBLIC_KEYS.includes(k as any));
+    if (stray.length) {
+      throw new Error(
+        `offers-index: refusing to publish non-public field(s): ${stray.join(', ')}. ` +
+        `Add it to PUBLIC_KEYS only if it is genuinely safe for buyers to see.`
+      );
+    }
+  }
 
   return new Response(JSON.stringify({ source, count: index.length, offers: index }), {
     headers: {

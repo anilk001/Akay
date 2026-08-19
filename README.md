@@ -58,12 +58,28 @@ browser  ──POST /api/chat──▶  netlify/functions/chat.mjs
                                  └─ Claude (claude-opus-5)
 ```
 
-Three things make this safe to point at a public site:
+Four things make this safe to point at a public site:
 
 - **It cannot invent a price.** The model never sees the catalogue as free text.
   It calls `search_offers`, and every figure it repeats is copied from
   `/offers-index.json` — the same `getOffers()` data that renders the cards, so
   the chat and the page can never disagree.
+- **Live offers only, and no supplier or buy-price data — enforced, not assumed.**
+  Both guarantees are inherited from the data layer (the assistant reads the same
+  index the cards do, so it cannot reach anything the site does not already
+  publish), and both are then re-checked in code:
+  - `isLive()` in `src/data/airtable.mjs` re-applies the real publish gate —
+    `Status=Live`, `Offer Approval Status=Approved`, `Is Expired≠Yes`,
+    `Listing Approved` — on every row, on top of the `{Public Listing}='Yes'`
+    query. A missing field passes, so a rename cannot empty the catalogue; if the
+    check rejects *everything* the fetch throws and the last good snapshot is
+    served instead. Anything it excludes is logged: a non-zero count means
+    `Public Listing` was letting stale rows through to the site as well.
+  - `PUBLIC_KEYS` in `src/pages/offers-index.json.ts` is an explicit allowlist and
+    the build **fails** if any other key reaches the published index. The chat
+    function applies the same list again when it loads the index. Supplier, buy
+    price and margin are never requested from Airtable in the first place, so
+    there are three independent gates between them and a buyer.
 - **The key stays server-side.** The site is static; the Netlify function is the
   only place `ANTHROPIC_API_KEY` exists. Conversation history arriving from the
   browser is rebuilt as plain user/assistant text, so a crafted payload cannot

@@ -36,12 +36,27 @@ let cache = null;
 let cacheAt = 0;
 const CACHE_MS = 5 * 60 * 1000;
 
+// The only fields the assistant is ever allowed to see. The index is already
+// built from a public-safe allowlist, so this is belt and braces — but it is the
+// last gate before catalogue data reaches the model and the quote webhook, and
+// it costs nothing to make the guarantee structural instead of inherited.
+const PUBLIC_KEYS = [
+  'id', 'name', 'variants', 'brand', 'category', 'spec', 'currency',
+  'amount', 'unitAmount', 'priceDetail', 'stock', 'qty', 'terms', 'tier', 'origin',
+];
+
+function sanitize(raw) {
+  const o = {};
+  for (const k of PUBLIC_KEYS) if (raw[k] !== undefined) o[k] = raw[k];
+  return o;
+}
+
 async function catalogue() {
   if (cache && Date.now() - cacheAt < CACHE_MS) return cache;
   const res = await fetch(`${SITE}/offers-index.json`);
   if (!res.ok) throw new Error(`offers-index ${res.status}`);
   const data = await res.json();
-  const offers = data.offers || [];
+  const offers = (data.offers || []).map(sanitize);
   for (const o of offers) o._hay = haystack(o);   // precompute once, reuse per search
   cache = offers;
   cacheAt = Date.now();
