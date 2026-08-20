@@ -1603,24 +1603,6 @@
    "featured": false
   },
   {
-   "id": "rec1zuVEKTKnDJLvG",
-   "name": "Mumm Cordon Rouge Brut",
-   "variants": "Cordon Rouge Brut",
-   "brand": "Mumm",
-   "category": "Champagne",
-   "spec": "6 x 75cl x 12.5% alc",
-   "currency": "EUR",
-   "amount": 143.64,
-   "unitAmount": 23.94,
-   "priceDetail": "EUR 143.64/case (6pk) · EUR 23.94/unit",
-   "stock": "in",
-   "qty": 120,
-   "terms": "DAP Loendersloot",
-   "tier": "",
-   "origin": "",
-   "featured": false
-  },
-  {
    "id": "rec21R44VuYjuD1P2",
    "name": "Passoa Passionfruit 17%",
    "variants": "",
@@ -7538,24 +7520,6 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW",
-   "tier": "",
-   "origin": "",
-   "featured": false
-  },
-  {
-   "id": "rec9Q3u04vClDMzxB",
-   "name": "Monkey Shoulder",
-   "variants": "",
-   "brand": "Monkey Shoulder",
-   "category": "Spirits",
-   "spec": "6 x 70cl x 40% alc",
-   "currency": "EUR",
-   "amount": 78.75,
-   "unitAmount": 13.13,
-   "priceDetail": "EUR 78.75/case (6pk) · EUR 13.13/unit",
-   "stock": "in",
-   "qty": 700,
-   "terms": "DAP Loendersloot",
    "tier": "",
    "origin": "",
    "featured": false
@@ -16723,24 +16687,6 @@
    "featured": false
   },
   {
-   "id": "recKH255f7CB1gc8h",
-   "name": "Dos Maderas Seleccion Superior Reserve Rum + GB",
-   "variants": "",
-   "brand": "Dos Maderas",
-   "category": "Spirits",
-   "spec": "6 x 70cl x 42% alc",
-   "currency": "EUR",
-   "amount": 139.86,
-   "unitAmount": 23.31,
-   "priceDetail": "EUR 139.86/case (6pk) · EUR 23.31/unit",
-   "stock": "in",
-   "qty": 50,
-   "terms": "DAP Loendersloot",
-   "tier": "",
-   "origin": "",
-   "featured": false
-  },
-  {
    "id": "recKIucQCD8i9oO4B",
    "name": "Glen Moray 18y Elgin Heritage",
    "variants": "",
@@ -18541,24 +18487,6 @@
    "featured": false
   },
   {
-   "id": "recMeDaz11BX5XCMj",
-   "name": "Longmorn Distil Choice 70cl + GB",
-   "variants": "",
-   "brand": "Longmorn",
-   "category": "Spirits",
-   "spec": "6 x 70cl x 40% alc",
-   "currency": "EUR",
-   "amount": 166.95,
-   "unitAmount": 27.83,
-   "priceDetail": "EUR 166.95/case (6pk) · EUR 27.83/unit",
-   "stock": "warn",
-   "qty": 9,
-   "terms": "DAP Loendersloot",
-   "tier": "",
-   "origin": "",
-   "featured": false
-  },
-  {
    "id": "recMgIi2EctTvXVVX",
    "name": "Gillette Skin Shaving Gel 200ml Ultra Sensitive Shea Butter&Vitamin E",
    "variants": "",
@@ -18721,24 +18649,6 @@
    "featured": false
   },
   {
-   "id": "recMuGeVyhxZCnk9n",
-   "name": "Yamazakura Blended Japan + GB",
-   "variants": "",
-   "brand": "Yamazakura",
-   "category": "Spirits",
-   "spec": "6 x 70cl x 40% alc",
-   "currency": "EUR",
-   "amount": 147.42,
-   "unitAmount": 24.57,
-   "priceDetail": "EUR 147.42/case (6pk) · EUR 24.57/unit",
-   "stock": "warn",
-   "qty": 30,
-   "terms": "DAP Loendersloot",
-   "tier": "",
-   "origin": "",
-   "featured": false
-  },
-  {
    "id": "recMumX3sslPfhtU9",
    "name": "Patron XO Cafe Tequila 70CL 35%",
    "variants": "",
@@ -18789,24 +18699,6 @@
    "qty": 10,
    "terms": "EXW",
    "tier": "Bonded",
-   "origin": "",
-   "featured": false
-  },
-  {
-   "id": "recMzGRYwv2TXKrfh",
-   "name": "Jack Daniel's Barrel + GB",
-   "variants": "",
-   "brand": "Jack Daniel's",
-   "category": "Spirits",
-   "spec": "6 x 70cl x 47% alc",
-   "currency": "EUR",
-   "amount": 142.38,
-   "unitAmount": 23.73,
-   "priceDetail": "EUR 142.38/case (6pk) · EUR 23.73/unit",
-   "stock": "in",
-   "qty": 60,
-   "terms": "DAP Loendersloot",
-   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -28963,24 +28855,6 @@
    "featured": false
   },
   {
-   "id": "recY0t7j7lyZtA0KH",
-   "name": "Bowmore Sherry Cask 12YO + GB",
-   "variants": "12YO",
-   "brand": "Bowmore",
-   "category": "Spirits",
-   "spec": "6 x 70cl x 40% alc",
-   "currency": "EUR",
-   "amount": 173.88,
-   "unitAmount": 28.98,
-   "priceDetail": "EUR 173.88/case (6pk) · EUR 28.98/unit",
-   "stock": "in",
-   "qty": 100,
-   "terms": "DAP Loendersloot",
-   "tier": "",
-   "origin": "",
-   "featured": false
-  },
-  {
    "id": "recY37q9ZzWM5klKG",
    "name": "Beefeater Gin",
    "variants": "",
@@ -33225,24 +33099,6 @@
    "qty": 8,
    "terms": "EXW",
    "tier": "Bonded",
-   "origin": "",
-   "featured": false
-  },
-  {
-   "id": "recdgr6lHYQTxJz9T",
-   "name": "Glenmorangie Lasanta 15YO",
-   "variants": "Lasanta 15YO",
-   "brand": "Glenmorangie",
-   "category": "Spirits",
-   "spec": "6 x 70cl x 43% alc",
-   "currency": "EUR",
-   "amount": 204.75,
-   "unitAmount": 34.13,
-   "priceDetail": "EUR 204.75/case (6pk) · EUR 34.13/unit",
-   "stock": "in",
-   "qty": 200,
-   "terms": "DAP Loendersloot",
-   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -37761,24 +37617,6 @@
    "qty": 1000,
    "terms": "DAP Loendersloot",
    "tier": "T2",
-   "origin": "",
-   "featured": false
-  },
-  {
-   "id": "recjAELIiUKX7jsmD",
-   "name": "Courvoisier VS",
-   "variants": "VS",
-   "brand": "Courvoisier",
-   "category": "Spirits",
-   "spec": "6 x 100cl x 40% alc",
-   "currency": "EUR",
-   "amount": 136.08,
-   "unitAmount": 22.68,
-   "priceDetail": "EUR 136.08/case (6pk) · EUR 22.68/unit",
-   "stock": "in",
-   "qty": 200,
-   "terms": "DAP Loendersloot",
-   "tier": "",
    "origin": "",
    "featured": false
   },
@@ -51572,5 +51410,5 @@
   }
  ],
  "source": "snapshot",
- "generated": "2026-08-19"
+ "generated": "2026-08-20"
 }
