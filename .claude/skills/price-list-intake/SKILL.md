@@ -30,6 +30,18 @@ Rows it cannot price are written to the report, never silently dropped
 - After writing the CSV, run the offer-data-validator skill on it -
   import only a clean file.
 
+## Supplier adapters
+Some lists do not fit the one-header-row shape `intake_pricelist.py`
+assumes. Those get a named adapter next to it:
+- `intake_surya_graha.py` - PT. Surya Graha Pasaraya (Jakarta). Handles
+  brand-banner rows inside the L'Oreal/Garnier/Maybelline sheet and the
+  merged cells of the Ellips sheet, expands the supplier's SKU shorthand
+  where it is unambiguous (and flags what it will not guess), and applies
+  the trade margin plus the offer expiry date:
+  `python3 intake_surya_graha.py --loreal A.xlsx --ellips B.xlsx --out DIR
+   --margin 5 --expiry-days 30 --currency USD`
+  Writes `surya-graha-akay-import.csv` + `surya-graha-skipped.csv`.
+
 ## Import
 Airtable: Offers table -> view "zz temp..." or any grid -> right-click
 "Import data" -> CSV -> map columns 1:1 (names already match).
