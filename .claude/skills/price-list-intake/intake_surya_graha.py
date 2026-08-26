@@ -383,6 +383,9 @@ def main():
     ap.add_argument("--expiry-days", type=int, default=30)
     ap.add_argument("--currency", default="USD")
     ap.add_argument("--today", default=datetime.date.today().isoformat())
+    ap.add_argument("--keep-duplicates", action="store_true",
+                    help="keep re-listed lines (same product, pack and price) and only "
+                         "flag them, instead of importing one row per product")
     ap.add_argument("--drop-sell-through", action="store_true",
                     help="leave out lines the supplier marks 'Hanya untuk Sell Through' "
                          "(they are listed in the skipped file instead)")
@@ -396,18 +399,67 @@ def main():
     if args.ellips:
         parse_ellips(args.ellips, args, out, skipped)
 
-    # the supplier lists some SKUs twice (different distributor codes, same
-    # product and price) - flag them so the catalogue does not get twin cards.
-    seen = {}
+    # The supplier lists some SKUs twice - a re-issued distributor code, or the
+    # same line typed again. Two rows are the same offer only when brand, name,
+    # variant, pack AND price all match; a shared barcode alone is not enough,
+    # because the sheet reuses barcodes across genuinely different products.
+    def superseded(r):
+        return bool(re.search(r"digantikan", r["Supplier Remarks"], re.I))
+
+    groups = {}
     for r in out:
-        seen.setdefault((r["Brand"], r["Public Product Description"],
-                         r["PCS/Case"], r["Sell Price Per Case"]), []).append(r)
-    dupes = 0
-    for group in seen.values():
+        groups.setdefault((r["Brand"], r["Public Product Description"], r["Variant"],
+                           r["PCS/Case"], r["Sell Price Per Case"]), []).append(r)
+    dropped_dupes = []
+    for group in groups.values():
+        if len(group) == 1:
+            continue
+        # prefer a code the supplier has not marked as replaced ("digantikan kode X")
+        keeper = next((r for r in group if not superseded(r)), group[0])
+        others = [r for r in group if r is not keeper]
+        codes = ", ".join(f"row {r['Source Row']}"
+                          + (f" ({r['Supplier Ref']})" if r["Supplier Ref"] else "")
+                          for r in others)
+        note = f"supplier listed this {len(group)}x - duplicate not imported: {codes}"
+        keeper["Notes"] = f"{keeper['Notes']}; {note}" if keeper["Notes"] else note
+        for r in others:
+            if args.keep_duplicates:
+                flag = f"duplicate of row {keeper['Source Row']}"
+                r["Review"] = f"{r['Review']}; {flag}" if r["Review"] else flag
+                continue
+            skipped.append({"Source Row": r["Source Row"], "Source List": r["Source List"],
+                            "Ref": r["Supplier Ref"], "Name": r["Product Name"],
+                            "Reason": f"duplicate of row {keeper['Source Row']} "
+                                      f"(same product, pack and price)"})
+            dropped_dupes.append(r)
+    if not args.keep_duplicates:
+        out[:] = [r for r in out if r not in dropped_dupes]
+
+    # Same name, same pack, but a different price: either two shades the supplier
+    # describes identically, or a pricing error. Never merged - only surfaced.
+    by_name = {}
+    for r in out:
+        by_name.setdefault((r["Brand"], r["Public Product Description"],
+                            r["Variant"], r["PCS/Case"]), []).append(r)
+    for group in by_name.values():
         if len(group) > 1:
-            dupes += len(group)
             for r in group:
-                flag = f"duplicate line in the supplier list ({len(group)}x)"
+                rest = ", ".join(str(o["Source Row"]) for o in group if o is not r)
+                flag = (f"same name and pack as row {rest} at a different price - "
+                        "confirm these are different products")
+                r["Review"] = f"{r['Review']}; {flag}" if r["Review"] else flag
+
+    # A shared barcode across different descriptions is the supplier's own data
+    # problem - surfaced, never resolved by guessing.
+    by_barcode = {}
+    for r in out:
+        if r["Barcode"]:
+            by_barcode.setdefault(r["Barcode"], []).append(r)
+    for group in by_barcode.values():
+        if len(group) > 1:
+            for r in group:
+                rest = ", ".join(str(o["Source Row"]) for o in group if o is not r)
+                flag = f"shares barcode with row {rest} - confirm these are different products"
                 r["Review"] = f"{r['Review']}; {flag}" if r["Review"] else flag
 
     os.makedirs(args.out, exist_ok=True)
@@ -426,11 +478,13 @@ def main():
     reasons = {}
     for o in flagged:
         for part in o["Review"].split("; "):
-            key = part.split(":")[0]
+            key = re.sub(r"row [\d, ]+", "row N", part.split(":")[0])
             reasons[key] = reasons.get(key, 0) + 1
     for k, v in sorted(reasons.items(), key=lambda kv: -kv[1]):
         print(f"    {v:5d}  {k}")
-    print(f"    of which {dupes} rows are duplicate supplier lines")
+    print(f"DUPLICATES: {len(dropped_dupes)} re-listed rows left out (one row per product kept)"
+          if not args.keep_duplicates else
+          f"DUPLICATES: {len(dropped_dupes)} re-listed rows kept and flagged")
     print(f"SKIPPED: {len(skipped)} rows -> {skp}")
     why = {}
     for s in skipped:
