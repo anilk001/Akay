@@ -180,6 +180,26 @@ def price_block(buy_case, pack, margin, currency):
     return sell_case, sell_unit, disp_case, detail
 
 
+def read_price(value):
+    """-> (price, reason it cannot be used). Only a positive number is a price:
+    a zero, a blank, a negative or a broken formula never becomes an offer."""
+    if value in (None, ""):
+        return None, "no FOB price on the list"
+    if isinstance(value, str):
+        txt = value.strip()
+        if txt.startswith("#"):          # #REF!, #N/A - broken formula in the sheet
+            return None, f"price cell is a spreadsheet error ({txt})"
+        try:
+            value = float(txt.replace(",", "."))
+        except ValueError:
+            return None, f"price is not a number ({txt!r})"
+    if value == 0:
+        return None, "zero price on the supplier list"
+    if value < 0:
+        return None, f"negative price ({value})"
+    return float(value), ""
+
+
 def base_row(**kw):
     row = {c: "" for c in COLUMNS}
     row.update(kw)
@@ -223,11 +243,12 @@ def parse_loreal(path, args, out, skipped):
                                 "Ref": "", "Name": label,
                                 "Reason": "filler row (dashes only)"})
             continue
-        if not isinstance(price, (int, float)) or price == 0:
-            # brand banner rows carry a name and nothing else; real products
-            # with a zero price are a supplier gap and must be reported.
+        price, why = read_price(price)
+        if price is None:
+            # brand banner rows carry a name and nothing else; a real product the
+            # supplier left unpriced is a gap in their list and must be reported.
             has_sku = str(barcode or "").strip() not in ("", "-")
-            kind = ("no FOB price on the list" if has_sku else
+            kind = (why if has_sku else
                     "section banner" if label else "blank spacer row")
             ref = str(code or "").strip()
             skipped.append({"Source Row": i, "Source List": "LOREAL_GARNIER",
@@ -278,7 +299,7 @@ def parse_loreal(path, args, out, skipped):
             "Volume ML": ml if ml else "", "PCS/Case": pack, "Unit Type": unit_type,
             "Supplier Remarks": rem,
         })
-        out.append(finish(row, float(price), pack, args, unexplained, notes, review))
+        out.append(finish(row, price, pack, args, unexplained, notes, review))
 
 
 # --- Ellips sheet --------------------------------------------------------
@@ -308,9 +329,10 @@ def parse_ellips(path, args, out, skipped):
         if not any(v not in (None, "") for v in (name, variant, vol, price)):
             continue
         label = re.sub(r"\s+", " ", str(name or "")).strip()
-        if not isinstance(price, (int, float)) or price == 0:
+        price, why = read_price(price)
+        if price is None:
             skipped.append({"Source Row": i, "Source List": "ELLIPS", "Ref": "",
-                            "Name": label, "Reason": "no FOB price on the list"})
+                            "Name": label, "Reason": why})
             continue
         if not isinstance(pack, (int, float)) or pack <= 0:
             skipped.append({"Source Row": i, "Source List": "ELLIPS", "Ref": "",
@@ -350,7 +372,7 @@ def parse_ellips(path, args, out, skipped):
             "Volume ML": ml if ml else "", "PCS/Case": pack, "Unit Type": unit_type,
             "Supplier Remarks": packtxt,
         })
-        out.append(finish(row, float(price), pack, args, [], notes, review))
+        out.append(finish(row, price, pack, args, [], notes, review))
 
 
 def main():
