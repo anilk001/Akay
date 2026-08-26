@@ -105,9 +105,29 @@ publish gate). The 419 PACK problems it reports are exactly the "no unit size" r
 
 ## Importing
 
-Airtable → `Akay Offers` base → `Offers` table → grid view → right-click → *Import data* →
-CSV. Column names match the base 1:1. `Source List`, `Source Row`, `Review` and
-`Notes` are working columns — map them to internal fields or drop them at import; they
+Either route works; both create the same records.
+
+**By hand:** Airtable → `Akay Offers` base → `Offers` table → grid view → right-click →
+*Import data* → CSV. Column names match the base 1:1.
+
+**By script:**
+
+```bash
+export AIRTABLE_TOKEN=pat...          # needs data.records:write + schema.bases:read
+python3 .claude/skills/price-list-intake/push_to_airtable.py \
+    imports/2026-08-26-surya-graha/surya-graha-akay-import.csv --limit 5   # dry run
+python3 .claude/skills/price-list-intake/push_to_airtable.py \
+    imports/2026-08-26-surya-graha/surya-graha-akay-import.csv --commit
+```
+
+It reads the live table schema first and refuses to write if any column is missing from
+the base, so a renamed field cannot silently drop data. Writes in batches of 10 under the
+API rate limit. `--limit N` does a trial run of the first N rows.
+
+Note: `api.airtable.com` is outside this sandbox's network allowlist, so the push has to
+run somewhere with Airtable access (or the host has to be allowed for the environment).
+ `Source List` and `Source Row` are working columns the
+script leaves out by default; `Review` and `Notes` are internal columns — map them to internal fields or drop them at import; they
 must never be added to the public field allowlist in `src/data/airtable.mjs`.
 
 Supplier identity, buy price and margin stay internal — the catalogue only ever requests
