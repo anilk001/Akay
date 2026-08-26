@@ -1,0 +1,71 @@
+name: Import offers into Airtable
+
+# Loads an intake CSV (imports/<date>-<supplier>/*-akay-import.csv) into the
+# Airtable Offers table.
+#
+# This runs here rather than from a Claude Code session because GitHub runners
+# have open egress, while sandboxed sessions cannot reach api.airtable.com.
+# Same reason the refresh workflow does the Airtable read.
+#
+# REQUIRED: a repository secret named AIRTABLE_WRITE_TOKEN — a Personal Access
+#   Token with data.records:write AND schema.bases:read on the Akay Offers base.
+#   The existing AIRTABLE_TOKEN is read-only and cannot create records, so it is
+#   deliberately not used here.
+#
+# Always dry-run first (leave "commit" unchecked): the script prints what it
+# would send and stops if any CSV column is missing from the base.
+
+on:
+  workflow_dispatch:
+    inputs:
+      csv:
+        description: 'CSV to import'
+        required: true
+        default: 'imports/2026-08-26-surya-graha/surya-graha-akay-import.csv'
+      limit:
+        description: 'Only the first N rows (blank = all rows)'
+        required: false
+        default: '5'
+      commit:
+        description: 'Create the records for real (unchecked = dry run)'
+        type: boolean
+        required: true
+        default: false
+
+concurrency:
+  group: airtable-import          # never two imports at once
+  cancel-in-progress: false
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Push the CSV into Airtable
+        env:
+          AIRTABLE_WRITE_TOKEN: ${{ secrets.AIRTABLE_WRITE_TOKEN }}
+          AIRTABLE_BASE_ID: ${{ vars.AIRTABLE_BASE_ID || 'appaDSdZkAE9PGkjT' }}
+          AIRTABLE_OFFERS_TABLE: ${{ vars.AIRTABLE_OFFERS_TABLE || 'Offers' }}
+        run: |
+          if [ -z "$AIRTABLE_WRITE_TOKEN" ]; then
+            echo "::error::AIRTABLE_WRITE_TOKEN is not set. Add a write-scoped Airtable PAT"
+            echo "::error::under Settings -> Secrets and variables -> Actions. Nothing was imported."
+            exit 1
+          fi
+          if [ ! -f "${{ inputs.csv }}" ]; then
+            echo "::error::No such file: ${{ inputs.csv }}"
+            exit 1
+          fi
+
+          export AIRTABLE_TOKEN="$AIRTABLE_WRITE_TOKEN"
+          ARGS=""
+          [ -n "${{ inputs.limit }}" ] && ARGS="$ARGS --limit ${{ inputs.limit }}"
+          [ "${{ inputs.commit }}" = "true" ] && ARGS="$ARGS --commit"
+
+          echo "Importing ${{ inputs.csv }} ($([ "${{ inputs.commit }}" = "true" ] && echo "FOR REAL" || echo "dry run"))"
+          python3 .claude/skills/price-list-intake/push_to_airtable.py "${{ inputs.csv }}" $ARGS

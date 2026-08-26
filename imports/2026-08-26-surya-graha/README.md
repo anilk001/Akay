@@ -124,8 +124,14 @@ It reads the live table schema first and refuses to write if any column is missi
 the base, so a renamed field cannot silently drop data. Writes in batches of 10 under the
 API rate limit. `--limit N` does a trial run of the first N rows.
 
-Note: `api.airtable.com` is outside this sandbox's network allowlist, so the push has to
-run somewhere with Airtable access (or the host has to be allowed for the environment).
+**From GitHub Actions** (the runner has open egress, like the refresh workflow):
+Actions tab → *Import offers into Airtable* → Run workflow. Leave *commit* unchecked for a
+dry run first. It needs a repository secret `AIRTABLE_WRITE_TOKEN` — a PAT with
+`data.records:write` and `schema.bases:read`. The existing `AIRTABLE_TOKEN` is read-only,
+so it cannot create records.
+
+Note: `api.airtable.com` is outside a sandboxed session's network allowlist, so the push
+runs from Actions, from your machine, or from any environment where the host is allowed.
  `Source List` and `Source Row` are working columns the
 script leaves out by default; `Review` and `Notes` are internal columns — map them to internal fields or drop them at import; they
 must never be added to the public field allowlist in `src/data/airtable.mjs`.
