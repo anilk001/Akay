@@ -52,16 +52,21 @@ SIGN_BRAND = {
     "MYB": "Maybelline",
 }
 
-# Supplier packaging word -> Offers.Unit Type, which only offers
-# Bottle/Can/Jar/Pack/Piece/Other. The exact supplier word is preserved in
-# Notes so nothing is lost by the mapping.
+# Supplier packaging word -> Offers.Unit Type. Tube and Sachet were added to
+# the field on 2026-08-26 (Anil) because they are the two commonest forms in
+# this catalogue - 199 tube lines and 114 sachet lines - and folding them into
+# "Piece" threw away the part a buyer actually asks about. The remaining
+# oddments (ampoule, pen, pump, bag) stay as Piece and blister/hanger/renceng
+# as Pack; the exact supplier word is preserved in Notes either way.
 UNIT_MAP = {
     "BOTTLE": "Bottle", "BOTOL": "Bottle",
     "CAN": "Can",
     "JAR": "Jar",
+    "TUBE": "Tube",
+    "SACHET": "Sachet",
     "BOX": "Pack", "BOKS": "Pack", "PACK": "Pack", "BUNDLE": "Pack",
     "BLISTER": "Pack", "HANGER": "Pack", "RENCENG": "Pack",
-    "PCS": "Piece", "TUBE": "Piece", "SACHET": "Piece", "AMPOULE": "Piece",
+    "PCS": "Piece", "AMPOULE": "Piece",
     "PEN": "Piece", "PUMP": "Piece", "BAG": "Piece",
 }
 
