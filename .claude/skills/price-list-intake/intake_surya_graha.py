@@ -258,6 +258,13 @@ def parse_loreal(path, args, out, skipped):
             review.append("bundle/value set - confirm what the case contains")
         rem = str(remark or "").strip()
         if re.search(r"sell through", rem, re.I):
+            # the supplier's REMARKS column marks these local sell-through only,
+            # so they are not ours to export.
+            if args.drop_sell_through:
+                skipped.append({"Source Row": i, "Source List": "LOREAL_GARNIER",
+                                "Ref": str(code or "").strip(), "Name": label,
+                                "Reason": "sell-through only (supplier remark)"})
+                continue
             review.append("supplier marks it sell-through only")
         row = base_row(**{
             "Source List": "LOREAL_GARNIER", "Source Row": i,
@@ -354,6 +361,9 @@ def main():
     ap.add_argument("--expiry-days", type=int, default=30)
     ap.add_argument("--currency", default="USD")
     ap.add_argument("--today", default=datetime.date.today().isoformat())
+    ap.add_argument("--drop-sell-through", action="store_true",
+                    help="leave out lines the supplier marks 'Hanya untuk Sell Through' "
+                         "(they are listed in the skipped file instead)")
     args = ap.parse_args()
     args.expiry = (datetime.date.fromisoformat(args.today)
                    + datetime.timedelta(days=args.expiry_days)).isoformat()
