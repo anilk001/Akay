@@ -2,8 +2,7 @@
 import { getOffers } from '../../data/airtable.mjs';
 import { generateSlug, dedupeSlug } from '../../lib/slug.mjs';
 import { productOfferSchema, breadcrumbSchema, organizationSchema } from '../../lib/schema.mjs';
-
-const WA = '353872382368';
+import { enquiryLink, WA_LINK, WA_DISPLAY } from '../../lib/whatsapp.mjs';
 
 // Get all valid slugs for static generation
 export async function getStaticPaths() {
@@ -42,17 +41,11 @@ function priceParts(detail = '') {
   return { basis, other, msg };
 }
 
-function waLink(o, msg) {
-  const amt = o.amount != null ? o.amount.toFixed(2) : '';
-  const txt = `Hi, I'd like a quote for ${o.name} ${o.spec ? `(${o.spec})` : ''} listed at ${o.currency} ${amt}${msg ? ' ' + msg : ''}.`;
-  return `https://wa.me/${WA}?text=${encodeURIComponent(txt)}`;
-}
-
 const STOCK = { in: ['ok', 'In stock'], warn: ['warn', 'Limited'], enq: ['neu', 'Enquire'] };
 
 const { basis, other, msg } = priceParts(offer.priceDetail);
 const st = STOCK[offer.stock] || STOCK.enq;
-const wa = waLink(offer, msg);
+const wa = enquiryLink(offer, msg);
 
 // Category slug for linking
 const categorySlug = offer.category.toLowerCase().replace(/\s+/g, '-');
@@ -392,7 +385,7 @@ if (offer.stock === 'in') {
         <a href="/">← Back to catalogue</a>
       </p>
       <p>
-        AKAY Trade — <a href="https://wa.me/353872382368" target="_blank">WhatsApp +353 87 238 2368</a> | offers@akay.ie
+        AKAY Trade — <a href={WA_LINK} target="_blank" rel="noopener">WhatsApp {WA_DISPLAY}</a> | offers@akay.ie
       </p>
     </div>
   </div>

@@ -2,8 +2,8 @@
 import { getOffers } from '../data/airtable.mjs';
 import { organizationSchema } from '../lib/schema.mjs';
 import { guides } from '../data/guides.mjs';
+import { enquiryLink, WA_LINK } from '../lib/whatsapp.mjs';
 
-const WA = '353872382368';
 const { offers, source } = await getOffers();
 
 // Google Analytics 4 for offers.akay.ie. The Measurement ID is a public,
@@ -22,16 +22,11 @@ function priceParts(detail = '') {
   const other = parts.slice(1).join(' · ');
   return { basis, other, msg };
 }
-function waLink(o, msg) {
-  const amt = o.amount != null ? o.amount.toFixed(2) : '';
-  const txt = `Hi Anil, I'd like a quote for ${o.name} (${o.spec}) listed at ${o.currency} ${amt}${msg ? ' ' + msg : ''}.`;
-  return `https://wa.me/${WA}?text=${encodeURIComponent(txt)}`;
-}
 const STOCK = { in: ['ok', 'In stock'], warn: ['warn', 'Limited'], enq: ['neu', 'Enquire'] };
 
 function toView(o) {
   const { basis, other, msg } = priceParts(o.priceDetail);
-  return { ...o, basis, other, wa: waLink(o, msg), st: STOCK[o.stock] || STOCK.enq };
+  return { ...o, basis, other, wa: enquiryLink(o, msg), st: STOCK[o.stock] || STOCK.enq };
 }
 const view = offers.map(toView);
 // Pin Featured offers to the front of the catalogue; stable sort keeps original order otherwise.
@@ -397,7 +392,7 @@ const stats = [
         <br /><br />
         <a href="/about/" style="color:var(--brass);text-decoration:none">About AKAY</a> · <a href="/#guides" style="color:var(--brass);text-decoration:none">Guides</a> · <a href="/guides/requirement-list-format/" style="color:var(--brass);text-decoration:none">How to order</a>
       </div>
-      <div style="font-family:var(--mono);text-align:right">© AKAY · Shannon<br /><a href="https://wa.me/353872382368" style="color:var(--brass);text-decoration:none">WhatsApp</a> · <a href="mailto:hello@akay.ie" style="color:var(--brass);text-decoration:none">hello@akay.ie</a></div>
+      <div style="font-family:var(--mono);text-align:right">© AKAY · Shannon<br /><a href={WA_LINK} style="color:var(--brass);text-decoration:none">WhatsApp</a> · <a href="mailto:hello@akay.ie" style="color:var(--brass);text-decoration:none">hello@akay.ie</a></div>
     </div>
   </footer>
 

@@ -1,5 +1,6 @@
 ---
 import { organizationSchema } from '../lib/schema.mjs';
+import { WA_LINK, WA_DISPLAY } from '../lib/whatsapp.mjs';
 
 const orgSchema = organizationSchema();
 const pageTitle = 'About AKAY Trade — 36 Years in Wholesale';
@@ -362,7 +363,7 @@ const pageDesc = 'AKAY Trade: Ireland-based B2B wholesale trading company specia
           <strong>Email:</strong> <a href="mailto:offers@akay.ie">offers@akay.ie</a>
         </p>
         <p>
-          <strong>WhatsApp:</strong> <a href="https://wa.me/353872382368" target="_blank">+353 87 238 2368</a>
+          <strong>WhatsApp:</strong> <a href={WA_LINK} target="_blank" rel="noopener">{WA_DISPLAY}</a>
         </p>
         <p>
           <strong>Hours:</strong> Monday–Friday, 9am–5pm GMT

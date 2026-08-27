@@ -1,6 +1,7 @@
 ---
 import { guides, getGuideBySlug, getAllGuidesSlugs } from '../../data/guides.mjs';
 import { articleSchema, organizationSchema } from '../../lib/schema.mjs';
+import { WA_LINK, WA_DISPLAY } from '../../lib/whatsapp.mjs';
 
 export async function getStaticPaths() {
   return guides.map((guide) => ({
@@ -335,7 +336,7 @@ const pageDesc = guide.excerpt;
       <h3>Ready to order?</h3>
       <p>Browse our live catalogue and get a quote for wholesale pricing.</p>
       <a href="/" class="cta-button">Browse Offers</a>
-      <a href="https://wa.me/353872382368" class="cta-button">WhatsApp Enquiry</a>
+      <a href={WA_LINK} class="cta-button" target="_blank" rel="noopener">WhatsApp Enquiry</a>
     </div>
 
     <div class="related-guides">
@@ -355,7 +356,7 @@ const pageDesc = guide.excerpt;
     <div class="footer">
       <p>
         <strong>Questions?</strong> Contact us at <a href="mailto:offers@akay.ie">offers@akay.ie</a> or{' '}
-        <a href="https://wa.me/353872382368" target="_blank">WhatsApp +353 87 238 2368</a>.
+        <a href={WA_LINK} target="_blank" rel="noopener">WhatsApp {WA_DISPLAY}</a>.
       </p>
       <p>
         <a href="/">← Back to catalogue</a> | <a href="/about/">About AKAY</a>
