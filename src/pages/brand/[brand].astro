@@ -1,0 +1,175 @@
+---
+// Durable brand landing pages.
+//
+// An offer page is disposable: across the snapshot history 4,690 offer URLs have
+// existed and only ~2,540 are live at once, so a page that earns a ranking for
+// "absolut wholesale" is usually gone within days. /brand/absolut/ is the stable
+// answer to that query — it survives every individual offer rotating out, and it
+// stays useful because it always lists whatever is currently in stock.
+import { getOffers } from '../../data/airtable.mjs';
+import { generateSlug, dedupeSlug } from '../../lib/slug.mjs';
+import { groupByBrand } from '../../lib/brand.mjs';
+import { brandCollectionSchema, organizationSchema } from '../../lib/schema.mjs';
+
+export async function getStaticPaths() {
+  const { offers } = await getOffers();
+
+  // Attach slugs exactly as the offer route does, so every link resolves.
+  const slugs = [];
+  const withSlugs = offers.map((offer) => {
+    const slug = dedupeSlug(generateSlug(offer.name, offer.spec), slugs);
+    slugs.push(slug);
+    return { ...offer, slug };
+  });
+
+  return groupByBrand(withSlugs).map((group) => ({
+    params: { brand: group.slug },
+    props: { brand: group.name, brandSlug: group.slug, offers: group.offers },
+  }));
+}
+
+const { brand, brandSlug, offers } = Astro.props;
+
+// Cheapest per unit first: on a brand page the buyer is comparing pack formats
+// of the same product, so the per-unit figure is the meaningful sort.
+const brandOffers = [...offers].sort(
+  (a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0) ||
+    (a.unitAmount ?? Infinity) - (b.unitAmount ?? Infinity)
+);
+
+const categories = Array.from(new Set(brandOffers.map((o) => o.category))).sort();
+const currencies = Array.from(new Set(brandOffers.map((o) => o.currency).filter(Boolean))).sort();
+const inStock = brandOffers.filter((o) => o.stock === 'in').length;
+const catSlug = (c) => c.toLowerCase().replace(/\s+/g, '-');
+
+const orgSchema = organizationSchema();
+const collectionSchema = brandCollectionSchema(brand, brandSlug, brandOffers);
+
+const url = `https://offers.akay.ie/brand/${brandSlug}/`;
+const pageTitle = `${brand} Wholesale — ${brandOffers.length} Trade Offers | AKAY Trade`;
+const pageDesc =
+  `Wholesale ${brand} by the case and pallet from AKAY Trade — ${brandOffers.length} live offers` +
+  `${categories.length ? ` across ${categories.join(', ').toLowerCase()}` : ''}. ` +
+  `Trade pricing${currencies.length ? ` in ${currencies.join(' / ')}` : ''}, pack specs and duty tier on every line.`;
+---
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{pageTitle}</title>
+  <meta name="description" content={pageDesc} />
+  <link rel="icon" href="/akay-bird.png" />
+  <link rel="canonical" href={url} />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="AKAY Trade" />
+  <meta property="og:url" content={url} />
+  <meta property="og:title" content={`${brand} Wholesale Offers`} />
+  <meta property="og:description" content={pageDesc} />
+  <meta property="og:image" content="https://offers.akay.ie/akay-bird.png" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content={`${brand} Wholesale Offers`} />
+  <meta name="twitter:description" content={pageDesc} />
+  <meta name="robots" content="max-snippet:-1, max-image-preview:large" />
+
+  <script type="application/ld+json" set:html={JSON.stringify(orgSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(collectionSchema)} />
+
+  <style>
+    :root {
+      --paper: #F7F5F0; --paper-2: #EFEDE4; --card: #FFFFFF;
+      --ink: #17140F; --ink-soft: #41473F; --muted: #767E72; --line: #E4E0D4;
+      --brass: #B4231F;
+      --ok: #0E7A3B; --ok-bg: #E2F0E5; --warn: #9A6A12; --warn-bg: #F5E9CE;
+      --neu: #5C6A78; --neu-bg: #E9ECEF;
+      --shadow: 0 1px 2px rgba(20,33,26,.06), 0 6px 20px -8px rgba(20,33,26,.14);
+      --radius: 14px;
+      --serif: "Hoefler Text", "Iowan Old Style", Palatino, Georgia, "Times New Roman", serif;
+      --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --paper: #0C140F; --paper-2: #081009; --card: #13201A;
+        --ink: #F1EFE7; --ink-soft: #C6CEC4; --muted: #8A968A; --line: #243029;
+        --brass: #EC5A52;
+        --ok: #5FC97E; --ok-bg: #123021; --warn: #E0B65C; --warn-bg: #31280F;
+        --neu: #9AA7B4; --neu-bg: #1B2530;
+        --shadow: 0 1px 2px rgba(0,0,0,.4), 0 10px 28px -12px rgba(0,0,0,.6);
+      }
+    }
+    body { margin: 0; padding: 20px; background: var(--paper); color: var(--ink); font: 16px/1.5 var(--sans); }
+    h1 { font: 600 2em var(--serif); margin: 1em 0 .5em; }
+    a { color: var(--brass); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .container { max-width: 1000px; margin: 0 auto; }
+    .breadcrumb { font-size: .9em; color: var(--muted); margin-bottom: 2em; }
+    .header { margin-bottom: 2em; }
+    .header p { color: var(--muted); margin: .5em 0 0; }
+    .facts { display: flex; flex-wrap: wrap; gap: 8px; margin: 1.2em 0 0; padding: 0; list-style: none; }
+    .facts li { font: 12px var(--mono); color: var(--ink-soft); border: 1px solid var(--line);
+      background: var(--card); border-radius: 8px; padding: 6px 11px; }
+    .facts a { color: var(--ink-soft); }
+    .offer-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5em; margin: 2em 0; }
+    .offer-card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+      padding: 1.5em; box-shadow: var(--shadow); display: flex; flex-direction: column; }
+    .offer-card h2 { margin: 0 0 .5em; font: 600 1.1em var(--serif); color: var(--ink); }
+    .offer-card p { margin: .3em 0; color: var(--muted); font-size: .9em; }
+    .offer-card .price { font: 600 1.3em var(--serif); color: var(--brass); margin: .8em 0 .5em; }
+    .offer-card .stock { font-size: .85em; font-weight: 600; padding: .3em .6em; border-radius: 4px;
+      display: inline-block; margin: .5em 0; }
+    .stock-ok { background: var(--ok-bg); color: var(--ok); }
+    .stock-warn { background: var(--warn-bg); color: var(--warn); }
+    .stock-neu { background: var(--neu-bg); color: var(--neu); }
+    .offer-card a.view-link { font-weight: 600; margin-top: auto; padding-top: 1em; border-top: 1px solid var(--line); }
+    .nav { text-align: center; padding: 2em 0; border-top: 1px solid var(--line); margin-top: 3em; }
+    .nav a { margin: 0 1em; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="/">Home</a> / {brand}
+    </div>
+
+    <div class="header">
+      <h1>{brand} Wholesale Offers</h1>
+      <p>
+        {brandOffers.length} live trade {brandOffers.length === 1 ? 'offer' : 'offers'} from AKAY
+        {inStock > 0 && <>, {inStock} in stock now</>}. Case and pallet pricing, duty tier on every line.
+      </p>
+      <ul class="facts">
+        {categories.map((c) => (
+          <li><a href={`/category/${catSlug(c)}/`}>{c}</a></li>
+        ))}
+        {currencies.length > 0 && <li>{currencies.join(' / ')}</li>}
+      </ul>
+    </div>
+
+    <div class="offer-grid">
+      {brandOffers.map((offer) => {
+        const stockStatus = offer.stock === 'in' ? 'ok' : offer.stock === 'warn' ? 'warn' : 'neu';
+        const stockText = offer.stock === 'in' ? 'In stock' : offer.stock === 'warn' ? 'Limited' : 'Enquire';
+        return (
+          <div class="offer-card">
+            <h2>{offer.name}</h2>
+            {offer.spec && <p>{offer.spec}</p>}
+            <div class="price">{offer.currency} {offer.amount?.toFixed(2) || '—'} / case</div>
+            <span class={`stock stock-${stockStatus}`}>{stockText}</span>
+            {offer.tier && <p><strong>Duty:</strong> {offer.tier}</p>}
+            {offer.terms && <p><strong>Terms:</strong> {offer.terms}</p>}
+            <a href={`/offers/${offer.slug}/`} class="view-link">View offer →</a>
+          </div>
+        );
+      })}
+    </div>
+
+    <div class="nav">
+      <a href="/">← Back to catalogue</a>
+      |
+      <a href="/guides/requirement-list-format/">How to order</a>
+    </div>
+  </div>
+</body>
+</html>

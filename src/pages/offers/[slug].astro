@@ -3,6 +3,7 @@ import { getOffers } from '../../data/airtable.mjs';
 import { generateSlug, dedupeSlug } from '../../lib/slug.mjs';
 import { productOfferSchema, breadcrumbSchema, organizationSchema } from '../../lib/schema.mjs';
 import { enquiryLink, WA_LINK, WA_DISPLAY } from '../../lib/whatsapp.mjs';
+import { brandSlug, groupByBrand } from '../../lib/brand.mjs';
 
 // Get all valid slugs for static generation
 export async function getStaticPaths() {
@@ -50,13 +51,31 @@ const wa = enquiryLink(offer, msg);
 // Category slug for linking
 const categorySlug = offer.category.toLowerCase().replace(/\s+/g, '-');
 
-// Related offers (same category, max 4)
+// Does this brand have its own landing page? Only brands with enough live
+// offers get one, so the link is conditional.
+const thisBrandSlug = brandSlug(offer.brand);
+const brandHasPage = thisBrandSlug
+  ? groupByBrand(allOffers).some((g) => g.slug === thisBrandSlug)
+  : false;
+
+// Related offers: same brand first, then the rest of the category.
+//
+// This was previously `.sort(() => Math.random() - 0.5)`, which re-rolled the
+// internal links on all ~2,500 offer pages every single build — and the
+// catalogue rebuilds every few minutes, so no set of internal links ever
+// settled long enough for a crawler to treat them as meaningful. Ordering is
+// now deterministic, and prefers the same brand so link equity flows toward the
+// durable brand page rather than scattering at random.
+const key = (o) => o.id || `${o.brand}-${o.name}`;
 const relatedOffers = allOffers
-  .filter(
-    (o) => o.category === offer.category &&
-            (o.id || `${o.brand}-${o.name}`) !== (offer.id || `${offer.brand}-${offer.name}`)
-  )
-  .sort(() => Math.random() - 0.5)
+  .filter((o) => key(o) !== key(offer) &&
+    (o.category === offer.category || (offer.brand && o.brand === offer.brand)))
+  .sort((a, b) => {
+    const sameBrand = (o) => (offer.brand && o.brand === offer.brand ? 0 : 1);
+    return sameBrand(a) - sameBrand(b) ||
+      (a.unitAmount ?? Infinity) - (b.unitAmount ?? Infinity) ||
+      a.name.localeCompare(b.name);
+  })
   .slice(0, 4);
 
 // Build schemas
@@ -311,7 +330,10 @@ if (offer.stock === 'in') {
 <body>
   <div class="container">
     <div class="breadcrumb">
-      <a href="/">Home</a> / <a href={`/category/${categorySlug}/`}>{offer.category}</a> / {offer.name}
+      <a href="/">Home</a> / <a href={`/category/${categorySlug}/`}>{offer.category}</a>
+      {offer.brand && (brandHasPage
+        ? <> / <a href={`/brand/${thisBrandSlug}/`}>{offer.brand}</a></>
+        : <> / {offer.brand}</>)} / {offer.name}
     </div>
 
     <div class="offer-header">

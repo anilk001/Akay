@@ -32,6 +32,31 @@ export function organizationSchema() {
   };
 }
 
+// Validate a barcode and return the schema.org property it belongs in.
+//
+// The catalogue has no product images, so it can never qualify for Google's
+// image-bearing Product rich results. A GTIN is the substitute: given a valid
+// one, Google resolves the listing against its own product catalogue instead of
+// relying on our page alone.
+//
+// Publishing an INVALID identifier is worse than publishing none — Google flags
+// it and distrusts the record — so the GS1 check digit is verified here. The
+// weighting (3,1,3,1... from the rightmost data digit) is the same for EAN-8,
+// UPC-12, EAN-13 and GTIN-14, so one routine covers every length we accept.
+function gtinProperty(raw = '') {
+  const code = String(raw).replace(/[^0-9]/g, '');
+  const prop = { 8: 'gtin8', 12: 'gtin12', 13: 'gtin13', 14: 'gtin14' }[code.length];
+  if (!prop) return null;
+
+  const digits = code.split('').map(Number);
+  const check = digits.pop();
+  let sum = 0;
+  digits.reverse().forEach((d, i) => { sum += d * (i % 2 === 0 ? 3 : 1); });
+  if ((10 - (sum % 10)) % 10 !== check) return null;
+
+  return { prop, code };
+}
+
 // Map stock status to schema.org availability
 function mapAvailability(stock) {
   if (stock === 'in') return 'https://schema.org/InStock';
@@ -64,13 +89,28 @@ export function productOfferSchema(offer, slug) {
         }
       : null;
 
+  // Public Note is buyer-facing copy a trader wrote for this specific offer, so
+  // it beats the generated template whenever it exists. The template stays as
+  // the fallback for the offers that have none.
+  const description = [
+    `${offer.name} ${offer.spec}, ${offer.tier || 'wholesale'}.`,
+    offer.priceDetail || '',
+    offer.note || '',
+  ].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim();
+
   const productSchema = {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: offer.name,
     url: `${SITE_URL}/offers/${slug}/`,
-    description: `${offer.name} ${offer.spec}, ${offer.tier || 'wholesale'}. ${offer.priceDetail || ''}`.trim(),
+    description,
   };
+
+  // Product identifier, when the barcode passes its check digit.
+  const gtin = gtinProperty(offer.ean);
+  if (gtin) {
+    productSchema[gtin.prop] = gtin.code;
+  }
 
   if (offer.brand) {
     productSchema.brand = { '@type': 'Brand', name: offer.brand };
@@ -166,6 +206,28 @@ export function categoryItemListSchema(categoryName, offers) {
     url: `${SITE_URL}/category/${categoryName.toLowerCase().replace(/\s+/g, '-')}/`,
     mainEntity: {
       '@type': 'ItemList',
+      itemListElement: offers.map((offer, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        url: `${SITE_URL}/offers/${offer.slug}/`,
+        name: offer.name,
+      })),
+    },
+  };
+}
+
+// CollectionPage + ItemList for a brand landing page. Mirrors the category
+// schema so both collection surfaces describe themselves the same way.
+export function brandCollectionSchema(brandName, slug, offers) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: `${brandName} Wholesale Offers`,
+    url: `${SITE_URL}/brand/${slug}/`,
+    description: `Current wholesale trade offers for ${brandName} — case and pallet pricing, pack specs and duty tier on every line.`,
+    mainEntity: {
+      '@type': 'ItemList',
+      numberOfItems: offers.length,
       itemListElement: offers.map((offer, index) => ({
         '@type': 'ListItem',
         position: index + 1,

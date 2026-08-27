@@ -20,6 +20,11 @@ const FIELDS = [
   'Price Display', 'Currency', 'Price Per Unit & Case', 'PCS/Case',
   'Stock Display', 'Stock Cases', 'Public Terms',
   'Bond/Customs Status', 'Origin Country', 'Public Listing', 'Featured',
+  // Both carry an explicit "SAFE FOR offers.akay.ie" note on the Airtable field.
+  // EAN Unit is the product's GTIN — the only way Google can tie a listing to a
+  // known product when the catalogue has no images. Public Note is trader-written
+  // buyer-facing copy (never the internal 'Notes' field, which names suppliers).
+  'EAN Unit', 'Public Note',
 ];
 
 function stockCode(label = '') {
@@ -125,6 +130,8 @@ function normalize(fields, recordId = null) {
     tier: fields['Bond/Customs Status'] || '',
     origin: fields['Origin Country'] || '',
     featured: fields['Featured'] === true,
+    ean: String(fields['EAN Unit'] || '').trim(),
+    note: String(fields['Public Note'] || '').trim(),
   };
 }
 
@@ -174,6 +181,10 @@ function renormalizeSnapshotOffer(o, index) {
         : headline ? headline.amount
         : o.amount,
     qty: typeof o.qty === 'number' ? Math.round(o.qty) : o.qty,
+    // Absent from snapshots baked before these fields were pulled; the next
+    // refresh fills them in. Defaulted so a stale snapshot still builds.
+    ean: o.ean || '',
+    note: o.note || '',
   };
 }
 

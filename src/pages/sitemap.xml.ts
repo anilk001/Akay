@@ -1,6 +1,7 @@
 import { getOffers } from '../data/airtable.mjs';
 import { generateSlug, dedupeSlug } from '../lib/slug.mjs';
 import { guides } from '../data/guides.mjs';
+import { groupByBrand } from '../lib/brand.mjs';
 
 export const prerender = true;
 
@@ -56,6 +57,18 @@ export async function GET() {
     const categorySlug = category.toLowerCase().replace(/\s+/g, '-');
     sitemap += `  <url>
     <loc>https://offers.akay.ie/category/${categorySlug}/</loc>
+    <lastmod>${now}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+`;
+  }
+
+  // Brand pages — the durable surface for "<brand> wholesale" queries, so they
+  // rank above the offer pages, which churn out of the catalogue within days.
+  for (const group of groupByBrand(offersWithSlugs)) {
+    sitemap += `  <url>
+    <loc>https://offers.akay.ie/brand/${group.slug}/</loc>
     <lastmod>${now}</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
