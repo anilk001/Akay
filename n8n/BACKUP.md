@@ -58,6 +58,19 @@ which absorbs a short burst. The orchestrator's `Export Each Table` node
 already carries `onError: continueRegularOutput`, so a table that still fails
 after the retries degrades the backup and flags it rather than aborting the run.
 
+### Outcome
+
+Re-run as orchestrator execution 26790 (12:13 Dublin): **14 of 14 tables,
+55,518 records**, Products at 3,898. It wrote its own row for 2026-08-27 with
+Status **Verified** (`recKJYe16244WPDm5`), so dispatch Gate 2 is satisfied.
+
+The 05:06 `Flagged` row was left as Flagged — it is an accurate record of an
+incomplete backup — with the review findings appended to its Notes. Both rows
+now carry today's date, which is harmless: `Backup Check` in
+`Offer Dispatch — Akay` filters *all* registry rows for Status = Verified AND
+Backup Date = today and takes the first match, rather than reading the latest
+row and checking its status.
+
 ### Precedent
 
 2026-08-24 was the same failure class — `Products` and `Invoices` both failed
