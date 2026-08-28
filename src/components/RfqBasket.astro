@@ -1,0 +1,450 @@
+---
+// §4 — the RFQ basket. Client-side only; the site stays fully static.
+//
+// Why not Netlify Forms or a function: both were explicitly off the table, and
+// neither would help — the enquiry has to land in Airtable and notify the desk,
+// which is n8n's job already. So the browser POSTs JSON straight to the n8n
+// webhook, and Netlify never needs to run anything.
+//
+// The contract in Appendix A is mirrored client-side (email shape, 200-line cap,
+// the allowed `categories` set, the honeypot) so a buyer gets the rejection
+// instantly instead of a 400 from a server three seconds later.
+//
+// A failed submission never clears localStorage: a wholesaler who has ticked 40
+// lines will not do it twice.
+import { STOCK_LIST_PATH } from '../lib/stock-list.mjs';
+
+// Falls back to the production endpoint from Appendix A. Netlify supplies
+// PUBLIC_RFQ_WEBHOOK_URL to point at /webhook-test/akay-rfq before the workflow
+// is activated.
+const WEBHOOK = import.meta.env.PUBLIC_RFQ_WEBHOOK_URL
+  || 'https://akay-team.app.n8n.cloud/webhook/akay-rfq';
+---
+
+<!-- Persistent bar. Hidden until the basket has a line in it. -->
+<div class="rfq-bar" id="rfqBar" hidden data-webhook={WEBHOOK}>
+  <div class="rfq-bar-in">
+    <span class="rfq-count" id="rfqCount">0 lines</span>
+    <button type="button" class="rfq-clear" id="rfqClear">Clear</button>
+    <button type="button" class="rfq-go" id="rfqOpen">Request quote</button>
+  </div>
+</div>
+
+<!-- Secondary entry point: the stock list is the strongest lead magnet on the
+     site, so it gets its own trigger rather than hiding inside the basket. -->
+<button type="button" class="rfq-dl-trigger" id="rfqDownloadOpen">
+  Download full stock list (XLSX)
+</button>
+
+<div class="rfq-overlay" id="rfqOverlay" hidden>
+  <div class="rfq-panel" role="dialog" aria-modal="true" aria-labelledby="rfqTitle">
+    <div class="rfq-head">
+      <h2 id="rfqTitle">Request a quote</h2>
+      <button type="button" class="rfq-x" id="rfqClose" aria-label="Close">×</button>
+    </div>
+
+    <p class="rfq-intro" id="rfqIntro">
+      Tell us who you are and we will come back with firm prices, availability and loading
+      terms on the lines you selected.
+    </p>
+
+    <div class="rfq-lines" id="rfqLines"></div>
+
+    <form class="rfq-form" id="rfqForm" novalidate>
+      <div class="rfq-grid">
+        <label>Company <span aria-hidden="true">*</span>
+          <input name="company" required autocomplete="organization" placeholder="Acme Importers Ltd" />
+        </label>
+        <label>Country <span aria-hidden="true">*</span>
+          <input name="country" required autocomplete="country-name" placeholder="Brazil" />
+        </label>
+        <label>Contact name <span aria-hidden="true">*</span>
+          <input name="name" required autocomplete="name" placeholder="Maria Silva" />
+        </label>
+        <label>Email <span aria-hidden="true">*</span>
+          <input name="email" type="email" required autocomplete="email" placeholder="buyer@acme.com" />
+        </label>
+        <label>WhatsApp
+          <input name="whatsapp" autocomplete="tel" placeholder="+55 11 90000 0000" />
+        </label>
+        <label>Target market
+          <input name="targetMarket" placeholder="Brazil, Paraguay" />
+        </label>
+        <label>Monthly volume
+          <input name="monthlyVolume" placeholder="2 x 40ft per month" />
+        </label>
+      </div>
+
+      <label class="rfq-full">Notes
+        <textarea name="notes" rows="3" placeholder="Duty-paid stock only; need COA and health certificate."></textarea>
+      </label>
+
+      <!-- Honeypot (Appendix A). Real buyers never see it; anything that fills
+           it in is silently rejected server-side. Kept out of the tab order and
+           hidden from assistive tech as well as from sight. -->
+      <div class="rfq-hp" aria-hidden="true">
+        <label>Company website
+          <input name="company_website" tabindex="-1" autocomplete="off" />
+        </label>
+      </div>
+
+      <p class="rfq-msg" id="rfqMsg" role="status" hidden></p>
+
+      <div class="rfq-actions">
+        <button type="submit" class="rfq-submit" id="rfqSubmit">Send request</button>
+        <span class="rfq-privacy">We only use this to answer your enquiry.</span>
+      </div>
+
+      <div class="rfq-done" id="rfqDone" hidden>
+        <a class="rfq-dl" id="rfqDl" href={STOCK_LIST_PATH} download>Download the full stock list (XLSX)</a>
+        <p class="rfq-done-note">One sheet per category. Public pricing, pack specs and availability only.</p>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  (() => {
+    const KEY = 'akay_rfq_basket_v1';
+    const MAX_LINES = 200; // Appendix A: the workflow drops anything past this.
+
+    // The Enquiries table's Requested Categories select has no Champagne option
+    // (Appendix A). Mapping it to Wine keeps the enquiry categorised instead of
+    // silently dropping the only category on a Champagne-only request.
+    const ALLOWED_CATEGORIES = ['Beer', 'Spirits', 'Wine', 'Grocery', 'Confectionery', 'Toiletries', 'Soft Drinks', 'Other FMCG'];
+    const CATEGORY_MAP = { Champagne: 'Wine' };
+
+    const bar = document.getElementById('rfqBar');
+    // Read from the DOM rather than define:vars: define:vars implies is:inline,
+    // which would inline this whole script into every one of ~2,900 pages
+    // instead of emitting one cached, shared chunk.
+    const WEBHOOK = bar?.dataset.webhook || '';
+    const countEl = document.getElementById('rfqCount');
+    const overlay = document.getElementById('rfqOverlay');
+    const linesEl = document.getElementById('rfqLines');
+    const form = document.getElementById('rfqForm');
+    const msg = document.getElementById('rfqMsg');
+    const submitBtn = document.getElementById('rfqSubmit');
+    const doneEl = document.getElementById('rfqDone');
+    const titleEl = document.getElementById('rfqTitle');
+    const introEl = document.getElementById('rfqIntro');
+    const dlTrigger = document.getElementById('rfqDownloadOpen');
+    if (!bar || !form) return;
+
+    // 'rfq' needs at least one line; 'download' may submit an empty basket.
+    let mode = 'rfq';
+    let openedAt = 0;
+
+    const read = () => {
+      try {
+        const raw = JSON.parse(localStorage.getItem(KEY) || '[]');
+        return Array.isArray(raw) ? raw : [];
+      } catch {
+        return []; // corrupt or unavailable storage must not break the page
+      }
+    };
+    const write = (lines) => {
+      try { localStorage.setItem(KEY, JSON.stringify(lines)); } catch { /* private mode */ }
+    };
+
+    function paintBar() {
+      const n = read().length;
+      countEl.textContent = n === 1 ? '1 line selected' : `${n} lines selected`;
+      bar.hidden = n === 0;
+    }
+
+    // Ticks the boxes for lines already in the basket when a page loads, so the
+    // selection survives navigating from a brand page to a category page.
+    function syncCheckboxes() {
+      const ids = new Set(read().map((l) => l.offerId));
+      document.querySelectorAll('.basket-cb').forEach((cb) => {
+        cb.checked = ids.has(cb.dataset.offerId);
+      });
+    }
+
+    document.addEventListener('change', (e) => {
+      const cb = e.target.closest('.basket-cb');
+      if (!cb) return;
+      const id = cb.dataset.offerId;
+      let lines = read();
+      if (cb.checked) {
+        if (lines.length >= MAX_LINES) {
+          cb.checked = false;
+          alert(`A single request can carry ${MAX_LINES} lines. Send these first and we will pick up the rest by email.`);
+          return;
+        }
+        if (!lines.some((l) => l.offerId === id)) {
+          lines.push({
+            offerId: id,
+            publicDescription: cb.dataset.desc || '',
+            priceDisplay: cb.dataset.price || '',
+            category: cb.dataset.category || '',
+            qty: '',
+          });
+        }
+      } else {
+        lines = lines.filter((l) => l.offerId !== id);
+      }
+      write(lines);
+      paintBar();
+    });
+
+    function paintLines() {
+      const lines = read();
+      if (!lines.length) {
+        linesEl.innerHTML = mode === 'download'
+          ? ''
+          : '<p class="rfq-empty">No lines selected yet. Tick “Add to quote request” on any offer.</p>';
+        return;
+      }
+      linesEl.innerHTML = `
+        <table class="rfq-table">
+          <thead><tr><th>Line</th><th>Listed price</th><th>Quantity wanted</th><th></th></tr></thead>
+          <tbody>
+            ${lines.map((l, i) => `
+              <tr>
+                <td>${esc(l.publicDescription)}</td>
+                <td class="rfq-price">${esc(l.priceDisplay)}</td>
+                <td><input class="rfq-qty" data-i="${i}" value="${esc(l.qty || '')}" placeholder="e.g. 200 cases" /></td>
+                <td><button type="button" class="rfq-rm" data-id="${esc(l.offerId)}" aria-label="Remove line">×</button></td>
+              </tr>`).join('')}
+          </tbody>
+        </table>`;
+    }
+
+    // Basket contents are echoed back into the panel as HTML, and they came from
+    // Airtable via data- attributes, so they get escaped on the way in.
+    function esc(s) {
+      return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+
+    linesEl.addEventListener('input', (e) => {
+      const q = e.target.closest('.rfq-qty');
+      if (!q) return;
+      const lines = read();
+      const i = Number(q.dataset.i);
+      if (lines[i]) { lines[i].qty = q.value; write(lines); }
+    });
+
+    linesEl.addEventListener('click', (e) => {
+      const rm = e.target.closest('.rfq-rm');
+      if (!rm) return;
+      write(read().filter((l) => l.offerId !== rm.dataset.id));
+      paintLines();
+      paintBar();
+      syncCheckboxes();
+    });
+
+    function open(nextMode) {
+      mode = nextMode;
+      openedAt = Date.now();
+      msg.hidden = true;
+      doneEl.hidden = true;
+      submitBtn.hidden = false;
+      submitBtn.disabled = false;
+      submitBtn.textContent = mode === 'download' ? 'Send and download' : 'Send request';
+      titleEl.textContent = mode === 'download' ? 'Download the full stock list' : 'Request a quote';
+      introEl.textContent = mode === 'download'
+        ? 'The workbook carries every live line with public pricing, pack specs and availability. Tell us who you are and it downloads immediately.'
+        : 'Tell us who you are and we will come back with firm prices, availability and loading terms on the lines you selected.';
+      paintLines();
+      overlay.hidden = false;
+      document.body.style.overflow = 'hidden';
+      form.querySelector('[name=company]')?.focus();
+    }
+
+    function close() {
+      overlay.hidden = true;
+      document.body.style.overflow = '';
+    }
+
+    document.getElementById('rfqOpen')?.addEventListener('click', () => open('rfq'));
+    dlTrigger?.addEventListener('click', () => open('download'));
+    document.getElementById('rfqClose')?.addEventListener('click', close);
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) close(); });
+
+    document.getElementById('rfqClear')?.addEventListener('click', () => {
+      write([]);
+      paintBar();
+      paintLines();
+      syncCheckboxes();
+    });
+
+    function fail(text) {
+      msg.className = 'rfq-msg err';
+      msg.textContent = text;
+      msg.hidden = false;
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fd = new FormData(form);
+      const get = (k) => String(fd.get(k) || '').trim();
+      const lines = read();
+
+      // Mirror the workflow's own rules so the feedback is instant.
+      if (mode === 'rfq' && !lines.length) return fail('Tick at least one offer before sending a quote request.');
+      for (const k of ['company', 'country', 'name', 'email']) {
+        if (!get(k)) return fail('Company, country, contact name and email are all needed.');
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(get('email'))) return fail('That email address does not look right.');
+
+      // Minimum time on form. A human filling seven fields takes longer than
+      // this; a bot that autofills and submits does not.
+      if (Date.now() - openedAt < 3000) return fail('Just a moment — please finish filling the form.');
+
+      const categories = [...new Set(
+        lines.map((l) => CATEGORY_MAP[l.category] || l.category).filter((c) => ALLOWED_CATEGORIES.includes(c))
+      )];
+
+      const payload = {
+        type: mode === 'download' ? 'download' : 'rfq',
+        company: get('company'),
+        name: get('name'),
+        email: get('email'),
+        country: get('country'),
+        whatsapp: get('whatsapp'),
+        targetMarket: get('targetMarket'),
+        monthlyVolume: get('monthlyVolume'),
+        notes: get('notes'),
+        categories,
+        company_website: get('company_website'),
+        lines: lines.slice(0, MAX_LINES).map((l) => ({
+          offerId: l.offerId,
+          publicDescription: l.publicDescription,
+          priceDisplay: l.priceDisplay,
+          qty: l.qty || '',
+        })),
+      };
+
+      submitBtn.disabled = true;
+      const label = submitBtn.textContent;
+      submitBtn.textContent = 'Sending…';
+      msg.hidden = true;
+
+      try {
+        const res = await fetch(WEBHOOK, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        let body = {};
+        try { body = await res.json(); } catch { /* non-JSON error page */ }
+
+        if (!res.ok || body.ok === false) {
+          // 400 carries a specific reason worth showing; anything else is ours.
+          fail(body.error
+            ? `${body.error[0].toUpperCase()}${body.error.slice(1)}.`
+            : `That did not send (error ${res.status}). Your selection is saved — try again, or email offers@akay.ie.`);
+          return;
+        }
+
+        msg.className = 'rfq-msg ok';
+        msg.textContent = body.enquiryId
+          ? `Received. Your reference is ${body.enquiryId} — quote your reference in any follow-up. We reply within one business day.`
+          : 'Received. We reply within one business day.';
+        msg.hidden = false;
+        submitBtn.hidden = true;
+        doneEl.hidden = false; // the download link appears only on a 2xx
+        if (typeof window.gtag === 'function') {
+          window.gtag('event', mode === 'download' ? 'stock_list_download' : 'rfq_submit', {
+            lines: payload.lines.length,
+            country: payload.country,
+          });
+        }
+        // Only a confirmed submission clears the basket.
+        write([]);
+        paintBar();
+        syncCheckboxes();
+        form.reset();
+      } catch {
+        fail('That did not send — check your connection. Your selection is saved, so nothing is lost.');
+      } finally {
+        submitBtn.disabled = false;
+        if (!submitBtn.hidden) submitBtn.textContent = label;
+      }
+    });
+
+    paintBar();
+    syncCheckboxes();
+  })();
+</script>
+
+<style>
+  .rfq-bar{position:fixed;left:0;right:0;bottom:0;z-index:60;background:var(--card);
+    border-top:1px solid var(--line);box-shadow:0 -6px 24px -12px rgba(0,0,0,.35)}
+  .rfq-bar[hidden]{display:none}
+  .rfq-bar-in{max-width:1200px;margin:0 auto;padding:11px 20px;display:flex;align-items:center;gap:12px}
+  .rfq-count{font-family:var(--mono);font-size:13px;color:var(--ink);flex:1;font-variant-numeric:tabular-nums}
+  .rfq-clear{background:none;border:1px solid var(--line);color:var(--muted);border-radius:9px;
+    height:38px;padding:0 14px;font-size:13px;cursor:pointer}
+  .rfq-clear:hover{border-color:var(--brass-2);color:var(--brass)}
+  .rfq-go{background:var(--forest);color:var(--paper);border:1px solid transparent;border-radius:9px;
+    height:38px;padding:0 20px;font-size:14px;font-weight:600;cursor:pointer}
+  :root[data-theme="dark"] .rfq-go{color:#0A140F}
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .rfq-go{color:#0A140F}}
+  .rfq-go:hover{background:var(--brass);color:#fff}
+
+  .rfq-dl-trigger{background:var(--card);border:1px solid var(--brass-2);color:var(--brass);
+    border-radius:10px;height:42px;padding:0 18px;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--sans)}
+  .rfq-dl-trigger:hover{background:var(--brass);color:#fff;border-color:var(--brass)}
+
+  .rfq-overlay{position:fixed;inset:0;z-index:70;background:rgba(10,16,12,.55);
+    display:flex;align-items:flex-start;justify-content:center;padding:24px 16px;overflow-y:auto}
+  .rfq-overlay[hidden]{display:none}
+  .rfq-panel{background:var(--paper);border:1px solid var(--line);border-radius:16px;
+    max-width:720px;width:100%;padding:24px;box-shadow:0 24px 60px -20px rgba(0,0,0,.5)}
+  .rfq-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+  .rfq-head h2{font-family:var(--serif);font-size:22px;font-weight:600;margin:0;color:var(--ink)}
+  .rfq-x{background:none;border:none;font-size:26px;line-height:1;color:var(--muted);cursor:pointer;padding:0 4px}
+  .rfq-x:hover{color:var(--brass)}
+  .rfq-intro{margin:8px 0 18px;color:var(--ink-soft);font-size:14px;max-width:60ch}
+
+  .rfq-lines{margin-bottom:18px}
+  .rfq-empty{margin:0;font-size:13.5px;color:var(--muted);font-family:var(--mono)}
+  .rfq-table{width:100%;border-collapse:collapse;font-size:13px}
+  .rfq-table th{text-align:left;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--muted);font-weight:400;padding:0 8px 6px 0;border-bottom:1px solid var(--line)}
+  .rfq-table td{padding:7px 8px 7px 0;border-bottom:1px solid var(--line-soft);color:var(--ink-soft);vertical-align:middle}
+  .rfq-table .rfq-price{font-family:var(--mono);white-space:nowrap;font-variant-numeric:tabular-nums}
+  .rfq-qty{width:120px;height:32px;border:1px solid var(--line);background:var(--card);color:var(--ink);
+    border-radius:7px;padding:0 8px;font-size:12.5px;font-family:var(--sans)}
+  .rfq-rm{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:0 2px}
+  .rfq-rm:hover{color:var(--brass)}
+
+  .rfq-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+  .rfq-form label{display:block;font-size:12.5px;color:var(--muted)}
+  .rfq-form label span{color:var(--brass)}
+  .rfq-form input,.rfq-form textarea{width:100%;margin-top:4px;border:1px solid var(--line);
+    background:var(--card);color:var(--ink);border-radius:9px;padding:9px 11px;font-size:14px;font-family:var(--sans)}
+  .rfq-form textarea{resize:vertical}
+  .rfq-form input:focus,.rfq-form textarea:focus{outline:2px solid var(--brass-2);outline-offset:1px;border-color:transparent}
+  .rfq-full{margin-top:12px}
+  /* Off-screen rather than display:none — a display:none input is skipped by
+     some autofill bots, and the honeypot only works if they fill it. */
+  .rfq-hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+
+  .rfq-msg{margin:14px 0 0;font-size:13.5px;font-family:var(--mono);line-height:1.5}
+  .rfq-msg.ok{color:var(--ok)}
+  .rfq-msg.err{color:var(--brass)}
+  .rfq-actions{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:18px}
+  .rfq-submit{background:var(--forest);color:var(--paper);border:1px solid transparent;border-radius:10px;
+    height:44px;padding:0 24px;font-size:15px;font-weight:600;cursor:pointer}
+  :root[data-theme="dark"] .rfq-submit{color:#0A140F}
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .rfq-submit{color:#0A140F}}
+  .rfq-submit:hover{background:var(--brass);color:#fff}
+  .rfq-submit:disabled{opacity:.55;cursor:default}
+  .rfq-privacy{font-size:12px;color:var(--muted)}
+
+  .rfq-done{margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
+  .rfq-dl{display:inline-block;background:var(--brass);color:#fff;text-decoration:none;
+    border-radius:10px;padding:12px 20px;font-size:14.5px;font-weight:600}
+  .rfq-dl:hover{background:var(--forest)}
+  .rfq-done-note{margin:10px 0 0;font-size:12.5px;color:var(--muted)}
+
+  @media (max-width:560px){
+    .rfq-panel{padding:18px}
+    .rfq-table th:nth-child(2),.rfq-table td:nth-child(2){display:none}
+  }
+</style>

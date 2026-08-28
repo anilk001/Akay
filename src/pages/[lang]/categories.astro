@@ -1,0 +1,138 @@
+---
+// §6 — translated category directory. Four pages.
+//
+// Category NAMES stay in English throughout, and that is deliberate: they are
+// the words on the offer rows, the workbook sheet tabs and the enquiry the desk
+// receives. Translating the heading but not the rows would leave a buyer
+// hunting for "Destilados" in a list that says "Spirits". The chrome around
+// them is translated; the vocabulary the trade actually uses is not.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCatalogue } from '../../lib/catalogue.mjs';
+import { aggregationFacts } from '../../lib/aggregation-intro.mjs';
+import { TRANSLATED, LOCALES } from '../../i18n/locales.mjs';
+import { UI } from '../../i18n/content.mjs';
+import { organizationSchema, breadcrumbList } from '../../lib/schema.mjs';
+
+export async function getStaticPaths() {
+  return TRANSLATED.map((lang) => ({ params: { lang }, props: { lang } }));
+}
+
+const { lang } = Astro.props;
+const ui = UI[lang];
+const { categories, stats } = await getCatalogue();
+
+const rows = categories.map((c) => ({ ...c, facts: aggregationFacts(c.offers) }));
+
+const HEAD = {
+  pt: {
+    title: `Categorias por grosso — ${stats.offers} linhas disponíveis | Akay Irl Ltd`,
+    description: `Todas as ${stats.categories} categorias do catálogo Akay: ${stats.offers} linhas de ${stats.brands} marcas, com preço por caixa, regime aduaneiro e condições de carga.`,
+    lede: `${stats.offers} linhas disponíveis em ${stats.categories} categorias e ${stats.brands} marcas. Cada página de categoria mostra o preço atual por caixa, o formato de embalagem, o regime aduaneiro e o ponto de carga.`,
+  },
+  es: {
+    title: `Categorías al por mayor — ${stats.offers} líneas disponibles | Akay Irl Ltd`,
+    description: `Todas las ${stats.categories} categorías del catálogo Akay: ${stats.offers} líneas de ${stats.brands} marcas, con precio por caja, régimen aduanero y condiciones de carga.`,
+    lede: `${stats.offers} líneas disponibles en ${stats.categories} categorías y ${stats.brands} marcas. Cada página de categoría muestra el precio actual por caja, el formato, el régimen aduanero y el punto de carga.`,
+  },
+  fr: {
+    title: `Catégories en gros — ${stats.offers} lignes disponibles | Akay Irl Ltd`,
+    description: `Les ${stats.categories} catégories du catalogue Akay : ${stats.offers} lignes issues de ${stats.brands} marques, avec prix à la caisse, régime douanier et conditions de chargement.`,
+    lede: `${stats.offers} lignes disponibles réparties sur ${stats.categories} catégories et ${stats.brands} marques. Chaque page de catégorie affiche le prix actuel à la caisse, le format, le régime douanier et le point de chargement.`,
+  },
+  ar: {
+    title: `فئات البيع بالجملة — ${stats.offers} بنداً متاحاً | Akay Irl Ltd`,
+    description: `جميع فئات كتالوج Akay البالغة ${stats.categories}: ${stats.offers} بنداً من ${stats.brands} ماركة، مع السعر بالكرتونة والوضع الجمركي وشروط التحميل.`,
+    lede: `${stats.offers} بنداً متاحاً موزعة على ${stats.categories} فئات و${stats.brands} ماركة. كل صفحة فئة تعرض السعر الحالي بالكرتونة وشكل التعبئة والوضع الجمركي ونقطة التحميل.`,
+  },
+}[lang];
+
+const jsonLd = [
+  organizationSchema(),
+  breadcrumbList([
+    { name: ui.catalogue, path: '/' },
+    { name: ui.categories, path: `/${lang}/categories/` },
+  ]),
+];
+
+const siblings = TRANSLATED.filter((c) => c !== lang);
+---
+
+<BaseLayout
+  title={HEAD.title}
+  description={HEAD.description}
+  lang={lang}
+  i18nPath="/categories/"
+  jsonLd={jsonLd}
+  wide={true}
+>
+  <nav class="crumbs" aria-label="Breadcrumb">
+    <a href="/">{ui.catalogue}</a>
+    <span aria-hidden="true">/</span>
+    <span aria-current="page">{ui.categories}</span>
+  </nav>
+
+  <header class="dir-head">
+    <h1>{ui.categories}</h1>
+    <p class="dir-intro">{HEAD.lede}</p>
+    <p class="dir-note">{ui.catalogueNote}</p>
+  </header>
+
+  <div class="cat-grid">
+    {rows.map((c) => (
+      <article class="cat-card">
+        <h2><a href={`/${lang}/category/${c.slug}/`}>{c.name}</a></h2>
+        <dl class="cat-stats">
+          <div><dt>{ui.liveLines}</dt><dd>{c.facts.lines}</dd></div>
+          <div><dt>{ui.brandsLabel}</dt><dd>{c.facts.brands.length}</dd></div>
+          {c.facts.inStock > 0 && <div><dt>{ui.inStock}</dt><dd>{c.facts.inStock}</dd></div>}
+        </dl>
+        {c.facts.tiers.length > 0 && (
+          <p class="cat-meta"><span>{ui.customs}</span> {c.facts.tiers.join(' · ')}</p>
+        )}
+        {c.facts.currencies.length > 0 && (
+          <p class="cat-meta"><span>{ui.currencies}</span> {c.facts.currencies.join(' / ')}</p>
+        )}
+        <a class="cat-go" href={`/${lang}/category/${c.slug}/`}>
+          {ui.browseLines(c.facts.lines, c.name)} →
+        </a>
+      </article>
+    ))}
+  </div>
+
+  <nav class="lang-switch" aria-label="Languages">
+    <a href="/categories/">English</a>
+    {siblings.map((code) => (
+      <a href={`/${code}/categories/`} lang={code}>{LOCALES[code].native}</a>
+    ))}
+  </nav>
+</BaseLayout>
+
+<style>
+  .crumbs{display:flex;flex-wrap:wrap;gap:8px;font-size:12.5px;color:var(--muted);margin-bottom:18px;font-family:var(--mono)}
+  .crumbs a{color:var(--brass);text-decoration:none}
+  .dir-head{margin-bottom:26px;padding-bottom:20px;border-bottom:1px solid var(--line)}
+  h1{font-family:var(--serif);font-weight:600;font-size:clamp(28px,4vw,38px);line-height:1.1;margin:0 0 14px}
+  .dir-intro{margin:0 0 10px;color:var(--ink-soft);font-size:15px;max-width:74ch}
+  .dir-note{margin:0;color:var(--muted);font-size:13px;max-width:74ch;
+    border-inline-start:2px solid var(--line);padding-inline-start:12px}
+
+  .cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+  .cat-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:20px;box-shadow:var(--shadow);display:flex;flex-direction:column}
+  .cat-card h2{font-family:var(--serif);font-size:20px;font-weight:600;margin:0 0 12px}
+  .cat-card h2 a{color:var(--ink);text-decoration:none}
+  .cat-card h2 a:hover{color:var(--brass)}
+  .cat-stats{display:flex;flex-wrap:wrap;gap:16px;margin:0 0 14px;padding-bottom:13px;border-bottom:1px solid var(--line-soft)}
+  .cat-stats dt{font-size:11px;color:var(--muted)}
+  .cat-stats dd{margin:2px 0 0;font-family:var(--mono);font-size:18px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
+  .cat-meta{margin:0 0 7px;font-size:12.5px;color:var(--ink-soft)}
+  .cat-meta span{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.07em;
+    text-transform:uppercase;color:var(--muted)}
+  .cat-go{margin-top:auto;padding-top:15px;font-size:13.5px;font-weight:600;color:var(--brass);text-decoration:none}
+  .cat-go:hover{text-decoration:underline}
+
+  .lang-switch{display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:30px;padding-top:16px;
+    border-top:1px solid var(--line);font-size:13.5px}
+  .lang-switch a{color:var(--brass);text-decoration:none}
+  .lang-switch a:hover{text-decoration:underline}
+</style>

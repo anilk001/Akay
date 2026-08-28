@@ -1,0 +1,118 @@
+---
+// §2 credibility block. Footer of every page.
+//
+// The buyers this site is for do not enquire before they have satisfied
+// themselves the counterparty is real. That check happens in the footer, on
+// whichever page they happened to land on from search — which is why this is not
+// only on /about/. Registered identity, the authenticity representation, and a
+// contact route with a stated response time, all in one block.
+//
+// Anything Anil has not supplied prints as "On request" rather than a plausible
+// looking placeholder; see src/data/company.mjs.
+import { company, orRequest, isTBC, warnOnTBC } from '../data/company.mjs';
+import { WA_LINK } from '../lib/whatsapp.mjs';
+
+warnOnTBC();
+
+const { compact = false } = Astro.props;
+
+const legal = [
+  ['Registered name', company.registeredName],
+  ['Company reg. (CRO)', orRequest(company.cro)],
+  ['VAT number', orRequest(company.vat)],
+  ['EORI number', orRequest(company.eori)],
+  ['Registered address', orRequest(company.registeredAddress)],
+];
+
+const footprint = [
+  ['Years trading', orRequest(company.yearsTrading)],
+  ['Countries shipped to', orRequest(company.countriesShipped)],
+  ['Containers per month', orRequest(company.containersPerMonth)],
+];
+
+// Suppressed entirely when nothing is filled in — three rows of "On request" is
+// worse than no section, and pretends to a disclosure that has not happened.
+const showFootprint = footprint.some(([, v]) => v !== 'On request');
+---
+
+<footer class="site-footer">
+  <div class="sf-wrap">
+    <div class="sf-grid">
+      <section class="sf-col">
+        <h2>Akay Irl Ltd</h2>
+        <dl class="sf-dl">
+          {legal.map(([k, v]) => (
+            <div class="sf-row"><dt>{k}</dt><dd>{v}</dd></div>
+          ))}
+        </dl>
+        {showFootprint && (
+          <dl class="sf-dl sf-dl-gap">
+            {footprint.map(([k, v]) => (
+              <div class="sf-row"><dt>{k}</dt><dd>{v}</dd></div>
+            ))}
+          </dl>
+        )}
+        <p class="sf-refs">{company.references}</p>
+      </section>
+
+      <section class="sf-col">
+        <h2>Authenticity of stock</h2>
+        <ul class="sf-auth">
+          <li>Genuine brand-owner product, from the brand owner or an authorised distributor.</li>
+          <li>Batch and best-before traceable to the consignment.</li>
+          <li>Full export documentation with every shipment.</li>
+          <li>No counterfeit, refilled or diverted goods.</li>
+        </ul>
+        <p class="sf-more"><a href="/about/">Full company and authenticity statement →</a></p>
+      </section>
+
+      <section class="sf-col">
+        <h2>Trade desk</h2>
+        <dl class="sf-dl">
+          <div class="sf-row"><dt>Email</dt><dd><a href={`mailto:${company.email}`}>{company.email}</a></dd></div>
+          <div class="sf-row"><dt>WhatsApp</dt><dd><a href={WA_LINK} target="_blank" rel="noopener">{company.whatsappDisplay}</a></dd></div>
+          <div class="sf-row"><dt>Based</dt><dd>{company.tradingBase}</dd></div>
+        </dl>
+        <p class="sf-resp">{company.responseTime}</p>
+        <nav class="sf-nav" aria-label="Trade information">
+          <a href="/trade-terms/">Trade terms</a>
+          <a href="/customs-glossary/">Customs glossary</a>
+          <a href="/brands/">All brands</a>
+          <a href="/categories/">All categories</a>
+          <a href="/about/">About</a>
+        </nav>
+      </section>
+    </div>
+
+    <p class="sf-legal">
+      Trade sales only — we do not supply private individuals. Prices are indicative, quoted per the
+      basis shown on each line, and confirmed on a formal quotation against available stock. Supplier
+      identity, buy prices and margins are never published.
+      {!compact && <> <a href="/customs-glossary/">T1 and T2 explained →</a></>}
+    </p>
+  </div>
+</footer>
+
+<style>
+  .site-footer{border-top:1px solid var(--line);background:var(--paper-2);
+    padding:34px 0 40px;font-size:13px;color:var(--muted);line-height:1.55}
+  .sf-wrap{max-width:1200px;margin:0 auto;padding:0 20px}
+  .sf-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:26px 34px}
+  .sf-col h2{font-family:var(--serif);font-size:15px;font-weight:600;color:var(--ink);margin:0 0 12px;letter-spacing:.01em}
+  .sf-dl{margin:0;display:flex;flex-direction:column;gap:4px}
+  .sf-dl-gap{margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)}
+  .sf-row{display:flex;gap:10px;align-items:baseline}
+  .sf-row dt{flex:0 0 45%;color:var(--muted)}
+  .sf-row dd{margin:0;color:var(--ink-soft);font-family:var(--mono);font-size:12px;word-break:break-word}
+  .sf-row dd a{color:var(--brass);text-decoration:none}
+  .sf-row dd a:hover{text-decoration:underline}
+  .sf-refs,.sf-resp{margin:12px 0 0;color:var(--ink-soft)}
+  .sf-auth{margin:0;padding-left:16px;display:flex;flex-direction:column;gap:5px;color:var(--ink-soft)}
+  .sf-more{margin:12px 0 0}
+  .sf-more a,.sf-nav a{color:var(--brass);text-decoration:none}
+  .sf-more a:hover,.sf-nav a:hover{text-decoration:underline}
+  .sf-nav{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:14px;padding-top:12px;border-top:1px dashed var(--line)}
+  .sf-legal{margin:26px 0 0;padding-top:16px;border-top:1px solid var(--line);max-width:100ch;font-size:12px}
+  .sf-legal a{color:var(--brass);text-decoration:none}
+  .sf-legal a:hover{text-decoration:underline}
+</style>

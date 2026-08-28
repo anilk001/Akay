@@ -1,0 +1,285 @@
+---
+// §3 — the page that removes the five-email exchange before a first order.
+//
+// Everything a buyer would otherwise have to ask for: minimums, the Incoterms
+// we actually work on and what each means for us specifically, where we load,
+// what documents ship with the goods, whether we consolidate, and lead times.
+//
+// Facts come from the catalogue wherever the catalogue knows them — loading
+// points, Incoterms in use, real MOQ strings — so the page cannot drift from
+// what we are actually offering. Payment terms are the one thing left blank on
+// purpose: which to publish is Anil's call (see src/data/company.mjs).
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCatalogue } from '../lib/catalogue.mjs';
+import { aggregationFacts } from '../lib/aggregation-intro.mjs';
+import { INCOTERMS } from '../lib/glossary.mjs';
+import { company, isTBC } from '../data/company.mjs';
+import { organizationSchema, breadcrumbList } from '../lib/schema.mjs';
+
+const { offers, stats } = await getCatalogue();
+const facts = aggregationFacts(offers);
+
+// Real MOQ strings off the live lines, deduplicated. About a third of lines
+// carry one; showing the actual wording beats paraphrasing it.
+const moqExamples = [...new Set(offers.map((o) => String(o.moq || '').trim()).filter(Boolean))]
+  .sort((a, b) => a.localeCompare(b))
+  .slice(0, 8);
+
+const leadTimeExamples = [...new Set(offers.map((o) => String(o.leadTime || '').trim()).filter(Boolean))]
+  .sort((a, b) => a.localeCompare(b))
+  .slice(0, 8);
+
+// Only describe the Incoterms we actually quote on.
+const incotermsInUse = INCOTERMS.filter(([code]) => facts.incoterms.includes(code));
+const incotermsToShow = incotermsInUse.length ? incotermsInUse : INCOTERMS;
+
+const documents = [
+  ['Commercial invoice', 'On every shipment, in the currency of the sale.'],
+  ['Packing list', 'Cases, pallets, gross and net weights, batch codes where the warehouse records them.'],
+  ['CMR', 'Road consignment note on truck movements within Europe.'],
+  ['T1 / T2', 'Customs transit declaration, on any movement under customs control.'],
+  ['EX1', 'Export declaration, on shipments leaving the EU.'],
+  ['COA', 'Certificate of analysis, where the producer issues one — standard on spirits.'],
+  ['Health certificate', 'Where the destination requires one for food, beverage or cosmetic goods. Confirmed per shipment, since requirements vary by country.'],
+  ['Certificate of origin', 'On request, chambered where the destination demands it.'],
+];
+
+const title = 'Trade terms, minimums, Incoterms and documents | Akay Irl Ltd';
+const description = 'How we trade: order minimums, the Incoterms we quote on and what each means for us, loading points, the documents supplied with every shipment, consolidation policy and lead times.';
+
+const jsonLd = [
+  organizationSchema(),
+  breadcrumbList([{ name: 'Home', path: '/' }, { name: 'Trade terms', path: '/trade-terms/' }]),
+];
+---
+
+<BaseLayout title={title} description={description} jsonLd={jsonLd} i18nPath="/trade-terms/">
+  <nav class="crumbs" aria-label="Breadcrumb">
+    <a href="/">Catalogue</a><span aria-hidden="true">/</span><span aria-current="page">Trade terms</span>
+  </nav>
+
+  <header class="doc-head">
+    <p class="eyebrow">How we trade</p>
+    <h1>Trade terms</h1>
+    <p class="doc-lede">
+      Everything you would otherwise have to email us to find out. If something you need is
+      not here, ask — and we will add it to this page rather than answer it privately twice.
+    </p>
+  </header>
+
+  <nav class="toc" aria-label="On this page">
+    <a href="#minimums">Minimums</a>
+    <a href="#payment">Payment</a>
+    <a href="#incoterms">Incoterms</a>
+    <a href="#loading">Loading points</a>
+    <a href="#documents">Documents</a>
+    <a href="#consolidation">Consolidation</a>
+    <a href="#lead-times">Lead times</a>
+  </nav>
+
+  <section class="entry" id="minimums">
+    <h2>Order minimums</h2>
+    <p>
+      Minimums are set per line by the warehouse holding the stock, not by us centrally, so they
+      vary. Where a line carries its own minimum it is printed on that offer.
+    </p>
+    <p>
+      As a rule of thumb: a single line usually goes out at one full pallet or more, and a mixed
+      order needs to reach a value that makes a shipment worth loading. Below that we will still
+      quote, but freight per case starts to dominate the price and you are usually better served
+      by a consolidator.
+    </p>
+    {moqExamples.length > 0 && (
+      <>
+        <h3>Minimums currently stated on live lines</h3>
+        <ul class="plain">
+          {moqExamples.map((m) => <li><code>{m}</code></li>)}
+        </ul>
+        <p class="note">
+          Read off the catalogue as it stands today. The minimum that applies to you is the one
+          shown on the specific lines you enquire about.
+        </p>
+      </>
+    )}
+  </section>
+
+  <section class="entry" id="payment">
+    <h2>Payment</h2>
+    {isTBC(company.paymentTerms) ? (
+      <>
+        <p>
+          Payment terms are confirmed on the quotation, against the specific lines, volume and
+          destination. We will state them in writing before you commit to anything, and they do
+          not change between quotation and invoice.
+        </p>
+        <p>
+          For a first order with a new counterparty, expect terms to be tighter than for
+          established accounts. That works in both directions: ask us for trade and bank
+          references and we will supply them.
+        </p>
+      </>
+    ) : (
+      <p>{company.paymentTerms}</p>
+    )}
+    <p class="note">{company.references}.</p>
+  </section>
+
+  <section class="entry" id="incoterms">
+    <h2>Incoterms — and what each means for us</h2>
+    <p>
+      The definitions are standard; what is worth knowing is which party does what on an Akay
+      shipment. These are the terms we quote on.
+    </p>
+    <dl class="terms">
+      {incotermsToShow.map(([code, name, meaning]) => (
+        <div class="term">
+          <dt><span class="code">{code}</span> {name}</dt>
+          <dd>{meaning}</dd>
+        </div>
+      ))}
+    </dl>
+    <p class="note">
+      Every offer on the catalogue shows its terms in the card footer. Where the loading point is
+      known it is appended, e.g. <code>EXW Loendersloot</code>.
+    </p>
+  </section>
+
+  <section class="entry" id="loading">
+    <h2>Loading points</h2>
+    <p>
+      We do not hold a single central warehouse. Stock loads from wherever the consignment sits,
+      which is why the loading point is stated per line rather than assumed.
+    </p>
+    {facts.points.length > 0 && (
+      <>
+        <p>Live lines currently load from:</p>
+        <ul class="chips">
+          {facts.points.sort((a, b) => a.localeCompare(b)).map((p) => <li>{p}</li>)}
+        </ul>
+      </>
+    )}
+    <p class="note">
+      Read off the catalogue as it stands today, so this list moves with the stock. If your
+      preferred port is not on it, ask — we can often load elsewhere on a container order.
+    </p>
+  </section>
+
+  <section class="entry" id="documents">
+    <h2>Documents supplied</h2>
+    <p>
+      Documentation is the part of an export order that most often goes wrong, and the part
+      buyers are least willing to chase. This is what ships with the goods.
+    </p>
+    <dl class="terms">
+      {documents.map(([doc, when]) => (
+        <div class="term">
+          <dt>{doc}</dt>
+          <dd>{when}</dd>
+        </div>
+      ))}
+    </dl>
+    <p class="note">
+      If your customs broker needs something not listed, tell us at quotation stage rather than
+      after loading — some certificates cannot be issued retrospectively.
+    </p>
+  </section>
+
+  <section class="entry" id="consolidation">
+    <h2>Mixed pallets and consolidation</h2>
+    <p>
+      Mixed pallets are possible where the lines sit in the same warehouse. Building a pallet from
+      stock in two warehouses means an inland movement first, which adds cost and a few days —
+      worth it on a container, rarely worth it on a single pallet.
+    </p>
+    <p>
+      For container orders we will consolidate across categories: spirits, soft drinks and FMCG on
+      one shipment is normal and often the reason the freight per case works. Alcohol under bond
+      cannot be consolidated with duty-paid goods on the same movement, because the two travel
+      under different customs regimes.
+    </p>
+    <p>
+      Tell us your target container size and we will tell you what fits and what it lands at.
+    </p>
+  </section>
+
+  <section class="entry" id="lead-times">
+    <h2>Lead times</h2>
+    <p>
+      From confirmed order and cleared payment: European truck movements typically load within a
+      few working days. Sea freight depends on the sailing schedule from the load port far more
+      than on us — that is where the weeks go, not in picking the order.
+    </p>
+    <p>
+      Where a line carries its own stated lead time, it is printed on that offer.
+    </p>
+    {leadTimeExamples.length > 0 && (
+      <>
+        <h3>Lead times currently stated on live lines</h3>
+        <ul class="plain">
+          {leadTimeExamples.map((t) => <li><code>{t}</code></li>)}
+        </ul>
+      </>
+    )}
+    <p class="note">
+      We quote a load date, not a delivery date, on anything moving by sea. A delivery date we
+      cannot control is not a commitment worth making.
+    </p>
+  </section>
+
+  <aside class="cta">
+    <h2>Ready to price something?</h2>
+    <p>
+      Tick the lines you want on the catalogue and send one request — we come back with firm
+      prices, availability, the loading point and the documents for those specific lines.
+    </p>
+    <p class="cta-links">
+      <a href="/">Browse {stats.offers} live lines →</a>
+      <a href="/customs-glossary/">T1, T2 and bonded explained →</a>
+      <a href="mailto:offers@akay.ie?subject=Trade%20terms%20question">offers@akay.ie</a>
+    </p>
+  </aside>
+</BaseLayout>
+
+<style>
+  .crumbs{display:flex;flex-wrap:wrap;gap:8px;font-size:12.5px;color:var(--muted);margin-bottom:18px;font-family:var(--mono)}
+  .crumbs a{color:var(--brass);text-decoration:none}
+  .doc-head{margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid var(--line)}
+  .eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--brass);margin:0 0 10px}
+  h1{font-family:var(--serif);font-weight:600;font-size:clamp(27px,4.4vw,38px);line-height:1.06;margin:0 0 14px;text-wrap:balance}
+  .doc-lede{margin:0;color:var(--ink-soft);font-size:16px;max-width:68ch}
+
+  .toc{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:30px}
+  .toc a{border:1px solid var(--line);background:var(--card);color:var(--ink-soft);
+    border-radius:999px;padding:6px 14px;font-size:13.5px;text-decoration:none;transition:.14s}
+  .toc a:hover{border-color:var(--brass-2);color:var(--brass)}
+
+  .entry{margin-bottom:36px;scroll-margin-top:76px}
+  .entry h2{font-family:var(--serif);font-size:23px;font-weight:600;margin:0 0 12px;color:var(--ink)}
+  .entry h3{font-family:var(--sans);font-size:13px;font-weight:600;letter-spacing:.02em;
+    text-transform:uppercase;color:var(--muted);margin:22px 0 9px}
+  .entry p{margin:0 0 12px;color:var(--ink-soft);font-size:15px;line-height:1.62;max-width:70ch}
+  .entry .note{font-size:13px;color:var(--muted);border-left:2px solid var(--line);padding-left:12px;margin-top:16px}
+  code{font-family:var(--mono);font-size:12.5px;background:var(--paper-2);border:1px solid var(--line-soft);
+    border-radius:5px;padding:1px 6px;color:var(--ink-soft)}
+
+  ul.plain{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:5px}
+  ul.chips{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:7px}
+  ul.chips li{border:1px solid var(--line);background:var(--card);border-radius:999px;
+    padding:5px 13px;font-size:13px;color:var(--ink-soft)}
+
+  .terms{margin:0;display:flex;flex-direction:column;gap:0}
+  .term{display:grid;grid-template-columns:200px 1fr;gap:8px 20px;padding:12px 0;border-bottom:1px solid var(--line-soft)}
+  .term:last-child{border-bottom:none}
+  .term dt{font-weight:600;color:var(--ink);font-size:14.5px}
+  .term dt .code{font-family:var(--mono);color:var(--brass);margin-right:5px}
+  .term dd{margin:0;color:var(--ink-soft);font-size:14.5px;line-height:1.58}
+  @media (max-width:640px){.term{grid-template-columns:1fr;gap:3px}}
+
+  .cta{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--brass);
+    border-radius:var(--radius);padding:22px;margin-top:36px}
+  .cta h2{font-family:var(--serif);font-size:19px;font-weight:600;margin:0 0 8px;color:var(--ink)}
+  .cta p{margin:0 0 10px;color:var(--ink-soft);font-size:14.5px;max-width:66ch}
+  .cta-links{display:flex;flex-wrap:wrap;gap:8px 20px;margin-bottom:0!important;font-weight:600}
+  .cta-links a{color:var(--brass);text-decoration:none}
+  .cta-links a:hover{text-decoration:underline}
+</style>

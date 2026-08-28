@@ -1,0 +1,140 @@
+---
+// §1 — the brand directory. Linked from the header on every page.
+//
+// This is the page that gets the 691 brand pages crawled: without one index
+// that links to all of them, a crawler reaching the catalogue has no route to
+// any brand page except through an offer, and offers turn over daily.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCatalogue } from '../lib/catalogue.mjs';
+import { organizationSchema, breadcrumbList } from '../lib/schema.mjs';
+
+const { brands, retiredBrands, stats } = await getCatalogue();
+
+// Grouped A–Z, with numeric and non-Latin first characters collected under #.
+// 691 links in one flat list is unusable; by initial it is scannable.
+const groups = new Map();
+for (const b of brands) {
+  const first = b.slug[0] || '#';
+  const key = /[a-z]/.test(first) ? first.toUpperCase() : '#';
+  if (!groups.has(key)) groups.set(key, []);
+  groups.get(key).push(b);
+}
+const letters = [...groups.keys()].sort((a, b) => (a === '#' ? 1 : b === '#' ? -1 : a.localeCompare(b)));
+
+const biggest = [...brands].sort((a, b) => b.offers.length - a.offers.length).slice(0, 12);
+
+const title = 'All wholesale brands — Export Case Prices | Akay Irl Ltd';
+const description = `Every brand we currently list: ${stats.brands} brands across ${stats.offers} live wholesale lines, with trade case pricing, customs status and loading terms on each.`;
+
+const jsonLd = [
+  organizationSchema(),
+  breadcrumbList([{ name: 'Home', path: '/' }, { name: 'Brands', path: '/brands/' }]),
+  {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: 'Wholesale brands',
+    url: 'https://offers.akay.ie/brands/',
+    mainEntity: {
+      '@type': 'ItemList',
+      numberOfItems: brands.length,
+      itemListElement: brands.map((b, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        name: b.name,
+        url: `https://offers.akay.ie/brand/${b.slug}/`,
+      })),
+    },
+  },
+];
+---
+
+<BaseLayout title={title} description={description} jsonLd={jsonLd} wide={true}>
+  <nav class="crumbs" aria-label="Breadcrumb">
+    <a href="/">Catalogue</a><span aria-hidden="true">/</span><span aria-current="page">Brands</span>
+  </nav>
+
+  <header class="dir-head">
+    <p class="eyebrow">Directory</p>
+    <h1>All brands</h1>
+    <p class="dir-intro">
+      {stats.brands} brands, {stats.offers} live lines. Every brand below has at least one
+      offer on the catalogue right now — each page carries the current case price, pack spec,
+      customs status and loading point for that brand's lines.
+    </p>
+  </header>
+
+  <section class="dir-top">
+    <h2>Deepest lines</h2>
+    <div class="dir-chips">
+      {biggest.map((b) => (
+        <a href={`/brand/${b.slug}/`}>{b.name}<span>{b.offers.length}</span></a>
+      ))}
+    </div>
+  </section>
+
+  <nav class="dir-jump" aria-label="Jump to letter">
+    {letters.map((l) => <a href={`#letter-${l === '#' ? 'other' : l}`}>{l}</a>)}
+  </nav>
+
+  {letters.map((letter) => (
+    <section class="dir-group" id={`letter-${letter === '#' ? 'other' : letter}`}>
+      <h2>{letter}</h2>
+      <ul class="dir-list">
+        {groups.get(letter).map((b) => (
+          <li>
+            <a href={`/brand/${b.slug}/`}>{b.name}</a>
+            <span class="dir-count">{b.offers.length}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  ))}
+
+  {retiredBrands.length > 0 && (
+    <section class="dir-group dir-retired">
+      <h2>No live lines today</h2>
+      <p class="dir-retired-note">
+        These brands were on the catalogue at the last refresh and have sold through. The pages
+        stay up so links keep working, and they return as soon as stock lands.
+      </p>
+      <ul class="dir-list">
+        {retiredBrands.map((b) => <li><a href={`/brand/${b.slug}/`}>{b.name}</a></li>)}
+      </ul>
+    </section>
+  )}
+</BaseLayout>
+
+<style>
+  .crumbs{display:flex;flex-wrap:wrap;gap:8px;font-size:12.5px;color:var(--muted);margin-bottom:18px;font-family:var(--mono)}
+  .crumbs a{color:var(--brass);text-decoration:none}
+  .dir-head{margin-bottom:26px;padding-bottom:20px;border-bottom:1px solid var(--line)}
+  .eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--brass);margin:0 0 10px}
+  h1{font-family:var(--serif);font-weight:600;font-size:clamp(28px,4vw,38px);line-height:1.06;margin:0 0 14px}
+  .dir-intro{margin:0;color:var(--ink-soft);font-size:15px;max-width:74ch}
+
+  .dir-top{margin-bottom:26px}
+  .dir-top h2,.dir-group h2{font-family:var(--serif);font-size:17px;font-weight:600;margin:0 0 11px;color:var(--ink)}
+  .dir-chips{display:flex;flex-wrap:wrap;gap:7px}
+  .dir-chips a{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--card);
+    color:var(--ink-soft);border-radius:999px;padding:6px 13px;font-size:13.5px;text-decoration:none;transition:.14s}
+  .dir-chips a:hover{border-color:var(--brass-2);color:var(--brass)}
+  .dir-chips a span{font-family:var(--mono);font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+
+  .dir-jump{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:28px;padding:12px 0;
+    border-top:1px solid var(--line-soft);border-bottom:1px solid var(--line-soft)}
+  .dir-jump a{display:inline-block;min-width:30px;text-align:center;font-family:var(--mono);font-size:13px;
+    color:var(--brass);text-decoration:none;border:1px solid var(--line);border-radius:7px;padding:3px 0}
+  .dir-jump a:hover{background:var(--brass);color:#fff;border-color:var(--brass)}
+
+  .dir-group{margin-bottom:26px;scroll-margin-top:76px}
+  .dir-list{list-style:none;margin:0;padding:0;columns:4 200px;column-gap:26px}
+  .dir-list li{display:flex;justify-content:space-between;gap:10px;padding:3px 0;
+    font-size:14px;break-inside:avoid}
+  .dir-list a{color:var(--ink-soft);text-decoration:none}
+  .dir-list a:hover{color:var(--brass);text-decoration:underline}
+  .dir-count{font-family:var(--mono);font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums;flex-shrink:0}
+
+  .dir-retired{margin-top:34px;padding-top:22px;border-top:1px solid var(--line)}
+  .dir-retired-note{margin:0 0 12px;color:var(--muted);font-size:13.5px;max-width:74ch}
+  .dir-retired .dir-list a{color:var(--muted)}
+</style>

@@ -208,3 +208,58 @@ export function articleSchema(title, content, slug) {
     },
   };
 }
+
+// ---------------------------------------------------------------------------
+// Aggregation-page structured data (§1).
+// ---------------------------------------------------------------------------
+
+// Generic breadcrumb builder. The offer-page helper above hardcodes a
+// Home → Category → Offer trail; brand and category pages need shorter or
+// differently-shaped trails, and offer pages now carry the brand step too.
+export function breadcrumbList(crumbs) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: crumbs.map((c, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: c.name,
+      item: c.path.startsWith('http') ? c.path : `${SITE_URL}${c.path}`,
+    })),
+  };
+}
+
+// ItemList for a brand or category page. Capped: a 400-line brand page would
+// otherwise emit a JSON-LD block bigger than the HTML around it, and search
+// engines only read the head of a long list anyway.
+export function aggregationItemListSchema({ name, path, offers, limit = 100 }) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name,
+    url: `${SITE_URL}${path}`,
+    mainEntity: {
+      '@type': 'ItemList',
+      numberOfItems: offers.length,
+      itemListElement: offers.slice(0, limit).map((offer, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        url: `${SITE_URL}/offers/${offer.slug}/`,
+        name: offer.name,
+      })),
+    },
+  };
+}
+
+// Declares the page as the canonical description of a Brand we stock, and ties
+// it back to the seller. Only emitted when the brand has live lines — asserting
+// a Brand page for a brand we cannot currently supply would be a false claim.
+export function brandSchema(brand, path) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Brand',
+    name: brand,
+    url: `${SITE_URL}${path}`,
+    mainEntityOfPage: `${SITE_URL}${path}`,
+  };
+}

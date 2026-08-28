@@ -1,84 +1,59 @@
 ---
-import { getOffers } from '../../data/airtable.mjs';
-import { generateSlug, dedupeSlug } from '../../lib/slug.mjs';
-import { productOfferSchema, breadcrumbSchema, organizationSchema } from '../../lib/schema.mjs';
-import { enquiryLink, WA_LINK, WA_DISPLAY } from '../../lib/whatsapp.mjs';
+import { getCatalogue } from '../../lib/catalogue.mjs';
+import { productOfferSchema, breadcrumbList, organizationSchema } from '../../lib/schema.mjs';
+import { WA_LINK, WA_DISPLAY } from '../../lib/whatsapp.mjs';
+import { GLOSSARY_HREF } from '../../lib/glossary.mjs';
+import OfferCard from '../../components/OfferCard.astro';
+import RfqBasket from '../../components/RfqBasket.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
 
-// Get all valid slugs for static generation
 export async function getStaticPaths() {
-  const { offers } = await getOffers();
-
-  // Build slug map
-  const slugMap = new Map();
-  const slugs = [];
-  for (const offer of offers) {
-    let slug = generateSlug(offer.name, offer.spec);
-    slug = dedupeSlug(slug, slugs);
-    slugs.push(slug);
-    slugMap.set(offer.id || `${offer.brand}-${offer.name}`, { ...offer, slug });
-  }
-
-  const allOffers = Array.from(slugMap.values());
-
-  return allOffers.map((offer) => ({
+  // Slugs, price basis and stock labels all come from the shared catalogue now,
+  // so this page cannot disagree with the index or the aggregation pages.
+  const { offers } = await getCatalogue();
+  return offers.map((offer) => ({
     params: { slug: offer.slug },
-    props: { offer, allOffers },
+    props: { offer, allOffers: offers },
   }));
 }
 
 const { offer, allOffers } = Astro.props;
 const slug = offer.slug;
+const { basis, other, st } = offer;
+const wa = offer.wa;
+const categorySlug = offer.categorySlug;
 
-// Helper functions
-function priceParts(detail = '') {
-  const parts = detail.split('·').map((s) => s.trim());
-  const first = parts[0] || '';
-  const basis = /\/\s*bottle/i.test(first) ? '/ btl'
-    : /\/\s*case/i.test(first) ? '/ case'
-    : /\/\s*unit/i.test(first) ? '/ unit' : '';
-  const msg = basis === '/ btl' ? 'per bottle' : basis === '/ case' ? 'per case' : basis === '/ unit' ? 'per unit' : '';
-  const other = parts.slice(1).join(' · ');
-  return { basis, other, msg };
-}
+// Related offers, same category. Previously shuffled with Math.random(), which
+// meant every rebuild rewrote the block on all ~2,900 pages — churn in the diff
+// and in Netlify's upload for no reader benefit. Now it walks forward from this
+// offer's own position, so the picks are stable per offer and still varied
+// across the catalogue.
+const pool = allOffers.filter((o) => o.category === offer.category && o.id !== offer.id);
+const startAt = pool.findIndex((o) => o.slug > offer.slug);
+const relatedOffers = pool.length
+  ? Array.from({ length: Math.min(4, pool.length) }, (_, i) => pool[((startAt < 0 ? 0 : startAt) + i) % pool.length])
+  : [];
 
-const STOCK = { in: ['ok', 'In stock'], warn: ['warn', 'Limited'], enq: ['neu', 'Enquire'] };
-
-const { basis, other, msg } = priceParts(offer.priceDetail);
-const st = STOCK[offer.stock] || STOCK.enq;
-const wa = enquiryLink(offer, msg);
-
-// Category slug for linking
-const categorySlug = offer.category.toLowerCase().replace(/\s+/g, '-');
-
-// Related offers (same category, max 4)
-const relatedOffers = allOffers
-  .filter(
-    (o) => o.category === offer.category &&
-            (o.id || `${o.brand}-${o.name}`) !== (offer.id || `${offer.brand}-${offer.name}`)
-  )
-  .sort(() => Math.random() - 0.5)
-  .slice(0, 4);
-
-// Build schemas
 const orgSchema = organizationSchema();
 const productSchema = productOfferSchema(offer, slug);
-const breadcrumbData = breadcrumbSchema(offer.name, offer.category, slug);
+// The trail now includes the brand step, matching the brief's
+// Home -> Category -> Brand -> Offer.
+const breadcrumbData = breadcrumbList([
+  { name: 'Home', path: '/' },
+  { name: offer.category, path: `/category/${categorySlug}/` },
+  ...(offer.brandSlug ? [{ name: offer.brand, path: `/brand/${offer.brandSlug}/` }] : []),
+  { name: offer.name, path: `/offers/${slug}/` },
+]);
 
-// Title and meta
-const pageTitle = `${offer.name} ${offer.spec || ''} wholesale — ${offer.currency}${offer.amount?.toFixed(2) || '—'}/case | AKAY Trade`;
-const pageDesc = `${offer.name} ${offer.spec || ''} wholesale: ${offer.currency}${offer.amount?.toFixed(2) || '—'}/case, ${offer.tier || 'trade pricing'}, ${offer.terms || 'terms available'}. Buy by the case from AKAY Trade.`;
+const pageTitle = `${offer.name} ${offer.spec || ''} wholesale — ${offer.priceLabel} | AKAY Trade`;
+const pageDesc = `${offer.name} ${offer.spec || ''} wholesale: ${offer.priceLabel}, ${offer.tier || 'trade pricing'}, ${offer.terms || 'terms available'}. Buy by the case from AKAY Trade.`;
 
 // Determine availability status for display
-let stockStatus = 'Enquire on request';
 let stockDetail = '';
-if (offer.stock === 'in') {
-  stockStatus = 'In stock';
-  if (offer.qty) {
-    stockDetail = `${offer.qty.toLocaleString()} cases available`;
-  }
-} else if (offer.stock === 'warn') {
-  stockStatus = 'Limited availability';
+if (offer.stock === 'in' && offer.qty) {
+  stockDetail = `${offer.qty.toLocaleString()} cases available`;
 }
+
 ---
 
 <!doctype html>
@@ -107,41 +82,32 @@ if (offer.stock === 'in') {
 
   <style>
     :root {
-      --paper: #F7F5F0;
-      --paper-2: #EFEDE4;
-      --card: #FFFFFF;
-      --ink: #17140F;
-      --ink-soft: #41473F;
-      --muted: #767E72;
-      --line: #E4E0D4;
-      --brass: #B4231F;
-      --ok: #0E7A3B;
-      --ok-bg: #E2F0E5;
-      --warn: #9A6A12;
-      --warn-bg: #F5E9CE;
-      --neu: #5C6A78;
-      --neu-bg: #E9ECEF;
+      /* Canonical token set, identical to src/layouts/BaseLayout.astro.
+         These templates each carried a subset that omitted --mono, --line-soft,
+         --forest, --brass-2 and --lime. That was survivable while every card was
+         hand-written per page, but the shared OfferCard and SiteFooter use all
+         of them — a missing --forest renders the Enquire button with no
+         background at all. */
+      --paper: #F7F5F0; --paper-2: #EFEDE4; --card: #FFFFFF;
+      --ink: #17140F; --ink-soft: #41473F; --muted: #767E72;
+      --line: #E4E0D4; --line-soft: #ECE8DD;
+      --brass: #B4231F; --brass-2: #D0362E; --forest: #0E7A3B; --lime: #6FA82E;
+      --ok: #0E7A3B; --ok-bg: #E2F0E5; --warn: #9A6A12; --warn-bg: #F5E9CE;
+      --neu: #5C6A78; --neu-bg: #E9ECEF;
       --shadow: 0 1px 2px rgba(20, 33, 26, 0.06), 0 6px 20px -8px rgba(20, 33, 26, 0.14);
       --radius: 14px;
-      --serif: "Hoefler Text", "Iowan Old Style", Palatino, Georgia, "Times New Roman", serif;
+      --serif: "Hoefler Text", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
       --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --mono: ui-monospace, "SF Mono", "SFMono-Regular", Menlo, Consolas, monospace;
     }
     @media (prefers-color-scheme: dark) {
       :root {
-        --paper: #0C140F;
-        --paper-2: #081009;
-        --card: #13201A;
-        --ink: #F1EFE7;
-        --ink-soft: #C6CEC4;
-        --muted: #8A968A;
-        --line: #243029;
-        --brass: #EC5A52;
-        --ok: #5FC97E;
-        --ok-bg: #123021;
-        --warn: #E0B65C;
-        --warn-bg: #31280F;
-        --neu: #9AA7B4;
-        --neu-bg: #1B2530;
+        --paper: #0C140F; --paper-2: #081009; --card: #13201A;
+        --ink: #F1EFE7; --ink-soft: #C6CEC4; --muted: #8A968A;
+        --line: #243029; --line-soft: #1B2620;
+        --brass: #EC5A52; --brass-2: #F26E66; --forest: #37B866; --lime: #9BD84F;
+        --ok: #5FC97E; --ok-bg: #123021; --warn: #E0B65C; --warn-bg: #31280F;
+        --neu: #9AA7B4; --neu-bg: #1B2530;
         --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 28px -12px rgba(0, 0, 0, 0.6);
       }
     }
@@ -155,7 +121,7 @@ if (offer.stock === 'in') {
     }
     h1 {
       font: 600 2em var(--serif);
-      margin: 1em 0 0.5em;
+      margin: 0.2em 0 0.5em;
     }
     h2 {
       font: 600 1.3em var(--serif);
@@ -171,8 +137,58 @@ if (offer.stock === 'in') {
     }
 
     .container {
-      max-width: 720px;
+      max-width: 900px;
       margin: 0 auto;
+      /* Clear the fixed basket bar at the foot of the page. */
+      padding-bottom: 70px;
+    }
+
+    .brand-eyebrow {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 11.5px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--brass);
+      text-decoration: none;
+      margin-bottom: 2px;
+    }
+    .brand-eyebrow:hover { text-decoration: underline; }
+
+    /* §5 — present only when the line actually carries logistics data. */
+    .logistics {
+      margin-top: 1.5em;
+      padding-top: 1em;
+      border-top: 1px solid var(--line);
+    }
+    .logistics h2 {
+      margin: 0 0 0.3em;
+      font: 600 1em var(--sans);
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .basket-add {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 1.5em;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--paper-2);
+      font-size: 0.88em;
+      color: var(--ink-soft);
+      cursor: pointer;
+    }
+    .basket-add input {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--ok);
+      flex-shrink: 0;
+      margin: 0;
+      cursor: pointer;
     }
 
     .breadcrumb {
@@ -274,25 +290,8 @@ if (offer.stock === 'in') {
       margin-top: 1em;
     }
 
-    .offer-card {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      padding: 1.5em;
-      box-shadow: var(--shadow);
-    }
-
-    .offer-card h3 {
-      margin: 0 0 0.5em;
-      font: 600 1.1em var(--serif);
-      color: var(--ink);
-    }
-
-    .offer-card .price {
-      font: 600 1.3em var(--serif);
-      color: var(--brass);
-      margin: 0.5em 0;
-    }
+    /* Related offers render through OfferCard.astro, which carries its own
+       styles; a page's scoped CSS does not reach into a child component. */
 
     .footer {
       text-align: center;
@@ -311,10 +310,13 @@ if (offer.stock === 'in') {
 <body>
   <div class="container">
     <div class="breadcrumb">
-      <a href="/">Home</a> / <a href={`/category/${categorySlug}/`}>{offer.category}</a> / {offer.name}
+      <a href="/">Home</a> / <a href={`/category/${categorySlug}/`}>{offer.category}</a>
+      {offer.brandSlug && <> / <a href={`/brand/${offer.brandSlug}/`}>{offer.brand}</a></>}
+      / {offer.name}
     </div>
 
     <div class="offer-header">
+      {offer.brandSlug && <a class="brand-eyebrow" href={`/brand/${offer.brandSlug}/`}>{offer.brand}</a>}
       <h1>{offer.name}</h1>
       {offer.spec && <p style="margin: 0; color: var(--muted); font-size: 0.95em;">{offer.spec}</p>}
 
@@ -330,8 +332,12 @@ if (offer.stock === 'in') {
 
       <div style="margin-top: 1.5em; border-top: 1px solid var(--line); padding-top: 1em;">
         <div class="spec-row">
-          <span class="spec-label">Duty Status</span>
-          <span class="spec-value">{offer.tier || 'Not specified'}</span>
+          <span class="spec-label">Customs status</span>
+          <span class="spec-value">
+            {offer.tier
+              ? <a href={GLOSSARY_HREF(offer.tier)}>{offer.tier}</a>
+              : 'Ask us'}
+          </span>
         </div>
         {offer.terms && (
           <div class="spec-row">
@@ -353,6 +359,34 @@ if (offer.stock === 'in') {
         )}
       </div>
 
+      {offer.logistics.length > 0 && (
+        <div class="logistics">
+          <h2>Logistics</h2>
+          <div>
+            {offer.logistics.map((row) => (
+              <div class="spec-row">
+                <span class="spec-label">{row.label}</span>
+                <span class="spec-value">{row.value}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {offer.id && (
+        <label class="basket-add">
+          <input
+            type="checkbox"
+            class="basket-cb"
+            data-offer-id={offer.id}
+            data-desc={offer.name + (offer.spec ? ` ${offer.spec}` : '')}
+            data-price={offer.priceLabel}
+            data-category={offer.category}
+          />
+          <span>Add this line to a quote request &mdash; tick more as you browse, then send one enquiry</span>
+        </label>
+      )}
+
       <div style="margin-top: 1.5em;">
         <a href={wa} class="cta-button">WhatsApp Enquiry</a>
         <a href={`mailto:offers@akay.ie?subject=Interest in ${offer.name}`} class="cta-button cta-secondary">Email</a>
@@ -367,27 +401,25 @@ if (offer.stock === 'in') {
       <div class="related-offers">
         <h2>Related {offer.category} Offers</h2>
         <div class="offer-grid">
-          {relatedOffers.map((rel) => (
-            <div class="offer-card">
-              <h3><a href={`/offers/${rel.slug}/`}>{rel.name}</a></h3>
-              {rel.spec && <p style="margin: 0.5em 0; color: var(--muted); font-size: 0.9em;">{rel.spec}</p>}
-              <div class="price">{rel.currency}{rel.amount?.toFixed(2) || '—'} / case</div>
-              <a href={`/offers/${rel.slug}/`} style="font-weight: 600;">View offer →</a>
-            </div>
-          ))}
+          {relatedOffers.map((rel) => <OfferCard offer={rel} basket={false} context="index" />)}
         </div>
       </div>
     )}
 
-    <div class="footer">
+    <nav class="footer">
       <p>
-        <a href={`/category/${categorySlug}/`}>← View all {offer.category} offers</a> |
-        <a href="/">← Back to catalogue</a>
+        <a href={`/category/${categorySlug}/`}>All {offer.category} offers</a>
+        {offer.brandSlug && <> · <a href={`/brand/${offer.brandSlug}/`}>All {offer.brand} offers</a></>}
+        · <a href="/trade-terms/">Trade terms</a>
+        · <a href="/customs-glossary/">Customs glossary</a>
+        · <a href="/">Back to catalogue</a>
       </p>
       <p>
         AKAY Trade — <a href={WA_LINK} target="_blank" rel="noopener">WhatsApp {WA_DISPLAY}</a> | offers@akay.ie
       </p>
-    </div>
+    </nav>
+    <RfqBasket />
   </div>
+  <SiteFooter />
 </body>
 </html>

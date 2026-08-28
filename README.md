@@ -88,14 +88,96 @@ The site is static, so it reflects Airtable as of the last build. To refresh:
 ## Project layout
 
 ```
+scripts/
+  assert-public-safe.mjs    build gate: fails if a denied Airtable field ID or
+                            label reaches dist/ (brief §0)
+  build-stock-list.mjs      bakes dist/downloads/akay-stock-list.xlsx from the
+                            public-safe column allow-list (§4)
 src/
   data/
-    airtable.mjs          live fetch + normalize (public-safe fields only)
-    offers-snapshot.json  offline/CI fallback sample
+    airtable.mjs            live fetch + normalize (public-safe fields only)
+    offers-snapshot.json    committed snapshot; what Netlify actually builds from
+    brand-registry.json     append-only record of every brand slug ever
+                            published, so a sold-through brand's page goes
+                            noindex instead of 404 (§1)
+    brand-aliases.mjs       committed brand merge map; the build warns on any
+                            unlisted slug collision
+    company.mjs             registered identity for the credibility block (§2);
+                            TBC values render "On request" and warn at build
+    guides.mjs              long-form guide content
+  i18n/
+    locales.mjs             the five locales and their direction
+    content.mjs             translated copy for the trust pages (§6)
   lib/
-    fetch-offers.mjs      refresh the snapshot from live data
+    catalogue.mjs           getCatalogue() — the resolved catalogue, once per
+                            build: slugs, brands, categories, freshness
+    slug.mjs                offer slugs (unchanged, URLs are live) + brand and
+                            category slugs
+    aggregation-intro.mjs   brand/category intro prose, composed only from data
+                            on the page's own offers
+    glossary.mjs            customs statuses and Incoterms (§3, §3a)
+    stock-list.mjs          XLSX path + the public-safe column allow-list
+    brand-registry.mjs      read/append the brand registry
+    schema.mjs              JSON-LD builders
+    whatsapp.mjs            click-to-chat links
+    fetch-offers.mjs        refresh the snapshot + registry from live data
+  layouts/
+    BaseLayout.astro        shared shell: tokens, header, hreflang, footer
+  components/
+    OfferCard.astro         the one offer card, used by index/brand/category
+    SiteFooter.astro        §2 credibility block, on every page
+    RfqBasket.astro         §4 basket, RFQ form and stock-list gate
   pages/
-    index.astro           the catalogue (design + interactivity)
+    index.astro             the catalogue
+    offers/[slug].astro     one page per offer (~2,890)
+    brand/[slug].astro      one page per brand (~671)
+    category/[category].astro
+    brands.astro            brand directory
+    categories.astro        category directory
+    trade-terms.astro       §3
+    customs-glossary.astro  §3a
+    about.astro             §2
+    [lang]/                 pt/es/fr/ar trust pages and category pages (§6)
+    sitemap.xml.ts          every indexable URL, with hreflang
 public/
-  akay-bird.png           logo (hummingbird, transparent)
+  akay-bird.png             logo (hummingbird, transparent)
 ```
+
+---
+
+## Build
+
+`npm run build` runs three steps in order, and any of them failing stops the deploy:
+
+1. `astro build` — renders the static site into `dist/`
+2. `npm run build:stock-list` — writes `dist/downloads/akay-stock-list.xlsx`
+3. `npm run verify:public-safe` — scans `dist/` for private Airtable data
+
+### The data-safety gate
+
+`scripts/assert-public-safe.mjs` is the backstop for brief §0. The data layer
+only ever *requests* public-safe fields, so supplier identity, buy prices and
+margins never enter the process — but a future page could still serialise a raw
+record, or someone could paste an internal field ID into a comment. The gate
+reads what was actually written to `dist/` and exits non-zero on a match, before
+Netlify or GitHub Actions can publish it.
+
+The XLSX is a binary zip that the text scan cannot see inside, so
+`build-stock-list.mjs` checks its own sheet headers against the allow-list in
+`src/lib/stock-list.mjs` and refuses to write a workbook carrying anything else.
+
+### Refreshing the catalogue
+
+`npm run sync-offers` re-fetches from Airtable and writes **two** files:
+`offers-snapshot.json` and `brand-registry.json`. The scheduled refresh workflow
+commits both together — the registry is what keeps a sold-through brand's page
+alive at `noindex` rather than 404, and Netlify builds without an Airtable token
+so the snapshot alone cannot tell the build what has gone.
+
+### RFQ submissions
+
+The basket POSTs JSON straight from the browser to an n8n webhook
+(`PUBLIC_RFQ_WEBHOOK_URL`, see `.env.example`). No Netlify Forms, no Netlify
+Functions — the site stays fully static. The request and response contract is
+Appendix A of the build brief; the client mirrors its validation rules so a buyer
+gets the rejection immediately rather than a 400 a few seconds later.

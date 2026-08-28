@@ -1,0 +1,118 @@
+---
+// §6 — the translated trust pages: /pt/about/, /es/trade-terms/, /ar/customs-glossary/
+// and so on. Twelve pages, one template.
+//
+// These three pages are what the West African, LatAm and MENA buyer base
+// actually needs translated: what the customs codes mean, how we trade, and who
+// they are dealing with. The catalogue itself stays in English — see
+// src/i18n/content.mjs for why.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCatalogue } from '../../lib/catalogue.mjs';
+import { LOCALES, TRANSLATED } from '../../i18n/locales.mjs';
+import { PAGES, UI } from '../../i18n/content.mjs';
+import { organizationSchema, breadcrumbList } from '../../lib/schema.mjs';
+
+export async function getStaticPaths() {
+  const paths = [];
+  for (const lang of TRANSLATED) {
+    for (const [path, byLang] of Object.entries(PAGES)) {
+      const content = byLang[lang];
+      if (!content) continue; // a language without this page simply has no route
+      // '/about/' -> 'about'
+      paths.push({
+        params: { lang, page: path.replace(/^\/|\/$/g, '') },
+        props: { lang, path, content },
+      });
+    }
+  }
+  return paths;
+}
+
+const { lang, path, content } = Astro.props;
+const ui = UI[lang];
+const { stats } = await getCatalogue();
+
+const jsonLd = [
+  organizationSchema(),
+  breadcrumbList([
+    { name: ui.catalogue, path: '/' },
+    { name: content.h1, path: `/${lang}${path}` },
+  ]),
+];
+
+// Sibling translations, so a buyer who landed on the wrong one can switch
+// without going back to the English page first.
+const siblings = TRANSLATED
+  .filter((code) => code !== lang && PAGES[path]?.[code])
+  .map((code) => ({ code, native: LOCALES[code].native, href: `/${code}${path}` }));
+---
+
+<BaseLayout
+  title={content.title}
+  description={content.description}
+  lang={lang}
+  i18nPath={path}
+  jsonLd={jsonLd}
+>
+  <nav class="crumbs" aria-label="Breadcrumb">
+    <a href="/">{ui.catalogue}</a>
+    <span aria-hidden="true">/</span>
+    <span aria-current="page">{content.h1}</span>
+  </nav>
+
+  <header class="doc-head">
+    <h1>{content.h1}</h1>
+    <p class="doc-lede">{content.lede}</p>
+  </header>
+
+  {content.sections.map((section) => (
+    <section class="entry">
+      <h2>{section.h2}</h2>
+      {section.p.map((para) => <p>{para}</p>)}
+    </section>
+  ))}
+
+  <aside class="cta">
+    <p class="cta-note">{ui.catalogueNote}</p>
+    <p class="cta-links">
+      <a href="/">{ui.viewInEnglish} →</a>
+      <a href={`mailto:offers@akay.ie`}>offers@akay.ie</a>
+    </p>
+    <p class="cta-count">{stats.offers} {ui.liveLines} · {stats.brands} {ui.brandsLabel}</p>
+  </aside>
+
+  <nav class="lang-switch" aria-label="Languages">
+    <a href={path}>English</a>
+    {siblings.map((s) => <a href={s.href} lang={s.code}>{s.native}</a>)}
+  </nav>
+</BaseLayout>
+
+<style>
+  .crumbs{display:flex;flex-wrap:wrap;gap:8px;font-size:12.5px;color:var(--muted);margin-bottom:18px;font-family:var(--mono)}
+  .crumbs a{color:var(--brass);text-decoration:none}
+  .doc-head{margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid var(--line)}
+  h1{font-family:var(--serif);font-weight:600;font-size:clamp(27px,4.4vw,38px);line-height:1.1;margin:0 0 14px;text-wrap:balance}
+  .doc-lede{margin:0;color:var(--ink-soft);font-size:16px;max-width:68ch}
+
+  .entry{margin-bottom:30px}
+  .entry h2{font-family:var(--serif);font-size:22px;font-weight:600;margin:0 0 10px;color:var(--ink)}
+  .entry p{margin:0 0 11px;color:var(--ink-soft);font-size:15px;line-height:1.68;max-width:70ch}
+
+  .cta{background:var(--card);border:1px solid var(--line);border-inline-start:3px solid var(--brass);
+    border-radius:var(--radius);padding:20px;margin-top:34px}
+  .cta p{margin:0 0 10px;color:var(--ink-soft);font-size:14px;max-width:68ch}
+  .cta-links{display:flex;flex-wrap:wrap;gap:8px 20px;font-weight:600}
+  .cta-links a{color:var(--brass);text-decoration:none}
+  .cta-links a:hover{text-decoration:underline}
+  .cta-count{margin-bottom:0!important;font-family:var(--mono);font-size:12.5px;color:var(--muted)}
+
+  .lang-switch{display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:26px;padding-top:16px;
+    border-top:1px solid var(--line);font-size:13.5px}
+  .lang-switch a{color:var(--brass);text-decoration:none}
+  .lang-switch a:hover{text-decoration:underline}
+
+  /* Arabic runs right-to-left; the logical properties above handle the border
+     side, and the layout inherits dir="rtl" from <html>. */
+  :global([dir="rtl"]) .doc-lede,
+  :global([dir="rtl"]) .entry p{line-height:1.85}
+</style>

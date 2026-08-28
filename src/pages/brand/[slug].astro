@@ -1,0 +1,163 @@
+---
+// §1 — one page per brand with at least one public offer (~691 of them), plus a
+// noindex page for every brand the last snapshot carried that has no live line
+// today.
+//
+// This is the biggest acquisition gap on the site: 691 brands, and until now
+// nothing grouped them. "Wholesale Absolut export case prices" is the query a
+// container buyer actually types, and there was no page to answer it.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import OfferCard from '../../components/OfferCard.astro';
+import RfqBasket from '../../components/RfqBasket.astro';
+import { getCatalogue, featuredFirst } from '../../lib/catalogue.mjs';
+import { brandIntro, aggregationFacts } from '../../lib/aggregation-intro.mjs';
+import {
+  organizationSchema, aggregationItemListSchema, breadcrumbList, brandSchema,
+} from '../../lib/schema.mjs';
+
+export async function getStaticPaths() {
+  const { brands, retiredBrands, categories } = await getCatalogue();
+  return [...brands, ...retiredBrands].map((brand) => ({
+    params: { slug: brand.slug },
+    props: { brand, allCategories: categories },
+  }));
+}
+
+const { brand, allCategories } = Astro.props;
+const offers = featuredFirst(brand.offers);
+const live = offers.length > 0;
+const path = `/brand/${brand.slug}/`;
+
+const intro = brandIntro(brand.name, offers);
+const requirementMailto = `mailto:offers@akay.ie?subject=${encodeURIComponent(`Requirement — ${brand.name}`)}`;
+const facts = aggregationFacts(offers);
+
+// The categories this brand actually sits in, for the cross-link row. A brand
+// page links to its category pages; the category pages link back.
+const brandCategories = allCategories.filter((c) => facts.categories.includes(c.name));
+
+// Titles come straight from the brief. Keeping them formulaic is deliberate:
+// they have to be predictable across 691 pages, and the brand name is the part
+// that does the work.
+const title = `Wholesale ${brand.name} — Export Case Prices | Akay Irl Ltd`;
+const description = live
+  ? `${facts.lines} live ${brand.name} wholesale ${facts.lines === 1 ? 'line' : 'lines'} by the case — trade pricing, pack specs, customs status and loading terms on every line.`
+  : `${brand.name} wholesale enquiries. No live lines listed right now — tell us your requirement and we will quote against incoming stock.`;
+
+const jsonLd = [
+  organizationSchema(),
+  breadcrumbList([
+    { name: 'Home', path: '/' },
+    ...(brandCategories[0] ? [{ name: brandCategories[0].name, path: `/category/${brandCategories[0].slug}/` }] : []),
+    { name: brand.name, path },
+  ]),
+  // Only assert Brand + ItemList when there is something to back them up.
+  ...(live ? [brandSchema(brand.name, path), aggregationItemListSchema({
+    name: `${brand.name} wholesale offers`,
+    path,
+    offers,
+  })] : []),
+];
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  noindex={!live}
+  jsonLd={jsonLd}
+  wide={true}
+>
+  <nav class="crumbs" aria-label="Breadcrumb">
+    <a href="/">Catalogue</a>
+    <span aria-hidden="true">/</span>
+    <a href="/brands/">Brands</a>
+    <span aria-hidden="true">/</span>
+    <span aria-current="page">{brand.name}</span>
+  </nav>
+
+  <header class="agg-head">
+    <p class="eyebrow">Brand</p>
+    <h1>{brand.name} wholesale offers</h1>
+    {intro.map((p) => <p class="agg-intro">{p}</p>)}
+
+    {live && (
+      <dl class="agg-stats">
+        <div><dt>Live lines</dt><dd>{facts.lines}</dd></div>
+        {facts.inStock > 0 && <div><dt>In stock now</dt><dd>{facts.inStock}</dd></div>}
+        {facts.currencies.length > 0 && <div><dt>Currencies</dt><dd>{facts.currencies.join(' / ')}</dd></div>}
+        {facts.tiers.length > 0 && <div><dt>Customs status</dt><dd>{facts.tiers.join(' · ')}</dd></div>}
+      </dl>
+    )}
+
+    <div class="agg-actions">
+      <RfqBasket />
+    </div>
+  </header>
+
+  {live ? (
+    <div class="grid">
+      {offers.map((offer) => <OfferCard offer={offer} context="brand" />)}
+    </div>
+  ) : (
+    <div class="agg-empty">
+      <p>
+        This page stays up so the link keeps working. Stock in a single brand turns over
+        constantly — a line sold this morning is off the catalogue by lunchtime.
+      </p>
+      <p>
+        <a href={requirementMailto}>Email your requirement</a>
+        and we will quote against incoming stock, or point you at the nearest equivalent we hold.
+      </p>
+    </div>
+  )}
+
+  <nav class="agg-links" aria-label="Related">
+    {brandCategories.length > 0 && (
+      <div class="agg-links-row">
+        <span class="agg-links-label">Browse the category:</span>
+        {brandCategories.map((c) => (
+          <a href={`/category/${c.slug}/`}>{c.name} ({c.offers.length})</a>
+        ))}
+      </div>
+    )}
+    <div class="agg-links-row">
+      <span class="agg-links-label">More:</span>
+      <a href="/brands/">All brands</a>
+      <a href="/trade-terms/">Trade terms and Incoterms</a>
+      <a href="/customs-glossary/">T1, T2 and bonded explained</a>
+    </div>
+  </nav>
+</BaseLayout>
+
+<style>
+  .crumbs{display:flex;flex-wrap:wrap;gap:8px;font-size:12.5px;color:var(--muted);margin-bottom:18px;font-family:var(--mono)}
+  .crumbs a{color:var(--brass);text-decoration:none}
+  .crumbs a:hover{text-decoration:underline}
+
+  .agg-head{margin-bottom:26px;padding-bottom:22px;border-bottom:1px solid var(--line)}
+  .eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--brass);margin:0 0 10px}
+  h1{font-family:var(--serif);font-weight:600;font-size:clamp(26px,4vw,38px);line-height:1.08;
+    margin:0 0 14px;letter-spacing:-.01em;text-wrap:balance}
+  .agg-intro{margin:0 0 9px;color:var(--ink-soft);font-size:15px;max-width:74ch}
+
+  .agg-stats{display:flex;flex-wrap:wrap;gap:14px 30px;margin:20px 0 0;padding-top:16px;border-top:1px solid var(--line-soft)}
+  .agg-stats dt{font-size:11.5px;color:var(--muted);letter-spacing:.03em}
+  .agg-stats dd{margin:2px 0 0;font-family:var(--mono);font-size:17px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
+  .agg-actions{margin-top:20px}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+
+  .agg-empty{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:24px;max-width:70ch;color:var(--ink-soft);font-size:14.5px}
+  .agg-empty p{margin:0 0 10px}
+  .agg-empty p:last-child{margin-bottom:0}
+  .agg-empty a{color:var(--brass)}
+
+  .agg-links{margin-top:34px;padding-top:20px;border-top:1px solid var(--line);
+    display:flex;flex-direction:column;gap:10px;font-size:13.5px}
+  .agg-links-row{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:baseline}
+  .agg-links-label{color:var(--muted);font-size:12.5px}
+  .agg-links a{color:var(--brass);text-decoration:none}
+  .agg-links a:hover{text-decoration:underline}
+</style>

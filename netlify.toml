@@ -20,3 +20,11 @@
   for = "/akay-bird.png"
   [headers.values]
     Cache-Control = "public, max-age=86400"
+
+# The stock-list workbook is regenerated on every build, so it must not be
+# cached long. Short cache with revalidation keeps a buyer who downloads it
+# twice in a day from getting yesterday's prices.
+[[headers]]
+  for = "/downloads/*"
+  [headers.values]
+    Cache-Control = "public, max-age=300, must-revalidate"

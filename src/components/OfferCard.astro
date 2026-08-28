@@ -1,0 +1,205 @@
+---
+// The one offer card, used by the index, brand and category pages.
+//
+// Its CSS moved here verbatim from index.astro. Astro scopes a page's <style>
+// to that page's own elements, so a component rendered inside the page would
+// not have matched those rules — the card has to own them. That is also what
+// makes the aggregation pages look identical to the catalogue instead of
+// growing a second card design (the category page had already grown one).
+//
+// Props:
+//   offer   — a view object from getCatalogue()
+//   basket  — render the RFQ checkbox (off on the offer detail page's related list)
+//   context — 'index' | 'brand' | 'category', decides which of the brand and
+//             category links to show; a brand page does not need 691 links back
+//             to itself on every card.
+import { GLOSSARY_HREF } from '../lib/glossary.mjs';
+
+const { offer, basket = true, context = 'index' } = Astro.props;
+const o = offer;
+
+// The bond/customs code is the single most common reason a non-EU buyer stalls,
+// so the badge is a link to the glossary rather than an opaque two-character
+// label (§3a).
+const tierHref = o.tier ? GLOSSARY_HREF(o.tier) : null;
+
+// Only the first two logistics rows fit on a card; the rest live on the offer
+// page. Today this list is empty for most lines, so nothing renders at all.
+const logisticsPreview = (o.logistics || []).slice(0, 2);
+---
+
+<article
+  class={`card${o.featured ? ' feat-on' : ''}`}
+  data-cat={o.category}
+  data-name={`${o.name} ${o.variants || ''} ${o.brand}`.toLowerCase()}
+  data-amt={o.unitAmount ?? o.amount ?? ''}
+  data-feat={o.featured ? '1' : '0'}
+>
+  {o.featured && <span class="feat-badge">★ Featured</span>}
+  <div class="c-top">
+    <div>
+      {o.brand && (
+        context === 'brand'
+          ? <div class="brand">{o.brand}</div>
+          : <a class="brand brand-link" href={`/brand/${o.brandSlug}/`}>{o.brand}</a>
+      )}
+      <h3 class="pname" title={o.name}><a class="pname-link" href={o.url}>{o.name}</a></h3>
+      {o.variants && <div class="variants" title={o.variants}>{o.variants}</div>}
+    </div>
+    {context === 'category'
+      ? <span class="cat-tag">{o.category}</span>
+      : <a class="cat-tag cat-tag-link" href={`/category/${o.categorySlug}/`}>{o.category}</a>}
+  </div>
+
+  <div class="spec">{o.spec}</div>
+
+  <div class="metaline">
+    {o.tier && (tierHref
+      ? <a class="tag tier" href={tierHref} title="What does this customs status mean?">{o.tier}</a>
+      : <span class="tag tier">{o.tier}</span>)}
+    {o.origin && <span class="tag">{o.origin}</span>}
+    {o.currency && <span class="tag">{o.currency}</span>}
+  </div>
+
+  {logisticsPreview.length > 0 && (
+    <dl class="logi">
+      {logisticsPreview.map((row) => (
+        <div class="logi-row"><dt>{row.label}</dt><dd>{row.value}</dd></div>
+      ))}
+    </dl>
+  )}
+
+  <div class="price-row">
+    <div class="price">
+      <div>
+        <span class="cur">{o.currency}</span>
+        <span class="amt">{o.amount != null ? o.amount.toFixed(2) : '—'}</span>
+        <span class="basis">{o.basis}</span>
+      </div>
+      {o.other && <div class="sub">{o.other}</div>}
+    </div>
+    <div class="stock">
+      <span class={`pill ${o.st[0]}`}>{o.st[1]}</span>
+      {o.qty
+        ? <span class="qty" title="Cases available">{o.qty.toLocaleString()} cases</span>
+        : <span class="qty muted">on request</span>}
+    </div>
+  </div>
+
+  <div class="c-foot">
+    <span class="incoterm">{o.terms}</span>
+    <span class="c-actions">
+      <a class="details" href={o.url}>Details</a>
+      <a
+        class="enquire"
+        href={o.wa}
+        target="_blank"
+        rel="noopener"
+        data-offer={o.name}
+        data-brand={o.brand}
+        data-category={o.category}
+        data-currency={o.currency}
+        data-amount={o.amount}
+      >
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.5A10 10 0 1 0 12 2Zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-1.7-.1-.4-.1-.9-.3-1.6-.6-2.8-1.2-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8 0-1.3.7-2 .9-2.2.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5.2.6.8 2 .9 2.1.1.1.1.3 0 .5-.1.2-.1.3-.3.5l-.4.5c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.4 1.5.3.1.5.1.6-.1.2-.2.7-.8.9-1.1.2-.3.4-.2.6-.1l1.8.9c.3.1.5.2.5.3.1.2.1.7-.1 1.4Z"/></svg>
+        Enquire
+      </a>
+    </span>
+  </div>
+
+  {basket && o.id && (
+    <label class="basket-add">
+      <input
+        type="checkbox"
+        class="basket-cb"
+        data-offer-id={o.id}
+        data-desc={o.name + (o.spec ? ` ${o.spec}` : '')}
+        data-price={o.priceLabel}
+        data-category={o.category}
+      />
+      <span>Add to quote request</span>
+    </label>
+  )}
+</article>
+
+<style>
+  /* Moved verbatim from index.astro so the card renders identically wherever
+     it appears. Colours come from the page-level custom properties. */
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px;
+    display:flex;flex-direction:column;gap:0;box-shadow:var(--shadow);transition:.16s;position:relative;overflow:hidden;
+    /* Off-screen cards cost nothing to render — keeps the single-page catalogue
+       fast on phones even if the base grows back past 1,000 offers. */
+    content-visibility:auto;contain-intrinsic-size:auto 340px}
+  .card[hidden]{display:none}  /* let search/filter actually hide cards (overrides display:flex) */
+  .card:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--brass-2) 55%,var(--line))}
+  .card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--brass-2);opacity:0;transition:.16s}
+  .card:hover::before{opacity:1}
+  .card.feat-on{border-color:color-mix(in srgb,var(--brass-2) 50%,var(--line))}
+  .feat-badge{align-self:flex-start;font-family:var(--mono);font-size:10px;font-weight:bold;letter-spacing:.08em;
+    text-transform:uppercase;color:#fff;background:#B4231F;padding:3px 8px;border-radius:6px;margin-bottom:12px}
+
+  .c-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+  .brand{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--brass);margin-bottom:6px;display:block}
+  a.brand-link{text-decoration:none}
+  a.brand-link:hover{text-decoration:underline}
+  .pname{font-family:var(--serif);font-size:19px;font-weight:600;line-height:1.15;margin:0;color:var(--ink);text-wrap:balance;
+    display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  a.pname-link{color:inherit;text-decoration:none}
+  a.pname-link:hover{color:var(--brass)}
+  /* Variant lists live under the name so long assortments never blow up the card. */
+  .variants{margin-top:5px;font-size:11.5px;line-height:1.35;color:var(--muted);font-family:var(--sans);
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .cat-tag{flex-shrink:0;font-size:10.5px;font-family:var(--mono);letter-spacing:.08em;text-transform:uppercase;
+    color:var(--ink-soft);border:1px solid var(--line);border-radius:6px;padding:3px 7px;margin-top:2px}
+  a.cat-tag-link{text-decoration:none}
+  a.cat-tag-link:hover{border-color:var(--brass-2);color:var(--brass)}
+
+  .spec{font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);margin:12px 0 0;letter-spacing:.01em}
+  .metaline{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+  .tag{font-size:11px;padding:3px 8px;border-radius:6px;font-family:var(--mono);letter-spacing:.03em;
+    border:1px solid var(--line);color:var(--muted)}
+  .tag.tier{border-color:color-mix(in srgb,var(--brass-2) 45%,var(--line));color:var(--brass);text-decoration:none}
+  a.tag.tier{border-bottom-style:dotted}
+  a.tag.tier:hover{background:color-mix(in srgb,var(--brass) 10%,transparent)}
+
+  /* §5 — renders only when a line actually carries logistics data. */
+  .logi{margin:12px 0 0;padding:10px 0 0;border-top:1px dashed var(--line-soft);display:flex;flex-wrap:wrap;gap:4px 18px}
+  .logi-row{display:flex;gap:6px;align-items:baseline}
+  .logi dt{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+  .logi dd{margin:0;font-family:var(--mono);font-size:11.5px;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+
+  .price-row{margin-top:16px;padding-top:14px;border-top:1px solid var(--line-soft);display:flex;align-items:flex-end;justify-content:space-between;gap:8px}
+  .price .amt{font-family:var(--mono);font-size:22px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums;line-height:1}
+  .price .cur{font-size:12px;color:var(--muted);font-family:var(--mono)}
+  .price .basis{font-size:12px;color:var(--muted);font-family:var(--mono);letter-spacing:.01em}
+  .price .sub{font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-top:5px;font-variant-numeric:tabular-nums}
+  .pill{font-size:11px;font-weight:600;padding:4px 9px;border-radius:999px;white-space:nowrap;font-family:var(--sans)}
+  .pill.ok{background:var(--ok-bg);color:var(--ok)}
+  .pill.warn{background:var(--warn-bg);color:var(--warn)}
+  .pill.neu{background:var(--neu-bg);color:var(--neu)}
+  .stock{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+  .qty{font-family:var(--mono);font-size:11.5px;font-weight:600;color:var(--ok);font-variant-numeric:tabular-nums;letter-spacing:.02em}
+  .qty.muted{color:var(--muted);font-weight:400}
+
+  .c-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:16px}
+  .incoterm{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+  .c-actions{display:inline-flex;align-items:center;gap:8px;flex-shrink:0}
+  .details{font-size:12.5px;font-weight:600;color:var(--brass);text-decoration:none;white-space:nowrap}
+  .details:hover{text-decoration:underline}
+  .enquire{display:inline-flex;align-items:center;gap:7px;background:var(--forest);color:var(--paper);
+    text-decoration:none;font-size:13px;font-weight:600;padding:8px 13px;border-radius:9px;transition:.14s;border:1px solid transparent}
+  :root[data-theme="dark"] .enquire{color:#0A140F}
+  @media (prefers-color-scheme:dark){.enquire{color:#0A140F}}
+  .enquire:hover{background:var(--brass);color:#fff}
+
+  /* §4 basket checkbox. Sits below the actions so it never competes with the
+     one-tap WhatsApp route that already works for smaller buyers. */
+  .basket-add{display:flex;align-items:center;gap:8px;margin-top:12px;padding-top:11px;
+    border-top:1px solid var(--line-soft);font-size:12.5px;color:var(--muted);cursor:pointer;user-select:none}
+  .basket-add input{width:15px;height:15px;accent-color:var(--forest);cursor:pointer;flex-shrink:0;margin:0}
+  .basket-add:hover{color:var(--ink-soft)}
+  .card:has(.basket-cb:checked){border-color:var(--forest);background:color-mix(in srgb,var(--forest) 4%,var(--card))}
+  .card:has(.basket-cb:checked) .basket-add{color:var(--forest);font-weight:600}
+
+  @media (prefers-reduced-motion:reduce){.card,.card::before,.enquire{transition:none}}
+</style>

@@ -1,0 +1,138 @@
+---
+// §3a — one short page explaining the customs codes every catalogue row shows.
+//
+// The bond badge on every offer card and offer page links here, anchored to the
+// specific status. An EU wholesaler reads "T1" without thinking; an importer in
+// Lagos, Dubai or São Paulo does not, and there is no reason to make them guess
+// or ask before they can price a container.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCatalogue } from '../lib/catalogue.mjs';
+import { BOND_ENTRIES } from '../lib/glossary.mjs';
+import { organizationSchema, breadcrumbList } from '../lib/schema.mjs';
+
+const { offers } = await getCatalogue();
+
+// How many live lines carry each status, so the page reflects the catalogue
+// rather than describing statuses we do not currently trade.
+const counts = new Map();
+for (const o of offers) {
+  const key = String(o.tier || '').toLowerCase();
+  if (key) counts.set(key, (counts.get(key) || 0) + 1);
+}
+const entries = BOND_ENTRIES.map((e) => ({
+  ...e,
+  live: e.match.reduce((n, m) => n + (counts.get(m) || 0), 0),
+}));
+
+const title = 'T1, T2, bonded and duty-paid explained | Akay Irl Ltd';
+const description = 'What the customs status on each wholesale offer means for you as an importer: T1 under-bond, T2 union goods, bonded warehouse stock and duty-paid — and which one you can actually buy.';
+
+const jsonLd = [
+  organizationSchema(),
+  breadcrumbList([{ name: 'Home', path: '/' }, { name: 'Customs glossary', path: '/customs-glossary/' }]),
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: BOND_ENTRIES.map((e) => ({
+      '@type': 'Question',
+      name: `What does ${e.term} mean on a wholesale offer?`,
+      acceptedAnswer: { '@type': 'Answer', text: `${e.short} ${e.body[0]}` },
+    })),
+  },
+];
+---
+
+<BaseLayout title={title} description={description} jsonLd={jsonLd} i18nPath="/customs-glossary/">
+  <nav class="crumbs" aria-label="Breadcrumb">
+    <a href="/">Catalogue</a><span aria-hidden="true">/</span><span aria-current="page">Customs glossary</span>
+  </nav>
+
+  <header class="doc-head">
+    <p class="eyebrow">Reference</p>
+    <h1>Customs status, in plain terms</h1>
+    <p class="doc-lede">
+      Every line on the catalogue shows a customs status. It is the single biggest factor in
+      what the goods actually cost you landed, and whether you are able to buy them at all.
+      Here is what each one means in practice.
+    </p>
+  </header>
+
+  <nav class="toc" aria-label="On this page">
+    {entries.map((e) => (
+      <a href={`#${e.id}`}>{e.term}{e.live > 0 && <span>{e.live}</span>}</a>
+    ))}
+  </nav>
+
+  {entries.map((e) => (
+    <section class="entry" id={e.id}>
+      <h2>{e.term}</h2>
+      <p class="entry-short">{e.short}</p>
+      {e.live > 0 && (
+        <p class="entry-live">
+          {e.live} live {e.live === 1 ? 'line carries' : 'lines carry'} this status right now.
+        </p>
+      )}
+      {e.body.map((p) => <p>{p}</p>)}
+    </section>
+  ))}
+
+  <section class="entry">
+    <h2>Which status should I be asking for?</h2>
+    <p>
+      If the goods are leaving the EU, ask for T1 or bonded. You are not the end consumer of
+      EU excise, and paying it only to export the goods again is money you will not get back
+      without a refund claim that takes months.
+    </p>
+    <p>
+      If you are selling inside the EU and do not hold a bonded facility, ask for T2 or
+      duty-paid. It costs more per case, and it is the only stock you can legally move into
+      free circulation yourself.
+    </p>
+    <p>
+      If you are not sure which applies to your business, tell us the destination country and
+      what you intend to do with the goods, and we will tell you which of our lines you can
+      actually take.
+    </p>
+  </section>
+
+  <aside class="cta">
+    <h2>Still not sure?</h2>
+    <p>
+      Send us the destination and the volume. We will come back with the status, the loading
+      point and the documents that come with it, before you commit to anything.
+    </p>
+    <p class="cta-links">
+      <a href="mailto:offers@akay.ie?subject=Customs%20status%20question">offers@akay.ie</a>
+      <a href="/trade-terms/">Trade terms, Incoterms and documents →</a>
+    </p>
+  </aside>
+</BaseLayout>
+
+<style>
+  .crumbs{display:flex;flex-wrap:wrap;gap:8px;font-size:12.5px;color:var(--muted);margin-bottom:18px;font-family:var(--mono)}
+  .crumbs a{color:var(--brass);text-decoration:none}
+  .doc-head{margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid var(--line)}
+  .eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--brass);margin:0 0 10px}
+  h1{font-family:var(--serif);font-weight:600;font-size:clamp(27px,4.4vw,38px);line-height:1.06;margin:0 0 14px;text-wrap:balance}
+  .doc-lede{margin:0;color:var(--ink-soft);font-size:16px;max-width:68ch}
+
+  .toc{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:30px}
+  .toc a{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--card);
+    color:var(--ink-soft);border-radius:999px;padding:6px 14px;font-size:13.5px;text-decoration:none;transition:.14s}
+  .toc a:hover{border-color:var(--brass-2);color:var(--brass)}
+  .toc a span{font-family:var(--mono);font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+
+  .entry{margin-bottom:32px;scroll-margin-top:76px}
+  .entry h2{font-family:var(--serif);font-size:22px;font-weight:600;margin:0 0 8px;color:var(--ink)}
+  .entry-short{margin:0 0 6px;font-weight:600;color:var(--ink);font-size:15.5px}
+  .entry-live{margin:0 0 12px;font-family:var(--mono);font-size:12px;color:var(--forest);font-variant-numeric:tabular-nums}
+  .entry p{margin:0 0 11px;color:var(--ink-soft);font-size:15px;line-height:1.62;max-width:70ch}
+
+  .cta{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--brass);
+    border-radius:var(--radius);padding:22px;margin-top:36px}
+  .cta h2{font-family:var(--serif);font-size:19px;font-weight:600;margin:0 0 8px;color:var(--ink)}
+  .cta p{margin:0 0 10px;color:var(--ink-soft);font-size:14.5px;max-width:66ch}
+  .cta-links{display:flex;flex-wrap:wrap;gap:8px 20px;margin-bottom:0!important;font-weight:600}
+  .cta-links a{color:var(--brass);text-decoration:none}
+  .cta-links a:hover{text-decoration:underline}
+</style>

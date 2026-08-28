@@ -1,273 +1,142 @@
 ---
-import { getOffers } from '../../data/airtable.mjs';
-import { generateSlug, dedupeSlug } from '../../lib/slug.mjs';
-import { categoryItemListSchema, organizationSchema } from '../../lib/schema.mjs';
+// §1 — one page per category (9 of them).
+//
+// Rewritten to use the shared card and shell. It previously carried a second,
+// simpler card design of its own that printed every price as "/ case" —
+// wrong on the ~250 lines priced per bottle, where it understated the case
+// price by the pack size. Using the real card fixes that by construction.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import OfferCard from '../../components/OfferCard.astro';
+import RfqBasket from '../../components/RfqBasket.astro';
+import { getCatalogue, featuredFirst } from '../../lib/catalogue.mjs';
+import { categoryIntro, aggregationFacts } from '../../lib/aggregation-intro.mjs';
+import { organizationSchema, aggregationItemListSchema, breadcrumbList } from '../../lib/schema.mjs';
+import { brandSlug } from '../../lib/slug.mjs';
 
 export async function getStaticPaths() {
-  const { offers } = await getOffers();
-
-  // Build slug map
-  const slugMap = new Map();
-  const slugs = [];
-  for (const offer of offers) {
-    let slug = generateSlug(offer.name, offer.spec);
-    slug = dedupeSlug(slug, slugs);
-    slugs.push(slug);
-    slugMap.set(offer.id || `${offer.brand}-${offer.name}`, { ...offer, slug });
-  }
-
-  // Get all unique categories
-  const categories = Array.from(new Set(Array.from(slugMap.values()).map((o) => o.category))).sort();
-
+  const { categories } = await getCatalogue();
   return categories.map((category) => ({
-    params: { category: category.toLowerCase().replace(/\s+/g, '-') },
-    props: { category, offers: Array.from(slugMap.values()) },
+    params: { category: category.slug },
+    props: { category },
   }));
 }
 
-const { category, offers } = Astro.props;
+const { category } = Astro.props;
+const offers = featuredFirst(category.offers);
+const path = `/category/${category.slug}/`;
 
-// Get offers in this category
-const categoryOffers = offers
-  .filter((o) => o.category === category)
-  .sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
+const intro = categoryIntro(category.name, offers);
+const facts = aggregationFacts(offers);
 
-// Build schemas
-const orgSchema = organizationSchema();
-const itemListSchema = categoryItemListSchema(category, categoryOffers);
+// Top brands by line count — the fastest route from a category page to a
+// specific brand page, and the internal linking that gets those 691 pages
+// crawled in the first place.
+const brandCounts = new Map();
+for (const o of offers) {
+  if (o.brand) brandCounts.set(o.brand, (brandCounts.get(o.brand) || 0) + 1);
+}
+const topBrands = [...brandCounts.entries()]
+  .map(([name, count]) => ({ name, slug: brandSlug(name), count }))
+  .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
 
-const categorySlug = category.toLowerCase().replace(/\s+/g, '-');
-const pageTitle = `Wholesale ${category} Offers — Trade Pricing | AKAY Trade`;
-const pageDesc = `Wholesale ${category} by the case from AKAY Trade. Live trade pricing, pack specs, and duty status. Buy spirits, beer, FMCG and more.`;
+const title = `Wholesale ${category.name} — Export Case Prices | Akay Irl Ltd`;
+const description = `${facts.lines} live wholesale ${category.name.toLowerCase()} lines across ${facts.brands.length} brands — trade pricing by the case, pack specs, customs status and loading terms on every line.`;
+
+const jsonLd = [
+  organizationSchema(),
+  breadcrumbList([
+    { name: 'Home', path: '/' },
+    { name: 'Categories', path: '/categories/' },
+    { name: category.name, path },
+  ]),
+  aggregationItemListSchema({ name: `Wholesale ${category.name} offers`, path, offers }),
+];
 ---
 
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>{pageTitle}</title>
-  <meta name="description" content={pageDesc} />
-  <link rel="icon" href="/akay-bird.png" />
-  <link rel="canonical" href={`https://offers.akay.ie/category/${categorySlug}/`} />
-  <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="AKAY Trade" />
-  <meta property="og:url" content={`https://offers.akay.ie/category/${categorySlug}/`} />
-  <meta property="og:title" content={`${category} Offers`} />
-  <meta property="og:description" content={pageDesc} />
-  <meta property="og:image" content="https://offers.akay.ie/akay-bird.png" />
-  <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content={`${category} Offers`} />
-  <meta name="twitter:description" content={pageDesc} />
-  <meta name="robots" content="max-snippet:-1, max-image-preview:large" />
+<BaseLayout title={title} description={description} jsonLd={jsonLd} i18nPath={path} wide={true}>
+  <nav class="crumbs" aria-label="Breadcrumb">
+    <a href="/">Catalogue</a>
+    <span aria-hidden="true">/</span>
+    <a href="/categories/">Categories</a>
+    <span aria-hidden="true">/</span>
+    <span aria-current="page">{category.name}</span>
+  </nav>
 
-  <script type="application/ld+json" set:html={JSON.stringify(orgSchema)} />
-  <script type="application/ld+json" set:html={JSON.stringify(itemListSchema)} />
+  <header class="agg-head">
+    <p class="eyebrow">Category</p>
+    <h1>{category.name} wholesale offers</h1>
+    {intro.map((p) => <p class="agg-intro">{p}</p>)}
 
-  <style>
-    :root {
-      --paper: #F7F5F0;
-      --paper-2: #EFEDE4;
-      --card: #FFFFFF;
-      --ink: #17140F;
-      --ink-soft: #41473F;
-      --muted: #767E72;
-      --line: #E4E0D4;
-      --brass: #B4231F;
-      --ok: #0E7A3B;
-      --ok-bg: #E2F0E5;
-      --warn: #9A6A12;
-      --warn-bg: #F5E9CE;
-      --neu: #5C6A78;
-      --neu-bg: #E9ECEF;
-      --shadow: 0 1px 2px rgba(20, 33, 26, 0.06), 0 6px 20px -8px rgba(20, 33, 26, 0.14);
-      --radius: 14px;
-      --serif: "Hoefler Text", "Iowan Old Style", Palatino, Georgia, "Times New Roman", serif;
-      --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --paper: #0C140F;
-        --paper-2: #081009;
-        --card: #13201A;
-        --ink: #F1EFE7;
-        --ink-soft: #C6CEC4;
-        --muted: #8A968A;
-        --line: #243029;
-        --brass: #EC5A52;
-        --ok: #5FC97E;
-        --ok-bg: #123021;
-        --warn: #E0B65C;
-        --warn-bg: #31280F;
-        --neu: #9AA7B4;
-        --neu-bg: #1B2530;
-        --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 28px -12px rgba(0, 0, 0, 0.6);
-      }
-    }
+    <dl class="agg-stats">
+      <div><dt>Live lines</dt><dd>{facts.lines}</dd></div>
+      <div><dt>Brands</dt><dd>{facts.brands.length}</dd></div>
+      {facts.inStock > 0 && <div><dt>In stock now</dt><dd>{facts.inStock}</dd></div>}
+      {facts.currencies.length > 0 && <div><dt>Currencies</dt><dd>{facts.currencies.join(' / ')}</dd></div>}
+    </dl>
 
-    body {
-      margin: 0;
-      padding: 20px;
-      background: var(--paper);
-      color: var(--ink);
-      font: 16px / 1.5 var(--sans);
-    }
-    h1 {
-      font: 600 2em var(--serif);
-      margin: 1em 0 0.5em;
-    }
-    h2 {
-      font: 600 1.3em var(--serif);
-      margin: 1.5em 0 0.5em;
-      color: var(--ink-soft);
-    }
-    a {
-      color: var(--brass);
-      text-decoration: none;
-    }
-    a:hover {
-      text-decoration: underline;
-    }
-
-    .container {
-      max-width: 1000px;
-      margin: 0 auto;
-    }
-
-    .breadcrumb {
-      font-size: 0.9em;
-      color: var(--muted);
-      margin-bottom: 2em;
-    }
-    .breadcrumb a {
-      color: var(--brass);
-    }
-
-    .header {
-      margin-bottom: 2em;
-    }
-
-    .header p {
-      color: var(--muted);
-      font-size: 1em;
-      margin: 0.5em 0 0;
-    }
-
-    .offer-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 1.5em;
-      margin: 2em 0;
-    }
-
-    .offer-card {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      padding: 1.5em;
-      box-shadow: var(--shadow);
-      display: flex;
-      flex-direction: column;
-    }
-
-    .offer-card h3 {
-      margin: 0 0 0.5em;
-      font: 600 1.1em var(--serif);
-      color: var(--ink);
-    }
-
-    .offer-card p {
-      margin: 0.3em 0;
-      color: var(--muted);
-      font-size: 0.9em;
-    }
-
-    .offer-card .price {
-      font: 600 1.3em var(--serif);
-      color: var(--brass);
-      margin: 0.8em 0 0.5em;
-    }
-
-    .offer-card .stock {
-      font-size: 0.85em;
-      font-weight: 600;
-      padding: 0.3em 0.6em;
-      border-radius: 4px;
-      display: inline-block;
-      margin: 0.5em 0;
-    }
-
-    .stock-ok {
-      background: var(--ok-bg);
-      color: var(--ok);
-    }
-    .stock-warn {
-      background: var(--warn-bg);
-      color: var(--warn);
-    }
-    .stock-neu {
-      background: var(--neu-bg);
-      color: var(--neu);
-    }
-
-    .offer-card a.view-link {
-      font-weight: 600;
-      margin-top: auto;
-      padding-top: 1em;
-      border-top: 1px solid var(--line);
-    }
-
-    .nav {
-      text-align: center;
-      padding: 2em 0;
-      border-top: 1px solid var(--line);
-      margin-top: 3em;
-    }
-
-    .nav a {
-      margin: 0 1em;
-      color: var(--brass);
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="breadcrumb">
-      <a href="/">Home</a> / {category}
+    <div class="agg-actions">
+      <RfqBasket />
     </div>
+  </header>
 
-    <div class="header">
-      <h1>Wholesale {category} Offers</h1>
-      <p>{categoryOffers.length} products in this category</p>
-    </div>
+  {topBrands.length > 1 && (
+    <nav class="brand-strip" aria-label={`Brands in ${category.name}`}>
+      <h2>Brands in {category.name}</h2>
+      <div class="brand-chips">
+        {topBrands.slice(0, 40).map((b) => (
+          <a href={`/brand/${b.slug}/`}>{b.name}<span>{b.count}</span></a>
+        ))}
+      </div>
+      {topBrands.length > 40 && <p class="brand-more"><a href="/brands/">See all {topBrands.length} brands in this category →</a></p>}
+    </nav>
+  )}
 
-    <div class="offer-grid">
-      {categoryOffers.map((offer) => {
-        const stockStatus = offer.stock === 'in' ? 'ok'
-          : offer.stock === 'warn' ? 'warn'
-          : 'neu';
-        const stockText = offer.stock === 'in' ? 'In stock'
-          : offer.stock === 'warn' ? 'Limited'
-          : 'Enquire';
-
-        return (
-          <div class="offer-card">
-            <h3>{offer.name}</h3>
-            {offer.spec && <p>{offer.spec}</p>}
-            <div class="price">{offer.currency}{offer.amount?.toFixed(2) || '—'} / case</div>
-            <span class={`stock stock-${stockStatus}`}>{stockText}</span>
-            {offer.tier && <p><strong>Duty:</strong> {offer.tier}</p>}
-            <a href={`/offers/${offer.slug}/`} class="view-link">View offer →</a>
-          </div>
-        );
-      })}
-    </div>
-
-    <div class="nav">
-      <a href="/">← Back to catalogue</a>
-      |
-      <a href="/">Browse all categories</a>
-    </div>
+  <div class="grid">
+    {offers.map((offer) => <OfferCard offer={offer} context="category" />)}
   </div>
-</body>
-</html>
+
+  <nav class="agg-links" aria-label="Related">
+    <div class="agg-links-row">
+      <span class="agg-links-label">More:</span>
+      <a href="/categories/">All categories</a>
+      <a href="/brands/">All brands</a>
+      <a href="/trade-terms/">Trade terms and Incoterms</a>
+      <a href="/customs-glossary/">T1, T2 and bonded explained</a>
+    </div>
+  </nav>
+</BaseLayout>
+
+<style>
+  .crumbs{display:flex;flex-wrap:wrap;gap:8px;font-size:12.5px;color:var(--muted);margin-bottom:18px;font-family:var(--mono)}
+  .crumbs a{color:var(--brass);text-decoration:none}
+  .crumbs a:hover{text-decoration:underline}
+
+  .agg-head{margin-bottom:24px;padding-bottom:22px;border-bottom:1px solid var(--line)}
+  .eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--brass);margin:0 0 10px}
+  h1{font-family:var(--serif);font-weight:600;font-size:clamp(26px,4vw,38px);line-height:1.08;
+    margin:0 0 14px;letter-spacing:-.01em;text-wrap:balance}
+  .agg-intro{margin:0 0 9px;color:var(--ink-soft);font-size:15px;max-width:74ch}
+  .agg-stats{display:flex;flex-wrap:wrap;gap:14px 30px;margin:20px 0 0;padding-top:16px;border-top:1px solid var(--line-soft)}
+  .agg-stats dt{font-size:11.5px;color:var(--muted);letter-spacing:.03em}
+  .agg-stats dd{margin:2px 0 0;font-family:var(--mono);font-size:17px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
+  .agg-actions{margin-top:20px}
+
+  .brand-strip{margin-bottom:26px}
+  .brand-strip h2{font-family:var(--serif);font-size:16px;font-weight:600;margin:0 0 10px;color:var(--ink)}
+  .brand-chips{display:flex;flex-wrap:wrap;gap:7px}
+  .brand-chips a{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--card);
+    color:var(--ink-soft);border-radius:999px;padding:5px 12px;font-size:13px;text-decoration:none;transition:.14s}
+  .brand-chips a:hover{border-color:var(--brass-2);color:var(--brass)}
+  .brand-chips a span{font-family:var(--mono);font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+  .brand-more{margin:10px 0 0;font-size:13px}
+  .brand-more a{color:var(--brass);text-decoration:none}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+
+  .agg-links{margin-top:34px;padding-top:20px;border-top:1px solid var(--line);font-size:13.5px}
+  .agg-links-row{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:baseline}
+  .agg-links-label{color:var(--muted);font-size:12.5px}
+  .agg-links a{color:var(--brass);text-decoration:none}
+  .agg-links a:hover{text-decoration:underline}
+</style>

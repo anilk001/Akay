@@ -3,6 +3,10 @@ export const prerender = true;
 export async function GET() {
   const robotsTxt = `User-agent: *
 Allow: /
+# The stock-list workbook is generated at build time and revealed in the UI only
+# after a successful enquiry (§4). A static site cannot gate the file itself, but
+# there is no reason for it to appear in search results as a naked download.
+Disallow: /downloads/
 
 User-agent: GPTBot
 Allow: /

@@ -1,47 +1,42 @@
 ---
-import { getOffers } from '../data/airtable.mjs';
+import { getCatalogue, featuredFirst } from '../lib/catalogue.mjs';
 import { organizationSchema } from '../lib/schema.mjs';
 import { guides } from '../data/guides.mjs';
-import { enquiryLink, WA_LINK } from '../lib/whatsapp.mjs';
+import { WA_LINK } from '../lib/whatsapp.mjs';
+import OfferCard from '../components/OfferCard.astro';
+import RfqBasket from '../components/RfqBasket.astro';
+import SiteFooter from '../components/SiteFooter.astro';
 
-const { offers, source } = await getOffers();
+// One resolved catalogue for the whole build (see src/lib/catalogue.mjs). This
+// page used to derive slugs, price basis, stock labels and WhatsApp links with
+// its own copy of that logic, which is how the category page ended up printing
+// every price as "/ case".
+const { offers: view, categories: catGroups, stats, generatedAt, source } = await getCatalogue();
 
 // Google Analytics 4 for offers.akay.ie. The Measurement ID is a public,
 // client-side value (safe to commit). PUBLIC_GA4_ID overrides it at build time
 // if you ever need to point at a different property without a code change.
 const GA4_ID = import.meta.env.PUBLIC_GA4_ID || 'G-FW42J5609V';
 
-// ---- derive per-offer view data (basis split so the price never repeats) ----
-function priceParts(detail = '') {
-  const parts = detail.split('·').map((s) => s.trim());
-  const first = parts[0] || '';
-  const basis = /\/\s*bottle/i.test(first) ? '/ btl'
-    : /\/\s*case/i.test(first) ? '/ case'
-    : /\/\s*unit/i.test(first) ? '/ unit' : '';
-  const msg = basis === '/ btl' ? 'per bottle' : basis === '/ case' ? 'per case' : basis === '/ unit' ? 'per unit' : '';
-  const other = parts.slice(1).join(' · ');
-  return { basis, other, msg };
-}
-const STOCK = { in: ['ok', 'In stock'], warn: ['warn', 'Limited'], enq: ['neu', 'Enquire'] };
-
-function toView(o) {
-  const { basis, other, msg } = priceParts(o.priceDetail);
-  return { ...o, basis, other, wa: enquiryLink(o, msg), st: STOCK[o.stock] || STOCK.enq };
-}
-const view = offers.map(toView);
 // Pin Featured offers to the front of the catalogue; stable sort keeps original order otherwise.
-const gridItems = [...view].sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
-const featuredCount = view.filter((o) => o.featured).length;
+const gridItems = featuredFirst(view);
 
-const categories = ['All', ...Array.from(new Set(view.map((o) => o.category))).sort()];
-const brandCount = new Set(view.map((o) => o.brand)).size;
-const currencies = Array.from(new Set(view.map((o) => o.currency).filter(Boolean))).sort();
-const stats = [
-  [view.length, 'live offers'],
-  [categories.length - 1, 'categories'],
-  [currencies.join(' / ') || '—', 'currencies'],
-  [brandCount, 'brands'],
+const categories = ['All', ...catGroups.map((c) => c.name).sort()];
+const statTiles = [
+  [stats.offers, 'live offers'],
+  [stats.categories, 'categories'],
+  [stats.currencies.join(' / ') || '\u2014', 'currencies'],
+  [stats.brands, 'brands'],
 ];
+
+// §4 freshness stamp. Buyers judge a supplier on how current the price list is,
+// and a catalogue with no date on it reads as a PDF someone emailed last year.
+// The date is when the catalogue data was baked, not when Netlify happened to
+// rebuild — see getCatalogue().
+const priceStamp = generatedAt.toLocaleDateString('en-GB', {
+  day: 'numeric', month: 'long', year: 'numeric',
+});
+
 ---
 
 <!doctype html>
@@ -120,6 +115,9 @@ const stats = [
     .mark b{color:var(--brass)}
     .dot{width:6px;height:6px;border-radius:50%;background:var(--brass-2);display:inline-block;margin:0 2px 2px 2px}
     .bar-sub{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.04em}
+    .bar-nav{display:flex;gap:15px;font-size:13.5px}
+    .bar-nav a{color:var(--ink-soft);text-decoration:none;white-space:nowrap}
+    .bar-nav a:hover{color:var(--brass)}
     .bar-spacer{flex:1}
     .theme-btn{border:1px solid var(--line);background:var(--card);color:var(--ink-soft);border-radius:9px;
       height:34px;padding:0 12px;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
@@ -198,56 +196,22 @@ const stats = [
 
     main.wrap{padding:26px 20px 40px}
     .count{font-family:var(--mono);font-size:12.5px;color:var(--muted);margin:0 0 16px;letter-spacing:.03em}
+    /* §4 freshness stamp — a price list with no date on it reads as stale. */
+    .cat-bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;
+      gap:12px;margin:0 0 14px;padding-bottom:14px;border-bottom:1px solid var(--line-soft)}
+    .freshness{margin:0;font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);letter-spacing:.03em}
+    .freshness time{color:var(--ink);font-weight:600}
     .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
-    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px;
-      display:flex;flex-direction:column;gap:0;box-shadow:var(--shadow);transition:.16s;position:relative;overflow:hidden;
-      /* Off-screen cards cost nothing to render — keeps the single-page catalogue
-         fast on phones even if the base grows back past 1,000 offers. */
-      content-visibility:auto;contain-intrinsic-size:auto 320px}
-    .card[hidden]{display:none}  /* let search/filter actually hide cards (overrides display:flex) */
-    .card:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--brass-2) 55%,var(--line))}
-    .card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--brass-2);opacity:0;transition:.16s}
-    .card:hover::before{opacity:1}
-    .c-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
-    .brand{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--brass);margin-bottom:6px}
-    .pname{font-family:var(--serif);font-size:19px;font-weight:600;line-height:1.15;margin:0;color:var(--ink);text-wrap:balance;
-      display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-    /* Variant lists live under the name so long assortments never blow up the card. */
-    .variants{margin-top:5px;font-size:11.5px;line-height:1.35;color:var(--muted);font-family:var(--sans);
-      display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-    .cat-tag{flex-shrink:0;font-size:10.5px;font-family:var(--mono);letter-spacing:.08em;text-transform:uppercase;
-      color:var(--ink-soft);border:1px solid var(--line);border-radius:6px;padding:3px 7px;margin-top:2px}
-    .spec{font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);margin:12px 0 0;letter-spacing:.01em}
-    .metaline{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
-    .tag{font-size:11px;padding:3px 8px;border-radius:6px;font-family:var(--mono);letter-spacing:.03em;
-      border:1px solid var(--line);color:var(--muted)}
-    .tag.tier{border-color:color-mix(in srgb,var(--brass-2) 45%,var(--line));color:var(--brass)}
-    .price-row{margin-top:16px;padding-top:14px;border-top:1px solid var(--line-soft);display:flex;align-items:flex-end;justify-content:space-between;gap:8px}
-    .price .amt{font-family:var(--mono);font-size:22px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums;line-height:1}
-    .price .cur{font-size:12px;color:var(--muted);font-family:var(--mono)}
-    .price .basis{font-size:12px;color:var(--muted);font-family:var(--mono);letter-spacing:.01em}
-    .price .sub{font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-top:5px;font-variant-numeric:tabular-nums}
-    .pill{font-size:11px;font-weight:600;padding:4px 9px;border-radius:999px;white-space:nowrap;font-family:var(--sans)}
-    .pill.ok{background:var(--ok-bg);color:var(--ok)}
-    .pill.warn{background:var(--warn-bg);color:var(--warn)}
-    .pill.neu{background:var(--neu-bg);color:var(--neu)}
-    .stock{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
-    .qty{font-family:var(--mono);font-size:11.5px;font-weight:600;color:var(--ok);font-variant-numeric:tabular-nums;letter-spacing:.02em}
-    .qty.muted{color:var(--muted);font-weight:400}
-    .c-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:16px}
-    .incoterm{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
-    .enquire{display:inline-flex;align-items:center;gap:7px;background:var(--forest);color:var(--paper);
-      text-decoration:none;font-size:13px;font-weight:600;padding:8px 13px;border-radius:9px;transition:.14s;border:1px solid transparent}
-    :root[data-theme="dark"] .enquire{color:#0A140F}
-    @media (prefers-color-scheme:dark){.enquire{color:#0A140F}}
-    .enquire:hover{background:var(--brass);color:#fff}
+    /* The offer card's styles live in src/components/OfferCard.astro.
+       A page's scoped <style> does not reach into a child component, so keeping
+       a copy here would be dead CSS and a second source of truth. */
     .empty{text-align:center;padding:60px 20px;color:var(--muted);font-family:var(--mono);font-size:14px}
 
-    footer{border-top:1px solid var(--line);padding:26px 0 44px;color:var(--muted);font-size:12.5px}
-    footer .wrap{display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between}
-    footer .note{max-width:64ch;line-height:1.6}
     @media (prefers-reduced-motion:reduce){*{transition:none!important}}
     @media (max-width:560px){.hero-in{padding-top:26px;padding-bottom:20px}.ticker{gap:18px}}
+    @media (max-width:860px){.bar-nav{display:none}}
+    /* The basket bar is fixed to the bottom; keep the last row of cards clear of it. */
+    main.wrap{padding-bottom:96px}
   </style>
 </head>
 <body>
@@ -257,6 +221,12 @@ const stats = [
         <img class="logo-slot" src="/akay-bird.png" alt="" width="320" height="279" />AKAY<span class="dot"></span><b>trade</b>
       </a>
       <span class="bar-sub">offers.akay.ie</span>
+      <nav class="bar-nav" aria-label="Catalogue">
+        <a href="/categories/">Categories</a>
+        <a href="/brands/">Brands</a>
+        <a href="/trade-terms/">Trade terms</a>
+        <a href="/customs-glossary/">Customs</a>
+      </nav>
       <span class="bar-spacer"></span>
       <button class="theme-btn" id="themeBtn" aria-label="Toggle light or dark theme">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5 19 19M19 5l-1.5 1.5M6.5 17.5 5 19"/></svg>
@@ -271,8 +241,8 @@ const stats = [
       <h1>Live trade pricing, straight from the desk.</h1>
       <p class="lede">Spirits and beer by the case, with current pricing, pack specs and duty tier on every line. Filter, compare, and send a WhatsApp enquiry in one tap — no login, no PDF.</p>
       <div class="ticker">
-        {stats.map((s) => (
-          <div class="stat"><div class="n">{s[0]}</div><div class="l">{s[1]}</div></div>
+        {statTiles.map((t) => (
+          <div class="stat"><div class="n">{t[0]}</div><div class="l">{t[1]}</div></div>
         ))}
       </div>
     </div>
@@ -325,46 +295,16 @@ const stats = [
   </section>
 
   <main class="wrap">
+    <div class="cat-bar">
+      <p class="freshness">
+        Prices updated <time datetime={generatedAt.toISOString().slice(0, 10)}>{priceStamp}</time>
+        · {stats.offers} live lines
+      </p>
+      <RfqBasket />
+    </div>
     <p class="count" id="count">Showing {view.length} of {view.length} offers</p>
     <div class="grid" id="grid">
-      {gridItems.map((o) => (
-        <article class={`card${o.featured ? ' feat-on' : ''}`} data-cat={o.category} data-name={(o.name + ' ' + (o.variants || '') + ' ' + o.brand).toLowerCase()} data-amt={o.unitAmount ?? o.amount ?? ''} data-feat={o.featured ? '1' : '0'}>
-          {o.featured && <span class="feat-badge">★ Featured</span>}
-          <div class="c-top">
-            <div>
-              <div class="brand">{o.brand}</div>
-              <h3 class="pname" title={o.name}>{o.name}</h3>
-              {o.variants && <div class="variants" title={o.variants}>{o.variants}</div>}
-            </div>
-            <span class="cat-tag">{o.category}</span>
-          </div>
-          <div class="spec">{o.spec}</div>
-          <div class="metaline">
-            {o.tier && <span class="tag tier">{o.tier}</span>}
-            {o.origin && <span class="tag">{o.origin}</span>}
-            {o.currency && <span class="tag">{o.currency}</span>}
-          </div>
-          <div class="price-row">
-            <div class="price">
-              <div><span class="cur">{o.currency}</span> <span class="amt">{o.amount != null ? o.amount.toFixed(2) : '—'}</span> <span class="basis">{o.basis}</span></div>
-              {o.other && <div class="sub">{o.other}</div>}
-            </div>
-            <div class="stock">
-              <span class={`pill ${o.st[0]}`}>{o.st[1]}</span>
-              {o.qty ? <span class="qty" title="Cases available">{o.qty.toLocaleString()} cases</span> : <span class="qty muted">on request</span>}
-            </div>
-          </div>
-          <div class="c-foot">
-            <span class="incoterm">{o.terms}</span>
-            <a class="enquire" href={o.wa} target="_blank" rel="noopener"
-               data-offer={o.name} data-brand={o.brand} data-category={o.category}
-               data-currency={o.currency} data-amount={o.amount}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.5A10 10 0 1 0 12 2Zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-1.7-.1-.4-.1-.9-.3-1.6-.6-2.8-1.2-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8 0-1.3.7-2 .9-2.2.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5.2.6.8 2 .9 2.1.1.1.1.3 0 .5-.1.2-.1.3-.3.5l-.4.5c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.4 1.5.3.1.5.1.6-.1.2-.2.7-.8.9-1.1.2-.3.4-.2.6-.1l1.8.9c.3.1.5.2.5.3.1.2.1.7-.1 1.4Z"/></svg>
-              Enquire
-            </a>
-          </div>
-        </article>
-      ))}
+      {gridItems.map((o) => <OfferCard offer={o} context="index" />)}
     </div>
     <div class="empty" id="empty" hidden>No offers match that filter. Try clearing the search.</div>
   </main>
@@ -385,16 +325,7 @@ const stats = [
     </div>
   </section>
 
-  <footer>
-    <div class="wrap">
-      <div class="note">
-        Live catalogue from AKAY's Airtable. Prices are indicative and shown per the listing basis; supplier identity, buy prices and margins are never published. <strong>T1</strong> = export / under-bond · <strong>T2</strong> = for sale in the EU.
-        <br /><br />
-        <a href="/about/" style="color:var(--brass);text-decoration:none">About AKAY</a> · <a href="/#guides" style="color:var(--brass);text-decoration:none">Guides</a> · <a href="/guides/requirement-list-format/" style="color:var(--brass);text-decoration:none">How to order</a>
-      </div>
-      <div style="font-family:var(--mono);text-align:right">© AKAY · Shannon<br /><a href={WA_LINK} style="color:var(--brass);text-decoration:none">WhatsApp</a> · <a href="mailto:hello@akay.ie" style="color:var(--brass);text-decoration:none">hello@akay.ie</a></div>
-    </div>
-  </footer>
+  <SiteFooter />
 
   <script>
     const grid = document.getElementById('grid');

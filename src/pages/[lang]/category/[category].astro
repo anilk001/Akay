@@ -1,0 +1,157 @@
+---
+// §6 — translated category pages: /pt/category/spirits/ and the other 35.
+//
+// The chrome is translated; the offer rows are not. A buyer in Angola needs to
+// know what T1 means and how we ship — not to see "Absolut Vodka 12 x 100cl"
+// rendered as something no supplier, warehouse or customs form would recognise.
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import OfferCard from '../../../components/OfferCard.astro';
+import RfqBasket from '../../../components/RfqBasket.astro';
+import { getCatalogue, featuredFirst } from '../../../lib/catalogue.mjs';
+import { aggregationFacts } from '../../../lib/aggregation-intro.mjs';
+import { TRANSLATED, LOCALES } from '../../../i18n/locales.mjs';
+import { UI } from '../../../i18n/content.mjs';
+import { organizationSchema, aggregationItemListSchema, breadcrumbList } from '../../../lib/schema.mjs';
+
+export async function getStaticPaths() {
+  const { categories } = await getCatalogue();
+  const paths = [];
+  for (const lang of TRANSLATED) {
+    for (const category of categories) {
+      paths.push({ params: { lang, category: category.slug }, props: { lang, category } });
+    }
+  }
+  return paths;
+}
+
+const { lang, category } = Astro.props;
+const ui = UI[lang];
+const offers = featuredFirst(category.offers);
+const facts = aggregationFacts(offers);
+const path = `/category/${category.slug}/`;
+
+// One sentence per language, filled from the live counts. Kept short on purpose:
+// a long translated paragraph adds nothing a buyer cannot read off the cards,
+// and the parts that DO need explaining live on the translated glossary page.
+const COPY = {
+  pt: {
+    title: `${category.name} por grosso — preços por caixa para exportação | Akay Irl Ltd`,
+    description: `${facts.lines} linhas de ${category.name} disponíveis de ${facts.brands.length} marcas — preço por caixa, formato de embalagem, regime aduaneiro e ponto de carga em cada linha.`,
+    h1: `${category.name} — ofertas por grosso`,
+    lede: `${facts.lines} linhas disponíveis de ${facts.brands.length} marcas, vendidas por caixa e palete a compradores comerciais.`,
+    more: 'Saber mais',
+  },
+  es: {
+    title: `${category.name} al por mayor — precios por caja para exportación | Akay Irl Ltd`,
+    description: `${facts.lines} líneas de ${category.name} disponibles de ${facts.brands.length} marcas — precio por caja, formato, régimen aduanero y punto de carga en cada línea.`,
+    h1: `${category.name} — ofertas al por mayor`,
+    lede: `${facts.lines} líneas disponibles de ${facts.brands.length} marcas, vendidas por caja y palé a compradores comerciales.`,
+    more: 'Más información',
+  },
+  fr: {
+    title: `${category.name} en gros — prix à la caisse à l’export | Akay Irl Ltd`,
+    description: `${facts.lines} lignes de ${category.name} disponibles issues de ${facts.brands.length} marques — prix à la caisse, format, régime douanier et point de chargement sur chaque ligne.`,
+    h1: `${category.name} — offres en gros`,
+    lede: `${facts.lines} lignes disponibles issues de ${facts.brands.length} marques, vendues à la caisse et à la palette à des acheteurs professionnels.`,
+    more: 'En savoir plus',
+  },
+  ar: {
+    title: `${category.name} بالجملة — أسعار الكرتونة للتصدير | Akay Irl Ltd`,
+    description: `${facts.lines} بنداً متاحاً من ${category.name} من ${facts.brands.length} ماركة — السعر بالكرتونة وشكل التعبئة والوضع الجمركي ونقطة التحميل لكل بند.`,
+    h1: `${category.name} — عروض الجملة`,
+    lede: `${facts.lines} بنداً متاحاً من ${facts.brands.length} ماركة، تُباع بالكرتونة والطبلية للمشترين التجاريين.`,
+    more: 'مزيد من المعلومات',
+  },
+}[lang];
+
+const jsonLd = [
+  organizationSchema(),
+  breadcrumbList([
+    { name: ui.catalogue, path: '/' },
+    { name: ui.categories, path: `/${lang}/categories/` },
+    { name: category.name, path: `/${lang}${path}` },
+  ]),
+  aggregationItemListSchema({ name: COPY.h1, path: `/${lang}${path}`, offers }),
+];
+
+const siblings = TRANSLATED.filter((c) => c !== lang);
+---
+
+<BaseLayout
+  title={COPY.title}
+  description={COPY.description}
+  lang={lang}
+  i18nPath={path}
+  jsonLd={jsonLd}
+  wide={true}
+>
+  <nav class="crumbs" aria-label="Breadcrumb">
+    <a href="/">{ui.catalogue}</a>
+    <span aria-hidden="true">/</span>
+    <a href={`/${lang}/categories/`}>{ui.categories}</a>
+    <span aria-hidden="true">/</span>
+    <span aria-current="page">{category.name}</span>
+  </nav>
+
+  <header class="agg-head">
+    <h1>{COPY.h1}</h1>
+    <p class="agg-intro">{COPY.lede}</p>
+
+    <dl class="agg-stats">
+      <div><dt>{ui.liveLines}</dt><dd>{facts.lines}</dd></div>
+      <div><dt>{ui.brandsLabel}</dt><dd>{facts.brands.length}</dd></div>
+      {facts.inStock > 0 && <div><dt>{ui.inStock}</dt><dd>{facts.inStock}</dd></div>}
+      {facts.currencies.length > 0 && <div><dt>{ui.currencies}</dt><dd>{facts.currencies.join(' / ')}</dd></div>}
+    </dl>
+
+    <p class="agg-note">{ui.catalogueNote}</p>
+
+    <nav class="agg-links" aria-label={COPY.more}>
+      <span class="agg-links-label">{COPY.more}:</span>
+      <a href={`/${lang}/customs-glossary/`}>{ui.customs}</a>
+      <a href={`/${lang}/trade-terms/`}>{ui.tradeTerms}</a>
+      <a href={`/${lang}/about/`}>{ui.about}</a>
+      <a href="/brands/">{ui.brands}</a>
+    </nav>
+
+    <div class="agg-actions">
+      <RfqBasket />
+    </div>
+  </header>
+
+  <div class="grid">
+    {offers.map((offer) => <OfferCard offer={offer} context="category" />)}
+  </div>
+
+  <nav class="lang-switch" aria-label="Languages">
+    <a href={path}>English</a>
+    {siblings.map((code) => (
+      <a href={`/${code}${path}`} lang={code}>{LOCALES[code].native}</a>
+    ))}
+  </nav>
+</BaseLayout>
+
+<style>
+  .crumbs{display:flex;flex-wrap:wrap;gap:8px;font-size:12.5px;color:var(--muted);margin-bottom:18px;font-family:var(--mono)}
+  .crumbs a{color:var(--brass);text-decoration:none}
+  .agg-head{margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid var(--line)}
+  h1{font-family:var(--serif);font-weight:600;font-size:clamp(26px,4vw,36px);line-height:1.1;margin:0 0 12px;text-wrap:balance}
+  .agg-intro{margin:0;color:var(--ink-soft);font-size:15px;max-width:74ch}
+  .agg-stats{display:flex;flex-wrap:wrap;gap:14px 30px;margin:18px 0 0;padding-top:15px;border-top:1px solid var(--line-soft)}
+  .agg-stats dt{font-size:11.5px;color:var(--muted)}
+  .agg-stats dd{margin:2px 0 0;font-family:var(--mono);font-size:17px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
+  .agg-note{margin:16px 0 0;color:var(--muted);font-size:13px;max-width:74ch;
+    border-inline-start:2px solid var(--line);padding-inline-start:12px}
+  .agg-links{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:baseline;margin-top:16px;font-size:13.5px}
+  .agg-links-label{color:var(--muted);font-size:12.5px}
+  .agg-links a{color:var(--brass);text-decoration:none}
+  .agg-links a:hover{text-decoration:underline}
+  .agg-actions{margin-top:18px}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+
+  .lang-switch{display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:30px;padding-top:16px;
+    border-top:1px solid var(--line);font-size:13.5px}
+  .lang-switch a{color:var(--brass);text-decoration:none}
+  .lang-switch a:hover{text-decoration:underline}
+</style>

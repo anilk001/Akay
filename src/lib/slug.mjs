@@ -58,3 +58,34 @@ export function buildOfferBySlug(offers, slugMap) {
   }
   return map;
 }
+
+// ---------------------------------------------------------------------------
+// Aggregation-page slugs (brands, categories).
+//
+// Deliberately NOT generateSlug(): that rule strips accents to nothing
+// ("Nescafé" -> "nescaf") and is already baked into ~2,900 indexed offer URLs,
+// so it must not change. Brand and category routes are new, so they get the
+// rule the brief specifies — lowercase, & -> and, punctuation stripped, spaces
+// -> hyphens — with accents transliterated rather than deleted.
+// ---------------------------------------------------------------------------
+
+// "Moët" -> "Moet", "Nescafé" -> "Nescafe". NFD splits a letter from its
+// diacritic; the range strips the combining marks and leaves the base letter.
+export function deaccent(s) {
+  return String(s).normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
+
+export function brandSlug(name) {
+  return deaccent(name)
+    .toLowerCase()
+    .replace(/&/g, ' and ')
+    .replace(/['‘’ʼ]/g, '') // apostrophes vanish: Dewar's -> dewars
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+// Category slugs are already live at /category/<slug>/ under this exact rule.
+// Kept byte-identical so existing URLs and inbound links survive.
+export function categorySlug(name) {
+  return String(name).toLowerCase().replace(/\s+/g, '-');
+}

@@ -70,10 +70,16 @@ jobs:
           git config user.name "akay-refresh-bot"
           git config user.email "actions@users.noreply.github.com"
 
-          if git diff --quiet -- src/data/offers-snapshot.json; then
+          # brand-registry.json is committed alongside the snapshot on purpose.
+          # It is the append-only record of every brand slug the site has ever
+          # published, and it is what keeps a sold-through brand's page
+          # returning 200 with noindex instead of 404 (see
+          # src/lib/brand-registry.mjs). Netlify builds without an Airtable
+          # token, so the snapshot alone cannot tell the build what has gone.
+          if git diff --quiet -- src/data/offers-snapshot.json src/data/brand-registry.json; then
             echo "Catalogue unchanged since last refresh — nothing to deploy."
           else
-            git add src/data/offers-snapshot.json
+            git add src/data/offers-snapshot.json src/data/brand-registry.json
             git commit -m "chore: refresh catalogue snapshot from Airtable"
             git push origin HEAD:claude/softr-webflow-migration-50kj20
             echo "Committed a refreshed catalogue — Netlify will redeploy."

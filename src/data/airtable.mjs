@@ -15,11 +15,22 @@ const BASE = process.env.AIRTABLE_BASE_ID || 'appaDSdZkAE9PGkjT';
 const TABLE = process.env.AIRTABLE_OFFERS_TABLE || 'Offers';
 
 // Public-safe fields only. Anything not listed here is never pulled.
+//
+// Every entry is on the brief's §0 safe list. Buy Price, Margin %, Notes,
+// Trader Comment, Delivery Info Source and every Supplier lookup are absent by
+// construction: Airtable returns only the fields asked for, so the private
+// columns never enter the process, let alone the build output.
 const FIELDS = [
   'Public Product Description', 'Variant', 'Brand', 'Category', 'Public Spec',
   'Price Display', 'Currency', 'Price Per Unit & Case', 'PCS/Case',
-  'Stock Display', 'Stock Cases', 'Public Terms',
+  'Stock Display', 'Stock Cases', 'Public Terms', 'Public Note',
   'Bond/Customs Status', 'Origin Country', 'Public Listing', 'Featured',
+  // §5 logistics. Near-empty today (CBM and HS Code sit at 0%), so the UI
+  // renders each row only when populated and collapses when none are — the
+  // section ships dark and lights up per-offer as the backfill lands.
+  'MOQ', 'Lead Time', 'Cases per Pallet', 'Pieces per Pallet',
+  'Full Truckload Qty', 'Weight KG', 'CBM', 'HS Code', 'BBD',
+  'EAN Unit', 'EAN Case', 'Incoterm', 'Warehouse',
 ];
 
 function stockCode(label = '') {
@@ -130,6 +141,23 @@ function normalize(fields, recordId = null) {
     tier: fields['Bond/Customs Status'] || '',
     origin: fields['Origin Country'] || '',
     featured: fields['Featured'] === true,
+    publicNote: fields['Public Note'] || '',
+    incoterm: fields['Incoterm'] || '',
+    warehouse: fields['Warehouse'] || '',
+    // §5 logistics. Left as '' rather than null when absent so the snapshot
+    // round-trips to identical JSON and the refresh job's change detection
+    // does not see churn on offers that gained nothing.
+    moq: fields['MOQ'] || '',
+    leadTime: fields['Lead Time'] || '',
+    casesPerPallet: fields['Cases per Pallet'] ?? '',
+    piecesPerPallet: fields['Pieces per Pallet'] ?? '',
+    fullTruckload: fields['Full Truckload Qty'] ?? '',
+    weightKg: fields['Weight KG'] ?? '',
+    cbm: fields['CBM'] ?? '',
+    hsCode: fields['HS Code'] || '',
+    bbd: fields['BBD'] || '',
+    eanUnit: fields['EAN Unit'] || '',
+    eanCase: fields['EAN Case'] || '',
   };
 }
 
