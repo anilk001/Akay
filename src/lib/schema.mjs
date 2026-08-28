@@ -25,6 +25,7 @@ export function organizationSchema() {
       streetAddress: '36 Gleann an Oir',
       addressLocality: 'Shannon',
       addressRegion: 'Co. Clare',
+      ...(isTBC(company.eircode) ? {} : { postalCode: company.eircode }),
       addressCountry: 'IE',
     },
     // Registration numbers, emitted only once actually supplied — a TBC

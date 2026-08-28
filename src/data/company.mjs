@@ -21,13 +21,17 @@ export const company = {
   // Irish trader's EORI is their VAT number. Listed separately anyway, because
   // a customs broker asks for "EORI" and needs to see that exact label.
   eori: 'IE8250418E',
-  registeredAddress: '36 Gleann an Oir, Shannon, Co. Clare, Ireland',
+  registeredAddress: '36 Gleann an Oir, Shannon, Co. Clare, V14 V006, Ireland',
+  eircode: 'V14 V006',
 
-  // Trading footprint — Anil to confirm the exact figures before these print
-  // as claims. Left TBC so the page says "on request" rather than a number
-  // nobody can stand behind.
-  yearsTrading: TBC,
-  countriesShipped: TBC,
+  // Trading footprint. yearsTrading and countriesShipped confirmed by Anil
+  // 2026-08-28 and are now the SINGLE SOURCE for every "years in trade" claim
+  // on the site — /about/, the guide, llms.txt and the footer all read from
+  // here. Seven places previously hardcoded "36", which contradicted this
+  // figure; a buyer checking a supplier notices two different numbers on the
+  // same site, so nothing may restate it as a literal again.
+  yearsTrading: 30,
+  countriesShipped: 'Over 50',
   containersPerMonth: TBC,
 
   // §3 — which payment terms to publish is Anil's commercial call (TT in

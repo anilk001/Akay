@@ -22,7 +22,7 @@ const footprint = [
 ].filter(([, v]) => v !== 'On request');
 
 const orgSchema = organizationSchema();
-const pageTitle = 'About AKAY Trade — 36 Years in Wholesale';
+const pageTitle = `About AKAY Trade — ${company.yearsTrading} Years in Wholesale`;
 const pageDesc = 'AKAY Trade: Ireland-based B2B wholesale trading company specializing in spirits, beer, soft drinks and FMCG for 1,000+ suppliers and 6,000+ clients worldwide.';
 ---
 
@@ -253,12 +253,12 @@ const pageDesc = 'AKAY Trade: Ireland-based B2B wholesale trading company specia
     <div class="header">
       <h1>About AKAY Trade</h1>
       <p style="color: var(--muted); font-size: 1.1em; margin-top: 0;">
-        36 years in wholesale. Ireland-based. Serving 1,000+ suppliers and 6,000+ clients across four continents.
+        {company.yearsTrading} years in wholesale. Ireland-based. Goods shipped to {String(company.countriesShipped).toLowerCase()} countries, serving 1,000+ suppliers and 6,000+ clients.
       </p>
 
       <div class="stats">
         <div class="stat">
-          <span class="stat-number">36</span>
+          <span class="stat-number">{company.yearsTrading}</span>
           <span class="stat-label">Years in trade</span>
         </div>
         <div class="stat">
@@ -270,8 +270,8 @@ const pageDesc = 'AKAY Trade: Ireland-based B2B wholesale trading company specia
           <span class="stat-label">Active clients</span>
         </div>
         <div class="stat">
-          <span class="stat-number">4</span>
-          <span class="stat-label">Continents served</span>
+          <span class="stat-number">{company.countriesShipped}</span>
+          <span class="stat-label">Countries shipped to</span>
         </div>
       </div>
     </div>
@@ -435,7 +435,7 @@ const pageDesc = 'AKAY Trade: Ireland-based B2B wholesale trading company specia
     <div class="section">
       <h2>Why Choose AKAY?</h2>
       <ul>
-        <li><strong>Experience:</strong> 36 years in wholesale—we know the market, the suppliers, and the regulations.</li>
+        <li><strong>Experience:</strong> {company.yearsTrading} years in wholesale—we know the market, the suppliers, and the regulations.</li>
         <li><strong>Scale:</strong> 1,000+ suppliers, 6,000+ clients—we have reach and negotiating power for you.</li>
         <li><strong>Transparency:</strong> Live pricing, no markup surprises, clear terms on every deal.</li>
         <li><strong>Speed:</strong> Quote within 24 hours, ship within 48–72 hours, deliver in 3–7 days (EU).</li>

@@ -1,3 +1,4 @@
+import { company } from '../data/company.mjs';
 export const prerender = true;
 
 export async function GET() {
@@ -26,7 +27,7 @@ export async function GET() {
 
 ## Company
 
-- [About AKAY](https://offers.akay.ie/about/): 36 years in trade, Ireland-based, 1,000+ suppliers, 6,000+ clients
+- [About AKAY](https://offers.akay.ie/about/): ${company.yearsTrading} years in trade, Ireland-based, goods shipped to ${String(company.countriesShipped).toLowerCase()} countries
 
 ## How to Enquire
 
