@@ -57,6 +57,12 @@ const coverRows = [
   ['Currencies', stats.currencies.join(', ')],
   ['', ''],
   ['Basis', 'Prices are quoted per the basis shown in the "Price basis" column — per case on most lines, per bottle or per unit on some. Read the basis before comparing two lines.'],
+  // Anil's call (2026-08-28): publish real quantities rather than availability
+  // labels alone. About a quarter of lines carry one. The column is kept
+  // strictly numeric so it sorts and filters — which is the main reason a buyer
+  // wants the file at all — so a blank has to be explained rather than filled
+  // with text. "Availability" carries the label for every line either way.
+  ['Stock quantities', 'The "Cases available" column shows the actual case count where the warehouse has confirmed one. A BLANK MEANS NOT STATED, NOT ZERO — read the "Availability" column, which is populated on every line. Quantities move during the day; they are confirmed on the quotation.'],
   ['Validity', 'Indicative and subject to availability at the time of order. Firm prices are confirmed on a written quotation.'],
   ['Customs status', 'T1, T2, bonded and duty-paid are explained at https://offers.akay.ie/customs-glossary/'],
   ['Terms and documents', 'https://offers.akay.ie/trade-terms/'],
