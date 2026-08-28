@@ -13,12 +13,15 @@
 export const TBC = 'TBC';
 
 export const company = {
-  // Legal identity — Anil to supply. See "Open items for Anil" in the brief.
+  // Legal identity, supplied by Anil 2026-08-28.
   registeredName: 'Akay Irl Ltd',
-  cro: TBC,        // Irish CRO company number
-  vat: TBC,        // Irish VAT number (IE…)
-  eori: TBC,       // EORI number, required for the export documentation buyers ask about
-  registeredAddress: TBC,
+  cro: '250418',           // Irish CRO company number — checkable at core.cro.ie
+  vat: 'IE8250418E',       // Irish VAT number
+  // EORI matches the VAT number, which is the normal Irish arrangement: an
+  // Irish trader's EORI is their VAT number. Listed separately anyway, because
+  // a customs broker asks for "EORI" and needs to see that exact label.
+  eori: 'IE8250418E',
+  registeredAddress: '36 Gleann an Oir, Shannon, Co. Clare, Ireland',
 
   // Trading footprint — Anil to confirm the exact figures before these print
   // as claims. Left TBC so the page says "on request" rather than a number

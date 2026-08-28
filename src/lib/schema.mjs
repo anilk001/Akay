@@ -1,5 +1,7 @@
 // JSON-LD schema generation for SEO
 
+import { company, isTBC } from '../data/company.mjs';
+
 const SITE_URL = 'https://offers.akay.ie';
 
 export function organizationSchema() {
@@ -15,11 +17,25 @@ export function organizationSchema() {
       'Ireland-based B2B wholesale trading company dealing in spirits, beer, soft drinks and FMCG products by the case and pallet. Duty-paid and export (under-bond) supply across Europe, Asia and the Caribbean.',
     email: 'hello@akay.ie',
     telephone: '+353872382368',
+    // The registered address, not just the town. A buyer verifying the
+    // counterparty is checking this against a public register, and search
+    // results that carry it are part of that check.
     address: {
       '@type': 'PostalAddress',
+      streetAddress: '36 Gleann an Oir',
       addressLocality: 'Shannon',
+      addressRegion: 'Co. Clare',
       addressCountry: 'IE',
     },
+    // Registration numbers, emitted only once actually supplied — a TBC
+    // sentinel must never reach structured data as if it were an identifier.
+    ...(isTBC(company.vat) ? {} : { vatID: company.vat }),
+    ...(isTBC(company.cro) ? {} : {
+      identifier: [
+        { '@type': 'PropertyValue', name: 'CRO company number', value: company.cro },
+        ...(isTBC(company.eori) ? [] : [{ '@type': 'PropertyValue', name: 'EORI', value: company.eori }]),
+      ],
+    }),
     areaServed: ['Europe', 'Asia', 'Caribbean', 'Middle East', 'Africa'],
     knowsAbout: [
       'wholesale spirits',
