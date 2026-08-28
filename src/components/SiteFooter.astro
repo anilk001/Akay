@@ -25,6 +25,7 @@ const legal = [
 ];
 
 const footprint = [
+  ['Established', orRequest(company.founded)],
   ['Years trading', orRequest(company.yearsTrading)],
   ['Countries shipped to', orRequest(company.countriesShipped)],
   ['Containers per month', orRequest(company.containersPerMonth)],

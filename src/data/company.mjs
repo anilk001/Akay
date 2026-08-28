@@ -12,6 +12,16 @@
 
 export const TBC = 'TBC';
 
+// Akay Irl Ltd was established in 1996 (confirmed by Anil 2026-08-28), which is
+// also what the CRO register shows against company number 250418 — so this is
+// the one date a buyer can independently verify, and every "years in trade"
+// claim on the site is counted from it rather than stated separately.
+//
+// Deriving the count matters: a hardcoded "30" is wrong from 1 January 2027
+// onwards, and the site has already been through one round of a stale years
+// figure contradicting the real one. This cannot go stale.
+export const FOUNDED = 1996;
+
 export const company = {
   // Legal identity, supplied by Anil 2026-08-28.
   registeredName: 'Akay Irl Ltd',
@@ -24,13 +34,14 @@ export const company = {
   registeredAddress: '36 Gleann an Oir, Shannon, Co. Clare, V14 V006, Ireland',
   eircode: 'V14 V006',
 
-  // Trading footprint. yearsTrading and countriesShipped confirmed by Anil
-  // 2026-08-28 and are now the SINGLE SOURCE for every "years in trade" claim
-  // on the site — /about/, the guide, llms.txt and the footer all read from
-  // here. Seven places previously hardcoded "36", which contradicted this
-  // figure; a buyer checking a supplier notices two different numbers on the
-  // same site, so nothing may restate it as a literal again.
-  yearsTrading: 30,
+  // Trading footprint. This object is the SINGLE SOURCE for every "years in
+  // trade" claim on the site — /about/, the About guide, llms.txt and the
+  // footer all read from here. Seven places previously hardcoded "36", which
+  // contradicted the real figure; a buyer checking a supplier notices two
+  // different numbers on the same site, so nothing may restate it as a literal
+  // again.
+  founded: FOUNDED,
+  yearsTrading: new Date().getFullYear() - FOUNDED,
   countriesShipped: 'Over 50',
   containersPerMonth: TBC,
 

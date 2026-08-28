@@ -17,6 +17,10 @@ export function organizationSchema() {
       'Ireland-based B2B wholesale trading company dealing in spirits, beer, soft drinks and FMCG products by the case and pallet. Duty-paid and export (under-bond) supply across Europe, Asia and the Caribbean.',
     email: 'hello@akay.ie',
     telephone: '+353872382368',
+    // The founding year is now confirmed, so this is a fact rather than an
+    // inference back-calculated from a years-in-trade figure. It corroborates
+    // the CRO number below against the public register.
+    ...(isTBC(company.founded) ? {} : { foundingDate: String(company.founded) }),
     // The registered address, not just the town. A buyer verifying the
     // counterparty is checking this against a public register, and search
     // results that carry it are part of that check.

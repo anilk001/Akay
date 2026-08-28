@@ -9,6 +9,7 @@ import SiteFooter from '../components/SiteFooter.astro';
 // than an invented number; see src/data/company.mjs.
 const registry = [
   ['Registered name', company.registeredName],
+  ['Established', orRequest(company.founded)],
   ['Company registration (CRO)', orRequest(company.cro)],
   ['VAT number', orRequest(company.vat)],
   ['EORI number', orRequest(company.eori)],
