@@ -28,5 +28,15 @@
         ]
       }
     ]
+  },
+  "permissions": {
+    "allow": [
+      "mcp__Airtable__list_records_for_table",
+      "mcp__n8n__get_workflow_details",
+      "mcp__n8n__get_workflow_execution",
+      "mcp__Airtable__search_records",
+      "mcp__n8n__search_workflow_executions",
+      "mcp__github__pull_request_read"
+    ]
   }
 }
