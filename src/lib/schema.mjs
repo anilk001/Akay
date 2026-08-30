@@ -192,6 +192,26 @@ export function categoryItemListSchema(categoryName, offers) {
   };
 }
 
+// Brand landing page CollectionPage schema
+export function brandCollectionSchema(brandName, brandUrlSlug, offers) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: `${brandName} Wholesale Offers`,
+    url: `${SITE_URL}/brands/${brandUrlSlug}/`,
+    about: { '@type': 'Brand', name: brandName },
+    mainEntity: {
+      '@type': 'ItemList',
+      itemListElement: offers.map((offer, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        url: `${SITE_URL}/offers/${offer.slug}/`,
+        name: offer.name,
+      })),
+    },
+  };
+}
+
 // Article schema for guide pages
 export function articleSchema(title, content, slug) {
   return {

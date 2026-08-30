@@ -1,6 +1,7 @@
 ---
 import { getOffers } from '../data/airtable.mjs';
 import { organizationSchema } from '../lib/schema.mjs';
+import { brandPages, categorySlug } from '../lib/slug.mjs';
 import { guides } from '../data/guides.mjs';
 import { enquiryLink, WA_LINK } from '../lib/whatsapp.mjs';
 
@@ -42,6 +43,12 @@ const stats = [
   [currencies.join(' / ') || '—', 'currencies'],
   [brandCount, 'brands'],
 ];
+
+// Crawlable links to the category and brand landing pages. The filter chips
+// above the grid are JS buttons, so without these anchors search engines have
+// no path from the homepage into /category/ and /brands/ at all.
+const allBrandPages = brandPages(offers);
+const topBrands = [...allBrandPages].sort((a, b) => b.offers.length - a.offers.length).slice(0, 24);
 ---
 
 <!doctype html>
@@ -385,12 +392,32 @@ const stats = [
     </div>
   </section>
 
+  <section class="browse" style="border-top:1px solid var(--line);padding:34px 0">
+    <div class="wrap">
+      <h2 style="font-family:var(--serif);font-size:22px;margin:0 0 6px;color:var(--ink)">Browse the catalogue</h2>
+      <p style="color:var(--muted);margin:0 0 18px;font-size:13.5px">Wholesale offers by category and brand — every page lists live case pricing and duty status.</p>
+      <h3 style="font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--brass);margin:0 0 8px">By category</h3>
+      <p style="margin:0 0 18px;line-height:2">
+        {categories.filter((c) => c !== 'All').map((c) => (
+          <a href={`/category/${categorySlug(c)}/`} style="color:var(--ink-soft);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:5px 13px;font-size:13px;margin:0 6px 6px 0;display:inline-block">Wholesale {c}</a>
+        ))}
+      </p>
+      <h3 style="font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--brass);margin:0 0 8px">Popular brands</h3>
+      <p style="margin:0;line-height:2">
+        {topBrands.map((b) => (
+          <a href={`/brands/${b.slug}/`} style="color:var(--ink-soft);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:5px 13px;font-size:13px;margin:0 6px 6px 0;display:inline-block">{b.brand}</a>
+        ))}
+        <a href="/brands/" style="color:var(--brass);text-decoration:none;font-weight:600;font-size:13px;padding:5px 6px;display:inline-block">All {allBrandPages.length} brands →</a>
+      </p>
+    </div>
+  </section>
+
   <footer>
     <div class="wrap">
       <div class="note">
         Live catalogue from AKAY's Airtable. Prices are indicative and shown per the listing basis; supplier identity, buy prices and margins are never published. <strong>T1</strong> = export / under-bond · <strong>T2</strong> = for sale in the EU.
         <br /><br />
-        <a href="/about/" style="color:var(--brass);text-decoration:none">About AKAY</a> · <a href="/#guides" style="color:var(--brass);text-decoration:none">Guides</a> · <a href="/guides/requirement-list-format/" style="color:var(--brass);text-decoration:none">How to order</a>
+        <a href="/about/" style="color:var(--brass);text-decoration:none">About AKAY</a> · <a href="/brands/" style="color:var(--brass);text-decoration:none">Brands A–Z</a> · <a href="/#guides" style="color:var(--brass);text-decoration:none">Guides</a> · <a href="/guides/requirement-list-format/" style="color:var(--brass);text-decoration:none">How to order</a>
       </div>
       <div style="font-family:var(--mono);text-align:right">© AKAY · Shannon<br /><a href={WA_LINK} style="color:var(--brass);text-decoration:none">WhatsApp</a> · <a href="mailto:hello@akay.ie" style="color:var(--brass);text-decoration:none">hello@akay.ie</a></div>
     </div>

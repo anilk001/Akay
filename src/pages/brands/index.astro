@@ -1,0 +1,177 @@
+---
+import { getOffers } from '../../data/airtable.mjs';
+import { brandPages, categorySlug } from '../../lib/slug.mjs';
+import { organizationSchema } from '../../lib/schema.mjs';
+
+const { offers } = await getOffers();
+// The directory only lists brands, so raw offers (no slugs) are enough here.
+const pages = brandPages(offers);
+const categories = Array.from(new Set(offers.map((o) => o.category))).sort();
+
+// Group alphabetically for scannability.
+const groups = new Map();
+for (const p of pages) {
+  const letter = /^[a-z]/i.test(p.brand) ? p.brand[0].toUpperCase() : '#';
+  if (!groups.has(letter)) groups.set(letter, []);
+  groups.get(letter).push(p);
+}
+
+const orgSchema = organizationSchema();
+const pageTitle = `Wholesale Brands A–Z — ${pages.length} Brands in Stock | AKAY Trade`;
+const pageDesc = `Browse ${pages.length} wholesale brands stocked by AKAY Trade — spirits, beer, soft drinks, confectionery and FMCG by the case. Live trade pricing and duty status on every offer.`;
+---
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{pageTitle}</title>
+  <meta name="description" content={pageDesc} />
+  <link rel="icon" href="/akay-bird.png" />
+  <link rel="canonical" href="https://offers.akay.ie/brands/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="AKAY Trade" />
+  <meta property="og:url" content="https://offers.akay.ie/brands/" />
+  <meta property="og:title" content="Wholesale Brands A–Z" />
+  <meta property="og:description" content={pageDesc} />
+  <meta property="og:image" content="https://offers.akay.ie/akay-bird.png" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Wholesale Brands A–Z" />
+  <meta name="twitter:description" content={pageDesc} />
+  <meta name="robots" content="max-snippet:-1, max-image-preview:large" />
+
+  <script type="application/ld+json" set:html={JSON.stringify(orgSchema)} />
+
+  <style>
+    :root {
+      --paper: #F7F5F0;
+      --card: #FFFFFF;
+      --ink: #17140F;
+      --muted: #767E72;
+      --line: #E4E0D4;
+      --brass: #B4231F;
+      --radius: 14px;
+      --serif: "Hoefler Text", "Iowan Old Style", Palatino, Georgia, "Times New Roman", serif;
+      --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --paper: #0C140F;
+        --card: #13201A;
+        --ink: #F1EFE7;
+        --muted: #8A968A;
+        --line: #243029;
+        --brass: #EC5A52;
+      }
+    }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      background: var(--paper);
+      color: var(--ink);
+      font: 16px / 1.5 var(--sans);
+    }
+    h1 {
+      font: 600 2em var(--serif);
+      margin: 1em 0 0.5em;
+    }
+    h2 {
+      font: 600 1.2em var(--serif);
+      margin: 1.5em 0 0.5em;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 0.3em;
+    }
+    a {
+      color: var(--brass);
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .breadcrumb {
+      font-size: 0.9em;
+      color: var(--muted);
+      margin-bottom: 2em;
+    }
+
+    .intro {
+      color: var(--muted);
+      max-width: 70ch;
+    }
+
+    .cat-links {
+      margin: 1em 0 2em;
+      font-size: 0.95em;
+    }
+    .cat-links a {
+      margin-right: 0.9em;
+      white-space: nowrap;
+    }
+
+    .brand-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4em 1.4em;
+      list-style: none;
+      margin: 0.8em 0 0;
+      padding: 0;
+    }
+    .brand-list a {
+      white-space: nowrap;
+    }
+    .brand-list .n {
+      color: var(--muted);
+      font-size: 0.85em;
+    }
+
+    .nav {
+      text-align: center;
+      padding: 2em 0;
+      border-top: 1px solid var(--line);
+      margin-top: 3em;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="/">Home</a> / Brands
+    </div>
+
+    <h1>Wholesale Brands A–Z</h1>
+    <p class="intro">
+      {pages.length} brands currently in the AKAY trade catalogue — spirits, beer, soft drinks,
+      confectionery and FMCG by the case. Every brand page lists live offers with pricing,
+      pack specs and duty status.
+    </p>
+
+    <p class="cat-links">
+      Browse by category:
+      {categories.map((c) => <a href={`/category/${categorySlug(c)}/`}>{c}</a>)}
+    </p>
+
+    {[...groups.keys()].map((letter) => (
+      <section>
+        <h2>{letter}</h2>
+        <ul class="brand-list">
+          {groups.get(letter).map((p) => (
+            <li><a href={`/brands/${p.slug}/`}>{p.brand}</a> <span class="n">({p.offers.length})</span></li>
+          ))}
+        </ul>
+      </section>
+    ))}
+
+    <div class="nav">
+      <a href="/">← Full catalogue</a>
+    </div>
+  </div>
+</body>
+</html>

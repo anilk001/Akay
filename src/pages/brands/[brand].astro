@@ -1,34 +1,35 @@
 ---
 import { getOffers } from '../../data/airtable.mjs';
-import { offersWithSlugs, categorySlug as toCategorySlug } from '../../lib/slug.mjs';
-import { categoryItemListSchema, organizationSchema } from '../../lib/schema.mjs';
+import { offersWithSlugs, brandPages, categorySlug } from '../../lib/slug.mjs';
+import { brandCollectionSchema, organizationSchema } from '../../lib/schema.mjs';
 import { basisLabel } from '../../lib/price.mjs';
 
 export async function getStaticPaths() {
   const { offers } = await getOffers();
-  const allOffers = offersWithSlugs(offers);
-  const categories = Array.from(new Set(allOffers.map((o) => o.category))).sort();
-
-  return categories.map((category) => ({
-    params: { category: toCategorySlug(category) },
-    props: { category, offers: allOffers },
+  const all = offersWithSlugs(offers);
+  return brandPages(all).map(({ brand, slug, offers: brandOffers }) => ({
+    params: { brand: slug },
+    props: { brand, brandUrlSlug: slug, brandOffers },
   }));
 }
 
-const { category, offers } = Astro.props;
+const { brand, brandUrlSlug, brandOffers } = Astro.props;
 
-// Get offers in this category
-const categoryOffers = offers
-  .filter((o) => o.category === category)
-  .sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
+// Featured first, then keep catalogue order.
+const sorted = [...brandOffers].sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
 
-// Build schemas
+const categories = Array.from(new Set(sorted.map((o) => o.category))).sort();
+const priced = sorted.filter((o) => o.amount != null);
+const lowPrice = priced.length ? Math.min(...priced.map((o) => o.amount)) : null;
+const currency = priced[0]?.currency || '';
+
 const orgSchema = organizationSchema();
-const itemListSchema = categoryItemListSchema(category, categoryOffers);
+const collectionSchema = brandCollectionSchema(brand, brandUrlSlug, sorted);
 
-const categorySlug = toCategorySlug(category);
-const pageTitle = `Wholesale ${category} Offers — Trade Pricing | AKAY Trade`;
-const pageDesc = `Wholesale ${category} by the case from AKAY Trade. Live trade pricing, pack specs, and duty status. Buy spirits, beer, FMCG and more.`;
+const pageTitle = `${brand} Wholesale — Trade Offers & Case Pricing | AKAY Trade`;
+const pageDesc = `Buy ${brand} wholesale from AKAY Trade: ${sorted.length} live offers${
+  lowPrice != null ? ` from ${currency} ${lowPrice.toFixed(2)}` : ''
+}. Case pricing, pack specs and duty status on every line. Duty-paid & export.`;
 ---
 
 <!doctype html>
@@ -39,20 +40,20 @@ const pageDesc = `Wholesale ${category} by the case from AKAY Trade. Live trade 
   <title>{pageTitle}</title>
   <meta name="description" content={pageDesc} />
   <link rel="icon" href="/akay-bird.png" />
-  <link rel="canonical" href={`https://offers.akay.ie/category/${categorySlug}/`} />
+  <link rel="canonical" href={`https://offers.akay.ie/brands/${brandUrlSlug}/`} />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="AKAY Trade" />
-  <meta property="og:url" content={`https://offers.akay.ie/category/${categorySlug}/`} />
-  <meta property="og:title" content={`${category} Offers`} />
+  <meta property="og:url" content={`https://offers.akay.ie/brands/${brandUrlSlug}/`} />
+  <meta property="og:title" content={`${brand} Wholesale Offers`} />
   <meta property="og:description" content={pageDesc} />
   <meta property="og:image" content="https://offers.akay.ie/akay-bird.png" />
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content={`${category} Offers`} />
+  <meta name="twitter:title" content={`${brand} Wholesale Offers`} />
   <meta name="twitter:description" content={pageDesc} />
   <meta name="robots" content="max-snippet:-1, max-image-preview:large" />
 
   <script type="application/ld+json" set:html={JSON.stringify(orgSchema)} />
-  <script type="application/ld+json" set:html={JSON.stringify(itemListSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(collectionSchema)} />
 
   <style>
     :root {
@@ -106,11 +107,6 @@ const pageDesc = `Wholesale ${category} by the case from AKAY Trade. Live trade 
       font: 600 2em var(--serif);
       margin: 1em 0 0.5em;
     }
-    h2 {
-      font: 600 1.3em var(--serif);
-      margin: 1.5em 0 0.5em;
-      color: var(--ink-soft);
-    }
     a {
       color: var(--brass);
       text-decoration: none;
@@ -129,18 +125,21 @@ const pageDesc = `Wholesale ${category} by the case from AKAY Trade. Live trade 
       color: var(--muted);
       margin-bottom: 2em;
     }
-    .breadcrumb a {
-      color: var(--brass);
-    }
-
-    .header {
-      margin-bottom: 2em;
-    }
 
     .header p {
       color: var(--muted);
       font-size: 1em;
       margin: 0.5em 0 0;
+      max-width: 70ch;
+    }
+
+    .cat-links {
+      margin: 1em 0 0;
+      font-size: 0.9em;
+      color: var(--muted);
+    }
+    .cat-links a {
+      margin-right: 0.8em;
     }
 
     .offer-grid {
@@ -160,7 +159,7 @@ const pageDesc = `Wholesale ${category} by the case from AKAY Trade. Live trade 
       flex-direction: column;
     }
 
-    .offer-card h3 {
+    .offer-card h2 {
       margin: 0 0 0.5em;
       font: 600 1.1em var(--serif);
       color: var(--ink);
@@ -187,18 +186,9 @@ const pageDesc = `Wholesale ${category} by the case from AKAY Trade. Live trade 
       margin: 0.5em 0;
     }
 
-    .stock-ok {
-      background: var(--ok-bg);
-      color: var(--ok);
-    }
-    .stock-warn {
-      background: var(--warn-bg);
-      color: var(--warn);
-    }
-    .stock-neu {
-      background: var(--neu-bg);
-      color: var(--neu);
-    }
+    .stock-ok { background: var(--ok-bg); color: var(--ok); }
+    .stock-warn { background: var(--warn-bg); color: var(--warn); }
+    .stock-neu { background: var(--neu-bg); color: var(--neu); }
 
     .offer-card a.view-link {
       font-weight: 600;
@@ -216,33 +206,36 @@ const pageDesc = `Wholesale ${category} by the case from AKAY Trade. Live trade 
 
     .nav a {
       margin: 0 1em;
-      color: var(--brass);
     }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="breadcrumb">
-      <a href="/">Home</a> / {category}
+      <a href="/">Home</a> / <a href="/brands/">Brands</a> / {brand}
     </div>
 
     <div class="header">
-      <h1>Wholesale {category} Offers</h1>
-      <p>{categoryOffers.length} products in this category</p>
+      <h1>{brand} Wholesale Offers</h1>
+      <p>
+        {sorted.length} live {brand} trade {sorted.length === 1 ? 'offer' : 'offers'} from AKAY —
+        wholesale by the case with current pricing, pack specs and duty tier on every line.
+        Duty-paid (T2) and export / under-bond (T1) supply.
+      </p>
+      {categories.length > 0 && (
+        <p class="cat-links">
+          In: {categories.map((c) => <a href={`/category/${categorySlug(c)}/`}>{c}</a>)}
+        </p>
+      )}
     </div>
 
     <div class="offer-grid">
-      {categoryOffers.map((offer) => {
-        const stockStatus = offer.stock === 'in' ? 'ok'
-          : offer.stock === 'warn' ? 'warn'
-          : 'neu';
-        const stockText = offer.stock === 'in' ? 'In stock'
-          : offer.stock === 'warn' ? 'Limited'
-          : 'Enquire';
-
+      {sorted.map((offer) => {
+        const stockStatus = offer.stock === 'in' ? 'ok' : offer.stock === 'warn' ? 'warn' : 'neu';
+        const stockText = offer.stock === 'in' ? 'In stock' : offer.stock === 'warn' ? 'Limited' : 'Enquire';
         return (
           <div class="offer-card">
-            <h3>{offer.name}</h3>
+            <h2><a href={`/offers/${offer.slug}/`}>{offer.name}</a></h2>
             {offer.spec && <p>{offer.spec}</p>}
             <div class="price">{offer.currency}{offer.amount?.toFixed(2) || '—'} {basisLabel(offer.priceBasis)}</div>
             <span class={`stock stock-${stockStatus}`}>{stockText}</span>
@@ -254,9 +247,9 @@ const pageDesc = `Wholesale ${category} by the case from AKAY Trade. Live trade 
     </div>
 
     <div class="nav">
-      <a href="/">← Back to catalogue</a>
+      <a href="/brands/">← All brands</a>
       |
-      <a href="/brands/">Browse by brand</a>
+      <a href="/">Full catalogue</a>
     </div>
   </div>
 </body>
