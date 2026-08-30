@@ -1,0 +1,135 @@
+[
+  {
+    "offerId": "recOaR0jjCJSPrBCF",
+    "offerName": "Coffee mate 400gr Jar - Example Supplier Ltd 2026-08-17",
+    "gatePassed": true,
+    "bondStatus": null,
+    "offerFields": {
+      "id": "recOaR0jjCJSPrBCF",
+      "createdTime": "2026-08-17T10:05:14.000Z",
+      "Bundle ID": "COFFEEMATE-2026-08-17",
+      "Supplier Country": [
+        "Vietnam"
+      ],
+      "Target Capsule Tags": "Indv groceries",
+      "Warehouse": "Thailand",
+      "Availability": "3,240 cartons per 40ft container",
+      "Public Note": "1) Coffee-Mate 400g Jar — 15 jars per carton — USD 30.24 per carton (USD 2.02 per jar) — 3,240 cartons per 40ft container\n2) Coffee-Mate 1kg — 12 units per carton — USD 48.30 per carton (USD 4.03 per unit) — 1,848 cartons per 40ft container\n\nPlease note: the above prices are for UNLABELLED product.\n\nTerms: FOB Thailand\nMinimum order: 1 x 40ft container per line\nValidity: until 16 September 2026, subject to prior sale",
+      "Target Countries": "UAE, United Arab Emirates, Saudi Arabia, Lebanon, Jordan, Turkey, Iraq, Qatar, Bahrain, Singapore",
+      "Source Sheet": "M-Pacific PRICE QUOTATION — WhatsApp image 2026-08-17",
+      "Incoterm": "FOB",
+      "Supplier Email": [
+        "ryan.do@m-pacific.com"
+      ],
+      "Status": "Live",
+      "whatsapp link": "https://wa.me/353872382368?text=Hi%20Anil%2C%20I%27d%20like%20a%20quote%20for%20Coffee%20mate%20400gr%20Jar%20%2815%29%20listed%20at%20USD%2030.24%20per%20case.",
+      "Buy Price": 28.8,
+      "Queued for Dispatch": true,
+      "Source Message ID": "manual:m-pacific:20260817:coffeemate-quotation",
+      "Auto Expiry Days": 30,
+      "Full Truckload Qty": 3240,
+      "Offer Name": "Coffee mate 400gr Jar - Example Supplier Ltd 2026-08-17",
+      "Public Product Description": "Coffee mate 400gr Jar",
+      "Auto Expiry Date": "2026-09-16T00:00:00.000Z",
+      "Offer Date": "2026-08-17",
+      "Product Name": "Coffee mate 400gr Jar",
+      "Origin Country": "Thailand",
+      "Notes": "Manual ingestion 2026-08-17 from M-Pacific PRICE QUOTATION image (WhatsApp).\nSupplier quote states: FOB PRICE/CARTON (WITHOUT LABEL) USD 28.80, packing 15 pcs/case, origin Thailand, quantity 3,240 cartons per 40FT.\n\nINCOTERM RESOLVED 2026-08-17 (Anil): FOB Thailand. Originally written as EXW Vietnam on first ingestion, then corrected on Anil's instruction to match the supplier's stated FOB basis. Load point is Thailand (origin), not Vietnam (supplier's country of registration). Warehouse = Thailand (sel99O77Z04mWxGUb), an option Anil added to the single-select himself.\n\nFLAGS:\n1. PRICE IS 'WITHOUT LABEL' — unlabelled/plain goods. Labelling cost is NOT included and must be added before quoting a client.\n2. QUANTITY 3,240 cartons is the 40FT container loadability, not confirmed available stock — recorded in Full Truckload Qty, NOT Stock Cases. Stock availability not stated by supplier.\n3. Volume ML left blank — 400gr is a WEIGHT, not a volume. Size is carried in the Product Name. Consequence: Public Spec renders as '15 x' with a trailing 'x'. Fix before ticking Listing Approved.\n4. No Products link — Bond/Customs Status is blank, and the Product Matching runbook says do not auto-create a Product on a blank bond status. Held for Annika.\n5. No BBD stated by supplier — expected on grocery, worth chasing.",
+      "Public Spec": "15",
+      "Category": "Grocery",
+      "Stock Display": "Enquire for availability",
+      "Brand": "Coffee mate",
+      "Public Listing": "Yes",
+      "Margin %": 0.05,
+      "Listing Approved": true,
+      "Public Terms": "FOB Thailand",
+      "Unit Type": "Jar",
+      "PCS/Case": 15,
+      "Send Eligible": "Yes",
+      "Price Display": "USD 30.24",
+      "Supplier": [
+        "recZvBaMlTZIHCRtK"
+      ],
+      "Bundle Title": "Coffee-Mate Non-Dairy Creamer — Thailand Origin",
+      "Price Per Unit & Case": "USD 30.24/case (15pk) · USD 2.02/unit",
+      "Offer Approval Status": "Approved",
+      "MOQ": "1 x 40FT (3,240 cartons)",
+      "Currency": "USD",
+      "Supplier Trust Level": [
+        "Medium"
+      ],
+      "Sell Price": 30.24,
+      "Supplier Name": [
+        "Example Supplier Ltd"
+      ],
+      "Is Expired": "No",
+      "Price Type": "Per Case"
+    }
+  },
+  {
+    "offerId": "receNqMOI5KRfHYBC",
+    "offerName": "Coffeemate 1kg - Example Supplier Ltd 2026-08-17",
+    "gatePassed": true,
+    "bondStatus": null,
+    "offerFields": {
+      "id": "receNqMOI5KRfHYBC",
+      "createdTime": "2026-08-17T10:05:14.000Z",
+      "Bundle ID": "COFFEEMATE-2026-08-17",
+      "Supplier Country": [
+        "Vietnam"
+      ],
+      "Target Capsule Tags": "Indv groceries",
+      "Warehouse": "Thailand",
+      "Availability": "1,848 cartons per 40ft container",
+      "Public Note": "1) Coffee-Mate 400g Jar — 15 jars per carton — USD 30.24 per carton (USD 2.02 per jar) — 3,240 cartons per 40ft container\n2) Coffee-Mate 1kg — 12 units per carton — USD 48.30 per carton (USD 4.03 per unit) — 1,848 cartons per 40ft container\n\nPlease note: the above prices are for UNLABELLED product.\n\nTerms: FOB Thailand\nMinimum order: 1 x 40ft container per line\nValidity: until 16 September 2026, subject to prior sale",
+      "Target Countries": "UAE, United Arab Emirates, Saudi Arabia, Lebanon, Jordan, Turkey, Iraq, Qatar, Bahrain, Singapore",
+      "Source Sheet": "M-Pacific PRICE QUOTATION — WhatsApp image 2026-08-17",
+      "Incoterm": "FOB",
+      "Supplier Email": [
+        "ryan.do@m-pacific.com"
+      ],
+      "Status": "Live",
+      "whatsapp link": "https://wa.me/353872382368?text=Hi%20Anil%2C%20I%27d%20like%20a%20quote%20for%20Coffee%20mate%201kg%20%2812%29%20listed%20at%20USD%2048.30%20per%20case.",
+      "Buy Price": 46,
+      "Queued for Dispatch": true,
+      "Source Message ID": "manual:m-pacific:20260817:coffeemate-quotation",
+      "Auto Expiry Days": 30,
+      "Full Truckload Qty": 1848,
+      "Offer Name": "Coffeemate 1kg - Example Supplier Ltd 2026-08-17",
+      "Public Product Description": "Coffee mate 1kg",
+      "Auto Expiry Date": "2026-09-16T00:00:00.000Z",
+      "Offer Date": "2026-08-17",
+      "Product Name": "Coffee mate 1kg",
+      "Origin Country": "Thailand",
+      "Notes": "Manual ingestion 2026-08-17 from M-Pacific PRICE QUOTATION image (WhatsApp).\nSupplier quote states: FOB PRICE/CARTON (WITHOUT LABEL) USD 46.00, packing 12 pcs/case, origin Thailand, quantity 1,848 cartons per 40FT.\n\nINCOTERM RESOLVED 2026-08-17 (Anil): FOB Thailand. Originally written as EXW Vietnam on first ingestion, then corrected on Anil's instruction to match the supplier's stated FOB basis. Load point is Thailand (origin), not Vietnam (supplier's country of registration). Warehouse = Thailand (sel99O77Z04mWxGUb), an option Anil added to the single-select himself.\n\nFLAGS:\n1. PRICE IS 'WITHOUT LABEL' — unlabelled/plain goods. Labelling cost is NOT included and must be added before quoting a client.\n2. QUANTITY 1,848 cartons is the 40FT container loadability, not confirmed available stock — recorded in Full Truckload Qty, NOT Stock Cases. Stock availability not stated by supplier.\n3. Volume ML left blank — 1kg is a WEIGHT, not a volume. Size is carried in the Product Name. Consequence: Public Spec renders as '12 x' with a trailing 'x'. Fix before ticking Listing Approved.\n4. Unit Type left blank — the supplier does not state the 1kg pack format (jar vs pouch/bag). Do not assume Jar.\n5. No Products link — Bond/Customs Status is blank, and the Product Matching runbook says do not auto-create a Product on a blank bond status. Held for Annika.\n6. No BBD stated by supplier — expected on grocery, worth chasing.\n7. PRICE SANITY: USD 46.00 / 12kg = USD 3.83 per kg vs line 1 at USD 28.80 / 6kg = USD 4.80 per kg. The 1kg is ~20% cheaper per kg, which is a normal bulk-format discount but sits at the edge of the outlier threshold — worth a confirm with Ryan.",
+      "Public Spec": "12",
+      "Category": "Grocery",
+      "Stock Display": "Enquire for availability",
+      "Brand": "Coffee mate",
+      "Public Listing": "Yes",
+      "Margin %": 0.05,
+      "Listing Approved": true,
+      "Public Terms": "FOB Thailand",
+      "PCS/Case": 12,
+      "Send Eligible": "Yes",
+      "Price Display": "USD 48.30",
+      "Supplier": [
+        "recZvBaMlTZIHCRtK"
+      ],
+      "Bundle Title": "Coffee-Mate Non-Dairy Creamer — Thailand Origin",
+      "Price Per Unit & Case": "USD 48.30/case (12pk) · USD 4.02/unit",
+      "Offer Approval Status": "Approved",
+      "MOQ": "1 x 40FT (1,848 cartons)",
+      "Currency": "USD",
+      "Supplier Trust Level": [
+        "Medium"
+      ],
+      "Sell Price": 48.3,
+      "Supplier Name": [
+        "Example Supplier Ltd"
+      ],
+      "Is Expired": "No",
+      "Price Type": "Per Case"
+    }
+  }
+]
