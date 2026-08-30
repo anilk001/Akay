@@ -50,6 +50,12 @@ AIRTABLE_TOKEN=pat... npm run sync-offers
 | `AIRTABLE_TOKEN` | **Read-only** Personal Access Token (`data.records:read`, `schema.bases:read`). Build-time only; never shipped to the browser. |
 | `AIRTABLE_BASE_ID` | Defaults to the `Akay Offers` base (`appaDSdZkAE9PGkjT`). |
 | `AIRTABLE_OFFERS_TABLE` | Defaults to `Offers`. |
+| `AIRTABLE_API_KEY` | Same PAT again, under the name the `.mcp.json` Airtable MCP server reads. Unset, that server starts credential-less and reconnect-loops every agent session. |
+
+**Claude Code cloud sessions** (claude.ai/code) don't read `.env` — set `AIRTABLE_TOKEN`
+and `AIRTABLE_API_KEY` in the cloud environment's **Environment variables** (the
+environment dialog on claude.ai). Without them, cloud builds silently serve the
+committed snapshot instead of live offers, and the Airtable MCP server flaps.
 
 Never commit the token — `.env` is git-ignored.
 
