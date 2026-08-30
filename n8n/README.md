@@ -16,13 +16,30 @@ between 2026-07-29 and 2026-08-27. A draft in n8n is invisible until published.
 
 | File | Workflow | Node | State |
 |---|---|---|---|
-| `whatsapp-offer-ingestion/extract-wa-offers.js` | `Bn6Irz2Yx7MTRnKu` | Extract WA Offers | full source, patched |
-| `whatsapp-filter-layer/classify-message.buy-side-guard.js` | `DO2ltjkISp2YDNnc` | Classify Message | patch only |
+| `whatsapp-offer-ingestion/extract-wa-offers.js` | `Bn6Irz2Yx7MTRnKu` | Extract WA Offers | full source, **published 2026-08-30** |
+| `whatsapp-filter-layer/classify-message.buy-side-guard.js` | `DO2ltjkISp2YDNnc` | Classify Message | patch only, **published 2026-08-30** |
 
-`classify-message` is a patch rather than full source because the node's code
-could not be read back verbatim when this was written (the n8n connector was not
-enabled for the session). Replace it with the full node source when it can be
-exported, rather than transcribing it by hand.
+Both changes are live. `classify-message` is a patch rather than full source
+because the node could not be exported verbatim at the time; replace it with the
+full source when convenient rather than transcribing it by hand.
+
+## One known difference from the deployed node
+
+In `extract-wa-offers.js` two regexes in `clean()` are written here with
+`\uXXXX` escapes:
+
+    .replace(/[\u200B-\u200D\uFEFF]/g, '')
+    .replace(/\p{Extended_Pictographic}|[\u2190-\u21FF\u2B00-\u2BFF\uFE0F\u20E3]/gu, ' ')
+
+The copy stored in n8n holds the **literal characters** in those two classes
+instead of the escape text. The two forms compile to the same regex and were
+verified to produce identical output, so this is presentational only — but it
+means a byte comparison of this file against the node will show two differing
+lines, and that is expected rather than drift.
+
+Keep the escapes in this file. A regex class containing raw zero-width
+characters is unreadable, and some editors strip them silently, which would
+break the pattern without any visible change to the source.
 
 ## Changes in this commit
 
