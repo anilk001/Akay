@@ -128,6 +128,45 @@ function normalize(fields, recordId = null) {
   };
 }
 
+/**
+ * Airtable allows 5 requests/second per base and answers 429 above that. The
+ * catalogue build shares that budget with the every-5-minutes refresh Action
+ * and with n8n's ingestion runs, so a burst is not hypothetical.
+ *
+ * Retries only what is worth retrying: 429 and 5xx, plus network errors. A 401,
+ * 403 or 422 is a configuration fault and repeating it just delays the report.
+ * Honours Retry-After when Airtable sends one, otherwise backs off
+ * exponentially from 500ms with jitter, so parallel builds do not resynchronise
+ * onto the same retry instant.
+ */
+async function fetchWithRetry(url, init, tries = 4) {
+  let wait = 500;
+  for (let attempt = 1; ; attempt += 1) {
+    let res;
+    try {
+      res = await fetch(url, init);
+    } catch (err) {
+      if (attempt >= tries) throw err;
+      await sleep(wait + Math.random() * 250);
+      wait *= 2;
+      continue;
+    }
+
+    if (res.status !== 429 && res.status < 500) return res;
+    if (attempt >= tries) return res;   // caller turns it into a thrown error
+
+    const retryAfter = Number(res.headers.get('retry-after'));
+    const delay = Number.isFinite(retryAfter) && retryAfter > 0
+      ? retryAfter * 1000
+      : wait + Math.random() * 250;
+    console.warn(`[airtable] ${res.status} on attempt ${attempt}/${tries} — retrying in ${Math.round(delay)}ms`);
+    await sleep(delay);
+    wait *= 2;
+  }
+}
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
 async function fetchLive() {
   const base = `https://api.airtable.com/v0/${BASE}/${encodeURIComponent(TABLE)}`;
   const headers = { Authorization: `Bearer ${TOKEN}` };
@@ -140,7 +179,7 @@ async function fetchLive() {
     FIELDS.forEach((f) => url.searchParams.append('fields[]', f));
     if (offset) url.searchParams.set('offset', offset);
 
-    const res = await fetch(url, { headers });
+    const res = await fetchWithRetry(url, { headers });
     if (!res.ok) throw new Error(`Airtable ${res.status}: ${await res.text()}`);
     const data = await res.json();
     for (const rec of data.records) {
