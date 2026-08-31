@@ -11838,25 +11838,6 @@
    "featured": false
   },
   {
-   "id": "recDFGKOdaGuHGWRN",
-   "name": "Grant's Triple Wood",
-   "variants": "",
-   "brand": "Grant's",
-   "category": "Spirits",
-   "spec": "12 x 750ml",
-   "currency": "USD",
-   "amount": 58.8,
-   "unitAmount": 4.9,
-   "priceDetail": "USD 58.80/case (12pk) · USD 4.90/unit",
-   "priceBasis": "case",
-   "stock": "in",
-   "qty": 1000,
-   "terms": "CIF",
-   "tier": "",
-   "origin": "United Kingdom",
-   "featured": false
-  },
-  {
    "id": "recDGtLkakvccaYww",
    "name": "Lay's Grilled Scallop With Butter & Garlic Flavor Snack 53g",
    "variants": "",
@@ -23827,25 +23808,6 @@
    "featured": false
   },
   {
-   "id": "recQokQawJ1LTOlDe",
-   "name": "Glenfiddich 18 Year Old",
-   "variants": "",
-   "brand": "Glenfiddich",
-   "category": "Spirits",
-   "spec": "6 x 700ml",
-   "currency": "USD",
-   "amount": 383.25,
-   "unitAmount": 63.88,
-   "priceDetail": "USD 383.25/case (6pk) · USD 63.88/unit",
-   "priceBasis": "case",
-   "stock": "in",
-   "qty": 500,
-   "terms": "CIF",
-   "tier": "",
-   "origin": "United Kingdom",
-   "featured": false
-  },
-  {
    "id": "recQqMFumra3NCoUQ",
    "name": "Perwoll Renew Dark Bloom — Renew Dark Bloom 60 WL",
    "variants": "Renew Dark Bloom 60 WL",
@@ -24069,25 +24031,6 @@
    "stock": "in",
    "qty": 4217,
    "terms": "EXW Turkey",
-   "tier": "",
-   "origin": "",
-   "featured": false
-  },
-  {
-   "id": "recR5K0rtUdxsmLfL",
-   "name": "Absolut Vodka 700ml 40%",
-   "variants": "",
-   "brand": "Absolut",
-   "category": "Spirits",
-   "spec": "70cl x 40% alc",
-   "currency": "EUR",
-   "amount": 5.78,
-   "unitAmount": 5.78,
-   "priceDetail": "EUR 5.78/bottle",
-   "priceBasis": "bottle",
-   "stock": "in",
-   "qty": 100,
-   "terms": "EXW Loendersloot",
    "tier": "",
    "origin": "",
    "featured": false
@@ -30626,25 +30569,6 @@
    "terms": "EXW Loendersloot",
    "tier": "Bonded",
    "origin": "",
-   "featured": false
-  },
-  {
-   "id": "recZXHhayn63fmRVc",
-   "name": "BuzzBallz Rita Lime / Espresso Martini / Strawberry Rita",
-   "variants": "",
-   "brand": "BuzzBallz",
-   "category": "Spirits",
-   "spec": "24 x 200ml",
-   "currency": "EUR",
-   "amount": 41.79,
-   "unitAmount": 1.74,
-   "priceDetail": "EUR 41.79/case (24pk) · EUR 1.74/unit",
-   "priceBasis": "case",
-   "stock": "enq",
-   "qty": null,
-   "terms": "EXW Loendersloot",
-   "tier": "",
-   "origin": "USA",
    "featured": false
   },
   {
@@ -44461,25 +44385,6 @@
    "featured": false
   },
   {
-   "id": "recpnE55mYzIddyzh",
-   "name": "Glenfiddich 12 Year Old",
-   "variants": "",
-   "brand": "Glenfiddich",
-   "category": "Spirits",
-   "spec": "12 x 700ml",
-   "currency": "USD",
-   "amount": 249.9,
-   "unitAmount": 20.83,
-   "priceDetail": "USD 249.90/case (12pk) · USD 20.83/unit",
-   "priceBasis": "case",
-   "stock": "in",
-   "qty": 1500,
-   "terms": "CIF",
-   "tier": "",
-   "origin": "United Kingdom",
-   "featured": false
-  },
-  {
    "id": "recpnscF7YGiPEcB8",
    "name": "Casino Azul Ring Anejo (Red)",
    "variants": "",
@@ -46453,25 +46358,6 @@
    "terms": "EXW Loendersloot",
    "tier": "T1",
    "origin": "",
-   "featured": false
-  },
-  {
-   "id": "recsLkBJiFjRkW243",
-   "name": "Glenfiddich 15 Year Old",
-   "variants": "",
-   "brand": "Glenfiddich",
-   "category": "Spirits",
-   "spec": "12 x 700ml",
-   "currency": "USD",
-   "amount": 383.25,
-   "unitAmount": 31.94,
-   "priceDetail": "USD 383.25/case (12pk) · USD 31.94/unit",
-   "priceBasis": "case",
-   "stock": "in",
-   "qty": 500,
-   "terms": "CIF",
-   "tier": "",
-   "origin": "United Kingdom",
    "featured": false
   },
   {
@@ -52803,5 +52689,5 @@
   }
  ],
  "source": "snapshot",
- "generated": "2026-08-30"
+ "generated": "2026-08-31"
 }
