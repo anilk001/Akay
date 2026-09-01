@@ -67,6 +67,21 @@ To revert just the quantity line, restore these two lines in the
 Do not wholesale-restore `compose-email.pre-2026-09-01.js` unless change (2) is
 also meant to go — that file predates both edits.
 
+## Gotcha: saving a node edit does not change what production runs
+
+Editing a node stores a new **draft** version; production executions keep
+running the **published** one. On 2026-09-01 both changes above were saved and
+read back correctly from the API — and two dispatch runs still executed the old
+code, composing `Quantity:` lines and dying on the un-degraded HTML error.
+`versionId` had moved on while `activeVersionId` had not.
+
+After editing, always publish, and confirm the two ids match:
+
+```
+get_workflow_details(detailLevel: "execution")  ->  versionId === activeVersionId
+publish_workflow(workflowId, versionId)          # if they differ
+```
+
 ## Testing note
 
 `test-nodes.cjs` from the offer-dispatch repo could **not** be run against this
