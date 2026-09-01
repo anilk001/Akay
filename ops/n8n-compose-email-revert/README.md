@@ -26,6 +26,30 @@ Requested by Anil for the `SPIRITS-SG-2026-09-01` dispatch (128 lines, ex Singap
    line and suppressed from each product block. With mixed or missing lead times
    the previous per-product behaviour is unchanged.
 
+## Also changed 2026-09-01: `Style as HTML` onError
+
+Separate from the code edits above, the **`Style as HTML`** node was switched
+from the default stop-on-error to `onError: continueRegularOutput`.
+
+It had been stopping the entire dispatch when the model call failed — which is
+exactly what `Verify HTML` says must never happen:
+
+> ANY failure drops the HTML and the dispatch continues text-only. A styling
+> fault must never stop a send that has already passed gate, backup and leak
+> checks.
+
+`Verify HTML` already handles an `r.error` input by calling `fail()`, returning
+`html: null` and an `htmlStatus` describing the fallback, and `Build Sends`
+already omits the `html` key cleanly and always sends a complete plain-text
+body. The setting was simply never configured to let that path run.
+
+Triggered by execution 29332 dying on Anthropic credit exhaustion and blocking
+the `SPIRITS-SG-2026-09-01` dispatch. **This one is not slated for revert** —
+it restores the documented intent. Note the side effect: while the Anthropic
+credential has no credit, every dispatch now goes out as plain text rather than
+failing loudly, so a silent loss of HTML styling is the new failure mode. Watch
+`htmlStatus` in the approval mail.
+
 ## Pending revert
 
 **Anil asked for change (1) — and only (1) — to be reverted after the
