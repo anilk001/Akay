@@ -207,7 +207,7 @@
     },
     {
       "parameters": {
-        "jsCode": "/**\n * n8n Code node — \"Products to Create\"\n * Mode: Run Once for All Items\n *\n * Emits one item per NEW product, for the Airtable create node that follows.\n *\n * These are products the catalogue has never seen. Until 2026-07-30 an offer\n * whose product did not match was parked for a human instead, on the reasoning\n * that auto-creating products is how a catalogue fills with near-duplicates.\n * That reasoning was right about the mechanism and wrong about the cost: it had\n * left 1,103 of 1,728 live offers with no product link, which is a stoppage\n * rather than a safeguard. Every record created here carries\n * Status = \"Needs Review\" so the duplicates stay findable and can be merged.\n *\n * Deduplicated in 04 by Product Key, so two rows of the same new SKU in one\n * file produce one product, not two.\n *\n * Emitted FLAT rather than wrapped in { fields: ... } — the Airtable node's\n * \"Map Automatically\" mode reads the item's top-level keys as column names.\n */\n\nconst products = [];\n\nfor (const item of $('Build Airtable Payload').all()) {\n  for (const record of item.json.productsToCreate || []) {\n    products.push({ json: record.fields || record });\n  }\n}\n\nreturn products;\n"
+        "jsCode": "/**\n * n8n Code node — \"Products to Create\"\n * Mode: Run Once for All Items\n *\n * Emits one item per NEW product, for the Airtable create node that follows.\n *\n * These are products the catalogue has never seen. Until 2026-07-30 an offer\n * whose product did not match was parked for a human instead, on the reasoning\n * that auto-creating products is how a catalogue fills with near-duplicates.\n * That reasoning was right about the mechanism and wrong about the cost: it had\n * left 1,103 of 1,728 live offers with no product link, which is a stoppage\n * rather than a safeguard. Every record created here carries\n * Status = \"Needs Review\" so the duplicates stay findable and can be merged.\n *\n * Deduplicated in 04 by Product Key, so two rows of the same new SKU in one\n * file produce one product, not two.\n *\n * Emitted FLAT rather than wrapped in { fields: ... } — the Airtable node's\n * \"Map Automatically\" mode reads the item's top-level keys as column names.\n */\n\nconst products = [];\n\nfor (const item of $('Build Airtable Payload').all()) {\n  for (const record of item.json.productsToCreate || []) {\n    products.push({ json: record.fields || record });\n  }\n}\n\n// A batch where every product already exists must still create its OFFERS and\n// mark the email done. n8n skips everything downstream when a node outputs\n// 0 items — that stranded execution 30368: two offers fully built, never\n// created, email left unlabelled and refetched every poll. So emit a single\n// sentinel instead; the \"Any New Products?\" gate routes it straight to\n// \"Offers to Create\", bypassing the Airtable product-create. The sentinel has\n// no Product Key, which is what the gate keys on.\nif (products.length === 0) {\n  return [{ json: { __noNewProducts: true } }];\n}\n\nreturn products;"
       },
       "name": "Products to Create",
       "type": "n8n-nodes-base.code",
@@ -243,7 +243,7 @@
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2,
       "position": [
-        1984,
+        2096,
         0
       ],
       "id": "f0d8a6c2-e4d6-446e-9f18-d3369321360d",
@@ -1012,6 +1012,40 @@
         "mode": "runOnceForEachItem",
         "jsCode": "// n8n Code node — \"Normalize Email\" (Run Once for Each Item)\n//\n// Sits between Gmail \"Get Many\" (Simplify OFF) and \"Extract Body Blocks\",\n// replacing the old Gmail Trigger, which had two faults:\n//\n//   1. It only surfaced messages RECEIVED after its last poll, so an email\n//      labelled Process_Akay any time after arrival was never seen at all.\n//      The label search feeding this node has no such window.\n//   2. It emitted metadata only (From/Subject/snippet — no body), so the\n//      parser read the ~90-character Gmail snippet instead of the email.\n//\n// Accepts both the parsed-raw shape ({from:{value,text}}, html, text) and the\n// old simplified shape (capitalised From/Subject), so a config change\n// upstream cannot silently empty the body again.\nconst j = $input.item.json;\n\nlet from = '';\nif (typeof j.from === 'string') from = j.from;\nelse if (j.from && typeof j.from === 'object') {\n  const first = Array.isArray(j.from.value) ? j.from.value[0] : null;\n  from = j.from.text || (first ? [first.name, first.address && ('<' + first.address + '>')].filter(Boolean).join(' ') : '');\n}\nif (!from) from = String(j.From || '');\n\nconst subject = (typeof j.subject === 'string' && j.subject) ? j.subject : String(j.Subject || '');\n\nreturn {\n  json: {\n    id: j.id,\n    threadId: j.threadId,\n    labelIds: j.labelIds,\n    sizeEstimate: j.sizeEstimate,\n    date: j.date || null,\n    snippet: typeof j.snippet === 'string' ? j.snippet : '',\n    from,\n    subject,\n    html: typeof j.html === 'string' ? j.html : '',\n    text: typeof j.text === 'string' ? j.text : '',\n  },\n  binary: $input.item.binary,\n};"
       }
+    },
+    {
+      "id": "5dbd39f1-080b-467b-bb11-6708c224b6f3",
+      "name": "Any New Products?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1984,
+        160
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 1
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "anp-1",
+              "leftValue": "={{ $json['Product Key'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ]
+        },
+        "options": {}
+      }
     }
   ],
   "connections": {
@@ -1100,17 +1134,6 @@
         [
           {
             "node": "Products to Create",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Products to Create": {
-      "main": [
-        [
-          {
-            "node": "Create Products",
             "type": "main",
             "index": 0
           }
@@ -1487,6 +1510,35 @@
         [
           {
             "node": "Extract Body Blocks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Products to Create": {
+      "main": [
+        [
+          {
+            "node": "Any New Products?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Any New Products?": {
+      "main": [
+        [
+          {
+            "node": "Create Products",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Offers to Create",
             "type": "main",
             "index": 0
           }
