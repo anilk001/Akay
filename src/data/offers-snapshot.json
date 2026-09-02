@@ -15,7 +15,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -148,7 +148,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -433,7 +433,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -661,7 +661,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -699,7 +699,7 @@
    "stock": "warn",
    "qty": 5,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -737,7 +737,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -756,7 +756,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -813,7 +813,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -1079,7 +1079,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -1326,7 +1326,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -1402,7 +1402,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -1611,7 +1611,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -1744,7 +1744,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -1820,7 +1820,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -1915,7 +1915,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -2029,7 +2029,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -2048,7 +2048,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -2105,7 +2105,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -2143,7 +2143,7 @@
    "stock": "warn",
    "qty": 2,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -2162,7 +2162,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -2447,7 +2447,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -2542,7 +2542,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -2637,7 +2637,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -2675,7 +2675,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -2694,7 +2694,7 @@
    "stock": "in",
    "qty": 4260,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -2713,7 +2713,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -2751,7 +2751,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -2846,7 +2846,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -2922,7 +2922,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -3055,7 +3055,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -3074,7 +3074,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -3093,7 +3093,7 @@
    "stock": "in",
    "qty": 1500,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -3150,7 +3150,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -3245,7 +3245,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -3264,7 +3264,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -3340,7 +3340,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -3359,7 +3359,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -3416,7 +3416,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -3492,7 +3492,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -3530,7 +3530,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -3549,7 +3549,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -3568,7 +3568,7 @@
    "stock": "enq",
    "qty": 0,
    "terms": "",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -3720,7 +3720,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -3910,7 +3910,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -4005,7 +4005,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -4024,7 +4024,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -4062,7 +4062,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -4176,7 +4176,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -4233,7 +4233,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -4309,7 +4309,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -4347,7 +4347,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -4404,7 +4404,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -4423,7 +4423,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -4461,7 +4461,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -4594,7 +4594,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -4651,7 +4651,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -4689,7 +4689,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -4708,7 +4708,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -4822,7 +4822,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -4841,7 +4841,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -5031,7 +5031,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -5050,7 +5050,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -5164,7 +5164,7 @@
    "stock": "enq",
    "qty": 0,
    "terms": "",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -5183,7 +5183,7 @@
    "stock": "in",
    "qty": 225,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -5202,7 +5202,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -5221,7 +5221,7 @@
    "stock": "warn",
    "qty": 25,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -5259,7 +5259,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -5297,7 +5297,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -5335,7 +5335,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -5373,7 +5373,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -5487,7 +5487,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -5525,7 +5525,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -5544,7 +5544,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -5791,7 +5791,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -5924,7 +5924,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -5962,7 +5962,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -6000,7 +6000,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -6209,7 +6209,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -6399,7 +6399,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -6646,7 +6646,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -6665,7 +6665,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -6741,7 +6741,7 @@
    "stock": "in",
    "qty": 950,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -6874,7 +6874,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T2",
    "origin": "",
    "featured": false
   },
@@ -6931,7 +6931,7 @@
    "stock": "enq",
    "qty": 0,
    "terms": "",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -6950,7 +6950,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -7007,7 +7007,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -7045,7 +7045,7 @@
    "stock": "in",
    "qty": 1303,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T1",
    "origin": "Ireland",
    "featured": false
   },
@@ -7197,7 +7197,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -7216,7 +7216,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -7311,7 +7311,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -7463,7 +7463,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -7596,7 +7596,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -7615,7 +7615,7 @@
    "stock": "warn",
    "qty": 1,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -7710,7 +7710,7 @@
    "stock": "warn",
    "qty": 20,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -7805,7 +7805,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -7881,7 +7881,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -7957,7 +7957,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -7995,7 +7995,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -8071,7 +8071,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -8109,7 +8109,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -8147,7 +8147,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -8166,7 +8166,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -8242,7 +8242,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -8299,7 +8299,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -8394,7 +8394,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -8413,7 +8413,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -8451,7 +8451,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -8470,7 +8470,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -8508,7 +8508,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -8584,7 +8584,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -8603,7 +8603,7 @@
    "stock": "enq",
    "qty": 0,
    "terms": "",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -8641,7 +8641,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -8793,7 +8793,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -8812,7 +8812,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -8850,7 +8850,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -8945,7 +8945,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -9097,7 +9097,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -9173,7 +9173,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -9192,7 +9192,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -9287,7 +9287,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -9344,7 +9344,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -9420,7 +9420,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -9534,7 +9534,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -9629,7 +9629,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -9648,7 +9648,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -9686,7 +9686,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T2",
    "origin": "",
    "featured": false
   },
@@ -9743,7 +9743,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -9762,7 +9762,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -9819,7 +9819,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -9857,7 +9857,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -10047,7 +10047,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -10085,7 +10085,7 @@
    "stock": "enq",
    "qty": 0,
    "terms": "",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -10237,7 +10237,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -10427,7 +10427,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -10522,7 +10522,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -10579,7 +10579,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -10636,7 +10636,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -10655,7 +10655,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -10731,7 +10731,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -10750,7 +10750,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -10788,7 +10788,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -10807,7 +10807,7 @@
    "stock": "enq",
    "qty": 0,
    "terms": "",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -10845,7 +10845,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -10921,7 +10921,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -10978,7 +10978,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -10997,7 +10997,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -11054,7 +11054,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -11206,7 +11206,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -11225,7 +11225,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -11244,7 +11244,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -11434,7 +11434,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -11567,7 +11567,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -11624,7 +11624,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -11909,7 +11909,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -12080,7 +12080,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -12346,7 +12346,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -12384,7 +12384,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -12498,7 +12498,7 @@
    "stock": "enq",
    "qty": 0,
    "terms": "",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -12593,7 +12593,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -12631,7 +12631,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -12650,7 +12650,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -12802,7 +12802,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -12840,7 +12840,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -12973,7 +12973,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -13011,7 +13011,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -13030,7 +13030,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -13049,7 +13049,7 @@
    "stock": "warn",
    "qty": 3,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -13106,7 +13106,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -13144,7 +13144,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -13391,7 +13391,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -13410,7 +13410,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -13486,7 +13486,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "DAP Loendersloot",
-   "tier": "",
+   "tier": "T2",
    "origin": "",
    "featured": false
   },
@@ -13771,7 +13771,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -13828,7 +13828,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T2",
    "origin": "",
    "featured": false
   },
@@ -13942,7 +13942,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -14075,7 +14075,7 @@
    "stock": "enq",
    "qty": 0,
    "terms": "",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -14113,7 +14113,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -14189,7 +14189,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -14550,7 +14550,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -14607,7 +14607,7 @@
    "stock": "in",
    "qty": 356,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -14645,7 +14645,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -14759,7 +14759,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -14816,7 +14816,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -14949,7 +14949,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -15006,7 +15006,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -15044,7 +15044,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -15196,7 +15196,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -15253,7 +15253,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -15329,7 +15329,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -15348,7 +15348,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -15367,7 +15367,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -15500,7 +15500,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -15595,7 +15595,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -15614,7 +15614,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -15652,7 +15652,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -16127,7 +16127,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -16279,7 +16279,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -16317,7 +16317,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "DAP Loendersloot",
-   "tier": "",
+   "tier": "T2",
    "origin": "",
    "featured": false
   },
@@ -16336,7 +16336,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -16355,7 +16355,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -16374,7 +16374,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -16431,7 +16431,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -16469,7 +16469,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -16488,7 +16488,7 @@
    "stock": "in",
    "qty": 1500,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -16507,7 +16507,7 @@
    "stock": "in",
    "qty": 240,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -16545,7 +16545,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -16678,7 +16678,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -16830,7 +16830,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -16868,7 +16868,7 @@
    "stock": "enq",
    "qty": 0,
    "terms": "",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -16906,7 +16906,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "DAP Loendersloot",
-   "tier": "",
+   "tier": "T2",
    "origin": "",
    "featured": false
   },
@@ -17172,7 +17172,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -17210,7 +17210,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -17305,7 +17305,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -17457,7 +17457,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -17476,7 +17476,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -17666,7 +17666,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -17685,7 +17685,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -17723,7 +17723,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -17742,7 +17742,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -17913,7 +17913,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -17932,7 +17932,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -17951,7 +17951,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -18027,7 +18027,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -18046,7 +18046,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -18122,7 +18122,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -18179,7 +18179,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T2",
    "origin": "",
    "featured": false
   },
@@ -18369,7 +18369,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -18407,7 +18407,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -18445,7 +18445,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -18559,7 +18559,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -18578,7 +18578,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -18654,7 +18654,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -18692,7 +18692,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -18711,7 +18711,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "DAP Loendersloot",
-   "tier": "",
+   "tier": "T2",
    "origin": "France",
    "featured": false
   },
@@ -18863,7 +18863,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -18920,7 +18920,7 @@
    "stock": "enq",
    "qty": 0,
    "terms": "",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -18958,7 +18958,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -18996,7 +18996,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -19186,7 +19186,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -19319,7 +19319,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -19528,7 +19528,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "DAP Loendersloot",
-   "tier": "",
+   "tier": "T2",
    "origin": "",
    "featured": false
   },
@@ -19585,7 +19585,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -19623,7 +19623,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -19642,7 +19642,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -19756,7 +19756,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -19851,7 +19851,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -19870,7 +19870,7 @@
    "stock": "in",
    "qty": 1800,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -19908,7 +19908,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -19984,7 +19984,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -20060,7 +20060,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -20098,7 +20098,7 @@
    "stock": "in",
    "qty": 1363,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -20136,7 +20136,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -20269,7 +20269,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "DAP Loendersloot",
-   "tier": "",
+   "tier": "T2",
    "origin": "",
    "featured": false
   },
@@ -20288,7 +20288,7 @@
    "stock": "enq",
    "qty": 0,
    "terms": "",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -20326,7 +20326,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -20345,7 +20345,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -20364,7 +20364,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -20402,7 +20402,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -20421,7 +20421,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -20516,7 +20516,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -20554,7 +20554,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -20573,7 +20573,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -20630,7 +20630,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -20687,7 +20687,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -20763,7 +20763,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -20782,7 +20782,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -20915,7 +20915,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -20934,7 +20934,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T2",
    "origin": "",
    "featured": false
   },
@@ -21010,7 +21010,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -21048,7 +21048,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -21238,7 +21238,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -21352,7 +21352,7 @@
    "stock": "in",
    "qty": 80,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -21447,7 +21447,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -21542,7 +21542,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -21561,7 +21561,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -21618,7 +21618,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -21637,7 +21637,7 @@
    "stock": "enq",
    "qty": 0,
    "terms": "",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -21713,7 +21713,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -21789,7 +21789,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -21808,7 +21808,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -21903,7 +21903,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -21941,7 +21941,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -22055,7 +22055,7 @@
    "stock": "in",
    "qty": 1500,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -22074,7 +22074,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -22302,7 +22302,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -22321,7 +22321,7 @@
    "stock": "enq",
    "qty": 0,
    "terms": "",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -22454,7 +22454,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T2",
    "origin": "",
    "featured": false
   },
@@ -22568,7 +22568,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -22644,7 +22644,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -22720,7 +22720,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -22758,7 +22758,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -22815,7 +22815,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -22872,7 +22872,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -22891,7 +22891,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -22986,7 +22986,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -23081,7 +23081,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -23119,7 +23119,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -23233,7 +23233,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T2",
    "origin": "",
    "featured": false
   },
@@ -23271,7 +23271,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -23461,7 +23461,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -23499,7 +23499,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -23613,7 +23613,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -23632,7 +23632,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -23670,7 +23670,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -23689,7 +23689,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -23803,7 +23803,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -23898,7 +23898,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -23936,7 +23936,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -23955,7 +23955,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -24031,7 +24031,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -24050,7 +24050,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -24145,7 +24145,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -24259,7 +24259,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -24335,7 +24335,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -24392,7 +24392,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -24430,7 +24430,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -24620,7 +24620,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -24677,7 +24677,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -24696,7 +24696,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T2",
    "origin": "",
    "featured": false
   },
@@ -24734,7 +24734,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -24791,7 +24791,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -24810,7 +24810,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -24867,7 +24867,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -24905,7 +24905,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -24981,7 +24981,7 @@
    "stock": "enq",
    "qty": 0,
    "terms": "",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -25247,7 +25247,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -25266,7 +25266,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -25285,7 +25285,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -25323,7 +25323,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -25342,7 +25342,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -25361,7 +25361,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -25380,7 +25380,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -25437,7 +25437,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -25475,7 +25475,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -25513,7 +25513,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -25646,7 +25646,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -25703,7 +25703,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -25760,7 +25760,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -25779,7 +25779,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -25798,7 +25798,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -25817,7 +25817,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -25855,7 +25855,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -25874,7 +25874,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -25988,7 +25988,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -26007,7 +26007,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -26121,7 +26121,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -26235,7 +26235,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -26254,7 +26254,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -26368,7 +26368,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -26482,7 +26482,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -26520,7 +26520,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "DAP Loendersloot",
-   "tier": "",
+   "tier": "T2",
    "origin": "",
    "featured": false
   },
@@ -26634,7 +26634,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -26653,7 +26653,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -26805,7 +26805,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -26843,7 +26843,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -27014,7 +27014,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -27071,7 +27071,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -27337,7 +27337,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -27470,7 +27470,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -27508,7 +27508,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -27527,7 +27527,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -27584,7 +27584,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -27622,7 +27622,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -27755,7 +27755,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -27774,7 +27774,7 @@
    "stock": "in",
    "qty": 384,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -27907,7 +27907,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -28078,7 +28078,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -28154,7 +28154,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -28211,7 +28211,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "DAP Loendersloot",
-   "tier": "",
+   "tier": "T2",
    "origin": "",
    "featured": false
   },
@@ -28287,7 +28287,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -28401,7 +28401,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -28458,7 +28458,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -28591,7 +28591,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -28610,7 +28610,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -28667,7 +28667,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -28762,7 +28762,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -28933,7 +28933,7 @@
    "stock": "enq",
    "qty": 0,
    "terms": "",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -28971,7 +28971,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -29009,7 +29009,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -29104,7 +29104,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -29370,7 +29370,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -29408,7 +29408,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -29427,7 +29427,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -29712,7 +29712,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -29864,7 +29864,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -30111,7 +30111,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -30149,7 +30149,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -30168,7 +30168,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -30320,7 +30320,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -30377,7 +30377,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -30434,7 +30434,7 @@
    "stock": "in",
    "qty": 1200,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T1",
    "origin": "Ireland",
    "featured": false
   },
@@ -30453,7 +30453,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -30700,7 +30700,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -30719,7 +30719,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -30757,7 +30757,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -30776,7 +30776,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -30871,7 +30871,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -30890,7 +30890,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T2",
    "origin": "",
    "featured": false
   },
@@ -30909,7 +30909,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -30928,7 +30928,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -30966,7 +30966,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -30985,7 +30985,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -31004,7 +31004,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -31080,7 +31080,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -31213,7 +31213,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -31270,7 +31270,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -31327,7 +31327,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -31460,7 +31460,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -31498,7 +31498,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -31536,7 +31536,7 @@
    "stock": "enq",
    "qty": 0,
    "terms": "",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -31574,7 +31574,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -31612,7 +31612,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -31707,7 +31707,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "DAP Loendersloot",
-   "tier": "",
+   "tier": "T2",
    "origin": "",
    "featured": false
   },
@@ -31745,7 +31745,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -31878,7 +31878,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -31897,7 +31897,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -31916,7 +31916,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -31992,7 +31992,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -32296,7 +32296,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -32353,7 +32353,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -32391,7 +32391,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -32467,7 +32467,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -32638,7 +32638,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -32657,7 +32657,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -32752,7 +32752,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -32809,7 +32809,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -33075,7 +33075,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -33227,7 +33227,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -33246,7 +33246,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -33379,7 +33379,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -33398,7 +33398,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "DAP Loendersloot",
-   "tier": "",
+   "tier": "T2",
    "origin": "",
    "featured": false
   },
@@ -33512,7 +33512,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -33550,7 +33550,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -33588,7 +33588,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -33626,7 +33626,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -33778,7 +33778,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -33911,7 +33911,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -33930,7 +33930,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -33968,7 +33968,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -34025,7 +34025,7 @@
    "stock": "in",
    "qty": 250,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -34120,7 +34120,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -34234,7 +34234,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -34291,7 +34291,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -34481,7 +34481,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -34633,7 +34633,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -34709,7 +34709,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -34728,7 +34728,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -34747,7 +34747,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -34842,7 +34842,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -34918,7 +34918,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -35013,7 +35013,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -35089,7 +35089,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -35108,7 +35108,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -35298,7 +35298,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -35393,7 +35393,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -35412,7 +35412,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -35469,7 +35469,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -35697,7 +35697,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -35792,7 +35792,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -35811,7 +35811,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -35963,7 +35963,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -35982,7 +35982,7 @@
    "stock": "in",
    "qty": 1200,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -36020,7 +36020,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -36039,7 +36039,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -36210,7 +36210,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -36286,7 +36286,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -36362,7 +36362,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -36381,7 +36381,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -36457,7 +36457,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -36514,7 +36514,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -36571,7 +36571,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -36742,7 +36742,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -36761,7 +36761,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "DAP Loendersloot",
-   "tier": "",
+   "tier": "T2",
    "origin": "",
    "featured": false
   },
@@ -36818,7 +36818,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -36856,7 +36856,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -36951,7 +36951,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -36989,7 +36989,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -37008,7 +37008,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -37217,7 +37217,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -37236,7 +37236,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -37331,7 +37331,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -37483,7 +37483,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -37635,7 +37635,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -37654,7 +37654,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -37749,7 +37749,7 @@
    "stock": "enq",
    "qty": 0,
    "terms": "",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -37806,7 +37806,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -37863,7 +37863,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -37901,7 +37901,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -37939,7 +37939,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -38205,7 +38205,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -38376,7 +38376,7 @@
    "stock": "enq",
    "qty": 0,
    "terms": "",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -38395,7 +38395,7 @@
    "stock": "enq",
    "qty": 0,
    "terms": "",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -38433,7 +38433,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -38471,7 +38471,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -38604,7 +38604,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -38642,7 +38642,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -38699,7 +38699,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -38813,7 +38813,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -38832,7 +38832,7 @@
    "stock": "in",
    "qty": 60,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -38889,7 +38889,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -38946,7 +38946,7 @@
    "stock": "enq",
    "qty": 0,
    "terms": "",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -39041,7 +39041,7 @@
    "stock": "warn",
    "qty": 48,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -39098,7 +39098,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -39155,7 +39155,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -39174,7 +39174,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -39250,7 +39250,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -39326,7 +39326,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -39345,7 +39345,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -39478,7 +39478,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -39497,7 +39497,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -39554,7 +39554,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -39725,7 +39725,7 @@
    "stock": "warn",
    "qty": 12,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -39744,7 +39744,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -39896,7 +39896,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -40219,7 +40219,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -40238,7 +40238,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -40485,7 +40485,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -40561,7 +40561,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -40599,7 +40599,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -40637,7 +40637,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -40751,7 +40751,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -40846,7 +40846,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -40865,7 +40865,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -40903,7 +40903,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -40941,7 +40941,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -41055,7 +41055,7 @@
    "stock": "warn",
    "qty": 8,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -41226,7 +41226,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -41302,7 +41302,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -41359,7 +41359,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -41473,7 +41473,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -41511,7 +41511,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -41530,7 +41530,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -41644,7 +41644,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -41948,7 +41948,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -42024,7 +42024,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T2",
    "origin": "",
    "featured": false
   },
@@ -42138,7 +42138,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -42290,7 +42290,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -42423,7 +42423,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -42594,7 +42594,7 @@
    "stock": "in",
    "qty": 288,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -42689,7 +42689,7 @@
    "stock": "enq",
    "qty": 0,
    "terms": "",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -42708,7 +42708,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -42784,7 +42784,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -42860,7 +42860,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -42898,7 +42898,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -42917,7 +42917,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -42955,7 +42955,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -42974,7 +42974,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -43088,7 +43088,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -43354,7 +43354,7 @@
    "stock": "in",
    "qty": 2400,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -43392,7 +43392,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -43430,7 +43430,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -43449,7 +43449,7 @@
    "stock": "in",
    "qty": 180,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -43468,7 +43468,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -43525,7 +43525,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -43753,7 +43753,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -43905,7 +43905,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -43943,7 +43943,7 @@
    "stock": "in",
    "qty": 1632,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -44019,7 +44019,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -44057,7 +44057,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -44114,7 +44114,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -44209,7 +44209,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -44266,7 +44266,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -44304,7 +44304,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -44342,7 +44342,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -44437,7 +44437,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -44456,7 +44456,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -44475,7 +44475,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -44570,7 +44570,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -44646,7 +44646,7 @@
    "stock": "enq",
    "qty": 0,
    "terms": "",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -44684,7 +44684,7 @@
    "stock": "enq",
    "qty": 0,
    "terms": "",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -44741,7 +44741,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -44836,7 +44836,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -44874,7 +44874,7 @@
    "stock": "enq",
    "qty": 0,
    "terms": "",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -44893,7 +44893,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -44988,7 +44988,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -45045,7 +45045,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -45159,7 +45159,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -45406,7 +45406,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -45539,7 +45539,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -45786,7 +45786,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -45900,7 +45900,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -45938,7 +45938,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -46071,7 +46071,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -46109,7 +46109,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -46242,7 +46242,7 @@
    "stock": "in",
    "qty": 1800,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -46299,7 +46299,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -46375,7 +46375,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -46413,7 +46413,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -46470,7 +46470,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -46584,7 +46584,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -46603,7 +46603,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -46774,7 +46774,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -46888,7 +46888,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -47059,7 +47059,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -47097,7 +47097,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -47230,7 +47230,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -47287,7 +47287,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -47401,7 +47401,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -47420,7 +47420,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -47496,7 +47496,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -47572,7 +47572,7 @@
    "stock": "enq",
    "qty": 0,
    "terms": "",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -47610,7 +47610,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -47724,7 +47724,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -47743,7 +47743,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW Riga",
-   "tier": "",
+   "tier": "T2",
    "origin": "",
    "featured": false
   },
@@ -47857,7 +47857,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -47876,7 +47876,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -47971,7 +47971,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -47990,7 +47990,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -48199,7 +48199,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -48427,7 +48427,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -48465,7 +48465,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -48598,7 +48598,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -48655,7 +48655,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -48712,7 +48712,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -48731,7 +48731,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -48750,7 +48750,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -48769,7 +48769,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -48845,7 +48845,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -48940,7 +48940,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -49054,7 +49054,7 @@
    "stock": "in",
    "qty": 536,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -49111,7 +49111,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -49168,7 +49168,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "DAP Loendersloot",
-   "tier": "",
+   "tier": "T2",
    "origin": "",
    "featured": false
   },
@@ -49187,7 +49187,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -49206,7 +49206,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -49225,7 +49225,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -49244,7 +49244,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -49263,7 +49263,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -49282,7 +49282,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -49301,7 +49301,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -49396,7 +49396,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -49434,7 +49434,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -49453,7 +49453,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -49529,7 +49529,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -49567,7 +49567,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -49643,7 +49643,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -49681,7 +49681,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -49757,7 +49757,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -49776,7 +49776,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -49814,7 +49814,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -49871,7 +49871,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -50042,7 +50042,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -50080,7 +50080,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -50175,7 +50175,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -50213,7 +50213,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -50308,7 +50308,7 @@
    "stock": "in",
    "qty": 1800,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -50327,7 +50327,7 @@
    "stock": "in",
    "qty": 1655,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -50517,7 +50517,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -50536,7 +50536,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -50555,7 +50555,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -50650,7 +50650,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -50669,7 +50669,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -50783,7 +50783,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -50840,7 +50840,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -50935,7 +50935,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -51011,7 +51011,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -51068,7 +51068,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -51239,7 +51239,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -51258,7 +51258,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -51429,7 +51429,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -51619,7 +51619,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -51657,7 +51657,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -51714,7 +51714,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -51771,7 +51771,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -51809,7 +51809,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -51923,7 +51923,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -52037,7 +52037,7 @@
    "stock": "in",
    "qty": 1500,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -52189,7 +52189,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -52246,7 +52246,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -52265,7 +52265,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -52284,7 +52284,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -52398,7 +52398,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -52455,7 +52455,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -52493,7 +52493,7 @@
    "stock": "in",
    "qty": 1200,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T1",
    "origin": "Ireland",
    "featured": false
   },
@@ -52626,7 +52626,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -52645,7 +52645,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -52797,7 +52797,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -52854,7 +52854,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -52987,7 +52987,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -53025,7 +53025,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -53101,7 +53101,7 @@
    "stock": "in",
    "qty": 888,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -53177,7 +53177,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -53196,7 +53196,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -53253,7 +53253,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -53424,7 +53424,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -53500,7 +53500,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -53614,7 +53614,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "DAP Loendersloot",
-   "tier": "",
+   "tier": "T2",
    "origin": "",
    "featured": false
   },
@@ -53652,7 +53652,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -53690,7 +53690,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -53766,7 +53766,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -53918,7 +53918,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "DAP Loendersloot",
-   "tier": "",
+   "tier": "T2",
    "origin": "France",
    "featured": false
   },
@@ -54089,7 +54089,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -54108,7 +54108,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -54127,7 +54127,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -54146,7 +54146,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -54165,7 +54165,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -54222,7 +54222,7 @@
    "stock": "in",
    "qty": 785,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -54317,7 +54317,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -54336,7 +54336,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -54355,7 +54355,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -54412,7 +54412,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -54431,7 +54431,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -54564,7 +54564,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -54602,7 +54602,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -54621,7 +54621,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -54678,7 +54678,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -54735,7 +54735,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -54773,7 +54773,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -54811,7 +54811,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -54849,7 +54849,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -54963,7 +54963,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -55001,7 +55001,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -55362,7 +55362,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -55381,7 +55381,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -55514,7 +55514,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -55552,7 +55552,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -55609,7 +55609,7 @@
    "stock": "enq",
    "qty": 0,
    "terms": "",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -55742,7 +55742,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -55780,7 +55780,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -55799,7 +55799,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -55894,7 +55894,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -55913,7 +55913,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -55970,7 +55970,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -56122,7 +56122,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -56198,7 +56198,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -56236,7 +56236,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -56407,7 +56407,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -56673,7 +56673,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -56787,7 +56787,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -56977,7 +56977,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -57015,7 +57015,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -57053,7 +57053,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -57262,7 +57262,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -57338,7 +57338,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -57357,7 +57357,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -57452,7 +57452,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "DAP Loendersloot",
-   "tier": "",
+   "tier": "T2",
    "origin": "",
    "featured": false
   },
@@ -57547,7 +57547,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -57566,7 +57566,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -57623,7 +57623,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -57718,7 +57718,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -57832,7 +57832,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -57851,7 +57851,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -57965,7 +57965,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -58003,7 +58003,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -58041,7 +58041,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -58136,7 +58136,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -58212,7 +58212,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -58288,7 +58288,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -58459,7 +58459,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -58516,7 +58516,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -58611,7 +58611,7 @@
    "stock": "enq",
    "qty": 0,
    "terms": "",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -58649,7 +58649,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -58744,7 +58744,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -58782,7 +58782,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -58820,7 +58820,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -58934,7 +58934,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -58991,7 +58991,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -59029,7 +59029,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -59048,7 +59048,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -59105,7 +59105,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -59162,7 +59162,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -59181,7 +59181,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -59314,7 +59314,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -59485,7 +59485,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "DAP Loendersloot",
-   "tier": "",
+   "tier": "T2",
    "origin": "",
    "featured": false
   },
@@ -59542,7 +59542,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -59580,7 +59580,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -59618,7 +59618,7 @@
    "stock": "enq",
    "qty": 0,
    "terms": "",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -59675,7 +59675,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -59694,7 +59694,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -59789,7 +59789,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -59903,7 +59903,7 @@
    "stock": "enq",
    "qty": 0,
    "terms": "",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -59979,7 +59979,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -60036,7 +60036,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -60093,7 +60093,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -60321,7 +60321,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -60416,7 +60416,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -60454,7 +60454,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T2",
    "origin": "",
    "featured": false
   },
@@ -60511,7 +60511,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -60606,7 +60606,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -60644,7 +60644,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -60682,7 +60682,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -60872,7 +60872,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -60891,7 +60891,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -60986,7 +60986,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -61062,7 +61062,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -61081,7 +61081,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -61157,7 +61157,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -61176,7 +61176,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -61252,7 +61252,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -61461,7 +61461,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -61689,7 +61689,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -61727,7 +61727,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -61746,7 +61746,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -61822,7 +61822,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -61841,7 +61841,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -61955,7 +61955,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -62164,7 +62164,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -62259,7 +62259,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -62297,7 +62297,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -62316,7 +62316,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -62354,7 +62354,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -62620,7 +62620,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T2",
    "origin": "",
    "featured": false
   },
@@ -62715,7 +62715,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -62772,7 +62772,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -62829,7 +62829,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -62981,7 +62981,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -63019,7 +63019,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -63038,7 +63038,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -63171,7 +63171,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -63190,7 +63190,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -63361,7 +63361,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -63475,7 +63475,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "DAP Loendersloot",
-   "tier": "",
+   "tier": "T2",
    "origin": "",
    "featured": false
   },
@@ -63874,7 +63874,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -64140,7 +64140,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -64216,7 +64216,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -64596,7 +64596,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -64615,7 +64615,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -64634,7 +64634,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -64843,7 +64843,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -64862,7 +64862,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -64995,7 +64995,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -65071,7 +65071,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -65109,7 +65109,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -65470,7 +65470,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -65622,7 +65622,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -65774,7 +65774,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -65831,7 +65831,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -65850,7 +65850,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -65907,7 +65907,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -65983,7 +65983,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -66059,7 +66059,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -66154,7 +66154,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -66173,7 +66173,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -66249,7 +66249,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -66515,7 +66515,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -66534,7 +66534,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -66629,7 +66629,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -66648,7 +66648,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -66686,7 +66686,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -66705,7 +66705,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -66781,7 +66781,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -66800,7 +66800,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -66819,7 +66819,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -66895,7 +66895,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -66990,7 +66990,7 @@
    "stock": "warn",
    "qty": 14,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -67066,7 +67066,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -67123,7 +67123,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -67142,7 +67142,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -67180,7 +67180,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -67389,7 +67389,7 @@
    "stock": "enq",
    "qty": 0,
    "terms": "",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -67503,7 +67503,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -67560,7 +67560,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "DAP Loendersloot",
-   "tier": "",
+   "tier": "T2",
    "origin": "",
    "featured": false
   },
@@ -67598,7 +67598,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -67655,7 +67655,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -67788,7 +67788,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -68092,7 +68092,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -68168,7 +68168,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -68244,7 +68244,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -68320,7 +68320,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -68358,7 +68358,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -68396,7 +68396,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -68491,7 +68491,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -68529,7 +68529,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -68567,7 +68567,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -68605,7 +68605,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -68624,7 +68624,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -68738,7 +68738,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -68776,7 +68776,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -68814,7 +68814,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -68852,7 +68852,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -68871,7 +68871,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -69004,7 +69004,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -69042,7 +69042,7 @@
    "stock": "enq",
    "qty": 0,
    "terms": "",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -69061,7 +69061,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -69118,7 +69118,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "DAP Loendersloot",
-   "tier": "",
+   "tier": "T2",
    "origin": "",
    "featured": false
   },
@@ -69156,7 +69156,7 @@
    "stock": "enq",
    "qty": 0,
    "terms": "",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -69175,7 +69175,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -69213,7 +69213,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -69289,7 +69289,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -69308,7 +69308,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -69612,7 +69612,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -69650,7 +69650,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -69783,7 +69783,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -69821,7 +69821,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -69859,7 +69859,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -69897,7 +69897,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -70011,7 +70011,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -70125,7 +70125,7 @@
    "stock": "in",
    "qty": 1584,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -70182,7 +70182,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -70429,7 +70429,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -70600,7 +70600,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -70619,7 +70619,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -70885,7 +70885,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -70942,7 +70942,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -70961,7 +70961,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -71208,7 +71208,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -71227,7 +71227,7 @@
    "stock": "enq",
    "qty": 0,
    "terms": "",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -71322,7 +71322,7 @@
    "stock": "warn",
    "qty": 20,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -71360,7 +71360,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -71778,7 +71778,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -71835,7 +71835,7 @@
    "stock": "warn",
    "qty": 1,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -71892,7 +71892,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -71968,7 +71968,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -71987,7 +71987,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -72025,7 +72025,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -72177,7 +72177,7 @@
    "stock": "enq",
    "qty": 0,
    "terms": "",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -72519,7 +72519,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -72557,7 +72557,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -72576,7 +72576,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -72633,7 +72633,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -72823,7 +72823,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -72842,7 +72842,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -72880,7 +72880,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -72994,7 +72994,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -73108,7 +73108,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -73146,7 +73146,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -73222,7 +73222,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -73279,7 +73279,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -73412,7 +73412,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -73431,7 +73431,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -73450,7 +73450,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -73488,7 +73488,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -73526,7 +73526,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -73602,7 +73602,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -73678,7 +73678,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -73811,7 +73811,7 @@
    "stock": "in",
    "qty": 80,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -73887,7 +73887,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -73925,7 +73925,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -74039,7 +74039,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -74134,7 +74134,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -74172,7 +74172,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -74229,7 +74229,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -74248,7 +74248,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -74305,7 +74305,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -74362,7 +74362,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -74419,7 +74419,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -74438,7 +74438,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -74514,7 +74514,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -74571,7 +74571,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "DAP Loendersloot",
-   "tier": "",
+   "tier": "T2",
    "origin": "",
    "featured": false
   },
@@ -74609,7 +74609,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -74704,7 +74704,7 @@
    "stock": "enq",
    "qty": 0,
    "terms": "",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -74723,7 +74723,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -74989,7 +74989,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -75046,7 +75046,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -75084,7 +75084,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -75141,7 +75141,7 @@
    "stock": "in",
    "qty": 1500,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -75160,7 +75160,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -75179,7 +75179,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
@@ -75217,7 +75217,7 @@
    "stock": "enq",
    "qty": null,
    "terms": "EXW USA",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false
   },
