@@ -1,0 +1,266 @@
+<title>Johnnie Walker FOB Singapore</title>
+<style>
+  :root{
+    --paper:#F7F5F0; --paper-2:#EFEDE4; --card:#FFFFFF;
+    --ink:#17140F; --ink-soft:#41473F; --muted:#767E72;
+    --line:#E4E0D4; --line-soft:#ECE8DD;
+    --brass:#B4231F; --forest:#0E7A3B; --ok-bg:#E2F0E5;
+    --shadow:0 1px 2px rgba(20,33,26,.06),0 6px 20px -8px rgba(20,33,26,.14);
+    --radius:14px;
+    --serif:"Hoefler Text","Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono","SFMono-Regular",Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --paper:#0C140F; --paper-2:#081009; --card:#13201A;
+      --ink:#F1EFE7; --ink-soft:#C6CEC4; --muted:#8A968A;
+      --line:#243029; --line-soft:#1B2620;
+      --brass:#EC5A52; --forest:#37B866; --ok-bg:#123021;
+      --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px -12px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#0C140F; --paper-2:#081009; --card:#13201A;
+    --ink:#F1EFE7; --ink-soft:#C6CEC4; --muted:#8A968A;
+    --line:#243029; --line-soft:#1B2620;
+    --brass:#EC5A52; --forest:#37B866; --ok-bg:#123021;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px -12px rgba(0,0,0,.6);
+  }
+
+  *{box-sizing:border-box}
+  body{
+    background:var(--paper); color:var(--ink);
+    font-family:var(--sans); font-size:16px; line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  .sheet{max-width:860px; margin:0 auto; padding:32px 20px 56px}
+  .eyebrow{
+    font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--muted); font-weight:600;
+  }
+
+  /* ---- masthead ---- */
+  header.masthead{
+    display:flex; flex-wrap:wrap; gap:16px 24px;
+    align-items:flex-end; justify-content:space-between;
+    padding-bottom:18px; border-bottom:2px solid var(--ink);
+  }
+  .wordmark{font-family:var(--serif); font-size:26px; letter-spacing:.02em; margin:0}
+  .wordmark span{color:var(--brass)}
+  .masthead .meta{
+    font-family:var(--mono); font-size:12px; color:var(--ink-soft);
+    text-align:right; display:grid; gap:3px; font-variant-numeric:tabular-nums;
+  }
+  .masthead .meta b{font-weight:600; color:var(--ink)}
+
+  /* ---- thesis ---- */
+  .thesis{padding:30px 0 8px}
+  .thesis h1{
+    font-family:var(--serif); font-weight:400; text-wrap:balance;
+    font-size:clamp(30px,5.2vw,44px); line-height:1.1; margin:8px 0 12px;
+  }
+  .thesis p{max-width:60ch; color:var(--ink-soft); margin:0}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:18px}
+  .chip{
+    font-family:var(--mono); font-size:11.5px; letter-spacing:.04em;
+    padding:5px 9px; border:1px solid var(--line); border-radius:999px;
+    color:var(--ink-soft); background:var(--card);
+  }
+  .chip.duty{border-color:var(--brass); color:var(--brass); font-weight:600}
+  .chip.ready{background:var(--ok-bg); border-color:transparent; color:var(--forest); font-weight:600}
+
+  /* ---- the two lines ---- */
+  .lines{display:grid; gap:18px; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); margin:28px 0 0}
+  .line{
+    background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+    box-shadow:var(--shadow); padding:22px 22px 18px; display:flex; flex-direction:column; gap:14px;
+  }
+  .line h2{font-family:var(--serif); font-weight:400; font-size:23px; line-height:1.2; margin:0}
+  .line .spec{font-family:var(--mono); font-size:12.5px; color:var(--muted); margin:2px 0 0}
+
+  .price{display:flex; align-items:baseline; gap:9px; flex-wrap:wrap}
+  .price .cur{font-family:var(--mono); font-size:13px; color:var(--muted); letter-spacing:.06em}
+  .price .fig{
+    font-family:var(--serif); font-size:40px; line-height:1;
+    font-variant-numeric:tabular-nums; letter-spacing:-.01em;
+  }
+  .price .basis{font-size:13px; color:var(--muted)}
+  .derived{
+    font-family:var(--mono); font-size:12.5px; color:var(--ink-soft);
+    font-variant-numeric:tabular-nums; padding-top:2px; border-top:1px dashed var(--line);
+  }
+
+  dl.ledger{margin:0; display:grid; grid-template-columns:auto 1fr; gap:0 14px; font-size:13.5px}
+  dl.ledger dt{color:var(--muted); padding:6px 0; border-top:1px solid var(--line-soft)}
+  dl.ledger dd{
+    margin:0; padding:6px 0; text-align:right; color:var(--ink);
+    border-top:1px solid var(--line-soft); font-variant-numeric:tabular-nums;
+  }
+  dl.ledger dt:first-of-type,dl.ledger dd:first-of-type{border-top:0}
+  dd .in{color:var(--forest); font-weight:600}
+
+  .cta{
+    display:inline-block; margin-top:2px; align-self:flex-start;
+    font-size:14px; font-weight:600; text-decoration:none;
+    color:var(--card); background:var(--ink);
+    padding:10px 16px; border-radius:10px;
+  }
+  .cta:hover{background:var(--brass)}
+  .cta:focus-visible{outline:2px solid var(--brass); outline-offset:2px}
+
+  /* ---- terms ---- */
+  section.terms{margin-top:34px; padding-top:22px; border-top:1px solid var(--line)}
+  section.terms h3{font-family:var(--serif); font-weight:400; font-size:19px; margin:6px 0 16px}
+  .terms-grid{display:grid; gap:16px 28px; grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+  .term dt{font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); font-weight:600}
+  .term dd{margin:4px 0 0; font-size:14px; color:var(--ink-soft)}
+  .lot{
+    margin-top:24px; padding:16px 18px; border-radius:var(--radius);
+    background:var(--paper-2); border:1px solid var(--line);
+    display:flex; flex-wrap:wrap; gap:12px 34px; align-items:baseline;
+  }
+  .lot .item{display:grid; gap:2px}
+  .lot .n{font-family:var(--serif); font-size:24px; line-height:1; font-variant-numeric:tabular-nums}
+  .lot .l{font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); font-weight:600}
+
+  footer{
+    margin-top:36px; padding-top:18px; border-top:2px solid var(--ink);
+    display:flex; flex-wrap:wrap; gap:8px 26px; justify-content:space-between; align-items:baseline;
+    font-size:13.5px; color:var(--ink-soft);
+  }
+  footer a{color:var(--brass)}
+  footer .sig{font-family:var(--serif); font-size:16px; color:var(--ink)}
+  .subject{font-family:var(--mono); font-size:11.5px; color:var(--muted); margin-top:14px}
+</style>
+
+<div class="sheet">
+  <header class="masthead">
+    <div>
+      <p class="eyebrow">Trade offer &middot; Spirits</p>
+      <h1 class="wordmark">AKAY<span>.</span> Irl Ltd</h1>
+    </div>
+    <div class="meta">
+      <div>REF <b>JW-T1-SG-2026-09-02</b></div>
+      <div>ISSUED <b>02 SEP 2026</b></div>
+      <div>VALID TO <b>16 SEP 2026</b></div>
+    </div>
+  </header>
+
+  <div class="thesis">
+    <p class="eyebrow">Two lines, ex Singapore</p>
+    <h1>Johnnie Walker Black &amp; Red, 12&nbsp;&times;&nbsp;1L</h1>
+    <p>
+      Genuine Scotch, T1 export stock sitting in Singapore and ready to load. Both lines are
+      offered at 1,000 cases, first-come first-served and subject to prior sale.
+    </p>
+    <div class="chips">
+      <span class="chip duty">T1 &middot; export / duty-unpaid</span>
+      <span class="chip">FOB Singapore</span>
+      <span class="chip">Origin: Scotland</span>
+      <span class="chip">40% abv</span>
+      <span class="chip ready">Ready to load</span>
+    </div>
+  </div>
+
+  <div class="lines">
+    <article class="line">
+      <div>
+        <h2>Johnnie Walker Black Label</h2>
+        <p class="spec">12 &times; 100cl &middot; 40% alc &middot; case of 12</p>
+      </div>
+      <div>
+        <div class="price">
+          <span class="cur">USD</span>
+          <span class="fig">204.75</span>
+          <span class="basis">per case</span>
+        </div>
+        <p class="derived">12 bottles &times; USD 17.06 per bottle</p>
+      </div>
+      <dl class="ledger">
+        <dt>Available</dt><dd><span class="in">1,000 cases</span></dd>
+        <dt>Bottles</dt><dd>12,000</dd>
+        <dt>Duty status</dt><dd>T1 export</dd>
+        <dt>Terms</dt><dd>FOB Singapore</dd>
+        <dt>Lot value</dt><dd>USD 204,750</dd>
+      </dl>
+      <a class="cta" href="https://wa.me/353872382368?text=Hi%2C%20I%27d%20like%20a%20quote%20for%20Johnnie%20Walker%20Black%20Label%20(12%20x%20100cl%20x%2040%25%20alc)%20listed%20at%20USD%20204.75%20per%20case%20FOB%20Singapore.">Enquire on Black Label</a>
+    </article>
+
+    <article class="line">
+      <div>
+        <h2>Johnnie Walker Red Label</h2>
+        <p class="spec">12 &times; 100cl &middot; 40% alc &middot; case of 12</p>
+      </div>
+      <div>
+        <div class="price">
+          <span class="cur">USD</span>
+          <span class="fig">98.70</span>
+          <span class="basis">per case</span>
+        </div>
+        <p class="derived">12 bottles &times; USD 8.23 per bottle</p>
+      </div>
+      <dl class="ledger">
+        <dt>Available</dt><dd><span class="in">1,000 cases</span></dd>
+        <dt>Bottles</dt><dd>12,000</dd>
+        <dt>Duty status</dt><dd>T1 export</dd>
+        <dt>Terms</dt><dd>FOB Singapore</dd>
+        <dt>Lot value</dt><dd>USD 98,700</dd>
+      </dl>
+      <a class="cta" href="https://wa.me/353872382368?text=Hi%2C%20I%27d%20like%20a%20quote%20for%20Johnnie%20Walker%20Red%20Label%20(12%20x%20100cl%20x%2040%25%20alc)%20listed%20at%20USD%2098.70%20per%20case%20FOB%20Singapore.">Enquire on Red Label</a>
+    </article>
+  </div>
+
+  <section class="terms">
+    <p class="eyebrow">Terms of this offer</p>
+    <h3>How it ships and how it pays</h3>
+    <div class="terms-grid">
+      <dl class="term">
+        <dt>Incoterm</dt>
+        <dd>FOB Singapore. CFR to your port quoted on request.</dd>
+      </dl>
+      <dl class="term">
+        <dt>Duty status</dt>
+        <dd>T1 &mdash; export, duty-unpaid. Suits re-export and bonded programmes.</dd>
+      </dl>
+      <dl class="term">
+        <dt>Payment</dt>
+        <dd>Direct T/T against pro-forma invoice prior to release. Escrow is not available on this lot.</dd>
+      </dl>
+      <dl class="term">
+        <dt>Minimum order</dt>
+        <dd>On request &mdash; tell us your quantity per line and we will confirm.</dd>
+      </dl>
+      <dl class="term">
+        <dt>Validity</dt>
+        <dd>16 September 2026, subject to prior sale.</dd>
+      </dl>
+      <dl class="term">
+        <dt>Allocation</dt>
+        <dd>First-come, first-served. Lines may be taken separately.</dd>
+      </dl>
+    </div>
+
+    <div class="lot">
+      <div class="item"><span class="n">2,000</span><span class="l">cases in total</span></div>
+      <div class="item"><span class="n">24,000</span><span class="l">bottles</span></div>
+      <div class="item"><span class="n">USD 303,450</span><span class="l">full lot, both lines</span></div>
+    </div>
+
+    <p class="subject">
+      Prices are per case in USD and exclude duty, VAT and freight beyond the stated incoterm.
+    </p>
+  </section>
+
+  <footer>
+    <div>
+      <div class="sig">Anil Khetan</div>
+      <div>Akay Irl Ltd &middot; Ireland</div>
+    </div>
+    <div>
+      <a href="mailto:ak@akay.ie">ak@akay.ie</a> &middot;
+      <a href="https://wa.me/353872382368">+353 87 238 2368</a><br>
+      <a href="https://offers.akay.ie">offers.akay.ie</a>
+    </div>
+  </footer>
+</div>
