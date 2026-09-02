@@ -99,3 +99,13 @@ src/
 public/
   akay-bird.png           logo (hummingbird, transparent)
 ```
+
+---
+
+## For contributors and AI sessions
+
+Start with [`CLAUDE.md`](./CLAUDE.md) (project memory: stack, commands, hard rules),
+then `docs/`: [ARCHITECTURE](./docs/ARCHITECTURE.md), [WORKFLOW](./docs/WORKFLOW.md),
+[TROUBLESHOOTING](./docs/TROUBLESHOOTING.md), [DATA-RULES](./docs/DATA-RULES.md),
+[DECISIONS](./docs/DECISIONS.md). Path-scoped rules in `.claude/rules/` load
+automatically when the matching files are edited.
