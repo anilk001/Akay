@@ -102,6 +102,13 @@ public/
 
 ---
 
+## Project memory
+
+`CLAUDE.md` is the entry point for any Claude session: stack, commands, hard rules. It points
+to `docs/SYSTEMS.md` (every workflow, table and credential with IDs), `docs/INCIDENTS.md`
+(what has broken and the recurring patterns) and `docs/N8N-CHANGE-PROTOCOL.md` (the only
+allowed way to change a workflow).
+
 ## Offer dispatch (sales offers to clients)
 
 Sending an offer is a separate pipeline from this site: Airtable → n8n `Offer Dispatch — Akay`
