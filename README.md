@@ -99,3 +99,14 @@ src/
 public/
   akay-bird.png           logo (hummingbird, transparent)
 ```
+
+---
+
+## Offer dispatch (sales offers to clients)
+
+Sending an offer is a separate pipeline from this site: Airtable → n8n `Offer Dispatch — Akay`
+→ Resend, with a human approval gate. Its procedure, node source code, regression suite and
+the audit of the August 2026 send failures live in
+[`.claude/skills/offer-dispatch/`](.claude/skills/offer-dispatch/) — read `SKILL.md` before
+queueing a send or touching the workflow, and run `node test-nodes.cjs` before pasting any
+node change.

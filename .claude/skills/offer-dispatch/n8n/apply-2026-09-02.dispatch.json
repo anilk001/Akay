@@ -1,0 +1,149 @@
+{
+  "workflowId": "dAYMAj6mZD3hTV4T",
+  "versionName": "Audit 2026-09-02: deterministic HTML, idempotent sends, queue claim, halt reasons",
+  "versionDescription": "Four fixes from the 2026-09-02 dispatch audit (repo .claude/skills/offer-dispatch, 38/38 tests). (1) Style as HTML (claude-opus-5) replaced by deterministic Code node Render HTML: it blocked 4 of the last 9 runs (temperature 400, Anthropic credits x3) and failed the verbatim check on 2 of 4 that reached the model. (2) Build Sends emits idempotencyKey (dispatch:<offer>:<client>) sent as Resend Idempotency-Key, so retries, overlapping runs and re-queues can never mail a client twice within 24h. (3) Claim Dispatch Group + Write Claim untick Queued for Dispatch on the chosen group BEFORE approval: 29311 and 29315 were in flight together on 2026-09-01. (4) Fail Loudly on Halt recovers the real reason (declined approval; Resend 401 with credential hint; partial-send summary) instead of \"no reason recorded\" (21497, 28559, 29315).",
+  "operations": [
+    {
+      "type": "removeNode",
+      "nodeName": "Style as HTML"
+    },
+    {
+      "type": "addNode",
+      "node": {
+        "name": "Render HTML",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2320,
+          200
+        ],
+        "notes": "Deterministic formatter — replaces the Anthropic node 2026-09-02. Adds no words, numbers, links or images; Verify HTML still checks it and falls back to text on any failure. Source: repo .claude/skills/offer-dispatch/n8n/render-html.js",
+        "parameters": {
+          "mode": "runOnceForAllItems",
+          "jsCode": "/**\n * n8n Code node — \"Render HTML\"   (Offer Dispatch — Akay, dAYMAj6mZD3hTV4T)\n * Mode: Run Once for All Items\n * Added 2026-09-02, replacing the Anthropic \"Style as HTML\" node.\n *\n * SOURCE OF TRUTH: repo .claude/skills/offer-dispatch/n8n/render-html.js.\n * Edit the repo file, run `node test-nodes.cjs`, then paste — never edit here.\n *\n * WHY THIS EXISTS. From 2026-08-27 the HTML version of the offer was produced\n * by a call to claude-opus-5. In four working days that one node stopped the\n * dispatch outright three times (`temperature is deprecated` 400 on 28533, then\n * \"credit balance is too low\" on 29332, 29354 and 29365) and its output failed\n * the verbatim check on two of the four sends that did reach the model\n * (29315: a number the model invented; 29382: a `&middot;` entity). A formatter\n * has no business depending on a metered third-party API, and the approved text\n * has a fixed shape, so it is rendered here deterministically: no credentials,\n * no credits, no network, and the same input always gives the same HTML.\n *\n * CONTRACT — identical to the node it replaces:\n *   - input is the ALREADY-COMPOSED, already leak-checked body from Compose Email\n *   - output is { content: \"<html…>\" }, which is the shape Verify HTML reads\n *   - it adds NO words, NO numbers, NO links and NO images of its own. Only the\n *     approved text is emitted between tags, HTML-escaped. Verify HTML still runs\n *     after this node and still falls back to plain text if that ever fails.\n *   - the {{{FIRST_NAME|there}}} token is left intact for Build Sends\n *\n * Body shape (from Compose Email): paragraphs separated by blank lines. A\n * paragraph whose first line is free text and whose remaining lines all read\n * \"Label: value\" is a product block and is rendered as a card with a two-column\n * table. A paragraph made only of \"Label: value\" lines (Terms / Validity /\n * Lead time) is rendered as a bare two-column table. Everything else is a <p>.\n */\n\nconst composed = $('Compose Email').first().json;\nconst text = String(composed.bodyTemplate || '');\n\nreturn [{ json: { content: renderHtml(text) } }];\n\nfunction renderHtml(body) {\n  const NAVY = '#1A202C', INK = '#2D3748', MUTED = '#4A5568', LINE = '#E2E8F0', ACCENT = '#2563EB', PAGE = '#F7FAFC';\n  const FONT = \"-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif\";\n  const LABEL = /^([A-Za-z][A-Za-z ]{1,30}): (.+)$/;\n\n  const paragraphs = String(body).replace(/\\r\\n?/g, '\\n').split(/\\n{2,}/).map((p) => p.replace(/^\\n+|\\n+$/g, '')).filter(Boolean);\n\n  const parts = paragraphs.map((p) => {\n    const lines = p.split('\\n');\n    const labelled = lines.map((l) => l.match(LABEL));\n    const restLabelled = lines.length > 1 && labelled.slice(1).every(Boolean);\n    const allLabelled = labelled.every(Boolean);\n\n    if (allLabelled) return factsTable(labelled);\n    if (restLabelled && !labelled[0]) return productCard(lines[0], labelled.slice(1));\n    return `<p style=\"margin:0 0 14px 0;\">${lines.map(esc).join('<br>')}</p>`;\n  });\n\n  return [\n    '<!DOCTYPE html>',\n    '<html><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"></head>',\n    `<body style=\"margin:0;padding:0;background:${PAGE};\">`,\n    `<table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"background:${PAGE};\">`,\n    '<tr><td align=\"center\" style=\"padding:24px 12px;\">',\n    `<table role=\"presentation\" width=\"600\" cellpadding=\"0\" cellspacing=\"0\" style=\"max-width:600px;width:100%;background:#FFFFFF;border:1px solid ${LINE};border-radius:8px;\">`,\n    `<tr><td style=\"height:6px;background:${ACCENT};border-radius:8px 8px 0 0;font-size:0;line-height:0;\">&nbsp;</td></tr>`,\n    `<tr><td style=\"padding:24px 28px 12px 28px;font-family:${FONT};font-size:15px;line-height:1.5;color:${INK};\">`,\n    parts.join('\\n'),\n    '</td></tr></table></td></tr></table></body></html>',\n  ].join('\\n');\n\n  function productCard(title, rows) {\n    return [\n      `<table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"margin:0 0 14px 0;border:1px solid ${LINE};border-radius:6px;\">`,\n      `<tr><td style=\"padding:12px 16px;font-family:${FONT};\">`,\n      `<div style=\"font-size:16px;font-weight:600;color:${NAVY};margin:0 0 6px 0;\">${esc(title)}</div>`,\n      rowsTable(rows),\n      '</td></tr></table>',\n    ].join('');\n  }\n\n  function factsTable(rows) {\n    return `<div style=\"margin:0 0 14px 0;font-family:${FONT};\">${rowsTable(rows)}</div>`;\n  }\n\n  function rowsTable(rows) {\n    const trs = rows.map((m) =>\n      `<tr><td style=\"padding:2px 12px 2px 0;color:${MUTED};font-weight:600;white-space:nowrap;vertical-align:top;\">${esc(m[1])}</td>` +\n      `<td style=\"padding:2px 0;color:${NAVY};\">${esc(m[2])}</td></tr>`\n    ).join('');\n    return `<table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" style=\"font-size:15px;line-height:1.5;\">${trs}</table>`;\n  }\n\n  function esc(s) {\n    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\"/g, '&quot;').replace(/'/g, '&#39;');\n  }\n}\n"
+        }
+      }
+    },
+    {
+      "type": "addConnection",
+      "source": "Composed?",
+      "sourceIndex": 0,
+      "target": "Render HTML"
+    },
+    {
+      "type": "addConnection",
+      "source": "Render HTML",
+      "target": "Verify HTML"
+    },
+    {
+      "type": "removeConnection",
+      "source": "Recipients OK?",
+      "sourceIndex": 1,
+      "target": "Compose Email"
+    },
+    {
+      "type": "addNode",
+      "node": {
+        "name": "Claim Dispatch Group",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2100,
+          -200
+        ],
+        "notes": "Unticks Queued for Dispatch on the chosen group the moment it is chosen, so an overlapping run (or the 08:00 schedule) cannot pick the same group and mail the audience twice. Added 2026-09-02. Source: repo .claude/skills/offer-dispatch/n8n/claim-dispatch-group.js",
+        "parameters": {
+          "mode": "runOnceForAllItems",
+          "jsCode": "/**\n * n8n Code node — \"Claim Dispatch Group\"   (Offer Dispatch — Akay, dAYMAj6mZD3hTV4T)\n * Mode: Run Once for All Items\n * Added 2026-09-02. Sits on the OK branch of \"Recipients OK?\", before Compose Email.\n *\n * SOURCE OF TRUTH: repo .claude/skills/offer-dispatch/n8n/claim-dispatch-group.js.\n *\n * WHY. The \"Queued for Dispatch\" flag used to be cleared only at the very END\n * of a run — after approval, after the send, after the Sent Log. Approval takes\n * anything from minutes to hours, and Anil queues the next group while the\n * previous one is still waiting: on 2026-09-01 run 29311 (09:16, 1,277\n * recipients) and run 29315 (09:25) were in flight at the same time, and the\n * 08:00 schedule can also land on top of a hand-triggered run. Every one of\n * those runs re-reads the queue, and Build Recipients picks the group\n * deterministically (oldest Offer Date first) — so two concurrent runs pick the\n * SAME group and, once both are approved, the whole audience is mailed twice.\n * It did not happen on 2026-09-01 only because the second group's Offer Date\n * sorted first. Nothing in the workflow prevented it.\n *\n * FIX. Untick the flag on the chosen group the moment it is chosen, so no other\n * run can see it. The two existing clear steps (after Mark Broadcasted, and on\n * the halt path) stay and are harmless — unticking twice is a no-op.\n *\n * CONSEQUENCE TO KNOW. A run that is cancelled mid-approval (the 3-day limit,\n * or a manual stop) now leaves the offer UN-queued, exactly as a halt already\n * did. Re-queue by hand; the approval mail names the group.\n */\nconst rec = $('Build Recipients').first().json;\nconst ids = (Array.isArray(rec.bundleOfferIds) && rec.bundleOfferIds.length)\n  ? rec.bundleOfferIds\n  : (rec.offerId ? [rec.offerId] : []);\n\nif (!ids.length) {\n  throw new Error('Claim Dispatch Group: Build Recipients passed but named no offer id(s) — refusing to continue without knowing what to claim.');\n}\n\nreturn ids.map((id) => ({ json: { id, 'Queued for Dispatch': false } }));\n"
+        }
+      }
+    },
+    {
+      "type": "addNode",
+      "node": {
+        "name": "Write Claim",
+        "type": "n8n-nodes-base.airtable",
+        "typeVersion": 2,
+        "position": [
+          2200,
+          -200
+        ],
+        "notes": "Writes the claim from Claim Dispatch Group: Queued for Dispatch = false on every member of the chosen group, before approval. Same configuration as Write Clear Flag.",
+        "parameters": {
+          "operation": "update",
+          "base": {
+            "__rl": true,
+            "mode": "id",
+            "value": "appaDSdZkAE9PGkjT"
+          },
+          "table": {
+            "__rl": true,
+            "mode": "id",
+            "value": "tbljBgWrnIMZzkSAr"
+          },
+          "columns": {
+            "mappingMode": "autoMapInputData",
+            "matchingColumns": [
+              "id"
+            ],
+            "value": {}
+          },
+          "options": {
+            "typecast": true
+          }
+        },
+        "credentials": {
+          "airtableTokenApi": {
+            "id": "rgwpGVX08dlSKzwI",
+            "name": "Airtable Personal Access Token account"
+          }
+        }
+      }
+    },
+    {
+      "type": "addConnection",
+      "source": "Recipients OK?",
+      "sourceIndex": 1,
+      "target": "Claim Dispatch Group"
+    },
+    {
+      "type": "addConnection",
+      "source": "Claim Dispatch Group",
+      "target": "Write Claim"
+    },
+    {
+      "type": "addConnection",
+      "source": "Write Claim",
+      "target": "Compose Email"
+    },
+    {
+      "type": "updateNodeParameters",
+      "nodeName": "Build Sends",
+      "parameters": {
+        "jsCode": "/**\n * n8n Code node — \"Build Sends\"\n * Mode: Run Once for All Items\n *\n * SOURCE OF TRUTH: repo .claude/skills/offer-dispatch/n8n/build-sends.js.\n * Edit the repo file, run `node test-nodes.cjs`, then paste — never edit here.\n *\n * Fans the recipient list out into ONE ITEM PER RECIPIENT. Each send carries\n * `offerIds` (the full bundle, or a single-element array for a normal offer)\n * so Reconcile can log and later mark every bundle member.\n *\n * Updated 2026-08-27: sends multipart when Verify HTML approved an HTML body.\n * `text` is ALWAYS present and is the same approved plain text as before, so a\n * client that blocks HTML still gets a complete, readable offer. `html` is\n * added only when verification passed; the placeholder assertion below now\n * covers both bodies, since an unresolved token is just as wrong in markup.\n * The fully-formed Resend payload is built here rather than in the HTTP node's\n * expression so the html key can be omitted cleanly on the text-only path.\n *\n * Updated 2026-09-02: every send now carries `idempotencyKey`, which the HTTP\n * node passes to Resend as the `Idempotency-Key` header. The key is\n * \"dispatch:<first offer id>:<client id>\", stable across runs, so:\n *   - the node's own 3x retry can never deliver twice on a timeout after\n *     Resend had already accepted the message;\n *   - two overlapping runs of the same group (2026-09-01 had runs 29311 and\n *     29315 in flight at the same time) cannot mail the same client twice;\n *   - a re-queue after a partial send only reaches the clients who did not get\n *     it the first time. Resend keeps a key for 24 hours, so a deliberate\n *     re-send of the same offer to the same client must wait a day.\n * A replayed key returns the original message id, which Reconcile counts as\n * Sent — correct, the client has the email.\n */\n\nconst recipients = $('Build Recipients').first().json;\nconst email = $('Verify HTML').first().json;\n\nif (!email.composed) {\n  return [{ json: { halt: true, haltReason: email.haltReason } }];\n}\n\nconst list = recipients.recipients || [];\nif (list.length === 0) {\n  return [{ json: { halt: true, haltReason: 'No eligible recipients — nothing to send' } }];\n}\n\nconst FROM = 'Akay Irl Ltd <offers@akay.ie>';\nconst offerIds = (email.bundleOfferIds && email.bundleOfferIds.length) ? email.bundleOfferIds : [email.offerId];\n\nconst sends = list.map((r) => {\n  const subject = resolveFirstName(email.subject, r.firstName);\n  const textBody = resolveFirstName(email.bodyTemplate, r.firstName);\n  const htmlBody = email.html ? resolveFirstName(email.html, r.firstName) : null;\n  const headers = { 'List-Unsubscribe': `<${email.listUnsubscribe}>` };\n\n  const payload = { from: FROM, to: [r.email], subject, text: textBody, headers };\n  if (htmlBody) payload.html = htmlBody;\n\n  return {\n    json: {\n      payload,\n      idempotencyKey: idempotencyKeyFor(offerIds[0], r),\n      from: FROM,\n      to: [r.email],\n      subject,\n      text: textBody,\n      html: htmlBody,\n      headers,\n\n      offerId: email.offerId,\n      offerIds,\n      clientId: r.clientId,\n      clientName: r.clientName,\n      clientEmail: r.email,\n      recipientIndex: list.indexOf(r),\n      recipientTotal: list.length,\n    },\n  };\n});\n\nconst PLACEHOLDER = /\\{\\{\\{[^}]*\\}\\}\\}/;\nconst seenKeys = new Set();\n\nfor (const s of sends) {\n  if (!Array.isArray(s.json.to) || s.json.to.length !== 1) {\n    throw new Error(`Send payload for ${s.json.clientName} does not have exactly one recipient`);\n  }\n  if ('bcc' in s.json.payload || 'cc' in s.json.payload) {\n    throw new Error('Send payload contains cc/bcc — one email per recipient is required');\n  }\n  if (PLACEHOLDER.test(s.json.text) || PLACEHOLDER.test(s.json.subject)) {\n    throw new Error(`Unsubstituted placeholder left in message for ${s.json.clientName}`);\n  }\n  if (s.json.html && PLACEHOLDER.test(s.json.html)) {\n    throw new Error(`Unsubstituted placeholder left in the HTML body for ${s.json.clientName}`);\n  }\n  if (!s.json.payload.text) {\n    throw new Error(`Send payload for ${s.json.clientName} has no plain-text body`);\n  }\n  if (!s.json.idempotencyKey || s.json.idempotencyKey.length > 256) {\n    throw new Error(`Idempotency key missing or too long for ${s.json.clientName}`);\n  }\n  if (seenKeys.has(s.json.idempotencyKey)) {\n    throw new Error(`Duplicate idempotency key ${s.json.idempotencyKey} — two sends would collapse into one`);\n  }\n  seenKeys.add(s.json.idempotencyKey);\n}\n\nif (sends.length !== list.length) {\n  throw new Error(`Built ${sends.length} sends for ${list.length} recipients`);\n}\n\nreturn sends;\n\nfunction resolveFirstName(text, firstName) {\n  return String(text).replace(/\\{\\{\\{FIRST_NAME(\\|[^}]*)?\\}\\}\\}/g, (_m, dflt) => firstName || (dflt ? dflt.slice(1) : 'there'));\n}\n\nfunction idempotencyKeyFor(primaryOfferId, r) {\n  // Client id when we have one (stable even if the email is later corrected);\n  // the email address only for pilot rows with no Client record. Resend allows\n  // up to 256 characters; this is ~45.\n  const who = r.clientId || String(r.email || '').toLowerCase();\n  return `dispatch:${primaryOfferId}:${who}`.replace(/[^A-Za-z0-9:@._+-]/g, '_');\n}\n"
+      }
+    },
+    {
+      "type": "updateNodeParameters",
+      "nodeName": "Send via Resend",
+      "parameters": {
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Idempotency-Key",
+              "value": "={{ $json.idempotencyKey }}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "updateNodeParameters",
+      "nodeName": "Fail Loudly on Halt",
+      "parameters": {
+        "jsCode": "/**\n * n8n Code node — \"Fail Loudly on Halt\"   (Offer Dispatch — Akay, dAYMAj6mZD3hTV4T)\n * Mode: Run Once for All Items\n *\n * SOURCE OF TRUTH: repo .claude/skills/offer-dispatch/n8n/fail-loudly-on-halt.js.\n *\n * A halt IS a failed dispatch attempt, so surface it as one. \"Halt — Report\n * Reason\" is a NoOp that reported the reason to nobody, which is why a queued\n * offer could simply never go out with no notification anywhere. Throwing here\n * makes the ERROR HANDLER workflow (this workflow's errorWorkflow setting)\n * email ak@akay.ie with the reason.\n *\n * This node must stay LAST on the halt path: Untick Queue on Halt and Write\n * Clear Flag on Halt run first, so the offer is never left stuck ticked. It\n * does need re-queueing by hand once the cause is fixed.\n *\n * Updated 2026-09-02. Only the gate nodes put a `haltReason` on their item.\n * The two halt paths that matter most carried none, so the alert read\n * \"no reason recorded\" on 21497 and 29315 (approval declined) and on 28559\n * (all 507 sends rejected by Resend with a 401 — the one alert that should\n * have said \"check the Resend key\"). The reason is now recovered from the\n * node that actually decided the halt: Await Approval on a decline or timeout,\n * Reconcile on a failed or partial send (with the first failure messages, so a\n * 401 reads as a 401), and Composed? / Recipients OK? via their haltReason.\n */\nconst upstream = $('Halt — Report Reason').all().map((i) => i.json || {});\n\nlet reason = upstream.map((u) => u.haltReason).filter(Boolean)[0] || '';\nlet sentSummary = '';\n\nif (!reason) {\n  try {\n    const a = $('Await Approval').first().json || {};\n    if (a.data && a.data.approved === false) {\n      reason = 'Approval DECLINED (or the 3-day approval window expired without a click)' +\n        (a.data.respondedAt ? ' at ' + a.data.respondedAt : '') + '. Nothing was sent.';\n    }\n  } catch (e) { /* approval never ran on this path */ }\n}\n\nif (!reason) {\n  try {\n    const rows = $('Reconcile').all().map((i) => i.json || {});\n    const first = rows[0] || {};\n    if (first._summary) {\n      const failures = rows\n        .filter((r) => r['Dispatch Status'] === 'Failed')\n        .map((r) => String(r['Notes'] || '').replace(/^Send failed: /, ''));\n      const distinct = [...new Set(failures)].slice(0, 3);\n      sentSummary = first._summary;\n      reason = first._summary +\n        (distinct.length ? ' First failure(s): ' + distinct.join(' | ') : '');\n      if (failures.some((f) => /401|API key is invalid|unauthor/i.test(f))) {\n        reason += ' >>> Resend rejected the API key: every send failed for the same reason, so fix the \"Bearer Auth account\" credential before re-queueing.';\n      }\n    }\n  } catch (e) { /* Reconcile did not run on this halt path */ }\n}\n\nif (!reason) reason = 'no reason recorded';\n\nconst offers = new Set();\nfor (const u of upstream) {\n  [u.offerId, u._offerId, ...(Array.isArray(u.bundleOfferIds) ? u.bundleOfferIds : []), ...(Array.isArray(u._offerIds) ? u._offerIds : [])]\n    .filter(Boolean).forEach((id) => offers.add(id));\n}\nif (!offers.size) {\n  try {\n    const rec = $('Reconcile').first().json || {};\n    (rec._offerIds || []).forEach((id) => offers.add(id));\n    if (rec._offerId) offers.add(rec._offerId);\n  } catch (e) { /* not on this path */ }\n}\nif (!offers.size) {\n  try {\n    const br = $('Build Recipients').first().json || {};\n    (br.bundleOfferIds || []).forEach((id) => offers.add(id));\n    if (br.offerId) offers.add(br.offerId);\n  } catch (e) { /* not on this path */ }\n}\n\nconst sentNothing = !sentSummary || /\\b0 sent\\b/.test(sentSummary);\n\nthrow new Error(\n  (sentNothing ? 'Offer dispatch HALTED and sent nothing. ' : 'Offer dispatch ended INCOMPLETE — some emails WERE sent. ') +\n  'Reason: ' + reason +\n  (offers.size ? '. Offer(s): ' + [...offers].join(', ') : '') +\n  '. Queued for Dispatch has been cleared, so re-queue once the cause is fixed.'\n);\n"
+      }
+    }
+  ]
+}

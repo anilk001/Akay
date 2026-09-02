@@ -14,6 +14,9 @@ between 2026-07-29 and 2026-08-27. A draft in n8n is invisible until published.
 
 ## Contents
 
+The **Offer Dispatch** workflow's node sources are not here but in
+`.claude/skills/offer-dispatch/n8n/`, next to their regression suite.
+
 | File | Workflow | Node | State |
 |---|---|---|---|
 | `whatsapp-offer-ingestion/extract-wa-offers.js` | `Bn6Irz2Yx7MTRnKu` | Extract WA Offers | full source, **published 2026-08-30** |
