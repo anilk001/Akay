@@ -63,4 +63,3 @@ return {
     offerFields: f,
   },
 };
-

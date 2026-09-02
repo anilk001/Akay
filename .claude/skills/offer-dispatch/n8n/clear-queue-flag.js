@@ -9,4 +9,3 @@ const ids = (Array.isArray(rec._offerIds) && rec._offerIds.length)
   : (rec._offerId ? [rec._offerId] : []);
 
 return ids.map(id => ({ json: { id, 'Queued for Dispatch': false } }));
-

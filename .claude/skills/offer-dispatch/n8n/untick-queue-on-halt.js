@@ -50,4 +50,3 @@ if (!ids.size) {
 if (!ids.size) return [{ json: { note: 'No offer IDs found to clear — queue flag may need manual untick' } }];
 
 return [...ids].map(id => ({ json: { id, 'Queued for Dispatch': false } }));
-

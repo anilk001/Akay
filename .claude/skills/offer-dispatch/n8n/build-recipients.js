@@ -189,4 +189,3 @@ function firstNameOf(raw) {
   if (/^(sales|info|admin|office|purchasing|team|accounts|export|import|contact)$/i.test(first)) return '';
   return first.charAt(0).toUpperCase() + first.slice(1);
 }
-

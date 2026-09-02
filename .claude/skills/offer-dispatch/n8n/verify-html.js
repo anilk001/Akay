@@ -122,4 +122,3 @@ for (const addr of ['info@akay.ie', 'kai@akay.ie']) {
 if (leaks.length) return fail('LEAK GUARD tripped on the HTML — ' + leaks.join('; ') + '.');
 
 return [{ json: { ...composed, html, htmlStatus: 'OK — HTML verified verbatim against the approved text.' } }];
-

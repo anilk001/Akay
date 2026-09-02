@@ -191,7 +191,7 @@ node test-nodes.cjs      # 38 tests: composer, recipients, HTML render+verify, s
 | `n8n/prepare-broadcast-marks.js`, `clear-queue-flag.js`, `untick-queue-on-halt.js` | post-send / halt bookkeeping | |
 | `n8n/fail-loudly-on-halt.js` | Fail Loudly on Halt | throws with the real reason so the ERROR HANDLER emails it |
 | `n8n/error-handler-compose-alert.js` | ERROR HANDLER → Compose Alert | separate workflow `OnCFbngmILTKsdkw` |
-| `n8n/apply-2026-09-02.*.json` | — | exact `update_workflow` payloads for the 2026-09-02 changes |
+| `n8n/apply-2026-09-02.*.json` | — | the `update_workflow` payloads applied and published 2026-09-02 (dispatch version `6a013bba`) |
 
 **Then publish, and verify you published.** `update_workflow` writes to the
 *draft*; production keeps running the published version until `publish_workflow`
@@ -224,7 +224,7 @@ because the symptom is what you will recognise if something like it recurs.
 | `Execution limit reached` at the trigger | n8n Cloud plan execution quota exhausted (2026-08-14 lost both the backup and the dispatch) | No workflow change can fix this — check the plan; re-trigger by hand |
 | Dispatch waited hours | Gate 5 is a human click | Expected. Observed latency 1–6 h; plan sends around it |
 | Partial send | The halt path clears the queue flag | Re-queue by hand. Since 2026-09-02 every send carries a Resend `Idempotency-Key`, so clients who already received it are not mailed again within 24 h |
-| `Style as HTML`: `Bad request` / `temperature is deprecated` / `credit balance is too low` | The HTML step called a metered LLM API (2026-08-27 → 2026-09-02) | **[fixed 2026-09-02]** deterministic `Render HTML`, no API. Until applied: the node continues on error and the send goes text-only |
+| `Style as HTML`: `Bad request` / `temperature is deprecated` / `credit balance is too low` | The HTML step called a metered LLM API (2026-08-27 → 2026-09-02) | **[fixed 2026-09-02, live]** deterministic `Render HTML`, no API |
 | Approval mail says `HTML STYLING: FALLBACK — … introduced number/word` | The model rewrote the text | Text-only send is correct behaviour; **[fixed 2026-09-02]** the renderer cannot invent anything |
 | All sends fail `401 API key is invalid` | Resend key rotated/revoked; `Bearer Auth account` still holds the old one | Not a workflow fault. Update the credential, re-queue. Check before every send day |
 | Two approval mails for two runs at once; risk of the same group twice | Queue flag cleared only at the end of the run | **[fixed 2026-09-02]** `Claim Dispatch Group` unticks it at selection. Still: one run at a time |

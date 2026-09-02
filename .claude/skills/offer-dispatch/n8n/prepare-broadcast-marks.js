@@ -17,4 +17,3 @@ if (!ids.length) {
 }
 
 return ids.map((id) => ({ json: { id, Status: 'Broadcasted' } }));
-

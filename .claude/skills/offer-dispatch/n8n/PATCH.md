@@ -1,6 +1,6 @@
 # Offer Dispatch — change log
 
-## 2026-09-02 — audit fixes (repo: DONE · n8n: PENDING APPROVAL)
+## 2026-09-02 — audit fixes (repo: DONE · n8n: APPLIED AND PUBLISHED 2026-09-02 13:55 UTC)
 
 Full report: [`../AUDIT-2026-09-02.md`](../AUDIT-2026-09-02.md).
 
@@ -13,7 +13,9 @@ Full report: [`../AUDIT-2026-09-02.md`](../AUDIT-2026-09-02.md).
 | `Fail Loudly on Halt` | Recovers the reason from Await Approval / Reconcile (`fail-loudly-on-halt.js`) | "no reason recorded" on 21497, 28559, 29315 |
 | ERROR HANDLER `Compose Alert` | Consequence depends on node + message (`error-handler-compose-alert.js`) | Said "NO OFFERS WERE EMAILED" after 507 were delivered (28570) |
 
-**Apply** (on a day with no dispatch in flight):
+**Applied** 2026-09-02 on Anil's instruction, with no run in flight. Published versions: `Offer Dispatch — Akay` `6a013bba-2551-4e27-9be5-d818c4213c1a`, `ERROR HANDLER — Akay Alerts` `8699a8fe-b516-4aa8-a312-735a5a39f282`; both read back with `versionId === activeVersionId`, and the four changed Code nodes read back byte-identical to the files here. The proving run (step 4) has NOT been done yet.
+
+The steps, for the record and for the next change:
 
 1. `update_workflow` with the contents of `apply-2026-09-02.dispatch.json`.
 2. `publish_workflow dAYMAj6mZD3hTV4T`; assert `versionId === activeVersionId`; assert nodes

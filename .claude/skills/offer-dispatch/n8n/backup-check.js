@@ -58,4 +58,3 @@ return [{
     note: `Verified backup for ${today} found${cf['Storage Location'] ? ' (' + cf['Storage Location'] + ')' : ''}.`,
   },
 }];
-
