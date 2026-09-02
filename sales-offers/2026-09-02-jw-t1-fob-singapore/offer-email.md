@@ -47,14 +47,14 @@ Drop the relevant sentence in above the sign-off.
 
 - **Singapore (49):** *Stock is in Singapore — local collection or FOB loading, your choice.*
 - **UAE (34):** *Straightforward sailing to Jebel Ali; we can quote CFR on request.*
-- **Netherlands (40) / Latvia (14) / Poland (14):** *T1 export stock — suits bonded/re-export
-  programmes. If you need EU duty-paid (T2) instead, say so and we will send our
-  Loendersloot T2 list.*
+- **Netherlands (52) / Latvia (20) / Poland (18):** *T1 export stock — suits bonded and
+  re-export programmes. If you work duty-paid only, say the word and we will send our
+  Loendersloot T2 list by return.* (22 recipients across these three markets are tagged
+  duty-paid only, so this sentence matters — it turns a "T2 only please" into a second shot.)
 - **Panama (4):** *Free-zone re-export programmes welcome; CFR Colón on request.*
-- **Russia (14):** hold this segment until the sanctions check in the dispatch brief is signed off.
+- **Russia (14):** included per instruction; no extra line needed.
 
 ## Fields to fill before sending
 
-1. **MOQ** — blank on both Airtable rows. Either confirm with the supplier or leave as
-   "on request" (as written above).
-2. **Russia** — clear or drop, per the dispatch brief.
+**MOQ** — blank on both Airtable rows. Either confirm with the supplier or leave as
+"on request" (as written above).

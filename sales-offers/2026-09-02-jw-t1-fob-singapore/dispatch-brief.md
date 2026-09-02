@@ -1,6 +1,6 @@
 # Dispatch brief — Johnnie Walker T1, FOB Singapore
 
-Internal. Prepared 2026-09-02 by Claude Code for Anil.
+Internal. Prepared 2026-09-02, updated after Anil's go on pricing and audience.
 Sensitive fields (supplier identity, buy price, margin) are deliberately not repeated
 here — read them off the Airtable rows.
 
@@ -17,50 +17,45 @@ here — read them off the Airtable rows.
 | Status | Live · Approved · Send Eligible · Public Listing Yes | same |
 
 Full lot: **2,000 cases / 24,000 bottles / USD 303,450** at offer prices.
+Pricing confirmed by Anil: the 5% margin already embedded in the rows is the send price.
+
 Data check: case ÷ pack reconciles to the per-bottle figure on both lines; stock is
 whole cases; currency set. Both rows pass the offer-data-validator checks.
 
-## Recipient count
+## Recipient count — 191
 
-Segment = Clients with Capsule Tag **Indv spirits**, in the seven named countries.
+Segment = Clients with Capsule Tag **Indv spirits**, in the seven named countries,
+**both T1 and T2 buyers** (Anil's instruction — bond preference is not filtered on).
 
-| Country | Mailable | of which tagged *T1 Spirits* |
-|---|---|---|
-| Singapore | 49 | 35 |
-| Netherlands | 40 | 1 |
-| UAE | 34 | 12 |
-| Poland | 14 | 1 |
-| Latvia | 14 | 0 |
-| Russia | 14 | 0 |
-| Panama | 4 | 1 |
-| **Total** | **169** | **50** |
+| Country | Recipients | T1 Spirits tag | Spirits T2 ONLY tag | No bond preference |
+|---|---|---|---|---|
+| Netherlands | 52 | 1 | 12 | 39 |
+| Singapore | 49 | 35 | 0 | 14 |
+| UAE | 34 | 12 | 0 | 22 |
+| Latvia | 20 | 0 | 6 | 14 |
+| Poland | 18 | 1 | 4 | 13 |
+| Russia | 14 | 0 | 0 | 14 |
+| Panama | 4 | 1 | 0 | 3 |
+| **Total** | **191** | **50** | **22** | **119** |
 
 How that number was reached:
 
 1. 1,342 clients carry the *Indv spirits* tag.
-2. 205 of them sit in the seven target countries (all Active, all have an email address,
-   none flagged Do Not Contact, none with Excluded Bond Status = T1).
-3. −14 carry the **No Mailing** tag → 191.
-4. −22 carry **Spirits T2 ONLY** → **169**. These are EU buyers who have said they only
-   take duty-paid stock; this offer is T1, so they should not get it.
+2. 205 of them sit in the seven target countries — all Active, all with an email address,
+   none flagged Do Not Contact, none with Excluded Bond Status = T1.
+3. −14 carry the **No Mailing** tag → **191**.
 
-### Two things that follow from the count
+The 22 clients tagged *Spirits T2 ONLY* are included on instruction. They have previously
+said they take duty-paid stock only, so expect some "T2 only please" replies from the
+Netherlands, Latvia and Poland — the per-market line in the email copy offers them the
+Loendersloot T2 list by return, which turns those replies into a second shot rather than
+a dead end.
 
-- **The dispatch workflow will send to 191, not 169.** Build Recipients filters on Target
-  Capsule Tags and Excluded Bond Status — it has no knowledge of the *Spirits T2 ONLY*
-  tag. The structural fix is to set **Excluded Bond Status = T1** on those 22 client
-  records (12 NL, 6 LV, 4 PL). Find them in Airtable → Clients, filtered on Capsule Tags
-  *has* `Spirits T2 ONLY`; then the workflow lands on 169 by itself and every future T1
-  offer is protected too. Without that, drop them by hand.
+**444 *Indv spirits* clients have a blank Country** and are therefore unreachable by this
+send: Target Countries is an include-only list, so a blank country never matches. Not a
+bug — worth knowing that the seven-country targeting reaches 191 of a 1,342-strong segment.
 
-  Client names and addresses are deliberately kept out of this repo — the recipient and
-  suppression lists were handed over as separate CSVs.
-- **444 *Indv spirits* clients have a blank Country** and are therefore unreachable by
-  this send: Target Countries is an include-only list, so a blank country never matches.
-  Not a bug — worth knowing that the seven-country targeting reaches 169 of a 1,342-strong
-  segment.
-
-## Proposed Airtable dispatch settings
+## Airtable dispatch settings — written 2026-09-02
 
 Set identically on both rows (bundled lines must agree on the audience keys):
 
@@ -70,14 +65,16 @@ Set identically on both rows (bundled lines must agree on the audience keys):
 | Bundle Title | `Johnnie Walker Black & Red — T1 FOB Singapore` |
 | Target Capsule Tags | `Indv spirits` |
 | Target Countries | `United Arab Emirates, Netherlands, Russian Federation, Panama, Singapore, Latvia, Poland` |
-| Excluded Countries | blank — or `Russia` if the check below is not cleared |
-| Match Interest Category | leave unticked (the capsule tag already narrows; ticking also drops blank-interest clients) |
-| Queued for Dispatch | tick only at dispatch approval |
+| Excluded Countries | blank |
+| Match Interest Category | unticked — the capsule tag already narrows, and ticking would also drop blank-interest clients |
+| Queued for Dispatch | **not ticked** — the one remaining action |
 
 Country strings are matched through the base's country folding, so `Russian Federation`
-also catches `Russia`, and `United Arab Emirates` catches `UAE`.
+also catches `Russia`, and `United Arab Emirates` catches `UAE`. Both rows read
+Send Eligible = Yes, so ticking Queued for Dispatch and running the Offer Dispatch
+workflow is all that is left.
 
-## Flags before you send
+## Flags still open
 
 1. **MOQ is blank on both rows.** The client copy says "on request", which is honest but
    weak. Confirm with the supplier whether part-lots load or it is FCL only, then fill the
@@ -87,9 +84,11 @@ also catches `Russia`, and `United Arab Emirates` catches `UAE`.
    is **FOB Singapore** — CFR carries the freight, FOB does not. The gap is partly the
    incoterm, not purely a better price, so it is not a claim to put in front of a buyer.
    Both lines are genuinely the cheapest of their spec on the base; that stands on its own.
-3. **Russia (14 recipients).** Goods are UK-origin Scotch and Akay is an EU operator, so
-   confirm the line may be offered to Russian buyers under the applicable EU/UK measures
-   before including that segment — and expect payment/banking friction even if it clears.
-   Unresolved → put `Russia` in Excluded Countries and send to the other 155.
+3. **Russia (14 recipients) is included per instruction.** Noted once for the file: the
+   goods are UK-origin Scotch and Akay is an EU operator, so the sanctions position and
+   payment route are Anil's call. Excluded Countries is the field to use if that changes.
 4. **Escrow.** The supplier is direct-payment only, so the offer states escrow is not
    available. Any client who normally insists on escrow will push back.
+
+Client names and addresses are deliberately kept out of this repo — the recipient list
+was handed over as a separate CSV.
