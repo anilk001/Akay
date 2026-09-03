@@ -48,7 +48,8 @@ node n8n/tests/split-quantity.test.js
 - `n8n/` — WhatsApp offer-ingestion scripts + plain-Node tests (a PostToolUse
   hook runs them after any edit under `n8n/`)
 - `.claude/` — skills (offers-catalogue, offer-data-validator,
-  price-list-intake, new-guide), agents (public-safety-reviewer, test-writer),
+  price-list-intake, new-guide, plus vendored design skills — see
+  `.claude/skills/VENDORED.md`), agents (public-safety-reviewer, test-writer),
   hooks, plugin config
 
 After changing the data layer or page templates, run the
