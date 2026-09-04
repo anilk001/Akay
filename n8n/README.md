@@ -18,6 +18,8 @@ between 2026-07-29 and 2026-08-27. A draft in n8n is invisible until published.
 |---|---|---|---|
 | `whatsapp-offer-ingestion/extract-wa-offers.js` | `Bn6Irz2Yx7MTRnKu` | Extract WA Offers | full source, **published 2026-08-30** |
 | `whatsapp-filter-layer/classify-message.buy-side-guard.js` | `DO2ltjkISp2YDNnc` | Classify Message | patch only, **published 2026-08-30** |
+| `whatsapp-offer-broadcast/plan-broadcast.js` | `BeGfFpgxmI7hdCTI` | Plan Broadcast | full source, **published 2026-09-04** |
+| `whatsapp-offer-broadcast/build-results.js` | `BeGfFpgxmI7hdCTI` | Build Results | full source, **published 2026-09-04** |
 
 Both changes are live. `classify-message` is a patch rather than full source
 because the node could not be exported verbatim at the time; replace it with the
