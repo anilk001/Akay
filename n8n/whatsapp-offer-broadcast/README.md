@@ -3,18 +3,15 @@
 n8n workflow `BeGfFpgxmI7hdCTI` (`WhatsApp Offer Broadcast — Akay`). Created and
 published 2026-09-04.
 
-> **BLOCKED 2026-09-04 — Whapi token is stale.** Every Whapi API call from n8n
-> (this workflow AND the nightly Contact Sync's `Whapi Contacts` fetch, silently
-> failing since at least 2026-09-02) returns `404 {"error":"Channel not found"}`,
-> while inbound webhooks from channel `SPDRMN-ED3CX` still arrive — so the
-> channel is alive but the token stored in the n8n **"Bearer Auth account"**
-> credential no longer matches it (rotated in the Whapi dashboard, new value
-> never saved to n8n). Fix: copy the current channel token from the Whapi
-> dashboard into the "Bearer Auth account" credential. The next scheduled run
-> then delivers the PILOT cards to Anil's own WhatsApp automatically; every run
-> until then emails a failure summary to ak@akay.ie. The 2026-09-04 pilot run
-> proved everything else end-to-end: 14 segment cards planned, composed and
-> pushed to Whapi — only the sends 404'd on the token.
+> **Whapi token note (resolved 2026-09-04).** The first pilot runs returned
+> `404 {"error":"Channel not found"}` on every send, while inbound webhooks
+> from channel `SPDRMN-ED3CX` still arrived: the token stored in the n8n
+> **"Bearer Auth account"** credential had been rotated in the Whapi
+> dashboard and never re-saved to n8n. The nightly Contact Sync's
+> `Whapi Contacts` fetch had been failing the same way, silently, since at
+> least 2026-09-02. Anil re-saved the current channel token and pilot run
+> 32369 delivered 14/14 cards. If this error ever reappears, that credential
+> is the first place to look — the symptom is not a channel outage.
 
 Broadcasts branded **image offer cards** to the WhatsApp client lists via
 [Whapi Cloud](https://whapi.cloud), in the style of the competitor ads (clean
