@@ -471,6 +471,15 @@ const stats = [
       filter();
     });
 
+    // Deep link: offers.akay.ie/#spirits (or #beer, #grocery …) preselects that
+    // category chip. Used by the email-signature link bar and shareable links;
+    // an unknown hash is ignored. Matched case-insensitively against the chips.
+    const hashCat = decodeURIComponent(location.hash.slice(1)).trim().toLowerCase();
+    if (hashCat) {
+      const chip = Array.from(cats.children).find((x) => (x.dataset.cat || '').toLowerCase() === hashCat);
+      if (chip) chip.click();
+    }
+
     // Category request form -> n8n webhook (emails the caller our live offers in that category).
     const reqForm = document.getElementById('reqForm');
     if (reqForm) {
