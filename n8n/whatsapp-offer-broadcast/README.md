@@ -63,17 +63,16 @@ after every run that sends anything; a run with nothing to send stays silent.
    updates `Offers.WA Broadcast Log` (only for segments with ≥1 delivered
    send, never in pilot), and emails the per-segment summary via Resend.
 
-## PILOT mode — currently ON
+## PILOT mode — OFF (live since 2026-09-04)
 
-`PILOT = true` at the top of the *Plan Broadcast* node. While on:
+`PILOT` at the top of the *Plan Broadcast* node. Set to `true` it makes every
+planned card go **only to Anil's own WhatsApp** (`353872382368@s.whatsapp.net`),
+one per segment, with the real audience size stated in the caption, and
+writes **nothing** to `WA Broadcast Log`. Pilot run 32369 delivered 14/14
+cards that way; Anil approved and the flag was set to `false` the same day.
 
-- every planned card is sent **only to Anil's own WhatsApp**
-  (`353872382368@s.whatsapp.net`), one per segment, with the real audience
-  size stated in the caption;
-- **nothing** is written to `WA Broadcast Log`.
-
-To go live: open the workflow, edit *Plan Broadcast*, set `PILOT = false`,
-save and publish. Everything else is already wired.
+To pause real sends at any time: edit *Plan Broadcast*, set `PILOT = true`,
+save and publish. Flip back to `false` to resume.
 
 ## Broadcasting a specific offer by hand (added 2026-09-04)
 

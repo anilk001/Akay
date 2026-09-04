@@ -24,8 +24,10 @@
  *  - PILOT=true sends every planned card ONLY to PILOT_TO (Anil), with the
  *    real audience size stated in the caption. Nothing else is contacted and
  *    nothing is logged to Airtable until PILOT is set to false.
+ *    LIVE since 2026-09-04 (Anil's go-ahead after pilot run 32369 delivered
+ *    14/14 cards). Set PILOT back to true to pause real sends at any time.
  */
-const PILOT = true;
+const PILOT = false;
 const PILOT_TO = '353872382368@s.whatsapp.net'; // Anil (ak@akay.ie) own WhatsApp
 const COOLDOWN_DAYS = 45;
 const MAX_EXTRAS = 3;          // "Also live" caption lines under the main card
