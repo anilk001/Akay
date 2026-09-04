@@ -78,6 +78,26 @@ after every run that sends anything; a run with nothing to send stays silent.
 To go live: open the workflow, edit *Plan Broadcast*, set `PILOT = false`,
 save and publish. Everything else is already wired.
 
+## Broadcasting a specific offer by hand (added 2026-09-04)
+
+Two fields on **Offers** drive the manual path, mirroring the email side's
+`Queued for Dispatch`:
+
+- **`Queued for WA Broadcast`** (checkbox) — tick it and the offer jumps to
+  the front of the next run, bypassing the automatic scoring **and** the
+  45-day cooldown. It must still be `Send Eligible = Yes`. The tick is
+  cleared automatically after a successful real (non-pilot) broadcast.
+- **`WA Target Segments`** (text, optional) — comma-separated segment names,
+  e.g. `Spirits clients, Duty Free`. Blank = every client segment whose
+  category mapping matches the offer's Category. Naming segments overrides
+  the category mapping (so a beer can be pushed to Duty Free). Supplier
+  segments are never valid targets. An offer aimed at named segments is also
+  withheld from the automatic pick everywhere else — the targeting wins.
+
+Then either wait for Mon/Thu 10:30 or open the workflow and press
+**Execute workflow** for an immediate run. The one-per-contact rule, country
+targeting, pacing, logging and PILOT flag all still apply.
+
 ## Segment → offer mapping
 
 | Segment | Offer categories | Extra filter |

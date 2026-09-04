@@ -42,7 +42,7 @@ const pilot = plans.length && plans[0].pilot;
 for (const p of plans) {
   const st = bySeg[p.segment] || { ok: 0, fail: 0, failSamples: [] };
   totalOk += st.ok; totalFail += st.fail;
-  lines.push('\u2022 ' + p.segment + ' \u2192 "' + p.offerHeadline + '" \u00b7 planned ' + p.plannedCount + ', sent ' + st.ok + ', failed ' + st.fail + (pilot ? ' (PILOT: delivered to Anil only)' : ''));
+  lines.push('\u2022 ' + p.segment + ' \u2192 "' + p.offerHeadline + '"' + (p.queuedPick ? ' [manually queued]' : '') + ' \u00b7 planned ' + p.plannedCount + ', sent ' + st.ok + ', failed ' + st.fail + (pilot ? ' (PILOT: delivered to Anil only)' : ''));
   for (const fs of st.failSamples) lines.push('    failed: ' + fs);
   if (!pilot && st.ok > 0) {
     if (!updatesById[p.offerId]) {

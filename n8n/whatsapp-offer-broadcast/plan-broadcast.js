@@ -15,6 +15,12 @@
  *    contact Country, with the SAME asymmetry as the email dispatch workflow:
  *    an include-list excludes blank-country contacts, the exclude-list never
  *    does (cannot prove a blank is an excluded country).
+ *  - MANUAL QUEUE (added 2026-09-04): ticking Offers.'Queued for WA
+ *    Broadcast' forces that offer to the front of the next run, bypassing
+ *    scoring AND the cooldown (manual intent wins). Blank 'WA Target
+ *    Segments' = every client segment whose category mapping matches; named
+ *    segments = exactly those lists, overriding the category mapping. The
+ *    tick is cleared by the workflow after a successful real broadcast.
  *  - PILOT=true sends every planned card ONLY to PILOT_TO (Anil), with the
  *    real audience size stated in the caption. Nothing else is contacted and
  *    nothing is logged to Airtable until PILOT is set to false.
@@ -91,6 +97,8 @@ for (const it of $('Fetch Offers').all()) {
     if (!isNaN(age) && age <= COOLDOWN_DAYS) sentTo[p[0]] = true;
   }
   offers.push({ id, cat, headline, priceStr, score, sentTo, logRaw: String(f['WA Broadcast Log'] || ''),
+    queued: !!f['Queued for WA Broadcast'],
+    waSegs: String(f['WA Target Segments'] || '').split(',').map(s => s.trim().toLowerCase()).filter(Boolean),
     spec: String(f['Public Spec'] || '').trim(),
     stockDisplay: String(f['Stock Display'] || '').trim(),
     stockCases: Number(f['Stock Cases']) || 0,
@@ -119,12 +127,13 @@ let planned = 0;
 const out = [];
 for (const seg of SEGMENTS) {
   const kwRe = seg.kw ? new RegExp(seg.kw, 'i') : null;
-  const pool = offers.filter(o => {
-    if (o.sentTo[seg.name]) return false;
-    if (seg.cats && seg.cats.indexOf(o.cat) < 0) return false;
-    if (kwRe && !kwRe.test(o.headline)) return false;
-    return true;
-  }).sort((a, b) => b.score - a.score);
+  const segLc = seg.name.toLowerCase();
+  const catOk = o => (!seg.cats || seg.cats.indexOf(o.cat) >= 0) && (!kwRe || kwRe.test(o.headline));
+  // Queued offers come first: they bypass scoring and the cooldown, and an
+  // explicit WA Target Segments entry also bypasses the category mapping.
+  const queuedHere = offers.filter(o => o.queued && (o.waSegs.length ? o.waSegs.indexOf(segLc) >= 0 : catOk(o))).sort((a, b) => b.score - a.score);
+  const scored = offers.filter(o => !o.queued && !o.sentTo[seg.name] && catOk(o)).sort((a, b) => b.score - a.score);
+  const pool = queuedHere.concat(scored);
   if (!pool.length) continue;
   const top = pool[0];
   const extras = pool.slice(1, 1 + MAX_EXTRAS);
@@ -174,7 +183,7 @@ for (const seg of SEGMENTS) {
   }
 
   out.push({ json: {
-    segment: seg.name, pilot: PILOT, offerId: top.id, offerHeadline: top.headline,
+    segment: seg.name, pilot: PILOT, offerId: top.id, offerHeadline: top.headline, queuedPick: !!top.queued,
     plannedCount: recips.length, recipients: finalRecips,
     existingLog: top.logRaw, logLine: seg.name + '|' + today,
     headline: clip(top.headline, 58) || ' ',
@@ -187,5 +196,5 @@ for (const seg of SEGMENTS) {
     caption
   } });
 }
-console.log('planned ' + out.length + ' segment card(s), ' + planned + ' real recipient(s)' + (PILOT ? ' [PILOT: all sends go to Anil only]' : ''));
+console.log('planned ' + out.length + ' segment card(s), ' + planned + ' real recipient(s), ' + out.filter(o => o.json.queuedPick).length + ' from the manual queue' + (PILOT ? ' [PILOT: all sends go to Anil only]' : ''));
 return out;
