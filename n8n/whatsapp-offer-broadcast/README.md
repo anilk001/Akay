@@ -1,6 +1,20 @@
 # WhatsApp Offer Broadcast — Akay
 
-n8n workflow `BeGfFpgxmI7hdCTI` (`WhatsApp Offer Broadcast — Akay`). Created 2026-09-04.
+n8n workflow `BeGfFpgxmI7hdCTI` (`WhatsApp Offer Broadcast — Akay`). Created and
+published 2026-09-04.
+
+> **BLOCKED 2026-09-04 — Whapi token is stale.** Every Whapi API call from n8n
+> (this workflow AND the nightly Contact Sync's `Whapi Contacts` fetch, silently
+> failing since at least 2026-09-02) returns `404 {"error":"Channel not found"}`,
+> while inbound webhooks from channel `SPDRMN-ED3CX` still arrive — so the
+> channel is alive but the token stored in the n8n **"Bearer Auth account"**
+> credential no longer matches it (rotated in the Whapi dashboard, new value
+> never saved to n8n). Fix: copy the current channel token from the Whapi
+> dashboard into the "Bearer Auth account" credential. The next scheduled run
+> then delivers the PILOT cards to Anil's own WhatsApp automatically; every run
+> until then emails a failure summary to ak@akay.ie. The 2026-09-04 pilot run
+> proved everything else end-to-end: 14 segment cards planned, composed and
+> pushed to Whapi — only the sends 404'd on the token.
 
 Broadcasts branded **image offer cards** to the WhatsApp client lists via
 [Whapi Cloud](https://whapi.cloud), in the style of the competitor ads (clean
