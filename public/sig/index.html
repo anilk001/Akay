@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>AKAY email signatures</title>
+<style>
+  body{margin:0;background:#F1EFE7;font-family:Arial,Helvetica,sans-serif;color:#17140F}
+  .wrap{max-width:760px;margin:0 auto;padding:28px 18px 60px}
+  h1{font-size:22px;margin:0 0 6px;color:#13201A}
+  .lede{color:#767E72;font-size:14px;margin:0 0 22px;line-height:1.5}
+  .steps{background:#fff;border:1px solid #E4E0D4;border-radius:8px;padding:14px 18px;margin:0 0 26px;font-size:14px;line-height:1.6}
+  .steps b{color:#B4231F}
+  .card{background:#fff;border:1px solid #E4E0D4;border-radius:8px;padding:18px;margin:0 0 22px}
+  .card h2{font-size:16px;margin:0 0 12px;color:#13201A;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+  .btn{background:#B4231F;color:#fff;border:0;border-radius:6px;padding:10px 16px;font-size:14px;font-weight:bold;cursor:pointer}
+  .btn:active{transform:translateY(1px)}
+  .btn.ok{background:#0E7A3B}
+  .sig{overflow-x:auto;padding:12px;border:1px dashed #E4E0D4;border-radius:6px;background:#fff}
+  .note{font-size:12px;color:#8A968A;margin:10px 0 0}
+  a{color:#B4231F}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>AKAY email signatures</h1>
+  <p class="lede">Find your name, press <b>Copy signature</b>, then paste it into Gmail. Takes about a minute.</p>
+  <div class="steps">
+    <b>1.</b> Press <b>Copy signature</b> under your name below.<br>
+    <b>2.</b> In Gmail on a computer: ⚙ → <b>See all settings</b> → <b>General</b> → scroll to <b>Signature</b> → <b>Create new</b> → name it "AKAY" → click in the box and paste (Ctrl+V / Cmd+V).<br>
+    <b>3.</b> Just below, set <b>For new emails use</b> and <b>On reply/forward use</b> to "AKAY".<br>
+    <b>4.</b> Scroll to the bottom and press <b>Save changes</b>. Send yourself a test email.<br>
+    <span style="color:#767E72">If the copy button does not work in your browser, open the signature link, select all (Ctrl+A / Cmd+A), copy, and paste the same way. Gmail signatures are set on a computer, not in the phone app.</span>
+  </div>
+  <div id="list"></div>
+</div>
+<script>
+  const PEOPLE = [
+    { file: 'anil-khetan.html',  name: 'Anil Khetan',  role: 'Managing Director' },
+    { file: 'kai-khetan.html',   name: 'Kai Khetan',   role: 'Sales Manager' },
+    { file: 'annika-ryan.html',  name: 'Annika Ryan',  role: 'Logistics Manager' },
+  ];
+  const list = document.getElementById('list');
+  for (const p of PEOPLE) {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = '<h2><span>' + p.name + ' <span style="color:#767E72;font-weight:normal">— ' + p.role + '</span></span>'
+      + '<button class="btn">Copy signature</button></h2>'
+      + '<div class="sig">Loading…</div>'
+      + '<p class="note">Direct link: <a href="' + p.file + '">offers.akay.ie/sig/' + p.file + '</a></p>';
+    list.appendChild(card);
+    const sig = card.querySelector('.sig');
+    const btn = card.querySelector('.btn');
+    fetch(p.file, { cache: 'no-store' }).then(r => r.text()).then(html => {
+      sig.innerHTML = html.replace(/<!--[\s\S]*?-->/, '');
+    }).catch(() => { sig.textContent = 'Could not load — open the direct link below instead.'; });
+    btn.addEventListener('click', async () => {
+      const html = sig.innerHTML;
+      const text = sig.innerText;
+      try {
+        if (navigator.clipboard && window.ClipboardItem) {
+          await navigator.clipboard.write([new ClipboardItem({
+            'text/html': new Blob([html], { type: 'text/html' }),
+            'text/plain': new Blob([text], { type: 'text/plain' }),
+          })]);
+        } else {
+          const range = document.createRange(); range.selectNodeContents(sig);
+          const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
+          document.execCommand('copy'); sel.removeAllRanges();
+        }
+        btn.textContent = 'Copied — now paste into Gmail'; btn.classList.add('ok');
+        setTimeout(() => { btn.textContent = 'Copy signature'; btn.classList.remove('ok'); }, 4000);
+      } catch (e) {
+        btn.textContent = 'Copy failed — use the direct link';
+      }
+    });
+  }
+</script>
+</body>
+</html>
