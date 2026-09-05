@@ -1,32 +1,25 @@
 ---
 import { getOffers } from '../../data/airtable.mjs';
-import { generateSlug, dedupeSlug } from '../../lib/slug.mjs';
+import { offersWithSlugs, brandPages } from '../../lib/slug.mjs';
 import { productOfferSchema, breadcrumbSchema, organizationSchema } from '../../lib/schema.mjs';
+import { basisLabel, basisSuffix } from '../../lib/price.mjs';
 import { enquiryLink, WA_LINK, WA_DISPLAY } from '../../lib/whatsapp.mjs';
 
 // Get all valid slugs for static generation
 export async function getStaticPaths() {
   const { offers } = await getOffers();
-
-  // Build slug map
-  const slugMap = new Map();
-  const slugs = [];
-  for (const offer of offers) {
-    let slug = generateSlug(offer.name, offer.spec);
-    slug = dedupeSlug(slug, slugs);
-    slugs.push(slug);
-    slugMap.set(offer.id || `${offer.brand}-${offer.name}`, { ...offer, slug });
-  }
-
-  const allOffers = Array.from(slugMap.values());
+  const allOffers = offersWithSlugs(offers);
+  // Brand page URL per brand name, for the breadcrumb link (only brands that
+  // actually get a landing page).
+  const brandSlugByName = new Map(brandPages(allOffers).map((p) => [p.brand, p.slug]));
 
   return allOffers.map((offer) => ({
     params: { slug: offer.slug },
-    props: { offer, allOffers },
+    props: { offer, allOffers, brandSlug: brandSlugByName.get((offer.brand || '').trim()) || null },
   }));
 }
 
-const { offer, allOffers } = Astro.props;
+const { offer, allOffers, brandSlug } = Astro.props;
 const slug = offer.slug;
 
 // Helper functions
@@ -50,23 +43,30 @@ const wa = enquiryLink(offer, msg);
 // Category slug for linking
 const categorySlug = offer.category.toLowerCase().replace(/\s+/g, '-');
 
-// Related offers (same category, max 4)
-const relatedOffers = allOffers
-  .filter(
-    (o) => o.category === offer.category &&
-            (o.id || `${o.brand}-${o.name}`) !== (offer.id || `${offer.brand}-${offer.name}`)
-  )
-  .sort(() => Math.random() - 0.5)
-  .slice(0, 4);
+// Related offers (same category, max 4). Deterministic: each offer takes a
+// different window of its category, rotated by its own position, so internal
+// links vary across pages but the HTML is stable from build to build (random
+// picks churned every page on every rebuild, wasting crawl budget on no-op
+// content changes).
+const sameCategory = allOffers.filter((o) => o.category === offer.category);
+const selfIndex = Math.max(0, sameCategory.findIndex((o) => o.slug === offer.slug));
+const otherOffers = sameCategory.filter((o) => o.slug !== offer.slug);
+const relatedOffers = Array.from(
+  { length: Math.min(4, otherOffers.length) },
+  (_, k) => otherOffers[(selfIndex + k) % otherOffers.length]
+);
 
 // Build schemas
 const orgSchema = organizationSchema();
 const productSchema = productOfferSchema(offer, slug);
 const breadcrumbData = breadcrumbSchema(offer.name, offer.category, slug);
 
-// Title and meta
-const pageTitle = `${offer.name} ${offer.spec || ''} wholesale — ${offer.currency}${offer.amount?.toFixed(2) || '—'}/case | AKAY Trade`;
-const pageDesc = `${offer.name} ${offer.spec || ''} wholesale: ${offer.currency}${offer.amount?.toFixed(2) || '—'}/case, ${offer.tier || 'trade pricing'}, ${offer.terms || 'terms available'}. Buy by the case from AKAY Trade.`;
+// Title and meta. The price basis comes from the offer itself — most lines
+// price per case but some price per bottle/piece, and labelling those "/case"
+// would misstate the price in search results.
+const priceText = `${offer.currency}${offer.amount?.toFixed(2) || '—'}${basisSuffix(offer.priceBasis)}`;
+const pageTitle = `${offer.name} ${offer.spec || ''} wholesale — ${priceText} | AKAY Trade`;
+const pageDesc = `${offer.name} ${offer.spec || ''} wholesale: ${priceText}, ${offer.tier || 'trade pricing'}, ${offer.terms || 'terms available'}. Buy by the case from AKAY Trade.`;
 
 // Determine availability status for display
 let stockStatus = 'Enquire on request';
@@ -311,7 +311,8 @@ if (offer.stock === 'in') {
 <body>
   <div class="container">
     <div class="breadcrumb">
-      <a href="/">Home</a> / <a href={`/category/${categorySlug}/`}>{offer.category}</a> / {offer.name}
+      <a href="/">Home</a> / <a href={`/category/${categorySlug}/`}>{offer.category}</a>
+      {brandSlug && <> / <a href={`/brands/${brandSlug}/`}>{offer.brand}</a></>} / {offer.name}
     </div>
 
     <div class="offer-header">
@@ -371,7 +372,7 @@ if (offer.stock === 'in') {
             <div class="offer-card">
               <h3><a href={`/offers/${rel.slug}/`}>{rel.name}</a></h3>
               {rel.spec && <p style="margin: 0.5em 0; color: var(--muted); font-size: 0.9em;">{rel.spec}</p>}
-              <div class="price">{rel.currency}{rel.amount?.toFixed(2) || '—'} / case</div>
+              <div class="price">{rel.currency}{rel.amount?.toFixed(2) || '—'} {basisLabel(rel.priceBasis)}</div>
               <a href={`/offers/${rel.slug}/`} style="font-weight: 600;">View offer →</a>
             </div>
           ))}

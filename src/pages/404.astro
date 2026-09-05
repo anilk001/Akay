@@ -1,0 +1,110 @@
+---
+import { WA_LINK, WA_DISPLAY } from '../lib/whatsapp.mjs';
+
+// Netlify serves dist/404.html for any unknown path. Wholesale stock moves
+// fast — offers leave the catalogue when they sell out — so a dead offer link
+// is routine, not an error. This page turns that dead end into an enquiry
+// path instead of a bare 404.
+---
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Offer not found | AKAY Trade</title>
+  <meta name="robots" content="noindex" />
+  <link rel="icon" href="/akay-bird.png" />
+  <style>
+    :root {
+      --paper: #F7F5F0;
+      --card: #FFFFFF;
+      --ink: #17140F;
+      --muted: #767E72;
+      --line: #E4E0D4;
+      --brass: #B4231F;
+      --forest: #0E7A3B;
+      --radius: 14px;
+      --serif: "Hoefler Text", "Iowan Old Style", Palatino, Georgia, "Times New Roman", serif;
+      --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --paper: #0C140F;
+        --card: #13201A;
+        --ink: #F1EFE7;
+        --muted: #8A968A;
+        --line: #243029;
+        --brass: #EC5A52;
+        --forest: #37B866;
+      }
+    }
+    body {
+      margin: 0;
+      padding: 20px;
+      background: var(--paper);
+      color: var(--ink);
+      font: 16px / 1.6 var(--sans);
+      display: flex;
+      min-height: 90vh;
+      align-items: center;
+      justify-content: center;
+    }
+    .box {
+      max-width: 520px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 2.5em;
+      text-align: center;
+    }
+    h1 {
+      font: 600 1.8em var(--serif);
+      margin: 0.5em 0;
+    }
+    p {
+      color: var(--muted);
+      margin: 0.8em 0;
+    }
+    a.btn {
+      display: inline-block;
+      background: var(--forest);
+      color: var(--paper);
+      padding: 0.7em 1.4em;
+      border-radius: 8px;
+      font-weight: 600;
+      text-decoration: none;
+      margin: 0.5em 0.4em 0;
+    }
+    a.link {
+      color: var(--brass);
+      text-decoration: none;
+    }
+    a.link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <img src="/akay-bird.png" alt="AKAY" width="64" height="56" />
+    <h1>That offer has moved on</h1>
+    <p>
+      Wholesale stock turns over fast — the line you're after has likely sold out
+      or been relisted. The live catalogue always shows what's available right now,
+      and we can quote alternatives on request.
+    </p>
+    <p>
+      <a class="btn" href="/">Browse live offers</a>
+      <a class="btn" href={WA_LINK}>WhatsApp us</a>
+    </p>
+    <p>
+      Or browse by <a class="link" href="/brands/">brand</a> ·
+      <a class="link" href="/category/spirits/">Spirits</a> ·
+      <a class="link" href="/category/beer/">Beer</a> ·
+      <a class="link" href="/category/confectionery/">Confectionery</a>
+    </p>
+    <p style="font-size: 0.85em;">WhatsApp {WA_DISPLAY} · offers@akay.ie</p>
+  </div>
+</body>
+</html>
