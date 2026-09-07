@@ -1,11 +1,11 @@
 ---
 name: offer-data-validator
-description: Validate Akay offer rows before publishing to the portal - catches price/pack/name data errors that break offers.akay.ie cards. Use when the user asks to check offers, validate a price list, or before a portal publish.
+description: Validate Akay offer rows before publishing to the portal - catches price/pack/name data errors that break akay.ie cards. Use when the user asks to check offers, validate a price list, or before a portal publish.
 ---
 
 # Offer Data Validator (Akay)
 
-Validates offer rows against the data rules that keep offers.akay.ie
+Validates offer rows against the data rules that keep akay.ie
 clean. Input: CSV/XLSX export of the Offers table (or rows pasted as
 text). Output: a numbered problem list, worst first, with the exact
 row and a suggested fix.

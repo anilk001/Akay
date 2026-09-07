@@ -54,7 +54,7 @@ after every run that sends anything; a run with nothing to send stays silent.
 4. **Card composition** — no external design service. The Edit Image node
    builds a 1080×1080 card from scratch: cream `#F7F5F0` ground, red `#B4231F`
    accent bar, dark-green `#13201A` footer band, the live site logo composited
-   from `https://offers.akay.ie/akay-bird.png`, then the offer text (badge,
+   from `https://akay.ie/akay-bird.png`, then the offer text (badge,
    product, spec, price in red, stock in green, terms, CTA footer).
 5. **Send loop** — one Whapi `POST /messages/image` per recipient (base64
    media + caption), paced 3 s apart, `continueRegularOutput` so one bad

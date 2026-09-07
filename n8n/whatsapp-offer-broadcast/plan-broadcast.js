@@ -32,7 +32,7 @@ const PILOT_TO = '353872382368@s.whatsapp.net'; // Anil (ak@akay.ie) own WhatsAp
 const COOLDOWN_DAYS = 45;
 const MAX_EXTRAS = 3;          // "Also live" caption lines under the main card
 const MAX_SENDS_PER_RUN = 450; // hard safety cap across all segments
-const SITE = 'https://offers.akay.ie';
+const SITE = 'https://akay.ie';
 
 const SPIRITS = ['Spirits', 'Champagne'];
 const FMCG = ['Grocery', 'Confectionery', 'Toiletries', 'Soft Drinks', 'Other FMCG'];

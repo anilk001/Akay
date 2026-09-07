@@ -1,4 +1,4 @@
-# AKAY — Trade Offers (`offers.akay.ie`)
+# AKAY — Trade Offers (`akay.ie`)
 
 The public B2B beverage catalogue for AKAY. A fast, static [Astro](https://astro.build)
 site that reads the offers **live from Airtable at build time** and renders every
@@ -75,13 +75,19 @@ The site is static, so it reflects Airtable as of the last build. To refresh:
 
 ---
 
-## Go-live — point `offers.akay.ie` (domain at GoDaddy)
+## Go-live — serve the site at `akay.ie` (DNS on Cloudflare)
 
-1. In Netlify → your site → **Domain management** → *Add a domain* → enter `offers.akay.ie`.
-   Netlify shows the target hostname.
-2. In **GoDaddy** → your domain → **DNS** → add a **CNAME**:
-   - Type `CNAME`, Name `offers`, Value = the `*.netlify.app` hostname Netlify gave you.
-3. Wait for DNS + automatic HTTPS to provision (usually minutes). Done.
+1. In Netlify → your site → **Domain management** → *Add a domain* → enter `akay.ie`
+   and set it as the **primary domain**. Keep `offers.akay.ie` listed as a domain alias
+   so Netlify still answers for it while the redirect below is live.
+2. In **Cloudflare** → DNS: point the apex `akay.ie` at Netlify (`A`/`ALIAS`/flattened `CNAME`
+   to the load-balancer/hostname Netlify shows), **proxied** (orange cloud). Leave the
+   `offers` record in place and proxied — a Cloudflare redirect rule only runs on proxied hosts.
+3. In **Cloudflare** → Rules → **Redirect Rules** → create a dynamic rule:
+   - When: `(http.host eq "offers.akay.ie")`
+   - Then: 301, URL = `concat("https://akay.ie", http.request.uri.path)`, preserve query string.
+4. Wait for DNS + automatic HTTPS to provision (usually minutes). Verify with
+   `curl -sI https://offers.akay.ie/about/` → `301` + `location: https://akay.ie/about/`.
 
 ---
 

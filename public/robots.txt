@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://offers.akay.ie/sitemap.xml
+Sitemap: https://akay.ie/sitemap.xml

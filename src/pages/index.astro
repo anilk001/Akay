@@ -6,7 +6,7 @@ import { enquiryLink, WA_LINK } from '../lib/whatsapp.mjs';
 
 const { offers, source } = await getOffers();
 
-// Google Analytics 4 for offers.akay.ie. The Measurement ID is a public,
+// Google Analytics 4 for akay.ie. The Measurement ID is a public,
 // client-side value (safe to commit). PUBLIC_GA4_ID overrides it at build time
 // if you ever need to point at a different property without a code change.
 const GA4_ID = import.meta.env.PUBLIC_GA4_ID || 'G-FW42J5609V';
@@ -52,13 +52,13 @@ const stats = [
   <title>AKAY — Trade Offers</title>
   <meta name="description" content="AKAY wholesale beverage offers — spirits and beer by the case, live trade pricing, pack specs and duty tier on every line." />
   <link rel="icon" href="/akay-bird.png" />
-  <link rel="canonical" href="https://offers.akay.ie/" />
+  <link rel="canonical" href="https://akay.ie/" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="AKAY Trade" />
-  <meta property="og:url" content="https://offers.akay.ie/" />
+  <meta property="og:url" content="https://akay.ie/" />
   <meta property="og:title" content="AKAY — Trade Offers" />
   <meta property="og:description" content="Wholesale spirits, beer and FMCG by the case. Live trade pricing, pack specs and duty tier on every line." />
-  <meta property="og:image" content="https://offers.akay.ie/akay-bird.png" />
+  <meta property="og:image" content="https://akay.ie/akay-bird.png" />
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="AKAY — Trade Offers" />
   <meta name="twitter:description" content="Wholesale spirits, beer and FMCG by the case. Live trade pricing on every line." />
@@ -256,7 +256,7 @@ const stats = [
       <a class="mark" href="/" aria-label="AKAY home">
         <img class="logo-slot" src="/akay-bird.png" alt="" width="320" height="279" />AKAY<span class="dot"></span><b>trade</b>
       </a>
-      <span class="bar-sub">offers.akay.ie</span>
+      <span class="bar-sub">akay.ie</span>
       <span class="bar-spacer"></span>
       <button class="theme-btn" id="themeBtn" aria-label="Toggle light or dark theme">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5 19 19M19 5l-1.5 1.5M6.5 17.5 5 19"/></svg>
@@ -471,7 +471,7 @@ const stats = [
       filter();
     });
 
-    // Deep link: offers.akay.ie/#spirits (or #beer, #grocery …) preselects that
+    // Deep link: akay.ie/#spirits (or #beer, #grocery …) preselects that
     // category chip. Used by the email-signature link bar and shareable links;
     // an unknown hash is ignored. Matched case-insensitively against the chips.
     const hashCat = decodeURIComponent(location.hash.slice(1)).trim().toLowerCase();

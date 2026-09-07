@@ -1,11 +1,11 @@
 ---
 name: offers-catalogue
-description: Work on the AKAY trade offers catalogue (offers.akay.ie) — the Astro static site that reads offers live from Airtable at build time. Use when editing offer cards, the Airtable data layer, refreshing the offline snapshot, running the build, or debugging why offers look wrong. Covers the Airtable → build → Netlify deploy pipeline and the public-safe field rules.
+description: Work on the AKAY trade offers catalogue (akay.ie) — the Astro static site that reads offers live from Airtable at build time. Use when editing offer cards, the Airtable data layer, refreshing the offline snapshot, running the build, or debugging why offers look wrong. Covers the Airtable → build → Netlify deploy pipeline and the public-safe field rules.
 ---
 
 # AKAY offers catalogue
 
-A static [Astro](https://astro.build) site (`offers.akay.ie`) that renders the
+A static [Astro](https://astro.build) site (`akay.ie`) that renders the
 public B2B beverage catalogue. Offers are read **live from Airtable at build
 time** and baked into plain HTML — the published site runs no server.
 

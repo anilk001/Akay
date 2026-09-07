@@ -33,7 +33,7 @@ export async function GET() {
 
   // Homepage
   sitemap += `  <url>
-    <loc>https://offers.akay.ie/</loc>
+    <loc>https://akay.ie/</loc>
     <lastmod>${now}</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
@@ -43,7 +43,7 @@ export async function GET() {
   // Offer pages
   for (const offer of offersWithSlugs) {
     sitemap += `  <url>
-    <loc>https://offers.akay.ie/offers/${offer.slug}/</loc>
+    <loc>https://akay.ie/offers/${offer.slug}/</loc>
     <lastmod>${now}</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
@@ -55,7 +55,7 @@ export async function GET() {
   for (const category of categories) {
     const categorySlug = category.toLowerCase().replace(/\s+/g, '-');
     sitemap += `  <url>
-    <loc>https://offers.akay.ie/category/${categorySlug}/</loc>
+    <loc>https://akay.ie/category/${categorySlug}/</loc>
     <lastmod>${now}</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
@@ -66,7 +66,7 @@ export async function GET() {
   // Guide pages
   for (const guide of guides) {
     sitemap += `  <url>
-    <loc>https://offers.akay.ie/guides/${guide.slug}/</loc>
+    <loc>https://akay.ie/guides/${guide.slug}/</loc>
     <lastmod>${now}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -76,7 +76,7 @@ export async function GET() {
 
   // About page
   sitemap += `  <url>
-    <loc>https://offers.akay.ie/about/</loc>
+    <loc>https://akay.ie/about/</loc>
     <lastmod>${now}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>

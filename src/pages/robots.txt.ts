@@ -28,7 +28,7 @@ Allow: /
 User-agent: CCBot
 Allow: /
 
-Sitemap: https://offers.akay.ie/sitemap.xml
+Sitemap: https://akay.ie/sitemap.xml
 `;
 
   return new Response(robotsTxt, {

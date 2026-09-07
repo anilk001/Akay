@@ -147,7 +147,7 @@ Wholesale pricing is **not fixed**—it depends on:
 
 ### 1. Check the catalogue
 
-Visit https://offers.akay.ie and filter by category. Note the product name, pack spec, and current asking price. Prices are live and updated daily.
+Visit https://akay.ie and filter by category. Note the product name, pack spec, and current asking price. Prices are live and updated daily.
 
 ### 2. Prepare a Requirement List
 
@@ -320,7 +320,7 @@ Anil or the team will:
 
 ## Tips for Success
 
-- **Be specific:** Use exact product names from the catalogue, or copy them from offers.akay.ie
+- **Be specific:** Use exact product names from the catalogue, or copy them from akay.ie
 - **Start small:** Test 1–2 cases first if you're new to wholesale
 - **Ask for bundles:** Mixing categories (spirits + beer + soft drinks) can unlock discounts
 - **Confirm duty status:** Always ask if the quote is T1 (under-bond) or T2 (duty-paid)
@@ -383,7 +383,7 @@ We don't directly retail or sell to the public—we are wholesale only. Our buye
 
 ## What We Publish
 
-This catalogue (https://offers.akay.ie) shows **public-facing, safe-to-quote offerings only**:
+This catalogue (https://akay.ie) shows **public-facing, safe-to-quote offerings only**:
 
 - **Product names** and specifications
 - **Live pricing** — per case and per unit
@@ -428,7 +428,7 @@ Shannon, Loendersloot (Netherlands), Riga (Latvia), and other EU licensed wareho
 
 ## How to Buy
 
-1. **Browse the catalogue:** https://offers.akay.ie
+1. **Browse the catalogue:** https://akay.ie
 2. **Click WhatsApp or email** with your requirement list
 3. **Get a quote** with pricing, terms, and stock status
 4. **Send a PO** to lock the deal

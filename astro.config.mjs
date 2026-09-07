@@ -4,7 +4,7 @@ import { defineConfig } from 'astro/config';
 // so the published site is plain HTML/CSS that Netlify serves globally
 // with no server to run. Rebuild to refresh offers (see README: Build Hook).
 export default defineConfig({
-  site: 'https://offers.akay.ie',
+  site: 'https://akay.ie',
   output: 'static',
   trailingSlash: 'ignore',
   build: { assets: '_assets' },

@@ -1,6 +1,6 @@
 // JSON-LD schema generation for SEO
 
-const SITE_URL = 'https://offers.akay.ie';
+const SITE_URL = 'https://akay.ie';
 
 export function organizationSchema() {
   return {
