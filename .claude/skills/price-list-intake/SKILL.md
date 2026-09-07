@@ -33,3 +33,12 @@ Rows it cannot price are written to the report, never silently dropped
 ## Import
 Airtable: Offers table -> view "zz temp..." or any grid -> right-click
 "Import data" -> CSV -> map columns 1:1 (names already match).
+
+## Hard rule: never set "Listing Approved"
+The Offers field **Listing Approved** (checkbox) is a human-only gate.
+It is what lets an offer onto offers.akay.ie (Public Listing formula).
+Never tick it on import, on record creation via the Airtable API/MCP,
+or on any bulk update - leave it blank and Anil ticks it by hand after
+reviewing the offer. This applies even when the supplier's earlier
+offers already have it ticked. If you find it ticked on records you
+created, untick it and say so.

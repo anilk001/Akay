@@ -16,6 +16,14 @@ prices, margins and internal notes are **never requested**, so they cannot reach
 the browser. When adding a field to a card, first add it to the `FIELDS` array in
 `src/data/airtable.mjs` — and only if it is genuinely public-safe.
 
+## Listing Approved is human-only
+
+An offer reaches the public site only when `Public Listing` evaluates to Yes,
+which requires the **Listing Approved** checkbox on the Offers record. That
+checkbox is set by a person after reviewing the offer. Never tick it from
+scripts, imports, MCP record writes or bulk updates - create offers with it
+blank and leave the decision to Anil.
+
 ## Where things live
 
 ```
