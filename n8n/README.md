@@ -16,7 +16,7 @@ between 2026-07-29 and 2026-08-27. A draft in n8n is invisible until published.
 
 | File | Workflow | Node | State |
 |---|---|---|---|
-| `whatsapp-offer-ingestion/extract-wa-offers.js` | `Bn6Irz2Yx7MTRnKu` | Extract WA Offers | full source, **published 2026-08-30** |
+| `whatsapp-offer-ingestion/extract-wa-offers.js` | `Bn6Irz2Yx7MTRnKu` | Extract WA Offers | full source, published 2026-08-30; **greeting/announcement fix of 2026-09-07 NOT YET PASTED INTO n8n** |
 | `whatsapp-filter-layer/classify-message.buy-side-guard.js` | `DO2ltjkISp2YDNnc` | Classify Message | patch only, **published 2026-08-30** |
 | `whatsapp-offer-broadcast/plan-broadcast.js` | `BeGfFpgxmI7hdCTI` | Plan Broadcast | full source, **published 2026-09-04** |
 | `whatsapp-offer-broadcast/build-results.js` | `BeGfFpgxmI7hdCTI` | Build Results | full source, **published 2026-09-04** |
@@ -79,12 +79,40 @@ missed offer costs more than a review line. It excludes "do you have", "do you
 need" and a bare "looking for", all of which appear in genuine sell messages —
 a real Pilsner Urquell offer opens "Do you need Pilsner Urquell".
 
+**3. A greeting taken as the product name** (`extract-wa-offers.js`, 2026-09-07)
+
+Sabina's message of 2026-09-06 read:
+
+    Hi I have on the floor
+    9960 bottles MacAllan 12 yo Double cask GB at 43 euro DAP Reftrans on the floor
+
+The priced line states no size, so it was not a product line, and the weakest
+naming rule in `findProductName()` took the first non-price line with letters
+in it: the greeting. The offer was filed as Brand "Hi", product "Hi I have on
+the floor", with a matching junk Product record (both since corrected by hand
+in Airtable; the offer now links to the existing Macallan product, priced per
+bottle).
+
+Two changes: the fallback rule refuses greeting-shaped lines (`GREETING`), so
+this message now goes to review with its text intact; and the announcement rule
+recognises "I have" beside "we have", steps over filler such as "on the floor"
+/ "in stock" (`ANNOUNCE_FILLER`), and cuts the name at the price, so "I have on
+the floor 9960 bottles Macallan 12 yo ..." on one line names the Macallan.
+
+Until this is pasted into node `Extract WA Offers` and the workflow is
+PUBLISHED, the running node still has the old behaviour.
+
 ## Tests
 
 Plain node, no framework:
 
     node n8n/tests/split-quantity.test.js
     node n8n/tests/buy-side-guard.test.js
+    node n8n/tests/greeting-product-name.test.js        # COMPARE=1 diffs against git HEAD
+
+`greeting-product-name` is the only one that executes the real node source
+(wrapped in `new Function` with `$input` supplied) rather than a copy of a
+helper, so it also guards the shapes the earlier rules were built for.
 
 Cases are real messages from the WhatsApp Log. The buy-side test asserts both
 directions: sell-side messages must stay `Supplier Offer`, buy-side must become

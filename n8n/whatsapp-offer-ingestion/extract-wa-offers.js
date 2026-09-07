@@ -96,6 +96,22 @@ const ATTRIBUTE_LINE = /^(?:bbd|b\.b\.d|best before|exp(?:iry)?|ean|barcode|moq|
 // ctn", a follow-up in a negotiation, into a product called "Offer price".
 const TERM_LABEL = /\b(?:price|offer|moq|qty|quantity|stock|terms|payment|packaging|available|lead|delivery|bbd|ean|origin|packing)\b/i;
 
+// A line that opens a conversation rather than describing goods. Only the
+// weakest naming rule consults this — a greeting can never be the product, but
+// it is the first line of most messages, which is exactly where that rule looks.
+// Observed on a real offer: "Hi I have on the floor" / "9960 bottles MacAllan 12
+// yo Double cask GB at 43 euro DAP Reftrans" was filed as Brand "Hi", product
+// "Hi I have on the floor", with a Product record created to match.
+const GREETING = /^(?:hi+|hello|hey|dear|greetings|good\s+(?:morning|afternoon|evening|day)|thanks?|thank\s+you)\b/i;
+
+// Filler that follows an announcement without naming anything: "I have on the
+// floor", "we have in stock", "we have available". Removed from the front of
+// what the announcement introduces, so the rule reads the product that follows
+// and yields nothing when nothing does. Applied as a separate step rather than
+// inside the announcement regex: an optional group there is simply backtracked
+// away so that the mandatory capture has something to hold.
+const ANNOUNCE_FILLER = /^(?:(?:in\s+stock|on\s+(?:the\s+)?floor|available|ready)\s*[:\-–—,]?\s*)+/i;
+
 // A stated approximation or a span. Any of these on the price line means the
 // number is not a price we can quote from.
 const INEXACT = /\b(?:average|approx(?:imately)?|around|about|starting|from)\b|~/i;
@@ -319,18 +335,33 @@ function findProductName(allLines, priceLines) {
     if (stripped && PRODUCT_SIGNAL.test(stripped)) return stripped;
   }
 
-  // 2. An explicit announcement.
+  // 2. An explicit announcement. "I have" sits beside "we have" because a
+  //    one-person supplier writes in the first person. Filler between the
+  //    verb and the goods ("on the floor", "in stock") is stepped over, so
+  //    "I have on the floor 9960 bottles Macallan ..." names the Macallan and
+  //    "I have on the floor" on its own names nothing. What is read stops at
+  //    the price: the terms after it are collected by readTerms, and left in
+  //    the name they only stop it matching a Product.
   for (const l of candidates) {
-    const m = l.match(/\b(?:we are offering|we offer|offering|we have|offer(?:ing)? for)\b\s*:?\s*(.+)$/i);
-    if (m && m[1].trim().length > 2) return stripPrices(m[1]);
+    const m = l.match(/\b(?:we are offering|we offer|offering|we have|i have|offer(?:ing)? for)\b\s*:?\s*(.+)$/i);
+    if (!m) continue;
+    const named = m[1].replace(ANNOUNCE_FILLER, '')
+      .replace(new RegExp(PRICE_RE.source + '.*$', 'i'), '')
+      .replace(/\s*(?:\bat|\bfor|@|[-–—:|])+\s*$/i, '')
+      .trim();
+    if (/[A-Za-z]{3}/.test(named)) return stripPrices(named);
   }
 
   // 3. The first line that reads like a name at all. Weak, but harmless: 04
   //    matches on Brand + Name + Volume + Bond, so a wrong name simply fails to
   //    match a Product and the offer is routed to review rather than created.
+  //    A greeting is refused here even though it "reads like a name": with
+  //    nothing else to go on, sending the message to a person with its text
+  //    intact beats creating a Product called "Hi I have on the floor".
   for (const l of candidates) {
     if (priceLines.includes(l)) continue;
     if (!/[A-Za-z]{3}/.test(l)) continue;
+    if (GREETING.test(l)) continue;
     const label = l.match(/^([A-Za-z][A-Za-z ]{0,24}):/);
     if (label && TERM_LABEL.test(label[1])) continue;
     return l;
