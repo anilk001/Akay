@@ -22,6 +22,8 @@ between 2026-07-29 and 2026-08-27. A draft in n8n is invisible until published.
 | `whatsapp-offer-broadcast/build-results.js` | `BeGfFpgxmI7hdCTI` | Build Results | full source, **published 2026-09-04** |
 | `offer-dispatch/fail-loudly-on-halt.js` | `dAYMAj6mZD3hTV4T` | Fail Loudly on Halt | full source, **published 2026-09-08** |
 | `offer-dispatch/untick-queue-on-halt.js` | `dAYMAj6mZD3hTV4T` | Untick Queue on Halt | full source, **published 2026-09-08** |
+| `offer-dispatch/build-recipients.js` | `dAYMAj6mZD3hTV4T` | Build Recipients | full source, **published 2026-09-08** |
+| `offer-dispatch/bulk-broadcast-build-batches.js` | `SrfRd6s06xumu0HD` | Build Batches | full source, saved 2026-09-08 (manual-only template) |
 
 Both changes are live. `classify-message` is a patch rather than full source
 because the node could not be exported verbatim at the time; replace it with the
@@ -88,6 +90,7 @@ Plain node, no framework:
     node n8n/tests/split-quantity.test.js
     node n8n/tests/buy-side-guard.test.js
     node n8n/tests/offer-dispatch-halt.test.cjs
+    node n8n/tests/resend-email-regex.test.cjs
 
 Cases are real messages from the WhatsApp Log. The buy-side test asserts both
 directions: sell-side messages must stay `Supplier Offer`, buy-side must become

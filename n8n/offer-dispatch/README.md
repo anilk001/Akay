@@ -9,15 +9,17 @@ Clients, composes the plain-text email, renders and verifies the HTML, emails an
 approval request to `ak@akay.ie` with Approve / Decline links, and only then
 sends one Resend email per recipient (2/s, `Idempotency-Key` per offer×client).
 
-Only the two Code nodes that were changed are mirrored here. The rest of the
-node code remains in n8n only.
+Only the Code nodes that have been changed from this repo are mirrored here.
+The rest of the node code remains in n8n only.
 
 ## Files
 
-| File | Node | State |
-|---|---|---|
-| `fail-loudly-on-halt.js` | Fail Loudly on Halt | full source, **published 2026-09-08** |
-| `untick-queue-on-halt.js` | Untick Queue on Halt | full source, **published 2026-09-08** |
+| File | Workflow | Node | State |
+|---|---|---|---|
+| `fail-loudly-on-halt.js` | `dAYMAj6mZD3hTV4T` | Fail Loudly on Halt | full source, **published 2026-09-08** |
+| `untick-queue-on-halt.js` | `dAYMAj6mZD3hTV4T` | Untick Queue on Halt | full source, **published 2026-09-08** |
+| `build-recipients.js` | `dAYMAj6mZD3hTV4T` | Build Recipients | full source, **published 2026-09-08** |
+| `bulk-broadcast-build-batches.js` | `SrfRd6s06xumu0HD` Ad-hoc Bulk Broadcast (template) | Build Batches | full source, saved 2026-09-08 (manual-only workflow, send node disabled) |
 
 The same publish also changed one expression on the `Approved?` If node:
 
@@ -57,9 +59,30 @@ replaced by *Wait for Approval* on 2026-09-03:
    actually claimed. (In 36640 there happened to be no deferred group, so no
    damage was done that day.)
 
+## Fix of 2026-09-08 — email validation matched to Resend
+
+The Lotus Biscoff bulk send that morning (workflow `SrfRd6s06xumu0HD`, 2,497
+recipients in 25 batches of 100) had three batches rejected by Resend with
+`422 Invalid \`to\` field`, because one malformed address fails the whole
+batch. The retry that followed used a home-grown "strict" regex to drop bad
+addresses, and the same regex was copied into Offer Dispatch's Build
+Recipients. It was stricter than Resend: it rejected apostrophes, so
+`alan.o'brien@barrys.ie` (a valid, deliverable address) was dropped from the
+retry and would have been silently excluded from every future dispatch.
+
+Both nodes now use the exact pattern Resend validates `to` against:
+
+    /^(?!\.)(?!.*\.\.)([a-z0-9_'+\-.]*)[a-z0-9_+-]@([a-z0-9][a-z0-9-]*\.)+[a-z]{2,}$/
+
+(applied after lower-casing). Rejects what Resend rejects: no TLD
+(`info@organic`), one-letter TLD (`grosshandel@medivon.d`), leading or double
+dots. Accepts what Resend accepts, apostrophes included; proven by a live
+single send to Alan O'Brien (Resend id `4d08184d`, 200).
+
 ## Tests
 
     node n8n/tests/offer-dispatch-halt.test.cjs
+    node n8n/tests/resend-email-regex.test.cjs
 
 Five scenarios run the mirrored sources against a stand-in for n8n's `$()`:
 declined, expired, post-send incomplete, 401 on every send, and a gate halt.
