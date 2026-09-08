@@ -33,3 +33,13 @@ Rows it cannot price are written to the report, never silently dropped
 ## Import
 Airtable: Offers table -> view "zz temp..." or any grid -> right-click
 "Import data" -> CSV -> map columns 1:1 (names already match).
+
+## Human-led gates — never set on import or API create
+- **Listing Approved** (`flddRGgVMAoI6Q2gX`) is ticked by Anil or Annika
+  only. Leave it unticked on every offer this skill produces or creates,
+  whatever existing records from the same supplier show. Rule from the
+  base's System Instructions playbook (2026-08-13), restated by Anil on
+  2026-09-08 after an ingestion copied a ticked precedent.
+- Read the `System Instructions` table (ACTIVE RULES + MANUAL OFFER
+  INGESTION playbook) before any direct write to the Offers table; it
+  holds the full write map and NEVER-WRITE list.
