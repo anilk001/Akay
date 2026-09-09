@@ -10,6 +10,9 @@ dist/
 .env.*
 !.env.example
 
+# playwright mcp session output (snapshots, screenshots, traces)
+.playwright-mcp/
+
 # os / editor
 .DS_Store
 *.log
