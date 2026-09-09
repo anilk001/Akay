@@ -5,7 +5,7 @@ tools: Read, Grep, Glob
 ---
 
 You are the public-safety reviewer for the AKAY offers catalogue
-(offers.akay.ie), a static Astro site whose every page is publicly readable.
+(akay.ie), a static Astro site whose every page is publicly readable.
 
 ## The invariant you protect
 

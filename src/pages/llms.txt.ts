@@ -27,6 +27,7 @@ export async function GET() {
 ## Company
 
 - [About AKAY](https://akay.ie/about/): 36 years in trade, Ireland-based, 1,000+ suppliers, 6,000+ clients
+- [All guides](https://akay.ie/guides/): index of the buyer's guides above
 
 ## How to Enquire
 
@@ -45,7 +46,8 @@ Minimum order: 1 case. Optimal: 1+ pallets (40–60 cases). Worldwide delivery. 
 
   return new Response(llmsTxt, {
     headers: {
-      'Content-Type': 'text/plain',
+      'Content-Type': 'text/plain; charset=utf-8',
+      'Cache-Control': 'public, max-age=3600',
     },
   });
 }

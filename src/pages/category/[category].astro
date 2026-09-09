@@ -1,27 +1,18 @@
 ---
 import { getOffers } from '../../data/airtable.mjs';
-import { generateSlug, dedupeSlug } from '../../lib/slug.mjs';
-import { categoryItemListSchema, organizationSchema } from '../../lib/schema.mjs';
+import { withSlugs } from '../../lib/slug.mjs';
+import { categoryItemListSchema, organizationSchema, crumbs } from '../../lib/schema.mjs';
+import Seo from '../../components/Seo.astro';
+import { priceLabel } from '../../lib/price.mjs';
 
 export async function getStaticPaths() {
   const { offers } = await getOffers();
-
-  // Build slug map
-  const slugMap = new Map();
-  const slugs = [];
-  for (const offer of offers) {
-    let slug = generateSlug(offer.name, offer.spec);
-    slug = dedupeSlug(slug, slugs);
-    slugs.push(slug);
-    slugMap.set(offer.id || `${offer.brand}-${offer.name}`, { ...offer, slug });
-  }
-
-  // Get all unique categories
-  const categories = Array.from(new Set(Array.from(slugMap.values()).map((o) => o.category))).sort();
+  const offersWithSlugs = withSlugs(offers);
+  const categories = Array.from(new Set(offersWithSlugs.map((o) => o.category))).sort();
 
   return categories.map((category) => ({
     params: { category: category.toLowerCase().replace(/\s+/g, '-') },
-    props: { category, offers: Array.from(slugMap.values()) },
+    props: { category, offers: offersWithSlugs },
   }));
 }
 
@@ -37,32 +28,63 @@ const orgSchema = organizationSchema();
 const itemListSchema = categoryItemListSchema(category, categoryOffers);
 
 const categorySlug = category.toLowerCase().replace(/\s+/g, '-');
-const pageTitle = `Wholesale ${category} Offers — Trade Pricing | AKAY Trade`;
-const pageDesc = `Wholesale ${category} by the case from AKAY Trade. Live trade pricing, pack specs, and duty status. Buy spirits, beer, FMCG and more.`;
+
+// Distinct facts per category page — brand count, stock count and the duty
+// tiers actually present — so the ~10 category pages don't read as one
+// boilerplate template repeated ten times.
+const brandNames = Array.from(new Set(categoryOffers.map((o) => o.brand).filter(Boolean))).sort();
+const inStockCount = categoryOffers.filter((o) => o.stock === 'in').length;
+const tiers = Array.from(new Set(categoryOffers.map((o) => o.tier).filter(Boolean))).sort();
+
+// "T1, T2 and Bonded" rather than "T1 and T2 and Bonded and …".
+function listPhrase(items, max = 3) {
+  const shown = items.slice(0, max);
+  if (shown.length === 0) return '';
+  if (shown.length === 1) return shown[0];
+  return `${shown.slice(0, -1).join(', ')} and ${shown[shown.length - 1]}`;
+}
+
+const pageTitle = `Wholesale ${category} — ${categoryOffers.length} Live Trade Offers | AKAY Trade`;
+const pageDesc = [
+  `${categoryOffers.length} wholesale ${category.toLowerCase()} offers from AKAY Trade, Ireland`,
+  brandNames.length ? `${brandNames.length} brands including ${listPhrase(brandNames, 4)}` : null,
+  tiers.length ? `${listPhrase(tiers)} duty status` : null,
+  'by the case and pallet, with live trade prices and pack specs.',
+].filter(Boolean).join(' · ').slice(0, 300);
+
+// Sibling categories keep every category page one click from the others, so
+// crawlers reach the whole catalogue without depending on the homepage.
+const siblingCategories = Array.from(new Set(offers.map((o) => o.category)))
+  .filter((c) => c && c !== category)
+  .sort()
+  .map((c) => ({ name: c, slug: c.toLowerCase().replace(/\s+/g, '-') }));
+
+// Built as one string: adjacent JSX expressions swallow the whitespace
+// between them, which silently produced "491brands" in the rendered copy.
+const introLine = [
+  `${categoryOffers.length} live ${category.toLowerCase()} ${categoryOffers.length === 1 ? 'line' : 'lines'} from AKAY Trade`,
+  brandNames.length ? `across ${brandNames.length} ${brandNames.length === 1 ? 'brand' : 'brands'}` : null,
+  'priced by the case and pallet for trade buyers.',
+].filter(Boolean).join(', ') + (inStockCount > 0
+  ? ` ${inStockCount} ${inStockCount === 1 ? 'line is' : 'lines are'} in stock now; the rest are priced on enquiry.`
+  : '');
+
+const breadcrumbData = crumbs([
+  { name: 'Home', path: '/' },
+  { name: category, path: `/category/${categorySlug}/` },
+]);
 ---
 
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>{pageTitle}</title>
-  <meta name="description" content={pageDesc} />
-  <link rel="icon" href="/akay-bird.png" />
-  <link rel="canonical" href={`https://akay.ie/category/${categorySlug}/`} />
-  <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="AKAY Trade" />
-  <meta property="og:url" content={`https://akay.ie/category/${categorySlug}/`} />
-  <meta property="og:title" content={`${category} Offers`} />
-  <meta property="og:description" content={pageDesc} />
-  <meta property="og:image" content="https://akay.ie/akay-bird.png" />
-  <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content={`${category} Offers`} />
-  <meta name="twitter:description" content={pageDesc} />
-  <meta name="robots" content="max-snippet:-1, max-image-preview:large" />
-
-  <script type="application/ld+json" set:html={JSON.stringify(orgSchema)} />
-  <script type="application/ld+json" set:html={JSON.stringify(itemListSchema)} />
+  <Seo
+    title={pageTitle}
+    description={pageDesc}
+    ogTitle={`Wholesale ${category} Offers`}
+    path={`/category/${categorySlug}/`}
+    schemas={[orgSchema, itemListSchema, breadcrumbData]}
+  />
 
   <style>
     :root {
@@ -228,6 +250,40 @@ const pageDesc = `Wholesale ${category} by the case from AKAY Trade. Live trade 
       margin: 0 1em;
       color: var(--brass);
     }
+
+    .sibling-cats {
+      border-top: 1px solid var(--line);
+      padding: 1.5em 0 3em;
+    }
+
+    .sibling-cats h2 {
+      font-size: 1rem;
+      margin: 0 0 0.8em;
+      color: var(--muted, #767E72);
+    }
+
+    .sibling-cats ul {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6em;
+      margin: 0;
+      padding: 0;
+    }
+
+    .sibling-cats a {
+      display: inline-block;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 0.4em 0.9em;
+      font-size: 0.9rem;
+      color: var(--brass);
+      text-decoration: none;
+    }
+
+    .sibling-cats a:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
@@ -238,7 +294,13 @@ const pageDesc = `Wholesale ${category} by the case from AKAY Trade. Live trade 
 
     <div class="header">
       <h1>Wholesale {category} Offers</h1>
-      <p>{categoryOffers.length} products in this category</p>
+      <p>{introLine}</p>
+      <p>
+        Prices are indicative and move with the market. Send a requirement list
+        (brand, product, quantity) and we quote within 24 hours — see
+        <a href="/guides/requirement-list-format/">how to format a requirement list</a>.
+        {tiers.length > 0 && <> Duty status on this page: {listPhrase(tiers, 5)} — see <a href="/guides/t1-vs-t2-duty-status/">T1 vs T2 explained</a>.</>}
+      </p>
     </div>
 
     <div class="offer-grid">
@@ -254,10 +316,10 @@ const pageDesc = `Wholesale ${category} by the case from AKAY Trade. Live trade 
           <div class="offer-card">
             <h3>{offer.name}</h3>
             {offer.spec && <p>{offer.spec}</p>}
-            <div class="price">{offer.currency}{offer.amount?.toFixed(2) || '—'} / case</div>
+            <div class="price">{priceLabel(offer, { short: true })}</div>
             <span class={`stock stock-${stockStatus}`}>{stockText}</span>
             {offer.tier && <p><strong>Duty:</strong> {offer.tier}</p>}
-            <a href={`/offers/${offer.slug}/`} class="view-link">View offer →</a>
+            <a href={`/offers/${offer.canonicalSlug || offer.slug}/`} class="view-link">View offer →</a>
           </div>
         );
       })}
@@ -266,8 +328,19 @@ const pageDesc = `Wholesale ${category} by the case from AKAY Trade. Live trade 
     <div class="nav">
       <a href="/">← Back to catalogue</a>
       |
-      <a href="/">Browse all categories</a>
+      <a href="/#categories">Browse all categories</a>
+      |
+      <a href="/about/">About AKAY</a>
     </div>
+
+    <nav class="sibling-cats" aria-label="Other categories">
+      <h2>Other categories</h2>
+      <ul>
+        {siblingCategories.map((c) => (
+          <li><a href={`/category/${c.slug}/`}>Wholesale {c.name}</a></li>
+        ))}
+      </ul>
+    </nav>
   </div>
 </body>
 </html>

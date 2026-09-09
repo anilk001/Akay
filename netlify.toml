@@ -1,4 +1,4 @@
-# Netlify build configuration for the AKAY offers catalogue.
+# Netlify build configuration for the AKAY catalogue at akay.ie.
 # Netlify auto-detects Astro, but pinning it here keeps builds reproducible.
 # Set AIRTABLE_TOKEN (and optionally AIRTABLE_BASE_ID) in the Netlify UI:
 #   Site settings → Environment variables. Build-time only; never shipped to the browser.
@@ -10,6 +10,56 @@
 [build.environment]
   NODE_VERSION = "20"
 
+# ---------------------------------------------------------------------------
+# Domain migration: offers.akay.ie → akay.ie
+#
+# The catalogue used to live at offers.akay.ie and every path is unchanged, so
+# each old URL maps 1:1 onto the same path on the apex domain. Without these
+# 301s the ranking and links earned by the old host are simply lost, and both
+# hosts serve identical HTML — duplicate content Google has to pick between.
+#
+# These rules only fire for requests that actually reach this Netlify site, so
+# offers.akay.ie must stay attached to the site as a domain alias (Site
+# configuration → Domain management) with its DNS still pointing at Netlify.
+# Keep it attached for at least 12 months so the signals fully transfer.
+# ---------------------------------------------------------------------------
+[[redirects]]
+  from = "https://offers.akay.ie/*"
+  to = "https://akay.ie/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "http://offers.akay.ie/*"
+  to = "https://akay.ie/:splat"
+  status = 301
+  force = true
+
+# One canonical host. Netlify also does this when akay.ie is the primary
+# domain, but stating it here means the behaviour survives a settings change.
+[[redirects]]
+  from = "https://www.akay.ie/*"
+  to = "https://akay.ie/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "http://www.akay.ie/*"
+  to = "https://akay.ie/:splat"
+  status = 301
+  force = true
+
+# The old site linked its guides from a homepage anchor; a few external links
+# use /guides without a slug. Send them to the real hub page.
+[[redirects]]
+  from = "/guide/*"
+  to = "/guides/:splat"
+  status = 301
+
+# ---------------------------------------------------------------------------
+# Caching
+# ---------------------------------------------------------------------------
+
 # Long-cache the immutable hashed assets and the logo.
 [[headers]]
   for = "/_assets/*"
@@ -20,3 +70,29 @@
   for = "/akay-bird.png"
   [headers.values]
     Cache-Control = "public, max-age=86400"
+
+[[headers]]
+  for = "/og-akay.png"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+
+# The catalogue is re-baked from Airtable every 5 minutes, so pages must not
+# be cached long at the edge — but they can be revalidated cheaply.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    X-Frame-Options = "SAMEORIGIN"
+    Permissions-Policy = "geolocation=(), microphone=(), camera=(), interest-cohort=()"
+    # No includeSubDomains: other akay.ie subdomains are outside this site's
+    # control and would be forced to HTTPS by a header set here.
+    Strict-Transport-Security = "max-age=31536000"
+
+# Internal email-signature HTML. robots.txt disallows crawling it; this header
+# also keeps it out of the index if it is ever linked from elsewhere.
+[[headers]]
+  for = "/sig/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"

@@ -1,24 +1,15 @@
 ---
 import { getOffers } from '../../data/airtable.mjs';
-import { generateSlug, dedupeSlug } from '../../lib/slug.mjs';
+import { withSlugs } from '../../lib/slug.mjs';
 import { productOfferSchema, breadcrumbSchema, organizationSchema } from '../../lib/schema.mjs';
+import Seo from '../../components/Seo.astro';
+import { priceLabel } from '../../lib/price.mjs';
 import { enquiryLink, WA_LINK, WA_DISPLAY } from '../../lib/whatsapp.mjs';
 
 // Get all valid slugs for static generation
 export async function getStaticPaths() {
   const { offers } = await getOffers();
-
-  // Build slug map
-  const slugMap = new Map();
-  const slugs = [];
-  for (const offer of offers) {
-    let slug = generateSlug(offer.name, offer.spec);
-    slug = dedupeSlug(slug, slugs);
-    slugs.push(slug);
-    slugMap.set(offer.id || `${offer.brand}-${offer.name}`, { ...offer, slug });
-  }
-
-  const allOffers = Array.from(slugMap.values());
+  const allOffers = withSlugs(offers);
 
   return allOffers.map((offer) => ({
     params: { slug: offer.slug },
@@ -28,6 +19,11 @@ export async function getStaticPaths() {
 
 const { offer, allOffers } = Astro.props;
 const slug = offer.slug;
+
+// Airtable lists the same product more than once (different lot or supplier).
+// Those pages all point their canonical at one representative URL so search
+// engines index a single page per product — see withSlugs() in lib/slug.mjs.
+const canonicalPath = `/offers/${offer.canonicalSlug || slug}/`;
 
 // Helper functions
 function priceParts(detail = '') {
@@ -61,12 +57,38 @@ const relatedOffers = allOffers
 
 // Build schemas
 const orgSchema = organizationSchema();
-const productSchema = productOfferSchema(offer, slug);
-const breadcrumbData = breadcrumbSchema(offer.name, offer.category, slug);
+const productSchema = productOfferSchema(offer, offer.canonicalSlug || slug);
+const breadcrumbData = breadcrumbSchema(offer.name, offer.category, offer.canonicalSlug || slug);
 
-// Title and meta
-const pageTitle = `${offer.name} ${offer.spec || ''} wholesale — ${offer.currency}${offer.amount?.toFixed(2) || '—'}/case | AKAY Trade`;
-const pageDesc = `${offer.name} ${offer.spec || ''} wholesale: ${offer.currency}${offer.amount?.toFixed(2) || '—'}/case, ${offer.tier || 'trade pricing'}, ${offer.terms || 'terms available'}. Buy by the case from AKAY Trade.`;
+// Short availability phrase for the meta description (the on-page version
+// with case counts is built further down).
+const stockLine = offer.stock === 'in'
+  ? (offer.qty ? `${offer.qty.toLocaleString()} cases in stock` : 'in stock')
+  : offer.stock === 'warn' ? 'limited availability' : 'enquire for availability';
+
+// Title and meta. priceLabel() reads the parsed basis, so a per-bottle line
+// never gets a "/case" price in its SERP snippet.
+const price = priceLabel(offer);
+
+// Product names run to 200+ characters on multi-variant lines. Budget the
+// title so the whole string stays near 110 characters — the product name is
+// the part that gets shortened, since the pack size and price are what make
+// one line distinguishable from the next.
+const titleTail = `${offer.spec ? ` ${offer.spec}` : ''} wholesale — ${price} | AKAY Trade`;
+const nameBudget = Math.max(24, 110 - titleTail.length);
+const shortName = offer.name.length > nameBudget
+  ? `${offer.name.slice(0, nameBudget - 1).trimEnd().replace(/[\s,;·—-]+$/, '')}…`
+  : offer.name;
+
+const pageTitle = `${shortName}${titleTail}`;
+const pageDesc = [
+  `Buy ${offer.name}${offer.spec ? ` (${offer.spec})` : ''} wholesale from AKAY Trade`,
+  price,
+  offer.tier,
+  offer.terms,
+  offer.origin ? `origin ${offer.origin}` : null,
+  stockLine,
+].filter(Boolean).join(' · ').slice(0, 300);
 
 // Determine availability status for display
 let stockStatus = 'Enquire on request';
@@ -84,26 +106,14 @@ if (offer.stock === 'in') {
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>{pageTitle}</title>
-  <meta name="description" content={pageDesc} />
-  <link rel="icon" href="/akay-bird.png" />
-  <link rel="canonical" href={`https://akay.ie/offers/${slug}/`} />
-  <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="AKAY Trade" />
-  <meta property="og:url" content={`https://akay.ie/offers/${slug}/`} />
-  <meta property="og:title" content={offer.name} />
-  <meta property="og:description" content={pageDesc} />
-  <meta property="og:image" content="https://akay.ie/akay-bird.png" />
-  <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content={offer.name} />
-  <meta name="twitter:description" content={pageDesc} />
-  <meta name="robots" content="max-snippet:-1, max-image-preview:large" />
-
-  <script type="application/ld+json" set:html={JSON.stringify(orgSchema)} />
-  <script type="application/ld+json" set:html={JSON.stringify(productSchema)} />
-  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+  <Seo
+    title={pageTitle}
+    description={pageDesc}
+    ogTitle={shortName}
+    path={canonicalPath}
+    type="product"
+    schemas={[orgSchema, productSchema, breadcrumbData]}
+  />
 
   <style>
     :root {
@@ -369,10 +379,10 @@ if (offer.stock === 'in') {
         <div class="offer-grid">
           {relatedOffers.map((rel) => (
             <div class="offer-card">
-              <h3><a href={`/offers/${rel.slug}/`}>{rel.name}</a></h3>
+              <h3><a href={`/offers/${rel.canonicalSlug || rel.slug}/`}>{rel.name}</a></h3>
               {rel.spec && <p style="margin: 0.5em 0; color: var(--muted); font-size: 0.9em;">{rel.spec}</p>}
               <div class="price">{rel.currency}{rel.amount?.toFixed(2) || '—'} / case</div>
-              <a href={`/offers/${rel.slug}/`} style="font-weight: 600;">View offer →</a>
+              <a href={`/offers/${rel.canonicalSlug || rel.slug}/`} style="font-weight: 600;">View offer →</a>
             </div>
           ))}
         </div>

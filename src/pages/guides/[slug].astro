@@ -1,6 +1,7 @@
 ---
 import { guides, getGuideBySlug, getAllGuidesSlugs } from '../../data/guides.mjs';
-import { articleSchema, organizationSchema } from '../../lib/schema.mjs';
+import { articleSchema, organizationSchema, crumbs } from '../../lib/schema.mjs';
+import Seo from '../../components/Seo.astro';
 import { WA_LINK, WA_DISPLAY } from '../../lib/whatsapp.mjs';
 
 export async function getStaticPaths() {
@@ -14,6 +15,12 @@ const { guide } = Astro.props;
 const orgSchema = organizationSchema();
 const articleData = articleSchema(guide.title, guide.content, guide.slug);
 
+const breadcrumbData = crumbs([
+  { name: 'Home', path: '/' },
+  { name: 'Guides', path: '/guides/' },
+  { name: guide.title, path: `/guides/${guide.slug}/` },
+]);
+
 const pageTitle = `${guide.title} | AKAY Trade Guides`;
 const pageDesc = guide.excerpt;
 ---
@@ -21,25 +28,14 @@ const pageDesc = guide.excerpt;
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>{pageTitle}</title>
-  <meta name="description" content={pageDesc} />
-  <link rel="icon" href="/akay-bird.png" />
-  <link rel="canonical" href={`https://akay.ie/guides/${guide.slug}/`} />
-  <meta property="og:type" content="article" />
-  <meta property="og:site_name" content="AKAY Trade" />
-  <meta property="og:url" content={`https://akay.ie/guides/${guide.slug}/`} />
-  <meta property="og:title" content={guide.title} />
-  <meta property="og:description" content={pageDesc} />
-  <meta property="og:image" content="https://akay.ie/akay-bird.png" />
-  <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content={guide.title} />
-  <meta name="twitter:description" content={pageDesc} />
-  <meta name="robots" content="max-snippet:-1, max-image-preview:large" />
-
-  <script type="application/ld+json" set:html={JSON.stringify(orgSchema)} />
-  <script type="application/ld+json" set:html={JSON.stringify(articleData)} />
+  <Seo
+    title={pageTitle}
+    description={pageDesc}
+    ogTitle={guide.title}
+    path={`/guides/${guide.slug}/`}
+    type="article"
+    schemas={[orgSchema, articleData, breadcrumbData]}
+  />
 
   <style>
     :root {
@@ -277,7 +273,7 @@ const pageDesc = guide.excerpt;
 <body>
   <div class="container">
     <div class="breadcrumb">
-      <a href="/">Home</a> / <a href="/#guides">Guides</a> / {guide.title}
+      <a href="/">Home</a> / <a href="/guides/">Guides</a> / {guide.title}
     </div>
 
     <article>

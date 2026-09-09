@@ -1,6 +1,6 @@
 ---
 name: new-guide
-description: Scaffold a new buyer's guide for offers.akay.ie — adds an entry to src/data/guides.mjs so it renders at /guides/<slug> and appears in the sitemap automatically. Use when the user wants a new trade guide, explainer, or educational page (e.g. duty status, incoterms, licensing).
+description: Scaffold a new buyer's guide for akay.ie — adds an entry to src/data/guides.mjs so it renders at /guides/<slug> and appears in the sitemap automatically. Use when the user wants a new trade guide, explainer, or educational page (e.g. duty status, incoterms, licensing).
 ---
 
 # New buyer's guide
