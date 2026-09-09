@@ -48,9 +48,57 @@ node n8n/tests/split-quantity.test.js
 - `n8n/` — WhatsApp offer-ingestion scripts + plain-Node tests (a PostToolUse
   hook runs them after any edit under `n8n/`)
 - `.claude/` — skills (offers-catalogue, offer-data-validator,
-  price-list-intake, new-guide, plus vendored design skills — see
-  `.claude/skills/VENDORED.md`), agents (public-safety-reviewer, test-writer),
-  hooks, plugin config
+  price-list-intake, new-guide, plus vendored design and task-observer skills —
+  see `.claude/skills/VENDORED.md`), agents (public-safety-reviewer,
+  test-writer), hooks, plugin config, and the task-observer workspace
+  (`.claude/task-observer/`)
 
 After changing the data layer or page templates, run the
 **public-safety-reviewer** agent to confirm nothing private can leak.
+
+## Task observer
+
+Before the first tool call of any session — and before writing or proposing a
+plan, not merely before executing one — invoke the `task-observer` skill AND
+execute its Session Start Protocol (storage check, frontmatter scan, review
+trigger). Loading the skill and running the protocol are separate steps; a
+session that loads the file and stops has activated nothing. Any turn that will
+involve a tool call counts; do not classify the session as "too simple" from its
+opening message.
+
+After completing each task, check the observation records written this session
+and report a one-line summary (ids and titles, or "none logged and why").
+
+Loading a skill is not complete until you have queried the observation log for
+OPEN observations naming it and read their bodies:
+
+```bash
+grep -l "skill:.*<skill-name>" .claude/task-observer/skill-observations/observation-log/*.md
+```
+
+Apply their insights to the current work even if the skill file hasn't been
+updated yet. Run this at every skill load. The session-start scan does not cover
+it: that is a frontmatter sweep over every observation, this is a body-level
+lookup for one skill at the moment its rules are applied.
+
+The task-observer workspace for this project is the `.claude/task-observer/`
+directory at the repository root — the directory holding this CLAUDE.md, which
+is `/home/user/Akay/.claude/task-observer` in a Claude Code on the web session.
+Resolve it from the repository root and never from the current working
+directory. Every path the skill uses derives from that root and nothing else:
+
+- `.claude/task-observer/skill-observations/observation-log/` (the log)
+- `.claude/task-observer/skill-observations/cross-cutting-principles.md`
+- `.claude/task-observer/skill-updates/` (staging root)
+- `.claude/task-observer/skill-updates/PENDING.md` (staging manifest)
+
+The workspace lives inside the repository on purpose, and Session Start step 1
+should **not** re-anchor it. Every web session runs in a container that is
+discarded when the session ends, so a path outside the checkout would not
+survive; the checkout is durable precisely because it is committed and pushed.
+Commit observation-log changes like any other file — an uncommitted observation
+is a lost one. See `.claude/task-observer/README.md`.
+
+Observations record methodology, never trade data: no supplier identity, buy
+prices, margins, or internal notes in an observation body (golden rule 1 applies
+to `.claude/` too, even though nothing there is published).
