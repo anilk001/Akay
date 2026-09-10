@@ -1,10 +1,6 @@
 // The offer shape a video is allowed to see, and the helpers that turn it into
-// on-screen strings.
-//
-// GOLDEN RULE 1 (see CLAUDE.md): only public-safe fields reach a rendered frame.
-// getOffers() already returns nothing but the FIELDS allowlist, and
-// toVideoOffer() narrows it again to exactly the keys a composition draws. A new
-// Airtable column cannot reach a video unless someone adds it here on purpose.
+// on-screen strings. The runtime allowlist itself lives in ../video-fields.mjs,
+// shared with the render CLI; this type is its compile-time twin.
 
 export type VideoOffer = {
   id: string;
@@ -15,7 +11,6 @@ export type VideoOffer = {
   spec: string;
   currency: string;
   amount: number | null;
-  unitAmount: number | null;
   priceDetail: string;
   priceBasis: string;
   stock: 'in' | 'warn' | 'enq';
@@ -23,21 +18,9 @@ export type VideoOffer = {
   terms: string;
   tier: string;
   origin: string;
-  featured: boolean;
 };
 
-const VIDEO_FIELDS = [
-  'id', 'name', 'variants', 'brand', 'category', 'spec', 'currency', 'amount',
-  'unitAmount', 'priceDetail', 'priceBasis', 'stock', 'qty', 'terms', 'tier',
-  'origin', 'featured',
-] as const;
-
-/** Narrow any offer object to the public-safe keys a composition may render. */
-export function toVideoOffer(o: Record<string, unknown>): VideoOffer {
-  const out = {} as Record<string, unknown>;
-  for (const k of VIDEO_FIELDS) out[k] = o[k] ?? (k === 'featured' ? false : null);
-  return out as unknown as VideoOffer;
-}
+export { toVideoOffer, VIDEO_FIELDS } from '../video-fields.mjs';
 
 export const STOCK_LABEL: Record<VideoOffer['stock'], string> = {
   in: 'In stock',

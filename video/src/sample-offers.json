@@ -8,15 +8,13 @@
     "spec": "120 x 5cl x 40% alc",
     "currency": "USD",
     "amount": 113.4,
-    "unitAmount": 0.95,
     "priceDetail": "USD 113.40/case (120pk) · USD 0.95/unit",
     "priceBasis": "case",
     "stock": "enq",
     "qty": null,
     "terms": "EXW USA",
     "tier": "T1",
-    "origin": "",
-    "featured": false
+    "origin": ""
   },
   {
     "id": "rec0aA2iUgDiksRrt",
@@ -27,15 +25,13 @@
     "spec": "24 x 355ml",
     "currency": "EUR",
     "amount": 15.1,
-    "unitAmount": 0.63,
     "priceDetail": "EUR 15.10/case (24pk) · EUR 0.63/unit",
     "priceBasis": "case",
     "stock": "in",
     "qty": 1728,
     "terms": "EXW Loendersloot",
     "tier": "T2",
-    "origin": "Mexico",
-    "featured": false
+    "origin": "Mexico"
   },
   {
     "id": "rec006BxJomjNiZXa",
@@ -46,15 +42,13 @@
     "spec": "120 x 45ml",
     "currency": "EUR",
     "amount": 34.8,
-    "unitAmount": 0.29,
     "priceDetail": "EUR 34.80/case (120pk) · EUR 0.29/unit",
     "priceBasis": "case",
     "stock": "enq",
     "qty": null,
     "terms": "EXW",
     "tier": "",
-    "origin": "",
-    "featured": false
+    "origin": ""
   },
   {
     "id": "rec0BuCed3sBJPAG9",
@@ -65,15 +59,13 @@
     "spec": "10",
     "currency": "EUR",
     "amount": 13.67,
-    "unitAmount": 1.37,
     "priceDetail": "EUR 13.67/case (10pk) · EUR 1.37/unit",
     "priceBasis": "case",
     "stock": "in",
     "qty": 1764,
     "terms": "UK",
     "tier": "",
-    "origin": "United Kingdom",
-    "featured": false
+    "origin": "United Kingdom"
   },
   {
     "id": "rec5i16FAf5VGf7cO",
@@ -84,14 +76,12 @@
     "spec": "24",
     "currency": "EUR",
     "amount": 10.56,
-    "unitAmount": 0.44,
     "priceDetail": "EUR 10.56/case (24pk) · EUR 0.44/unit",
     "priceBasis": "case",
     "stock": "enq",
     "qty": null,
     "terms": "EXW Poland",
     "tier": "",
-    "origin": "",
-    "featured": false
+    "origin": ""
   }
 ]

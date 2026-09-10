@@ -64,10 +64,11 @@ Rendered files land in `video/out/` (git-ignored).
 `render.mjs` calls `getOffers()` from `src/data/airtable.mjs` — live Airtable
 when `AIRTABLE_TOKEN` is set, the committed snapshot otherwise. That function
 only ever requests the `FIELDS` allowlist, and `toVideoOffer()` narrows each row
-again to the seventeen keys a composition may draw. **Supplier identity, buy
+again to the fifteen keys a composition may draw. **Supplier identity, buy
 prices, margins and internal notes are not in either list and cannot reach a
-frame** (golden rule 1 in `CLAUDE.md`). Adding a field to a video is a
-deliberate, reviewable edit in `src/offer.ts` *and* `render.mjs`.
+frame** (golden rule 1 in `CLAUDE.md`). The render CLI and the compositions
+import that second allowlist from one module, `video-fields.mjs`, so putting a
+new field on screen is a single deliberate, reviewable edit.
 
 Remotion Studio opens on `src/sample-offers.json` — five real public rows, so
 the editor has something on screen without bundling all 6,000.
@@ -92,12 +93,14 @@ To pin exact type, install `@remotion/google-fonts` and call `loadFont()` in
 video/
   render.mjs             CLI: pick offers -> bundle -> renderMedia
   remotion.config.ts     Studio/CLI config (publicDir points at the site's public/)
+  video-fields.mjs       the public-safe allowlist — one list, both consumers
+  find-browser.mjs       reuse an installed Chromium when there is one
   src/
     index.ts             registerRoot
     Root.tsx             the five <Composition> declarations
     OfferSlide.tsx       one offer, all three framings
     OfferRoll.tsx        title card + slides + sign-off
-    offer.ts             VideoOffer type, public-safe narrowing, price formatting
+    offer.ts             VideoOffer type + price/name formatting
     theme.ts             brand tokens copied from the site's :root
     sample-offers.json   Studio placeholder data
 ```

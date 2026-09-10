@@ -19,18 +19,10 @@ import { bundle } from '@remotion/bundler';
 import { renderMedia, renderStill, selectComposition } from '@remotion/renderer';
 import { getOffers } from '../src/data/airtable.mjs';
 import { findBrowser } from './find-browser.mjs';
+import { toVideoOffer } from './video-fields.mjs';
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
 const OUT_DIR = path.join(ROOT, 'out');
-
-// Keep this list in sync with VIDEO_FIELDS in src/offer.ts.
-const VIDEO_FIELDS = [
-  'id', 'name', 'variants', 'brand', 'category', 'spec', 'currency', 'amount',
-  'unitAmount', 'priceDetail', 'priceBasis', 'stock', 'qty', 'terms', 'tier',
-  'origin', 'featured',
-];
-const toVideoOffer = (o) =>
-  Object.fromEntries(VIDEO_FIELDS.map((k) => [k, o[k] ?? (k === 'featured' ? false : null)]));
 
 const ROLL_COMPS = new Set(['OfferRoll', 'OfferRollWide']);
 
