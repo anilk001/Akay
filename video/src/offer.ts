@@ -64,7 +64,8 @@ export function chipsFor(o: VideoOffer): string[] {
   if (o.tier) chips.push(o.tier === 'T1' ? 'T1 duty paid' : o.tier);
   if (o.origin) chips.push(o.origin);
   if (o.terms) chips.push(o.terms);
-  if (typeof o.qty === 'number' && o.qty > 0) chips.push(`${o.qty} cases`);
+  // Case counts run to five figures; unseparated they read as a part number.
+  if (typeof o.qty === 'number' && o.qty > 0) chips.push(`${o.qty.toLocaleString('en-IE')} cases`);
   return chips;
 }
 
