@@ -8,7 +8,11 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "sync-offers": "node src/lib/fetch-offers.mjs"
+    "sync-offers": "node src/lib/fetch-offers.mjs",
+    "video:install": "npm --prefix video install",
+    "video": "npm --prefix video run studio",
+    "video:render": "npm --prefix video run render --",
+    "video:list": "npm --prefix video run list --"
   },
   "dependencies": {
     "astro": "^4.16.18"

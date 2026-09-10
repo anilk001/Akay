@@ -43,6 +43,24 @@ AIRTABLE_TOKEN=pat... npm run sync-offers
 
 ---
 
+## Offer videos (Remotion)
+
+Social videos — 9:16 reels, square posts, multi-offer rolls — are generated from
+the same catalogue data with [Remotion](https://remotion.dev). The video
+workspace lives in `video/` with its own dependencies, so the site build and the
+Netlify deploy are untouched by it.
+
+```bash
+npm run video:install                        # once
+npm run video:list -- corona                 # find an offer
+npm run video:render -- -o "Corona Extra"    # -> video/out/OfferReel-*.mp4
+npm run video                                # Remotion Studio (visual editor)
+```
+
+Full flag reference and the list of compositions: [`video/README.md`](video/README.md).
+
+---
+
 ## Environment variables
 
 | Variable | Purpose |
@@ -104,4 +122,5 @@ src/
     index.astro           the catalogue (design + interactivity)
 public/
   akay-bird.png           logo (hummingbird, transparent)
+video/                    Remotion offer videos (own package.json — see video/README.md)
 ```
