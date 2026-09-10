@@ -44,10 +44,23 @@ export function formatAmount(amount: number | null): string {
   return amount.toLocaleString('en-IE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
+/**
+ * A third of the catalogue (2,048 of 6,273 rows in the current snapshot) carries
+ * a bare pack count as its Public Spec — "40", "120" — instead of a description
+ * like "24 x 355ml". Left alone that renders as a chip reading just "40". The
+ * number is the units per case (it matches the "(40pk)" in the price string),
+ * so label it rather than showing a naked figure.
+ */
+function specChip(spec: string): string {
+  const trimmed = String(spec).trim();
+  const bare = trimmed.match(/^(\d+)$/);
+  return bare ? `${bare[1]} per case` : trimmed;
+}
+
 /** Chips under the price: spec, duty tier, origin, incoterm, cases available. */
 export function chipsFor(o: VideoOffer): string[] {
   const chips: string[] = [];
-  if (o.spec) chips.push(o.spec);
+  if (o.spec) chips.push(specChip(o.spec));
   if (o.tier) chips.push(o.tier === 'T1' ? 'T1 duty paid' : o.tier);
   if (o.origin) chips.push(o.origin);
   if (o.terms) chips.push(o.terms);
