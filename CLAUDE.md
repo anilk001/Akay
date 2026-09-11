@@ -27,6 +27,12 @@ build time → static HTML → Netlify.
    (A PreToolUse hook enforces this.)
 3. **Secrets stay build-time.** `AIRTABLE_TOKEN` is read-only and never
    shipped to the client; only `PUBLIC_`-prefixed vars may reach the browser.
+4. **`Listing Approved` is a human decision.** When creating or updating
+   Offers records in Airtable (email intake, PDF uploads, pipeline clean-up),
+   never tick `Listing Approved`. Anil ticks it after reviewing the record;
+   nothing publishes to offers.akay.ie without it. Set Status, margin,
+   expiry and `Offer Approval Status` as instructed, but leave this box alone.
+   (Rule set by Anil 2026-09-11.)
 
 ## Commands
 
