@@ -21,6 +21,24 @@ prefilled **WhatsApp enquiry**.
 Search, category filter, and price/name sort run client-side on the pre-rendered
 cards (no data round-trips).
 
+### Search (`/search`)
+
+Every page header carries a search box that lands on `/search/`. The page
+fetches `/search-index.json` — generated at build time from the same
+public-safe offer shape — and searches it in the browser with
+`src/lib/search-engine.mjs`:
+
+- typo tolerant (`guiness`, `jamson`), unit-aware (`44cl` = `440ml`, `0.7` =
+  `700ml`, `24x440`), spelling-aware (draft/draught, whisky/whiskey);
+- multi-select facets: category, brand, size, pack, unit type, bond (T1/T2),
+  warehouse, incoterm, in-stock only, per-currency price range;
+- sort by relevance, price per unit, or newest (`Offer Date`);
+- the whole state lives in the URL (`/search/?q=guinness&cat=Beer&size=440ml`)
+  so searches can be bookmarked and shared, and the back button works.
+
+`npm test` runs the normaliser and engine tests against the committed snapshot,
+including the acceptance case "guiness 44cl → Guinness Draught 24 x 440ml".
+
 ---
 
 ## Local development
@@ -42,6 +60,16 @@ AIRTABLE_TOKEN=pat... npm run sync-offers
 ```
 
 ---
+
+## Public-safety assertion
+
+`npm run build` runs `scripts/check-public-safety.mjs` after Astro finishes. It
+fails the build if `dist/search-index.json` carries a key outside the public
+allowlist, or if any generated file contains a forbidden Airtable column name
+(`Supplier Name`, `Buy Price`, `Margin %`, `Trader Comment`, …) or an Airtable
+token. `src/data/airtable.mjs` also refuses to load if `FIELDS` ever names a
+forbidden field. CI (`.github/workflows/ci.yml`) runs the tests and the build on
+every push.
 
 ## Environment variables
 
@@ -100,8 +128,17 @@ src/
     offers-snapshot.json  offline/CI fallback sample
   lib/
     fetch-offers.mjs      refresh the snapshot from live data
+    normalise.mjs         size/pack/spelling normaliser (build + browser)
+    search-engine.mjs     inverted index with exact/prefix/fuzzy matching
+  components/
+    SiteSearch.astro      header search form used on every page
   pages/
     index.astro           the catalogue (design + interactivity)
+    search.astro          instant search with facets (/search)
+    search-index.json.ts  public-safe search index endpoint
+scripts/
+  check-public-safety.mjs post-build forbidden-field assertion
+tests/                    node tests for the normaliser and engine
 public/
   akay-bird.png           logo (hummingbird, transparent)
 ```
