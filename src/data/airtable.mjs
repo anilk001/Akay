@@ -38,8 +38,9 @@ export const FORBIDDEN_FIELDS = [
   'Client Feedback', 'WA Broadcast Log', 'WA Target Segments',
 ];
 export const FORBIDDEN_PATTERN = /supplier|buy|cost|markup|margin|trader|vendor|contact|internal|source|bundle|target|excluded|trust|\bnotes?\b|comparable|feedback|broadcast/i;
-// Public-by-design fields the pattern would otherwise trip on.
-const PATTERN_EXCEPTIONS = new Set(['Public Note']);
+// Public-by-design names the pattern would otherwise trip on: the Airtable
+// field "Public Note" and the `note` key it becomes in the search index.
+const PATTERN_EXCEPTIONS = new Set(['Public Note', 'note']);
 
 export function isForbiddenField(name) {
   if (FORBIDDEN_FIELDS.includes(name)) return true;
