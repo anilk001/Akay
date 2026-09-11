@@ -1,4 +1,5 @@
 ---
+import SiteSearch from '../../components/SiteSearch.astro';
 import { getOffers } from '../../data/airtable.mjs';
 import { generateSlug, dedupeSlug } from '../../lib/slug.mjs';
 import { categoryItemListSchema, organizationSchema } from '../../lib/schema.mjs';
@@ -232,6 +233,7 @@ const pageDesc = `Wholesale ${category} by the case from AKAY Trade. Live trade 
 </head>
 <body>
   <div class="container">
+    <SiteSearch />
     <div class="breadcrumb">
       <a href="/">Home</a> / {category}
     </div>

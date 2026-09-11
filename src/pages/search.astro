@@ -1,0 +1,751 @@
+---
+// /search — instant, typo-tolerant search over the whole public catalogue.
+//
+// The page ships no offer data itself. On load it fetches /search-index.json
+// (built from the same public-safe getOffers() shape as every other page) and
+// runs src/lib/search-engine.mjs in the browser. Facets, sort and the query all
+// live in the URL so any search can be bookmarked or shared; the back button
+// restores the previous state. No Airtable call ever happens client-side.
+import { organizationSchema } from '../lib/schema.mjs';
+import { WA_LINK } from '../lib/whatsapp.mjs';
+import SiteSearch from '../components/SiteSearch.astro';
+
+const GA4_ID = import.meta.env.PUBLIC_GA4_ID || 'G-FW42J5609V';
+const pageTitle = 'Search offers — AKAY Trade';
+const pageDesc = 'Search AKAY\'s live wholesale catalogue: spirits, beer, soft drinks and FMCG by the case. Filter by brand, size, pack, bond status, warehouse and price.';
+---
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{pageTitle}</title>
+  <meta name="description" content={pageDesc} />
+  <link rel="icon" href="/akay-bird.png" />
+  <link rel="canonical" href="https://akay.ie/search/" />
+  <!-- Results depend on the query string; keep the URL out of the index but let crawlers follow offer links. -->
+  <meta name="robots" content="noindex, follow" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="AKAY Trade" />
+  <meta property="og:url" content="https://akay.ie/search/" />
+  <meta property="og:title" content={pageTitle} />
+  <meta property="og:description" content={pageDesc} />
+  <meta property="og:image" content="https://akay.ie/akay-bird.png" />
+  <link rel="preload" href="/search-index.json" as="fetch" crossorigin="anonymous" />
+  {GA4_ID && (
+    <>
+      <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${GA4_ID}`}></script>
+      <script is:inline define:vars={{ GA4_ID }}>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){ dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', GA4_ID);
+      </script>
+    </>
+  )}
+  <script type="application/ld+json" set:html={JSON.stringify(organizationSchema())} />
+
+  <!-- is:global — result rows and facet chips are created client-side, so scoped
+       (data-astro-cid) selectors would never match them. -->
+  <style is:global>
+    :root{
+      --paper:#F7F5F0; --paper-2:#EFEDE4; --card:#FFFFFF; --ink:#17140F; --ink-soft:#41473F;
+      --muted:#767E72; --line:#E4E0D4; --line-soft:#ECE8DD;
+      --brass:#B4231F; --brass-2:#D0362E; --forest:#0E7A3B; --lime:#6FA82E;
+      --ok:#0E7A3B; --ok-bg:#E2F0E5; --warn:#9A6A12; --warn-bg:#F5E9CE; --neu:#5C6A78; --neu-bg:#E9ECEF;
+      --shadow:0 1px 2px rgba(20,33,26,.06),0 6px 20px -8px rgba(20,33,26,.14);
+      --radius:14px;
+      --serif:"Hoefler Text","Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+      --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      --mono:ui-monospace,"SF Mono","SFMono-Regular",Menlo,Consolas,monospace;
+    }
+    @media (prefers-color-scheme:dark){
+      :root{
+        --paper:#0C140F; --paper-2:#081009; --card:#13201A; --ink:#F1EFE7; --ink-soft:#C6CEC4;
+        --muted:#8A968A; --line:#243029; --line-soft:#1B2620;
+        --brass:#EC5A52; --brass-2:#F26E66; --forest:#37B866; --lime:#9BD84F;
+        --ok:#5FC97E; --ok-bg:#123021; --warn:#E0B65C; --warn-bg:#31280F; --neu:#9AA7B4; --neu-bg:#1B2530;
+        --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px -12px rgba(0,0,0,.6);
+      }
+    }
+    :root[data-theme="light"]{
+      --paper:#F7F5F0; --paper-2:#EFEDE4; --card:#FFFFFF; --ink:#17140F; --ink-soft:#41473F;
+      --muted:#767E72; --line:#E4E0D4; --line-soft:#ECE8DD; --brass:#B4231F; --brass-2:#D0362E; --forest:#0E7A3B; --lime:#6FA82E;
+      --ok:#0E7A3B; --ok-bg:#E2F0E5; --warn:#9A6A12; --warn-bg:#F5E9CE; --neu:#5C6A78; --neu-bg:#E9ECEF;
+    }
+    :root[data-theme="dark"]{
+      --paper:#0C140F; --paper-2:#081009; --card:#13201A; --ink:#F1EFE7; --ink-soft:#C6CEC4;
+      --muted:#8A968A; --line:#243029; --line-soft:#1B2620; --brass:#EC5A52; --brass-2:#F26E66; --forest:#37B866; --lime:#9BD84F;
+      --ok:#5FC97E; --ok-bg:#123021; --warn:#E0B65C; --warn-bg:#31280F; --neu:#9AA7B4; --neu-bg:#1B2530;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0}
+    [hidden]{display:none!important}
+    body{background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.5;-webkit-font-smoothing:antialiased}
+    .wrap{max-width:1200px;margin:0 auto;padding:0 20px}
+    a{color:var(--brass)}
+
+    header.bar{position:sticky;top:0;z-index:40;background:color-mix(in srgb,var(--paper) 86%,transparent);
+      backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+    .bar-in{display:flex;align-items:center;gap:16px;height:60px}
+    .mark{display:inline-flex;align-items:center;gap:9px;font-family:var(--serif);font-weight:600;font-size:26px;letter-spacing:.02em;color:var(--ink);text-decoration:none;line-height:1}
+    .logo-slot{flex-shrink:0;height:34px;width:auto;filter:drop-shadow(0 1px 2px rgba(0,0,0,.18))}
+    .mark b{color:var(--brass)}
+    .dot{width:6px;height:6px;border-radius:50%;background:var(--brass-2);display:inline-block;margin:0 2px 2px 2px}
+    .bar-sub{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.04em}
+    .bar-spacer{flex:1}
+    .theme-btn{border:1px solid var(--line);background:var(--card);color:var(--ink-soft);border-radius:9px;
+      height:34px;padding:0 12px;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+    .theme-btn:hover{border-color:var(--brass-2);color:var(--ink)}
+    @media (max-width:640px){.bar-sub,.theme-btn span{display:none}}
+
+    /* Sticky search bar */
+    .sbar{position:sticky;top:60px;z-index:30;background:color-mix(in srgb,var(--paper) 92%,transparent);
+      backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:12px 0}
+    .sbar-in{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+    .qbox{position:relative;flex:1;min-width:240px}
+    .qbox input{width:100%;height:44px;border:1px solid var(--line);background:var(--card);color:var(--ink);
+      border-radius:12px;padding:0 40px 0 42px;font-size:16px;font-family:var(--sans)}
+    .qbox input:focus{outline:2px solid var(--brass-2);outline-offset:1px;border-color:transparent}
+    .qbox>svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted)}
+    .qbox .clear{position:absolute;right:8px;top:50%;transform:translateY(-50%);border:0;background:transparent;color:var(--muted);
+      width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:18px;line-height:1}
+    .qbox .clear:hover{background:var(--paper-2);color:var(--ink)}
+    select.sort{height:40px;border:1px solid var(--line);background:var(--card);color:var(--ink-soft);
+      border-radius:999px;padding:0 14px;font-size:13.5px;cursor:pointer;font-family:var(--sans)}
+    .filt-btn{display:none;height:40px;border:1px solid var(--line);background:var(--card);color:var(--ink-soft);border-radius:999px;
+      padding:0 14px;font-size:13.5px;cursor:pointer;font-family:var(--sans);align-items:center;gap:8px}
+    .filt-btn .n{background:var(--forest);color:var(--paper);border-radius:999px;font-size:11px;padding:1px 7px;font-family:var(--mono)}
+
+    /* Layout */
+    .layout{display:grid;grid-template-columns:280px 1fr;gap:28px;padding:22px 20px 48px}
+    aside.facets{align-self:start;position:sticky;top:130px;max-height:calc(100vh - 140px);overflow:auto;padding-right:6px;scrollbar-width:thin}
+    .facet{border-top:1px solid var(--line-soft);padding:12px 0 10px}
+    .facet:first-child{border-top:0;padding-top:0}
+    .facet h3{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0 0 9px;display:flex;justify-content:space-between;align-items:center}
+    .facet h3 button{border:0;background:transparent;color:var(--brass);font-size:11px;cursor:pointer;font-family:var(--sans);letter-spacing:0;text-transform:none;padding:0}
+    .fchips{display:flex;flex-wrap:wrap;gap:6px}
+    .fchip{border:1px solid var(--line);background:var(--card);color:var(--ink-soft);border-radius:999px;
+      height:30px;padding:0 11px;font-size:12.5px;cursor:pointer;transition:.12s;white-space:nowrap;display:inline-flex;align-items:center;gap:6px;font-family:var(--sans)}
+    .fchip:hover{border-color:var(--brass-2)}
+    .fchip[aria-pressed="true"]{background:var(--forest);color:var(--paper);border-color:var(--forest)}
+    .fchip .c{font-family:var(--mono);font-size:10.5px;opacity:.7}
+    .fchip[aria-pressed="true"] .c{opacity:.85}
+    .fchip:disabled{opacity:.4;cursor:default}
+    .fsearch{width:100%;height:32px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:0 10px;font-size:13px;margin:0 0 8px;font-family:var(--sans)}
+    .toggle{display:flex;align-items:center;gap:9px;font-size:13.5px;color:var(--ink-soft);cursor:pointer}
+    .toggle input{width:16px;height:16px;accent-color:var(--forest)}
+    .price-ctl{display:flex;flex-direction:column;gap:8px}
+    .price-ctl select{height:34px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:0 10px;font-size:13px;font-family:var(--sans)}
+    .range-row{display:flex;gap:8px;align-items:center}
+    .range-row input[type=number]{width:50%;height:34px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:0 9px;font-size:13px;font-family:var(--mono)}
+    .range-row span{color:var(--muted);font-size:12px}
+    .dual{position:relative;height:28px;margin:2px 4px 0}
+    .dual input[type=range]{position:absolute;left:0;right:0;top:0;width:100%;height:28px;margin:0;background:transparent;pointer-events:none;-webkit-appearance:none;appearance:none}
+    .dual input[type=range]::-webkit-slider-thumb{pointer-events:auto;-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--forest);border:2px solid var(--card);box-shadow:0 0 0 1px var(--line);cursor:pointer}
+    .dual input[type=range]::-moz-range-thumb{pointer-events:auto;width:16px;height:16px;border-radius:50%;background:var(--forest);border:2px solid var(--card);cursor:pointer}
+    .dual .track{position:absolute;left:0;right:0;top:12px;height:4px;border-radius:2px;background:var(--line)}
+    .dual .fill{position:absolute;top:12px;height:4px;border-radius:2px;background:var(--forest)}
+    .price-hint{font-size:12px;color:var(--muted);margin:0}
+    .facet-empty{font-size:12.5px;color:var(--muted);margin:0}
+
+    /* Results */
+    .rhead{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin:0 0 12px}
+    .count{font-family:var(--mono);font-size:12.5px;color:var(--muted);letter-spacing:.03em;margin:0}
+    .active{display:flex;flex-wrap:wrap;gap:6px}
+    .achip{border:1px solid color-mix(in srgb,var(--forest) 40%,var(--line));background:color-mix(in srgb,var(--forest) 8%,var(--card));color:var(--ink-soft);
+      border-radius:999px;height:28px;padding:0 6px 0 10px;font-size:12px;display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-family:var(--sans)}
+    .achip b{font-weight:600;color:var(--ink)}
+    .achip .x{font-size:15px;line-height:1;color:var(--muted)}
+    .achip:hover .x{color:var(--brass)}
+    .achip.clear-all{border-style:dashed;background:transparent}
+    .list{display:flex;flex-direction:column;gap:10px}
+    .row{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow);
+      display:grid;grid-template-columns:auto 1fr auto auto;gap:6px 18px;align-items:start;position:relative;transition:.14s}
+    .row:hover{border-color:color-mix(in srgb,var(--brass-2) 55%,var(--line))}
+    .row.feat-on{border-color:color-mix(in srgb,var(--brass-2) 45%,var(--line))}
+    .sel{margin-top:4px}
+    .sel input{width:17px;height:17px;accent-color:var(--forest);cursor:not-allowed}
+    .r-main{min-width:0}
+    .brand{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--brass);margin-bottom:3px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .feat-badge{font-family:var(--mono);font-size:9.5px;font-weight:bold;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:#B4231F;padding:2px 6px;border-radius:5px}
+    .pname{font-family:var(--serif);font-size:18px;font-weight:600;line-height:1.2;margin:0;color:var(--ink);text-wrap:balance}
+    .pname a{color:inherit;text-decoration:none}
+    .pname a:hover{color:var(--brass)}
+    .variants{margin-top:3px;font-size:12px;line-height:1.35;color:var(--muted)}
+    .spec{font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);margin:6px 0 0;letter-spacing:.01em}
+    .metaline{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+    .tag{font-size:11px;padding:3px 8px;border-radius:6px;font-family:var(--mono);letter-spacing:.03em;border:1px solid var(--line);color:var(--muted)}
+    .tag.tier{border-color:color-mix(in srgb,var(--brass-2) 45%,var(--line));color:var(--brass)}
+    .tag.cat{color:var(--ink-soft)}
+    .note{margin:8px 0 0;font-size:13px;color:var(--ink-soft);line-height:1.45;border-left:2px solid var(--line);padding-left:9px}
+    .r-price{text-align:right;min-width:130px}
+    .r-price .amt{font-family:var(--mono);font-size:21px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums;line-height:1}
+    .r-price .cur,.r-price .basis{font-size:12px;color:var(--muted);font-family:var(--mono)}
+    .r-price .sub{font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-top:5px;font-variant-numeric:tabular-nums}
+    .r-price .stock{margin-top:8px;display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+    .pill{font-size:11px;font-weight:600;padding:4px 9px;border-radius:999px;white-space:nowrap}
+    .pill.ok{background:var(--ok-bg);color:var(--ok)}
+    .pill.warn{background:var(--warn-bg);color:var(--warn)}
+    .pill.neu{background:var(--neu-bg);color:var(--neu)}
+    .qty{font-family:var(--mono);font-size:11.5px;font-weight:600;color:var(--ok);font-variant-numeric:tabular-nums}
+    .qty.muted{color:var(--muted);font-weight:400}
+    .r-act{display:flex;flex-direction:column;gap:8px;align-items:stretch;min-width:112px}
+    .enquire{display:inline-flex;align-items:center;justify-content:center;gap:7px;background:var(--forest);color:var(--paper);
+      text-decoration:none;font-size:13px;font-weight:600;padding:8px 13px;border-radius:9px;transition:.14s;border:1px solid transparent}
+    :root[data-theme="dark"] .enquire{color:#0A140F}
+    @media (prefers-color-scheme:dark){.enquire{color:#0A140F}}
+    .enquire:hover{background:var(--brass);color:#fff}
+    .view{display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:var(--ink-soft);text-decoration:none;
+      border:1px solid var(--line);border-radius:9px;padding:7px 13px;background:var(--card)}
+    .view:hover{border-color:var(--brass-2);color:var(--ink)}
+    .more{display:block;margin:20px auto 0;height:42px;padding:0 22px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink-soft);font-size:14px;cursor:pointer;font-family:var(--sans)}
+    .more:hover{border-color:var(--brass-2);color:var(--ink)}
+    .empty{text-align:center;padding:60px 20px;color:var(--muted);font-family:var(--mono);font-size:14px;line-height:1.7}
+    .empty a{color:var(--brass)}
+    .status{padding:40px 20px;text-align:center;color:var(--muted);font-family:var(--mono);font-size:13px}
+    .partial{font-size:12.5px;color:var(--warn);font-family:var(--mono)}
+
+    footer{border-top:1px solid var(--line);padding:26px 0 44px;color:var(--muted);font-size:12.5px}
+    footer .wrap{display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between}
+    footer .note{max-width:64ch;line-height:1.6;border:0;padding:0;margin:0;font-size:12.5px;color:var(--muted)}
+    footer a{color:var(--brass);text-decoration:none}
+
+    /* Drawer + cards on small screens */
+    .backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:45}
+    @media (max-width:900px){
+      .layout{grid-template-columns:1fr;gap:0}
+      .filt-btn{display:inline-flex}
+      aside.facets{position:fixed;top:0;left:0;bottom:0;width:min(86vw,340px);max-height:none;background:var(--paper);z-index:50;
+        padding:16px 18px 30px;transform:translateX(-102%);transition:transform .22s ease;box-shadow:var(--shadow);border-right:1px solid var(--line)}
+      aside.facets.open{transform:none}
+      .backdrop.open{display:block}
+      .drawer-head{display:flex;align-items:center;justify-content:space-between;margin:0 0 10px}
+      .drawer-head h2{font-family:var(--serif);font-size:20px;margin:0}
+      .drawer-head button{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:9px;height:34px;padding:0 12px;cursor:pointer}
+      .row{grid-template-columns:auto 1fr;}
+      .r-price{grid-column:1 / -1;text-align:left;display:flex;justify-content:space-between;align-items:flex-end;gap:12px;border-top:1px solid var(--line-soft);padding-top:10px;margin-top:4px}
+      .r-price .stock{margin-top:0;align-items:flex-end}
+      .r-act{grid-column:1 / -1;flex-direction:row}
+      .r-act>*{flex:1}
+    }
+    @media (min-width:901px){.drawer-head{display:none}}
+    @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+  </style>
+</head>
+<body>
+  <header class="bar">
+    <div class="wrap bar-in">
+      <a class="mark" href="/" aria-label="AKAY home">
+        <img class="logo-slot" src="/akay-bird.png" alt="" width="320" height="279" />AKAY<span class="dot"></span><b>trade</b>
+      </a>
+      <span class="bar-sub">akay.ie / search</span>
+      <span class="bar-spacer"></span>
+      <button class="theme-btn" id="themeBtn" aria-label="Toggle light or dark theme">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5 19 19M19 5l-1.5 1.5M6.5 17.5 5 19"/></svg>
+        <span id="themeLbl">Theme</span>
+      </button>
+    </div>
+  </header>
+
+  <section class="sbar">
+    <div class="wrap sbar-in">
+      <form class="qbox" id="qform" role="search" action="/search/" method="get">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input id="q" name="q" type="search" placeholder="Search — e.g. guinness 44cl, jameson 70cl, kinder bueno" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Search offers" />
+        <button type="button" class="clear" id="qclear" aria-label="Clear search" hidden>×</button>
+      </form>
+      <button type="button" class="filt-btn" id="filtBtn" aria-controls="facets" aria-expanded="false">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 5h18M6 12h12M10 19h4"/></svg>
+        Filters <span class="n" id="filtN" hidden>0</span>
+      </button>
+      <select class="sort" id="sort" aria-label="Sort results">
+        <option value="rel">Sort: Relevance</option>
+        <option value="asc">Price ↑ per unit (low→high)</option>
+        <option value="desc">Price ↓ per unit (high→low)</option>
+        <option value="new">Newest first</option>
+      </select>
+    </div>
+  </section>
+
+  <div class="backdrop" id="backdrop"></div>
+
+  <div class="wrap layout">
+    <aside class="facets" id="facets" aria-label="Filters">
+      <div class="drawer-head">
+        <h2>Filters</h2>
+        <button type="button" id="drawerClose">Done</button>
+      </div>
+      <div id="facetHost"></div>
+    </aside>
+
+    <main>
+      <div class="rhead">
+        <p class="count" id="count">Loading catalogue…</p>
+        <span class="partial" id="partial" hidden></span>
+        <div class="active" id="active"></div>
+      </div>
+      <div class="list" id="list" aria-live="polite"></div>
+      <div class="empty" id="empty" hidden>
+        No offers match. Try fewer filters, or a shorter search.<br />
+        Can't find it? <a id="emptyWa" href={WA_LINK} target="_blank" rel="noopener">Ask us on WhatsApp</a> — we source to order.
+      </div>
+      <button class="more" id="more" hidden>Show more</button>
+      <noscript>
+        <div class="status">Search needs JavaScript. <a href="/">Browse the full catalogue</a> instead.</div>
+      </noscript>
+    </main>
+  </div>
+
+  <footer>
+    <div class="wrap">
+      <div class="note">
+        Live catalogue from AKAY's Airtable. Prices are indicative and shown per the listing basis; supplier identity, buy prices and margins are never published. <strong>T1</strong> = export / under-bond · <strong>T2</strong> = for sale in the EU.
+        <br /><br />
+        <a href="/">All offers</a> · <a href="/about/">About AKAY</a> · <a href="/guides/requirement-list-format/">How to order</a>
+      </div>
+      <div style="font-family:var(--mono);text-align:right">© AKAY · Shannon<br /><a href={WA_LINK}>WhatsApp</a> · <a href="mailto:hello@akay.ie">hello@akay.ie</a></div>
+    </div>
+  </footer>
+
+  <script>
+    import { buildIndex, search } from '../lib/search-engine.mjs';
+    import { volumeLabel } from '../lib/normalise.mjs';
+    import { enquiryLink } from '../lib/whatsapp.mjs';
+    import { generateSlug } from '../lib/slug.mjs';
+
+    // ---------- DOM ----------
+    const $ = (id) => document.getElementById(id);
+    const qEl = $('q'), qClear = $('qclear'), sortEl = $('sort'), listEl = $('list'), countEl = $('count');
+    const emptyEl = $('empty'), moreEl = $('more'), activeEl = $('active'), facetHost = $('facetHost');
+    const partialEl = $('partial'), filtBtn = $('filtBtn'), filtN = $('filtN'), facetsEl = $('facets'), backdrop = $('backdrop');
+
+    // ---------- Facet definitions ----------
+    // key = URL param; get = value(s) shown as chips. Counts are computed over
+    // rows that pass every OTHER facet, so a chip always tells the buyer how
+    // many results adding it would leave.
+    const FACETS = [
+      { key: 'cat',   label: 'Category',       get: (o) => o.category || '' },
+      { key: 'brand', label: 'Brand',          get: (o) => o.brand || '', top: 14, searchable: true },
+      { key: 'size',  label: 'Size',           get: (o) => o.sizeLabel || '', top: 14, num: (v) => sizeMl(v) },
+      { key: 'pack',  label: 'Pack (per case)', get: (o) => (o.pack ? String(o.pack) : ''), top: 12, num: (v) => parseInt(v, 10) },
+      { key: 'unit',  label: 'Unit type',      get: (o) => o.unitType || '' },
+      { key: 'bond',  label: 'Bond / customs', get: (o) => o.tier || 'Enquire' },
+      { key: 'wh',    label: 'Warehouse',      get: (o) => o.warehouse || '', top: 10, searchable: true },
+      { key: 'inco',  label: 'Incoterm',       get: (o) => o.incoterm || '' },
+    ];
+    const BOND_ORDER = ['T1', 'T2', 'Bonded', 'Duty Paid', 'On Floor', 'Other', 'Enquire'];
+    const STOCK = { in: ['ok', 'In stock'], warn: ['warn', 'Limited'], enq: ['neu', 'Enquire'] };
+    const PAGE = 50;
+
+    function sizeMl(label) {
+      const m = String(label).match(/^([\d.]+)\s*(ml|L)$/);
+      if (!m) return Infinity;
+      return m[2] === 'L' ? parseFloat(m[1]) * 1000 : parseFloat(m[1]);
+    }
+
+    // ---------- State <-> URL ----------
+    const emptyState = () => ({
+      q: '', sort: 'rel', stock: false, cur: '', min: null, max: null,
+      f: Object.fromEntries(FACETS.map((f) => [f.key, []])),
+    });
+    let state = emptyState();
+
+    function readURL() {
+      const p = new URLSearchParams(location.search);
+      const s = emptyState();
+      s.q = (p.get('q') || '').trim();
+      s.sort = ['rel', 'asc', 'desc', 'new'].includes(p.get('sort')) ? p.get('sort') : 'rel';
+      s.stock = p.get('stock') === '1';
+      s.cur = (p.get('cur') || '').toUpperCase();
+      s.min = p.has('min') && p.get('min') !== '' ? parseFloat(p.get('min')) : null;
+      s.max = p.has('max') && p.get('max') !== '' ? parseFloat(p.get('max')) : null;
+      for (const f of FACETS) {
+        const raw = p.get(f.key);
+        if (raw) s.f[f.key] = raw.split(',').map((v) => { try { return decodeURIComponent(v); } catch { return v; } }).filter(Boolean);
+      }
+      return s;
+    }
+
+    function buildQuery(s) {
+      const parts = [];
+      if (s.q) parts.push('q=' + encodeURIComponent(s.q));
+      for (const f of FACETS) if (s.f[f.key].length) parts.push(f.key + '=' + s.f[f.key].map(encodeURIComponent).join(','));
+      if (s.stock) parts.push('stock=1');
+      if (s.cur) parts.push('cur=' + encodeURIComponent(s.cur));
+      if (s.min != null) parts.push('min=' + s.min);
+      if (s.max != null) parts.push('max=' + s.max);
+      if (s.sort !== 'rel') parts.push('sort=' + s.sort);
+      return parts.length ? '?' + parts.join('&') : '';
+    }
+
+    let urlTimer;
+    function syncURL(push = true) {
+      clearTimeout(urlTimer);
+      urlTimer = setTimeout(() => {
+        const next = location.pathname + buildQuery(state);
+        if (next === location.pathname + location.search) return;
+        if (push) history.pushState(null, '', next); else history.replaceState(null, '', next);
+      }, 350);
+    }
+
+    // ---------- Data ----------
+    let docs = [], index = null, relCache = new Map();
+
+    function priceParts(detail = '') {
+      const parts = detail.split('·').map((s) => s.trim());
+      const first = parts[0] || '';
+      const basis = /\/\s*bottle/i.test(first) ? '/ btl'
+        : /\/\s*case/i.test(first) ? '/ case'
+        : /\/\s*unit/i.test(first) ? '/ unit'
+        : /\/\s*(can|piece|pack|jar)/i.test(first) ? '/ ' + first.match(/\/\s*(can|piece|pack|jar)/i)[1].toLowerCase() : '';
+      const msg = basis ? 'per ' + basis.replace('/ ', '').replace('btl', 'bottle') : '';
+      return { basis, other: parts.slice(1).join(' · '), msg };
+    }
+
+    async function load() {
+      const res = await fetch('/search-index.json', { credentials: 'same-origin' });
+      if (!res.ok) throw new Error('index ' + res.status);
+      const data = await res.json();
+      docs = data.offers.map((o, i) => {
+        const { basis, other, msg } = priceParts(o.priceDetail || '');
+        const incoterm = o.incoterm || '', warehouse = o.warehouse || '';
+        return {
+          ...o,
+          slug: o.slug || generateSlug(o.name || '', o.spec || ''),
+          variants: o.variants || '', brand: o.brand || '', tier: o.tier || '',
+          terms: [incoterm, warehouse].filter(Boolean).join(' '),
+          unitType: o.unitType || '', warehouse, incoterm,
+          sizeLabel: volumeLabel(o.volumeMl),
+          basis, other, wa: enquiryLink(o, msg), order: i,
+          fv: null,
+        };
+      });
+      // "Nivea" and "NIVEA" are one brand: merge case variants onto the most common spelling.
+      const spellings = new Map();
+      for (const d of docs) if (d.brand) { const k = d.brand.toLowerCase(); const m = spellings.get(k) || new Map(); m.set(d.brand, (m.get(d.brand) || 0) + 1); spellings.set(k, m); }
+      const shout = (v) => (v.replace(/[^A-Z]/g, '').length === v.replace(/[^A-Za-z]/g, '').length ? 1 : 0); // all-caps loses ties
+      const canon = new Map(Array.from(spellings, ([k, m]) => [k, Array.from(m).sort((a, b) => b[1] - a[1] || shout(a[0]) - shout(b[0]))[0][0]]));
+      for (const d of docs) if (d.brand) d.brand = canon.get(d.brand.toLowerCase());
+      for (const d of docs) d.fv = Object.fromEntries(FACETS.map((f) => [f.key, f.get(d)]));
+      index = buildIndex(docs, (o) => ({
+        strong: `${o.brand} ${o.name} ${o.variants}`,
+        weak: `${o.spec || ''} ${o.category || ''} ${o.unitType} ${o.tier} ${o.warehouse} ${o.incoterm} ${o.note || ''}`,
+      }));
+    }
+
+    // ---------- Search + filter ----------
+    let shown = 0, results = [], lastPartial = false;
+
+    function priceOf(o) { const v = o.unitAmount ?? o.amount; return Number.isFinite(v) ? v : null; }
+
+    function apply() {
+      // 1. Text query
+      let base, rank = null, partial = false;
+      const hits = state.q ? search(index, state.q, relCache) : null;
+      if (hits) {
+        base = hits.map((h) => docs[h.idx]);
+        rank = new Map(hits.map((h, i) => [h.idx, i]));
+        partial = hits.length > 0 && hits[0].matched < hits[0].of;
+      } else {
+        base = docs;
+      }
+
+      // 2. Per-facet pass flags, so counts can exclude the facet being counted.
+      const nF = FACETS.length;
+      const pass = base.map((o) => {
+        let bits = 0;
+        FACETS.forEach((f, i) => { const sel = state.f[f.key]; if (!sel.length || sel.includes(o.fv[f.key])) bits |= (1 << i); });
+        const stockOk = !state.stock || o.stock === 'in';
+        const p = priceOf(o);
+        const curOk = !state.cur || o.currency === state.cur;
+        const rangeOk = !state.cur || ((state.min == null || (p != null && p >= state.min)) && (state.max == null || (p != null && p <= state.max)));
+        return { o, bits, other: stockOk && curOk && rangeOk };
+      });
+      const ALL = (1 << nF) - 1;
+
+      results = pass.filter((r) => r.bits === ALL && r.other).map((r) => r.o);
+
+      // 3. Facet counts
+      const counts = FACETS.map(() => new Map());
+      for (const r of pass) {
+        if (!r.other) continue;
+        FACETS.forEach((f, i) => {
+          const without = ALL & ~(1 << i);
+          if ((r.bits & without) !== without) return;
+          const v = r.o.fv[f.key];
+          if (!v) return;
+          counts[i].set(v, (counts[i].get(v) || 0) + 1);
+        });
+      }
+      const currencies = new Map();
+      for (const r of pass) if (r.bits === ALL && (!state.stock || r.o.stock === 'in') && r.o.currency) currencies.set(r.o.currency, (currencies.get(r.o.currency) || 0) + 1);
+
+      // 4. Sort
+      const sort = state.sort === 'rel' && !state.q ? 'default' : state.sort;
+      if (sort === 'asc' || sort === 'desc') {
+        const dir = sort === 'asc' ? 1 : -1;
+        results.sort((a, b) => {
+          const pa = priceOf(a), pb = priceOf(b);
+          if (pa === null && pb === null) return a.order - b.order;
+          if (pa === null) return 1;
+          if (pb === null) return -1;
+          if (a.currency !== b.currency) return (a.currency || '').localeCompare(b.currency || '');
+          return (pa - pb) * dir || a.order - b.order;
+        });
+      } else if (sort === 'new') {
+        results.sort((a, b) => (b.offerDate || '').localeCompare(a.offerDate || '') || a.order - b.order);
+      } else if (sort === 'default') {
+        results.sort((a, b) => ((b.featured ? 1 : 0) - (a.featured ? 1 : 0)) || a.order - b.order);
+      } // 'rel': keep engine order (already ranked)
+
+      lastPartial = partial;
+      renderFacets(counts, currencies, pass);
+      renderResults(true);
+      renderActive();
+    }
+
+    // ---------- Rendering ----------
+    const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const fmtDate = (d) => { if (!d) return ''; const m = String(d).match(/^(\d{4})-(\d{2})-(\d{2})/); return m ? `${m[3]}/${m[2]}/${m[1]}` : String(d); };
+
+    function rowHTML(o) {
+      const st = STOCK[o.stock] || STOCK.enq;
+      const price = o.amount != null ? `<span class="cur">${esc(o.currency)}</span> <span class="amt">${o.amount.toFixed(2)}</span> <span class="basis">${esc(o.basis)}</span>` : `<span class="amt">—</span>`;
+      const tags = [
+        `<span class="tag tier">${esc(o.tier || 'Enquire')}</span>`,
+        o.terms ? `<span class="tag">${esc(o.terms)}</span>` : '',
+        o.category ? `<span class="tag cat">${esc(o.category)}</span>` : '',
+        o.unitType ? `<span class="tag">${esc(o.unitType)}</span>` : '',
+        o.moq ? `<span class="tag">MOQ ${esc(o.moq)}</span>` : '',
+        o.leadTime ? `<span class="tag">Lead ${esc(o.leadTime)}</span>` : '',
+        o.bbd ? `<span class="tag">BBD ${esc(fmtDate(o.bbd))}</span>` : '',
+        o.origin ? `<span class="tag">${esc(o.origin)}</span>` : '',
+      ].join('');
+      return `<article class="row${o.featured ? ' feat-on' : ''}" data-id="${esc(o.id)}">
+        <label class="sel" title="Multi-line enquiry basket coming soon"><input type="checkbox" disabled aria-label="Select ${esc(o.name)} for enquiry (coming soon)" /></label>
+        <div class="r-main">
+          <div class="brand">${esc(o.brand)}${o.featured ? '<span class="feat-badge">★ Featured</span>' : ''}</div>
+          <h3 class="pname"><a href="/offers/${esc(o.slug)}/">${esc(o.name)}</a></h3>
+          ${o.variants ? `<div class="variants">${esc(o.variants)}</div>` : ''}
+          ${o.spec ? `<div class="spec">${esc(o.spec)}</div>` : ''}
+          <div class="metaline">${tags}</div>
+          ${o.note ? `<p class="note">${esc(o.note)}</p>` : ''}
+        </div>
+        <div class="r-price">
+          <div><div>${price}</div>${o.other ? `<div class="sub">${esc(o.other)}</div>` : ''}</div>
+          <div class="stock"><span class="pill ${st[0]}">${st[1]}</span>${o.qty ? `<span class="qty">${Number(o.qty).toLocaleString()} cases</span>` : '<span class="qty muted">on request</span>'}</div>
+        </div>
+        <div class="r-act">
+          <a class="enquire" href="${esc(o.wa)}" target="_blank" rel="noopener" data-offer="${esc(o.name)}" data-brand="${esc(o.brand)}" data-category="${esc(o.category)}" data-currency="${esc(o.currency)}" data-amount="${o.amount ?? ''}">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.5A10 10 0 1 0 12 2Zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-1.7-.1-.4-.1-.9-.3-1.6-.6-2.8-1.2-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8 0-1.3.7-2 .9-2.2.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5.2.6.8 2 .9 2.1.1.1.1.3 0 .5-.1.2-.1.3-.3.5l-.4.5c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.4 1.5.3.1.5.1.6-.1.2-.2.7-.8.9-1.1.2-.3.4-.2.6-.1l1.8.9c.3.1.5.2.5.3.1.2.1.7-.1 1.4Z"/></svg>
+            Enquire
+          </a>
+          <a class="view" href="/offers/${esc(o.slug)}/">Details</a>
+        </div>
+      </article>`;
+    }
+
+    function renderResults(reset) {
+      if (reset) { listEl.innerHTML = ''; shown = 0; }
+      const slice = results.slice(shown, shown + PAGE);
+      listEl.insertAdjacentHTML('beforeend', slice.map(rowHTML).join(''));
+      shown += slice.length;
+      moreEl.hidden = shown >= results.length;
+      moreEl.textContent = `Show more (${(results.length - shown).toLocaleString()} left)`;
+      emptyEl.hidden = results.length > 0;
+      const qNote = state.q ? ` for “${state.q}”` : '';
+      countEl.textContent = `${results.length.toLocaleString()} of ${docs.length.toLocaleString()} offers${qNote}`;
+      partialEl.hidden = !lastPartial;
+      partialEl.textContent = lastPartial ? 'No offer matches every word — showing the closest matches.' : '';
+      if (state.q) {
+        const wa = new URL(document.getElementById('emptyWa').href);
+        wa.searchParams.set('text', `Hi, I'm looking for "${state.q}" — can you source it?`);
+        document.getElementById('emptyWa').href = wa.toString();
+      }
+    }
+
+    const facetOpen = {};   // key -> show all values
+    const facetFilter = {}; // key -> text typed into the facet's own search box
+
+    function renderFacets(counts, currencies, pass) {
+      const frag = [];
+      FACETS.forEach((f, i) => {
+        const sel = state.f[f.key];
+        let entries = Array.from(counts[i].entries());
+        for (const v of sel) if (!counts[i].has(v)) entries.push([v, 0]);
+        if (f.key === 'bond') entries.sort((a, b) => (BOND_ORDER.indexOf(a[0]) + 1 || 99) - (BOND_ORDER.indexOf(b[0]) + 1 || 99));
+        else if (f.num) entries.sort((a, b) => f.num(a[0]) - f.num(b[0]));
+        else entries.sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+        if (!entries.length) return;
+        const filt = (facetFilter[f.key] || '').toLowerCase();
+        if (filt) entries = entries.filter(([v]) => v.toLowerCase().includes(filt) || sel.includes(v));
+        const limit = f.top && !facetOpen[f.key] && !filt ? f.top : Infinity;
+        // Selected chips always stay visible; the rest are the most common values.
+        const byCount = entries.slice().sort((a, b) => b[1] - a[1]);
+        let visible = entries.filter(([v]) => sel.includes(v)).concat(byCount.filter(([v]) => !sel.includes(v))).slice(0, limit);
+        if (f.num) visible.sort((a, b) => f.num(a[0]) - f.num(b[0]));
+        else if (f.key === 'bond') visible.sort((a, b) => (BOND_ORDER.indexOf(a[0]) + 1 || 99) - (BOND_ORDER.indexOf(b[0]) + 1 || 99));
+        else visible.sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+        const hidden = entries.length - visible.length;
+        frag.push(`<section class="facet" data-key="${f.key}">
+          <h3>${f.label}${f.top && entries.length > f.top ? `<button type="button" data-toggle="${f.key}">${facetOpen[f.key] ? 'Show fewer' : `Show all (${entries.length})`}</button>` : ''}</h3>
+          ${f.searchable && entries.length > 8 ? `<input class="fsearch" type="search" data-fsearch="${f.key}" placeholder="Find a ${f.label.toLowerCase()}…" value="${esc(facetFilter[f.key] || '')}" aria-label="Filter ${f.label} list" />` : ''}
+          <div class="fchips">${visible.map(([v, c]) => `<button type="button" class="fchip" data-key="${f.key}" data-val="${esc(v)}" aria-pressed="${sel.includes(v)}" ${c === 0 && !sel.includes(v) ? 'disabled' : ''}>${esc(v)} <span class="c">${c}</span></button>`).join('')}</div>
+          ${hidden > 0 && !filt ? `<p class="facet-empty" style="margin-top:6px">+${hidden} more</p>` : ''}
+        </section>`);
+      });
+
+      // Availability + price
+      const curOpts = Array.from(currencies.entries()).sort((a, b) => b[1] - a[1]);
+      let priceHTML = '';
+      if (state.cur) {
+        const vals = pass.filter((r) => r.bits === (1 << FACETS.length) - 1 && (!state.stock || r.o.stock === 'in') && r.o.currency === state.cur).map((r) => priceOf(r.o)).filter((v) => v != null);
+        if (vals.length) {
+          const lo = Math.floor(Math.min(...vals)), hi = Math.ceil(Math.max(...vals));
+          const min = state.min != null ? Math.max(lo, state.min) : lo, max = state.max != null ? Math.min(hi, state.max) : hi;
+          const pct = (v) => hi === lo ? 0 : ((v - lo) / (hi - lo)) * 100;
+          priceHTML = `
+            <div class="range-row"><input type="number" id="pmin" min="${lo}" max="${hi}" step="0.01" value="${min}" aria-label="Minimum price per unit" /><span>to</span><input type="number" id="pmax" min="${lo}" max="${hi}" step="0.01" value="${max}" aria-label="Maximum price per unit" /></div>
+            <div class="dual"><div class="track"></div><div class="fill" style="left:${pct(min)}%;right:${100 - pct(max)}%"></div>
+              <input type="range" id="rmin" min="${lo}" max="${hi}" step="0.01" value="${min}" aria-label="Minimum price slider" />
+              <input type="range" id="rmax" min="${lo}" max="${hi}" step="0.01" value="${max}" aria-label="Maximum price slider" /></div>
+            <p class="price-hint">${state.cur} per unit · ${lo}–${hi} in these results</p>`;
+        } else {
+          priceHTML = `<p class="price-hint">No ${state.cur} prices in these results.</p>`;
+        }
+      }
+      frag.push(`<section class="facet" data-key="stock">
+        <h3>Availability</h3>
+        <label class="toggle"><input type="checkbox" id="stockOnly" ${state.stock ? 'checked' : ''} /> In stock only</label>
+      </section>
+      <section class="facet" data-key="price">
+        <h3>Price per unit${state.cur ? `<button type="button" id="priceReset">Reset</button>` : ''}</h3>
+        <div class="price-ctl">
+          <select id="curSel" aria-label="Currency for price filter">
+            <option value="">Choose a currency…</option>
+            ${curOpts.map(([c, n]) => `<option value="${c}" ${state.cur === c ? 'selected' : ''}>${c} (${n})</option>`).join('')}
+          </select>
+          ${priceHTML}
+        </div>
+      </section>`);
+      facetHost.innerHTML = frag.join('');
+      const n = activeCount();
+      filtN.hidden = n === 0; filtN.textContent = n;
+    }
+
+    function activeCount() {
+      return FACETS.reduce((a, f) => a + state.f[f.key].length, 0) + (state.stock ? 1 : 0) + (state.cur ? 1 : 0);
+    }
+
+    function renderActive() {
+      const chips = [];
+      for (const f of FACETS) for (const v of state.f[f.key]) chips.push(`<button type="button" class="achip" data-key="${f.key}" data-val="${esc(v)}"><span>${f.label}: <b>${esc(v)}</b></span><span class="x">×</span></button>`);
+      if (state.stock) chips.push(`<button type="button" class="achip" data-key="stock"><span><b>In stock only</b></span><span class="x">×</span></button>`);
+      if (state.cur) chips.push(`<button type="button" class="achip" data-key="cur"><span>Price: <b>${esc(state.cur)}${state.min != null || state.max != null ? ` ${state.min ?? ''}–${state.max ?? ''}` : ''}</b></span><span class="x">×</span></button>`);
+      if (chips.length > 1) chips.push(`<button type="button" class="achip clear-all" data-key="all">Clear all</button>`);
+      activeEl.innerHTML = chips.join('');
+    }
+
+    // ---------- Events ----------
+    function toggleFacet(key, val) {
+      const arr = state.f[key];
+      const i = arr.indexOf(val);
+      if (i >= 0) arr.splice(i, 1); else arr.push(val);
+    }
+
+    facetHost.addEventListener('click', (e) => {
+      const chip = e.target.closest('.fchip');
+      if (chip) { toggleFacet(chip.dataset.key, chip.dataset.val); apply(); syncURL(); return; }
+      const tog = e.target.closest('[data-toggle]');
+      if (tog) { facetOpen[tog.dataset.toggle] = !facetOpen[tog.dataset.toggle]; apply(); return; }
+      if (e.target.id === 'priceReset') { state.cur = ''; state.min = null; state.max = null; apply(); syncURL(); }
+    });
+    facetHost.addEventListener('input', (e) => {
+      const t = e.target;
+      if (t.dataset.fsearch) { facetFilter[t.dataset.fsearch] = t.value; const pos = t.selectionStart; apply(); const again = facetHost.querySelector(`[data-fsearch="${t.dataset.fsearch}"]`); if (again) { again.focus(); again.setSelectionRange(pos, pos); } return; }
+      if (t.id === 'rmin' || t.id === 'rmax' || t.id === 'pmin' || t.id === 'pmax') {
+        const lo = parseFloat(t.min), hi = parseFloat(t.max);
+        let min = parseFloat((t.id === 'pmin' ? t : $('rmin')).value), max = parseFloat((t.id === 'pmax' ? t : $('rmax')).value);
+        if (t.id === 'pmin' || t.id === 'rmin') { min = Math.min(min, max); } else { max = Math.max(min, max); }
+        state.min = min <= lo ? null : min; state.max = max >= hi ? null : max;
+        // Live update of the twin controls without a full re-render while dragging.
+        $('rmin').value = min; $('rmax').value = max; $('pmin').value = min; $('pmax').value = max;
+        const pct = (v) => hi === lo ? 0 : ((v - lo) / (hi - lo)) * 100;
+        const fill = facetHost.querySelector('.fill'); if (fill) { fill.style.left = pct(min) + '%'; fill.style.right = (100 - pct(max)) + '%'; }
+        clearTimeout(rangeTimer); rangeTimer = setTimeout(() => { apply(); syncURL(); }, 120);
+      }
+    });
+    let rangeTimer;
+    facetHost.addEventListener('change', (e) => {
+      if (e.target.id === 'stockOnly') { state.stock = e.target.checked; apply(); syncURL(); }
+      if (e.target.id === 'curSel') { state.cur = e.target.value; state.min = null; state.max = null; apply(); syncURL(); }
+    });
+
+    activeEl.addEventListener('click', (e) => {
+      const b = e.target.closest('.achip'); if (!b) return;
+      const k = b.dataset.key;
+      if (k === 'all') { for (const f of FACETS) state.f[f.key] = []; state.stock = false; state.cur = ''; state.min = null; state.max = null; }
+      else if (k === 'stock') state.stock = false;
+      else if (k === 'cur') { state.cur = ''; state.min = null; state.max = null; }
+      else toggleFacet(k, b.dataset.val);
+      apply(); syncURL();
+    });
+
+    let qTimer;
+    qEl.addEventListener('input', () => {
+      qClear.hidden = !qEl.value;
+      clearTimeout(qTimer);
+      qTimer = setTimeout(() => { state.q = qEl.value.trim(); if (state.sort === 'rel' || state.q) {/* keep */} apply(); syncURL(); }, 140);
+    });
+    $('qform').addEventListener('submit', (e) => { e.preventDefault(); clearTimeout(qTimer); state.q = qEl.value.trim(); apply(); syncURL(); qEl.blur(); });
+    qClear.addEventListener('click', () => { qEl.value = ''; qClear.hidden = true; state.q = ''; apply(); syncURL(); qEl.focus(); });
+    sortEl.addEventListener('change', () => { state.sort = sortEl.value; apply(); syncURL(); });
+    moreEl.addEventListener('click', () => renderResults(false));
+    // Auto-load the next page as the buyer scrolls.
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver((es) => { if (es.some((x) => x.isIntersecting) && !moreEl.hidden) renderResults(false); }, { rootMargin: '600px' }).observe(moreEl);
+    }
+
+    // GA4: which offers drive WhatsApp enquiries from search.
+    listEl.addEventListener('click', (e) => {
+      const a = e.target.closest('a.enquire');
+      if (!a || typeof window.gtag !== 'function') return;
+      const amt = parseFloat(a.dataset.amount);
+      window.gtag('event', 'whatsapp_enquiry', { offer_name: a.dataset.offer, brand: a.dataset.brand, category: a.dataset.category, currency: a.dataset.currency || undefined, value: Number.isFinite(amt) ? amt : undefined, source: 'search' });
+    });
+
+    // Mobile drawer
+    function setDrawer(open) { facetsEl.classList.toggle('open', open); backdrop.classList.toggle('open', open); filtBtn.setAttribute('aria-expanded', String(open)); document.body.style.overflow = open ? 'hidden' : ''; }
+    filtBtn.addEventListener('click', () => setDrawer(!facetsEl.classList.contains('open')));
+    $('drawerClose').addEventListener('click', () => setDrawer(false));
+    backdrop.addEventListener('click', () => setDrawer(false));
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setDrawer(false); });
+
+    // Back / forward restores the previous search.
+    window.addEventListener('popstate', () => { state = readURL(); qEl.value = state.q; qClear.hidden = !state.q; sortEl.value = state.sort; if (index) apply(); });
+
+    // Theme toggle (same behaviour as the home page).
+    const root = document.documentElement;
+    $('themeBtn').addEventListener('click', () => {
+      const cur = root.getAttribute('data-theme') || (matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light');
+      const next = cur === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      $('themeLbl').textContent = next === 'dark' ? 'Light' : 'Dark';
+    });
+
+    // ---------- Boot ----------
+    state = readURL();
+    qEl.value = state.q; qClear.hidden = !state.q; sortEl.value = state.sort;
+    if (!state.q) qEl.focus({ preventScroll: true });
+    load().then(() => {
+      apply();
+      if (typeof window.gtag === 'function' && state.q) window.gtag('event', 'search', { search_term: state.q, result_count: results.length });
+    }).catch((err) => {
+      countEl.textContent = 'Search is unavailable right now — browse the full catalogue on the home page.';
+      console.error(err);
+    });
+  </script>
+</body>
+</html>

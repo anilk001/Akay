@@ -8,6 +8,7 @@ export async function GET() {
 ## Catalogue
 
 - [All live offers](https://akay.ie/): full catalogue, updated continuously
+- [Search offers](https://akay.ie/search/): typo-tolerant search with brand, size, pack, bond and warehouse filters
 - [Spirits](https://akay.ie/category/spirits/)
 - [Beer](https://akay.ie/category/beer/)
 - [Soft Drinks](https://akay.ie/category/soft-drinks/)

@@ -20,3 +20,11 @@
   for = "/akay-bird.png"
   [headers.values]
     Cache-Control = "public, max-age=86400"
+
+# The client-side search index is rebuilt on every deploy (at most every 5
+# minutes). Short cache so buyers see fresh prices, with stale-while-revalidate
+# so a repeat search never waits on the network.
+[[headers]]
+  for = "/search-index.json"
+  [headers.values]
+    Cache-Control = "public, max-age=300, stale-while-revalidate=3600"

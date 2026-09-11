@@ -58,3 +58,16 @@ export function buildOfferBySlug(offers, slugMap) {
   }
   return map;
 }
+
+// Attach the public URL slug to every offer, in catalogue order, using exactly
+// the sequence the page routes use (generateSlug then dedupeSlug), so the
+// search index links to the same /offers/<slug>/ URLs the build emits.
+export function withSlugs(offers) {
+  const slugs = [];
+  return offers.map((offer) => {
+    let slug = generateSlug(offer.name, offer.spec);
+    slug = dedupeSlug(slug, slugs);
+    slugs.push(slug);
+    return { ...offer, slug };
+  });
+}

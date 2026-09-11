@@ -1,4 +1,5 @@
 ---
+import SiteSearch from '../../components/SiteSearch.astro';
 import { guides, getGuideBySlug, getAllGuidesSlugs } from '../../data/guides.mjs';
 import { articleSchema, organizationSchema } from '../../lib/schema.mjs';
 import { WA_LINK, WA_DISPLAY } from '../../lib/whatsapp.mjs';
@@ -276,6 +277,7 @@ const pageDesc = guide.excerpt;
 </head>
 <body>
   <div class="container">
+    <SiteSearch />
     <div class="breadcrumb">
       <a href="/">Home</a> / <a href="/#guides">Guides</a> / {guide.title}
     </div>

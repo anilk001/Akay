@@ -1,4 +1,5 @@
 ---
+import SiteSearch from '../../components/SiteSearch.astro';
 import { getOffers } from '../../data/airtable.mjs';
 import { generateSlug, dedupeSlug } from '../../lib/slug.mjs';
 import { productOfferSchema, breadcrumbSchema, organizationSchema } from '../../lib/schema.mjs';
@@ -310,6 +311,7 @@ if (offer.stock === 'in') {
 </head>
 <body>
   <div class="container">
+    <SiteSearch />
     <div class="breadcrumb">
       <a href="/">Home</a> / <a href={`/category/${categorySlug}/`}>{offer.category}</a> / {offer.name}
     </div>
