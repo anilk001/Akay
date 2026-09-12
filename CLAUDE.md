@@ -29,6 +29,11 @@ build time → static HTML → Netlify.
    (A PreToolUse hook enforces this.)
 3. **Secrets stay build-time.** `AIRTABLE_TOKEN` is read-only and never
    shipped to the client; only `PUBLIC_`-prefixed vars may reach the browser.
+4. **The build asserts public safety.** `npm run build` ends with
+   `scripts/check-public-safety.mjs`, which fails on any forbidden field name
+   in `dist/` or any non-allowlisted key in `dist/search-index.json`. The
+   allowlist is `PUBLIC_KEYS` in `src/lib/search-index-keys.mjs`, shared by
+   the endpoint and the checker.
 
 ## Commands
 
@@ -37,6 +42,7 @@ npm run dev          # local dev server
 npm run build        # static build to dist/ (works offline via snapshot)
 npm run preview      # serve the built site
 npm run sync-offers  # refresh offers-snapshot.json from Airtable (needs token)
+npm test             # normaliser + search engine + WhatsApp classifier tests
 node n8n/tests/buy-side-guard.test.js     # WhatsApp classifier tests
 node n8n/tests/split-quantity.test.js
 ```
@@ -50,7 +56,11 @@ node n8n/tests/split-quantity.test.js
   hand-roll meta tags
 - `src/data/guides.mjs` — buyer's guides content (see `/new-guide` skill)
 - `src/pages/` — index, category/offer/guide pages, sitemap, robots, llms.txt
-- `src/lib/` — fetch script, schema, slugs, WhatsApp link helpers
+- `src/lib/` — fetch script, schema, slugs, WhatsApp link helpers,
+  `normalise.mjs` + `search-engine.mjs` (shared by build, browser and tests)
+- `src/components/SiteSearch.astro` — header search form on every page
+- `src/pages/search.astro` + `search-index.json.ts` — client-side search over
+  the public-safe index (see `tests/` for the acceptance cases)
 - `n8n/` — WhatsApp offer-ingestion scripts + plain-Node tests (a PostToolUse
   hook runs them after any edit under `n8n/`)
 - `.claude/` — skills (offers-catalogue, offer-data-validator,

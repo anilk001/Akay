@@ -71,6 +71,8 @@ export function buildOfferBySlug(offers, slugMap) {
 // them all at one representative URL keeps the pages working for anyone
 // holding a direct link while giving search engines a single page per
 // product instead of two or three competing ones.
+// (The search index and the page routes both call this; it replaced a second,
+// slug-only copy of withSlugs() that the search work added in parallel.)
 export function withSlugs(offers) {
   const seen = [];
   const withSlug = offers.map((offer) => {

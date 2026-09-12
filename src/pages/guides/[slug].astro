@@ -1,4 +1,5 @@
 ---
+import SiteSearch from '../../components/SiteSearch.astro';
 import { guides, getGuideBySlug, getAllGuidesSlugs } from '../../data/guides.mjs';
 import { articleSchema, organizationSchema, crumbs } from '../../lib/schema.mjs';
 import Seo from '../../components/Seo.astro';
@@ -272,6 +273,7 @@ const pageDesc = guide.excerpt;
 </head>
 <body>
   <div class="container">
+    <SiteSearch />
     <div class="breadcrumb">
       <a href="/">Home</a> / <a href="/guides/">Guides</a> / {guide.title}
     </div>

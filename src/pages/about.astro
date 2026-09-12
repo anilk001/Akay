@@ -1,4 +1,5 @@
 ---
+import SiteSearch from '../components/SiteSearch.astro';
 import { organizationSchema, crumbs } from '../lib/schema.mjs';
 import Seo from '../components/Seo.astro';
 import { WA_LINK, WA_DISPLAY } from '../lib/whatsapp.mjs';
@@ -192,6 +193,7 @@ const pageDesc = 'AKAY Trade: Ireland-based B2B wholesale trading company specia
 </head>
 <body>
   <div class="container">
+    <SiteSearch />
     <div class="breadcrumb">
       <a href="/">Home</a> / About
     </div>
