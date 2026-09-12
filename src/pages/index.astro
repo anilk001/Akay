@@ -131,17 +131,26 @@ const stats = [
     .eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--brass);margin:0 0 12px}
     h1{font-family:var(--serif);font-weight:600;font-size:clamp(30px,5vw,46px);line-height:1.04;margin:0;max-width:16ch;text-wrap:balance;letter-spacing:-.01em}
     .lede{margin:14px 0 0;max-width:56ch;color:var(--ink-soft);font-size:16px}
-    /* Hero CTA → the Excel / AI quote matcher at quote.akay.ie. Brass rather
-       than forest so it reads as the primary action and doesn't echo the
-       green category-request button further down the page. */
-    .hero-cta{display:flex;flex-wrap:wrap;align-items:center;gap:12px 18px;margin-top:22px}
+    /* A line pointing down to the Instant Quote section rather than a second
+       button straight to quote.akay.ie — the section right below carries the
+       real CTA, and two identical buttons a screen apart read as a mistake. */
+    .cta-note{margin:16px 0 0;font-size:14.5px;color:var(--ink-soft);max-width:56ch}
+    /* inline, not inline-flex: the link is mid-sentence and has to be able to
+       wrap with the text around it rather than jumping to its own line. */
+    .cta-jump{color:var(--brass);font-weight:600;text-decoration:none;
+      border-bottom:1px solid color-mix(in srgb,var(--brass) 40%,transparent)}
+    .cta-jump:hover{color:var(--forest);border-bottom-color:color-mix(in srgb,var(--forest) 45%,transparent)}
+    .cta-jump svg{width:13px;height:13px;margin-left:5px;vertical-align:-1px}
+    /* Keeps the arrow tied to the last word so it can't orphan onto its own line. */
+    .cta-jump .nb{white-space:nowrap}
+    /* The Instant Quote button. Brass rather than forest so it reads as the
+       primary action on the page. */
     .cta-quote{display:inline-flex;align-items:center;gap:10px;height:50px;padding:0 22px;border-radius:12px;
       background:var(--brass);color:#fff;font-weight:600;font-size:15.5px;line-height:1;text-decoration:none;
       border:1px solid transparent;box-shadow:var(--shadow);transition:background .14s,transform .14s}
     .cta-quote:hover{background:var(--forest);transform:translateY(-1px)}
     .cta-quote:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
     .cta-quote svg{flex-shrink:0;width:19px;height:19px}
-    .cta-note{font-size:13.5px;color:var(--ink-soft);max-width:42ch}
     /* Dark palettes lighten --brass, so flip the label to ink to keep contrast. */
     @media (prefers-color-scheme:dark){.cta-quote{color:#17140F}}
     :root[data-theme="dark"] .cta-quote{color:#17140F}
@@ -158,7 +167,8 @@ const stats = [
        plain HTML/CSS rather than a video: nothing to host, nothing to
        download, and it renders with JS off. Set QUOTE_VIDEO in the
        frontmatter to swap in a real screen recording instead. */
-    .iq{border-bottom:1px solid var(--line);background:
+    /* scroll-margin-top clears the sticky header when the hero link jumps here. */
+    .iq{border-bottom:1px solid var(--line);scroll-margin-top:76px;background:
       radial-gradient(90% 140% at 0 0,color-mix(in srgb,var(--brass) 8%,transparent),transparent 58%),
       color-mix(in srgb,var(--forest) 5%,transparent)}
     .iq-in{padding-top:26px;padding-bottom:28px;display:grid;gap:24px 36px;
@@ -358,16 +368,9 @@ const stats = [
       <p class="eyebrow">Wholesale beverage offers · duty-paid &amp; export</p>
       <h1>Live trade pricing, straight from the desk.</h1>
       <p class="lede">Spirits and beer by the case, with current pricing, pack specs and duty tier on every line. Filter, compare, and send a WhatsApp enquiry in one tap — no login, no PDF.</p>
-      <div class="hero-cta">
-        <a class="cta-quote" href="https://quote.akay.ie">
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M12 15.5V3.5m0 0L7.8 7.7M12 3.5l4.2 4.2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M4 15.5V18a2.5 2.5 0 0 0 2.5 2.5h11A2.5 2.5 0 0 0 20 18v-2.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-          Upload Excel / Instant AI Quote Matcher
-        </a>
-        <span class="cta-note">Send us your buying list — every line matched to live stock and priced in seconds.</span>
-      </div>
+      <p class="cta-note">
+        Got a buying list? <a class="cta-jump" href="#instant-quote">Upload it in any format and download it <span class="nb">priced<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 4v13m0 0-5.5-5.5M12 17l5.5-5.5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a> — no template, no login.
+      </p>
       <div class="ticker">
         {stats.map((s) => (
           <div class="stat"><div class="n">{s[0]}</div><div class="l">{s[1]}</div></div>
