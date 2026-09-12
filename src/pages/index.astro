@@ -189,9 +189,10 @@ const stats = [
     .iq-alt a{color:var(--brass);font-weight:600;text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--brass) 40%,transparent)}
     .iq-alt a:hover{color:var(--forest)}
 
-    /* Explainer banner — a mock requirement list whose lines get matched and
-       priced one after another. Illustrative only: it shows that a line came
-       back priced, never a price, so nothing here can read as a real quote. */
+    /* Explainer banner — the customer's own file with our price written into
+       it. What they uploaded (product, their cost) sits static; what we add
+       (our price, the saving) animates in beside it, which is the whole story
+       in one picture. Figures are illustrative and captioned as such. */
     .iq-demo{margin:0;width:100%;max-width:460px;justify-self:end}
     @media (max-width:900px){.iq-demo{justify-self:stretch;max-width:none}}
     .iq-win{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
@@ -199,20 +200,29 @@ const stats = [
     .iq-bar{display:flex;align-items:center;gap:7px;padding:10px 13px;border-bottom:1px solid var(--line-soft);
       background:color-mix(in srgb,var(--paper-2) 55%,var(--card))}
     .iq-bar i{width:8px;height:8px;border-radius:50%;background:var(--line)}
-    .iq-bar span{margin-left:5px;font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+    .iq-bar .fn{margin-left:5px;font-family:var(--mono);font-size:11.5px;color:var(--muted);
+      overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .iq-bar .tag{margin-left:auto;flex-shrink:0;font-family:var(--mono);font-size:9.5px;letter-spacing:.07em;
+      background:var(--ok-bg);color:var(--ok);border-radius:5px;padding:3px 7px;font-weight:600}
     .iq-rows{padding:2px 13px 8px}
-    .iq-hd,.iq-row{display:grid;grid-template-columns:1fr 40px 86px;gap:9px;align-items:center}
-    .iq-hd{padding:8px 0 6px;border-bottom:1px solid var(--line-soft);font-family:var(--mono);font-size:9.5px;
-      letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
-    .iq-row{padding:10px 0;border-bottom:1px solid var(--line-soft);font-size:13px}
+    /* Wraps to two lines rather than squeezing four columns onto a phone. */
+    .iq-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:3px 10px;
+      padding:10px 0;border-bottom:1px solid var(--line-soft);font-size:13px}
     .iq-row:last-child{border-bottom:0}
-    .iq-row .nm{color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .iq-row .qt,.iq-hd .qt{font-family:var(--mono);font-variant-numeric:tabular-nums;color:var(--ink-soft);text-align:right}
-    .iq-hd .pr,.iq-row .pr{justify-self:end}
-    .iq-row .pr{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:999px;
-      background:var(--ok-bg);color:var(--ok);font-family:var(--mono);font-size:11px;font-weight:600;white-space:nowrap;
+    .iq-row .nm{color:var(--ink);flex:1 1 auto;min-width:115px}
+    /* Narrow enough that a long name would wrap on its own: stack every row
+       the same way rather than letting only the long ones break. */
+    @media (max-width:560px){.iq-row{justify-content:flex-start}.iq-row .nm{flex-basis:100%}}
+    .iq-cmp{display:inline-flex;align-items:center;gap:7px;flex-shrink:0;
+      font-family:var(--mono);font-size:12px;font-variant-numeric:tabular-nums;white-space:nowrap}
+    .iq-cmp .was{color:var(--muted)}
+    .iq-add{display:inline-flex;align-items:center;gap:7px;
       animation:iq-match .5s ease-out both;animation-delay:var(--d,0s)}
-    .iq-row .pr svg{width:11px;height:11px;flex-shrink:0}
+    .iq-add .arw{width:11px;height:11px;flex-shrink:0;color:var(--muted)}
+    .iq-add .now{color:var(--ink);font-weight:600}
+    .iq-add .sv{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:999px;
+      background:var(--ok-bg);color:var(--ok);font-size:10.5px;font-weight:600}
+    .iq-add .sv svg{width:9px;height:9px;flex-shrink:0}
     .iq-foot{display:flex;align-items:center;gap:7px;padding:10px 13px;border-top:1px solid var(--line-soft);
       background:color-mix(in srgb,var(--forest) 7%,var(--card));font-family:var(--mono);font-size:11.5px;color:var(--ok)}
     .iq-foot svg{width:13px;height:13px;flex-shrink:0}
@@ -370,20 +380,20 @@ const stats = [
     <div class="wrap iq-in">
       <div class="iq-copy">
         <p class="iq-eyebrow"><span class="new">New</span> Instant Quote</p>
-        <h2>Send your buying list. Get it back priced.</h2>
-        <p class="iq-lede">No rep, no callback, no PDF round-trip. Upload the list you already work from and every line is matched against the live catalogue on this page and priced on the spot.</p>
+        <h2>Send your list in any format. Get it back priced.</h2>
+        <p class="iq-lede">No rep, no callback, no template to fill in. Upload the list exactly as you already keep it — we read it, write our selling price into it, and hand it straight back to download.</p>
         <ol class="iq-steps">
           <li>
             <span class="iq-n" aria-hidden="true">1</span>
-            <div><b>Upload your list</b><span class="t">An Excel or CSV file with three columns — <strong>Brand</strong>, <strong>Product Name</strong>, <strong>Quantity</strong>.</span></div>
+            <div><b>Upload it however you have it</b><span class="t">Excel, CSV, or whatever your buying list already looks like. No fixed columns and no template — we parse it as it comes.</span></div>
           </li>
           <li>
             <span class="iq-n" aria-hidden="true">2</span>
-            <div><b>We match it to live stock</b><span class="t">Every line is read and matched against the {view.length.toLocaleString('en-IE')} offers live on this site right now — spelling, pack size and all.</span></div>
+            <div><b>We price it against live stock</b><span class="t">Every line is matched against the {view.length.toLocaleString('en-IE')} offers live on this site right now, and our selling price goes straight into your own file.</span></div>
           </li>
           <li>
             <span class="iq-n" aria-hidden="true">3</span>
-            <div><b>Your quote comes back priced</b><span class="t">Matched lines come back with trade price, pack spec and T1/T2 duty status. Anything we can't match is flagged so nothing goes quiet.</span></div>
+            <div><b>Download it back — with your savings</b><span class="t">Include your current cost or target price and we mark the difference on every line, so what you save is there in black and white.</span></div>
           </li>
         </ol>
         <div class="iq-cta">
@@ -392,9 +402,9 @@ const stats = [
               <path d="M12 15.5V3.5m0 0L7.8 7.7M12 3.5l4.2 4.2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               <path d="M4 15.5V18a2.5 2.5 0 0 0 2.5 2.5h11A2.5 2.5 0 0 0 20 18v-2.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
             </svg>
-            Upload your list — get an instant quote
+            Upload your list — download it priced
           </a>
-          <span class="iq-alt">Rather use email? Send it to <a href="mailto:offers@akay.ie?subject=Requirement%20List">offers@akay.ie</a> with "Requirement List" in the subject — same three columns, same automatic pricing.</span>
+          <span class="iq-alt">Rather use email? Send it to <a href="mailto:offers@akay.ie?subject=Requirement%20List">offers@akay.ie</a> with "Requirement List" in the subject — any format, same automatic pricing.</span>
         </div>
       </div>
 
@@ -405,25 +415,41 @@ const stats = [
              fails WCAG 2.2.2. */
           <video class="iq-video" src={QUOTE_VIDEO} poster={QUOTE_VIDEO_POSTER} width="460" height="300"
                  controls muted playsinline preload="none"
-                 aria-label="Screen recording: a requirement list uploaded to the Instant Quote tool and returned priced."></video>
+                 aria-label="Screen recording: a buying list uploaded to the Instant Quote tool and downloaded back with our prices and the savings marked."></video>
         ) : (
           /* aria-hidden: it's a picture of the three steps spelled out above,
-             so a screen reader gets the caption instead of a mock table. */
+             so a screen reader gets the caption instead of a mock table. The
+             figures are made up — generic product types, never a real line —
+             and the caption says so. */
           <div class="iq-win" aria-hidden="true">
-            <div class="iq-bar"><i></i><i></i><i></i><span>requirement-list.xlsx</span></div>
+            <div class="iq-bar"><i></i><i></i><i></i><span class="fn">my-buying-list.xlsx</span><span class="tag">+ AKAY PRICE</span></div>
             <div class="iq-rows">
-              <div class="iq-hd"><span>Product</span><span class="qt">Qty</span><span class="pr">Status</span></div>
-              <div class="iq-row" style="--d:.1s"><span class="nm">Irish whiskey · 12 × 70cl</span><span class="qt">40</span><span class="pr"><svg viewBox="0 0 24 24" fill="none"><path d="m5 13 4.5 4.5L19 7" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>Priced</span></div>
-              <div class="iq-row" style="--d:.55s"><span class="nm">Lager · 24 × 330ml can</span><span class="qt">25</span><span class="pr"><svg viewBox="0 0 24 24" fill="none"><path d="m5 13 4.5 4.5L19 7" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>Priced</span></div>
-              <div class="iq-row" style="--d:1s"><span class="nm">Vodka · 6 × 1L</span><span class="qt">60</span><span class="pr"><svg viewBox="0 0 24 24" fill="none"><path d="m5 13 4.5 4.5L19 7" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>Priced</span></div>
+              {[['Irish whiskey · 12 × 70cl', '142.00', '131.50', '7%', '.1s'],
+                ['Lager · 24 × 330ml can', '21.40', '19.95', '7%', '.55s'],
+                ['Vodka · 6 × 1L', '78.00', '74.25', '5%', '1s']].map(([nm, was, now, save, d]) => (
+                <div class="iq-row">
+                  <span class="nm">{nm}</span>
+                  <span class="iq-cmp">
+                    <span class="was">€{was}</span>
+                    <span class="iq-add" style={`--d:${d}`}>
+                      <svg class="arw" viewBox="0 0 24 24" fill="none"><path d="M4 12h15m0 0-5.5-5.5M19 12l-5.5 5.5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                      <span class="now">€{now}</span>
+                      <span class="sv">
+                        <svg viewBox="0 0 24 24" fill="none"><path d="M12 4v15m0 0-6-6m6 6 6-6" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        {save}
+                      </span>
+                    </span>
+                  </span>
+                </div>
+              ))}
             </div>
             <div class="iq-foot">
-              <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="m8 12 2.8 2.8L16 9.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              3 of 3 lines matched · quote ready
+              <svg viewBox="0 0 24 24" fill="none"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 16v2.5A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5V16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              3 of 3 lines priced · ready to download
             </div>
           </div>
         )}
-        <figcaption class="iq-cap">Example: your spreadsheet goes in, each line is matched against live stock, and the priced quote comes back — usually in seconds.</figcaption>
+        <figcaption class="iq-cap">Example figures. Your own file comes back with our live selling price written in beside your cost, and the saving worked out on every line.</figcaption>
       </figure>
     </div>
   </section>
