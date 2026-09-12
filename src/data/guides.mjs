@@ -151,24 +151,23 @@ Visit https://akay.ie and filter by category. Note the product name, pack spec, 
 
 ### 2. Prepare a Requirement List
 
-Format: Simple Excel or CSV with three columns:
-- **Brand / Product Name** (exact, as it appears in the catalogue)
-- **Product Name / Variant** (e.g., "Original 40% ABV")
-- **Quantity** (number of cases or pallets)
+No template and no fixed columns — send the list exactly as you already keep it. What helps every line get priced is the brand, the product name and variant (e.g. "Original 40% ABV"), and the quantity in cases or pallets. Add your current cost or target price if you have it, and the saving is worked out for you line by line.
 
 Example:
 
-    Brand            | Product Name           | Quantity
-    Absolut          | Vodka Original         | 5 cases
-    Heineken         | Lager 330ml            | 2 pallets
-    Fever Tree       | Premium Tonic          | 10 cases
+    Brand            | Product Name           | Quantity  | Your cost
+    Absolut          | Vodka Original         | 5 cases   | 142.00
+    Heineken         | Lager 330ml            | 2 pallets | 21.40
+    Fever Tree       | Premium Tonic          | 10 cases  |
 
-### 3. Email or WhatsApp
+### 3. Upload It — or Email / WhatsApp
+
+**Instant Quote:** https://quote.akay.ie (upload in any format, priced back on the spot)
 
 **Email:** offers@akay.ie (attach requirement list)
 **WhatsApp:** +353 87 238 2368 (text product names and quantities)
 
-Anil or the team will reply within 24 hours with:
+By email or WhatsApp, Anil or the team will reply within 24 hours with:
 - Exact pricing (per case + per unit if applicable)
 - Stock availability
 - Delivery terms and timeline
@@ -222,27 +221,33 @@ You don't. Wholesale is dynamic. Lock in a purchase order to freeze the price; o
 
 ## Next Steps
 
-Pick a product from the catalogue, click **WhatsApp Enquiry**, or email offers@akay.ie with a requirement list. Start small, test quality, build the relationship.
+Pick a product from the catalogue, upload your buying list at https://quote.akay.ie, click **WhatsApp Enquiry**, or email offers@akay.ie with a requirement list. Start small, test quality, build the relationship.
     `.trim(),
   },
   {
     slug: 'requirement-list-format',
-    title: 'Requirement List Format',
-    excerpt: 'How to structure your request for wholesale pricing and availability.',
+    title: 'How to Send a Requirement List',
+    excerpt: 'Upload your buying list in any format and get it back priced — plus what to include so more lines match.',
     content: `
+## The fastest route: Instant Quote
+
+Upload your buying list at https://quote.akay.ie and you get it back priced, there and then. There is no template and no required format — Excel, CSV, or whatever shape your list is already in. We parse it as it comes, match each line against live stock, and write our selling price into your own file for you to download.
+
+Nothing below is a rule. It is what makes more of your lines match, and match correctly.
+
 ## What Is a Requirement List?
 
-A Requirement List is a simple document that tells AKAY exactly what products you want to buy, in what quantities. It is the standard way to request wholesale pricing. You can send it by email or WhatsApp.
+A Requirement List is simply the document that says what you want to buy and how much. It is the standard way to ask for wholesale pricing, and it is what the Instant Quote tool reads. You can also send it by email or WhatsApp.
 
-## How to Format It
+## What Helps Us Match It
 
-Use an Excel spreadsheet, Google Sheet, or even a plain text email. Three columns:
+Whatever columns you use, these are the details that let a line be priced automatically:
 
-### Column 1: Brand
+### Brand
 The manufacturer or brand name.
 Example: Absolut, Heineken, Coca-Cola, Fever Tree
 
-### Column 2: Product Name / Variant
+### Product Name / Variant
 The exact product name and variant, as it appears on the bottle or in the catalogue.
 Example:
 - Vodka Original
@@ -250,29 +255,39 @@ Example:
 - Premium Indian Tonic Water
 - Chardonnay
 
-### Column 3: Quantity
+### Quantity
 How many cases (or pallets, or units) you want.
 Example: 5, 10, 2 pallets, 50 cases
 
+### Your Cost or Target Price (optional, but worth adding)
+If your list already carries what you pay today, or the price you are aiming for, leave the column in. We price against it and mark the difference on every line, so the saving is worked out for you instead of you comparing two files side by side.
+
 ## Example Requirement List
 
-    Brand                | Product Name            | Quantity
-    ---------------------------------------------------
-    Absolut              | Vodka Original 70cl     | 10 cases
-    Heineken             | Lager 330ml Cans        | 5 pallets
-    Fever Tree           | Premium Tonic 200ml     | 20 cases
-    Bacardi              | White Rum 70cl          | 3 cases
-    Coca-Cola            | Still 330ml Cans        | 2 pallets
-    San Pellegrino       | Sparkling 1L            | 15 cases
+Any layout works. This one is easy to read, and the last column is what turns the quote into a savings comparison:
 
-## What NOT to Include
+    Brand                | Product Name            | Quantity  | Your cost
+    ------------------------------------------------------------------------
+    Absolut              | Vodka Original 70cl     | 10 cases  | 142.00
+    Heineken             | Lager 330ml Cans        | 5 pallets | 21.40
+    Fever Tree           | Premium Tonic 200ml     | 20 cases  |
+    Bacardi              | White Rum 70cl          | 3 cases   | 78.00
+    Coca-Cola            | Still 330ml Cans        | 2 pallets |
+    San Pellegrino       | Sparkling 1L            | 15 cases  |
+
+Leave the cost blank on any line you have no figure for — those still come back priced, just without a saving against them.
+
+## What You Can Leave Out
 
 - **Your name or company** — say that in the email subject or WhatsApp message
 - **Delivery address** — provide that later, in your purchase order
 - **Notes on packaging** — assume original bottles unless you specify (rare)
-- **Budget** — we'll give you the price; you decide
+- **Tidying up the file** — extra columns, merged headers and stray notes are fine; we ignore what we don't need
 
 ## How to Send It
+
+### Instant Quote (fastest)
+Upload it at https://quote.akay.ie — any format, priced back to you on the spot.
 
 ### By Email
 **To:** offers@akay.ie
@@ -305,7 +320,9 @@ Send a text with product names and quantities. Example:
 
 ## What Happens Next
 
-Anil or the team will:
+Through Instant Quote, the priced file comes straight back to you — our selling price on every line we could match, the saving against your cost where you gave one, and anything we could not match flagged rather than dropped. Those flagged lines, and any question on terms, come back from Anil or the team within 24 hours.
+
+By email or WhatsApp, the team will:
 1. Check availability
 2. Lock in current pricing
 3. Reply with a **quotation** showing:
@@ -320,6 +337,8 @@ Anil or the team will:
 
 ## Tips for Success
 
+- **Send it as it is:** Don't retype your list into our format — upload the file you already keep
+- **Leave your cost in:** It is the difference between a price list and a savings comparison
 - **Be specific:** Use exact product names from the catalogue, or copy them from akay.ie
 - **Start small:** Test 1–2 cases first if you're new to wholesale
 - **Ask for bundles:** Mixing categories (spirits + beer + soft drinks) can unlock discounts
@@ -429,7 +448,7 @@ Shannon, Loendersloot (Netherlands), Riga (Latvia), and other EU licensed wareho
 ## How to Buy
 
 1. **Browse the catalogue:** https://akay.ie
-2. **Click WhatsApp or email** with your requirement list
+2. **Upload your buying list** at https://quote.akay.ie in any format — or click WhatsApp or email it to us
 3. **Get a quote** with pricing, terms, and stock status
 4. **Send a PO** to lock the deal
 5. **Arrange payment** (typically 50% upfront, 50% on shipment)
