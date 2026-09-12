@@ -16,6 +16,70 @@ const { guide } = Astro.props;
 const orgSchema = organizationSchema();
 const articleData = articleSchema(guide.title, guide.content, guide.slug);
 
+// Guide bodies in src/data/guides.mjs are written in a small subset of
+// markdown. Rendering is block-by-block on blank lines, so a bullet run
+// becomes one <ul> and an indented table stays a <pre> block — the old
+// line-by-line pass turned both into a column of loose <p>s, and printed
+// **bold** and [links](…) as literal punctuation.
+//
+// Content is repo-authored, never user input, but it is still escaped before
+// any tag is added so a stray < in a guide can't become markup.
+const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+function inline(text) {
+  return esc(text)
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, '<a href="$2">$1</a>')
+    // Bare URLs, the style most of the guides already use. The trailing
+    // [^.,;:)] keeps sentence punctuation outside the link.
+    .replace(/(^|[\s(])(https?:\/\/[^\s<)]*[^\s<).,;:])/g, '$1<a href="$2">$2</a>');
+}
+
+function renderGuide(content) {
+  // Guides often put a heading directly above its first line with no blank
+  // line between; force the break so the heading doesn't swallow that line.
+  return content.replace(/^(#{2,3} .*)$/gm, '$1\n').split(/\n{2,}/).map((block) => {
+    const b = block.trim();
+    if (!b) return '';
+    if (b.startsWith('## ')) return `<h2>${inline(b.slice(3))}</h2>`;
+    if (b.startsWith('### ')) return `<h3>${inline(b.slice(4))}</h3>`;
+    // Fenced or 4-space-indented block: keep it verbatim, it's a table or sample.
+    if (b.startsWith('```')) {
+      return `<pre><code>${esc(b.replace(/^```[^\n]*\n?/, '').replace(/\n?```$/, ''))}</code></pre>`;
+    }
+    if (block.split('\n').every((l) => !l.trim() || /^ {4}/.test(l))) {
+      return `<pre><code>${esc(block.replace(/^ {4}/gm, '').trim())}</code></pre>`;
+    }
+    // Guides often run a bullet list straight on from its lead-in line with no
+    // blank line between, so group consecutive lines by kind rather than
+    // typing the whole block from its first character. Plain lines inside one
+    // block are soft breaks (address blocks, "Example:" lines).
+    const out = [];
+    let buf = [];
+    let mode = null;
+    const flush = () => {
+      if (!buf.length) return;
+      if (mode === 'ul') {
+        out.push(`<ul>${buf.map((l) => `<li>${inline(l.replace(/^[-*]\s+/, ''))}</li>`).join('')}</ul>`);
+      } else if (mode === 'ol') {
+        out.push(`<ol>${buf.map((l) => `<li>${inline(l.replace(/^\d+\.\s+/, ''))}</li>`).join('')}</ol>`);
+      } else {
+        out.push(`<p>${buf.map(inline).join('<br />')}</p>`);
+      }
+      buf = [];
+    };
+    for (const line of b.split('\n').map((l) => l.trim()).filter(Boolean)) {
+      const kind = /^[-*]\s/.test(line) ? 'ul' : /^\d+\.\s/.test(line) ? 'ol' : 'p';
+      if (kind !== mode) { flush(); mode = kind; }
+      buf.push(line);
+    }
+    flush();
+    return out.join('');
+  }).join('');
+}
+
+const guideHtml = renderGuide(guide.content);
+
 const breadcrumbData = crumbs([
   { name: 'Home', path: '/' },
   { name: 'Guides', path: '/guides/' },
@@ -202,6 +266,81 @@ const pageDesc = guide.excerpt;
       margin-top: 0;
     }
 
+    /* The body is injected with set:html, so its tags carry no scope
+       attribute and none of the element rules above ever reached them —
+       guide prose has been rendering at browser defaults. Re-declare them
+       through :global() for the injected tree. Values mirror the scoped
+       rules so the body matches the rest of the page. */
+    .article-content :global(h2) {
+      font: 600 1.5em var(--serif);
+      margin: 1.5em 0 0.5em;
+      color: var(--ink-soft);
+    }
+
+    .article-content :global(h3) {
+      font: 600 1.2em var(--serif);
+      margin: 1.2em 0 0.4em;
+      color: var(--ink-soft);
+    }
+
+    .article-content :global(p) {
+      margin: 1em 0;
+    }
+
+    .article-content :global(a) {
+      color: var(--brass);
+      text-decoration: none;
+      border-bottom: 1px solid color-mix(in srgb, var(--brass) 40%, transparent);
+      /* Bare URLs in the guides are long enough to overflow a phone. */
+      overflow-wrap: anywhere;
+    }
+
+    .article-content :global(a:hover) {
+      color: var(--forest);
+    }
+
+    .article-content :global(strong) {
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    .article-content :global(em) {
+      font-style: italic;
+    }
+
+    .article-content :global(ul),
+    .article-content :global(ol) {
+      margin: 1em 0;
+      padding-left: 1.6em;
+    }
+
+    .article-content :global(li) {
+      margin: 0.4em 0;
+    }
+
+    .article-content :global(pre) {
+      background: var(--paper-2);
+      padding: 1em;
+      border-radius: 8px;
+      overflow-x: auto;
+      font: 0.9em / 1.5 var(--mono);
+      border-left: 3px solid var(--brass);
+    }
+
+    .article-content :global(code) {
+      background: var(--paper-2);
+      padding: 0.2em 0.4em;
+      border-radius: 4px;
+      font: 0.9em var(--mono);
+      color: var(--ink);
+    }
+
+    .article-content :global(pre code) {
+      background: none;
+      padding: 0;
+      color: inherit;
+    }
+
     .footer {
       margin-top: 3em;
       padding-top: 2em;
@@ -285,49 +424,8 @@ const pageDesc = guide.excerpt;
         From the AKAY Trade guides library. Last updated 2024.
       </div>
 
-      <div class="article-content" set:html={guide.content.split('\n').map((line) => {
-        // Simple markdown to HTML converter
-        if (line.startsWith('## ')) {
-          return `<h2>${line.slice(3)}</h2>`;
-        }
-        if (line.startsWith('### ')) {
-          return `<h3>${line.slice(4)}</h3>`;
-        }
-        if (line.startsWith('**') && line.endsWith('**')) {
-          return `<strong>${line.slice(2, -2)}</strong>`;
-        }
-        if (line.startsWith('```')) {
-          return '';
-        }
-        if (line.trim() === '') {
-          return '';
-        }
-        return `<p>${line}</p>`;
-      }).join('')} />
+      <div class="article-content" set:html={guideHtml} />
 
-      <!-- Re-render content properly -->
-      <div class="article-content">
-        {guide.content.split('\n\n').map((paragraph) => {
-          if (paragraph.trim().startsWith('## ')) {
-            const title = paragraph.replace(/^## /, '').trim();
-            return `<h2>${title}</h2>`;
-          }
-          if (paragraph.trim().startsWith('### ')) {
-            const title = paragraph.replace(/^### /, '').trim();
-            return `<h3>${title}</h3>`;
-          }
-          if (paragraph.trim().startsWith('```')) {
-            const code = paragraph.replace(/^```\n?/, '').replace(/\n?```$/, '');
-            return `<pre><code>${code}</code></pre>`;
-          }
-          if (paragraph.trim().startsWith('-') || paragraph.trim().startsWith('*')) {
-            const items = paragraph.split('\n').filter((l) => l.trim());
-            const list = items.map((item) => `<li>${item.replace(/^[-*]\s+/, '')}</li>`).join('');
-            return `<ul>${list}</ul>`;
-          }
-          return `<p>${paragraph.trim()}</p>`;
-        })}
-      </div>
     </article>
 
     <div class="cta">
