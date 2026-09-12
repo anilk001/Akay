@@ -14,7 +14,12 @@ export async function getStaticPaths() {
 
 const { guide } = Astro.props;
 const orgSchema = organizationSchema();
-const articleData = articleSchema(guide.title, guide.content, guide.slug);
+
+// One description for the page: the <meta> tag and the Article schema below
+// both take the guide's excerpt, so the two can't drift apart.
+const pageTitle = `${guide.title} | AKAY Trade Guides`;
+const pageDesc = guide.excerpt;
+const articleData = articleSchema(guide.title, pageDesc, guide.slug);
 
 // Guide bodies in src/data/guides.mjs are written in a small subset of
 // markdown. Rendering is block-by-block on blank lines, so a bullet run
@@ -94,9 +99,6 @@ const breadcrumbData = crumbs([
   { name: 'Guides', path: '/guides/' },
   { name: guide.title, path: `/guides/${guide.slug}/` },
 ]);
-
-const pageTitle = `${guide.title} | AKAY Trade Guides`;
-const pageDesc = guide.excerpt;
 ---
 
 <!doctype html>
