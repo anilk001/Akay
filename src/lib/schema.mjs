@@ -218,14 +218,19 @@ export function categoryItemListSchema(categoryName, offers) {
   };
 }
 
-// Article schema for guide pages
-export function articleSchema(title, content, slug) {
+// Article schema for guide pages.
+//
+// `description` is the guide's own excerpt, the same line the page gives its
+// meta description. It used to be content.split('\n')[0], which is the body's
+// opening "## …" heading — every guide was publishing a raw markdown heading
+// as its search description.
+export function articleSchema(title, description, slug) {
   return {
     '@context': 'https://schema.org',
     '@type': 'Article',
     headline: title,
     url: `${SITE_URL}/guides/${slug}/`,
-    description: content.split('\n')[0],
+    description,
     author: { '@type': 'Organization', name: 'AKAY Trade' },
     publisher: {
       '@type': 'Organization',
