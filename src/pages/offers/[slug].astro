@@ -5,17 +5,22 @@ import { productOfferSchema, breadcrumbSchema, organizationSchema } from '../../
 import { basisLabel, basisSuffix } from '../../lib/price.mjs';
 import { enquiryLink, WA_LINK, WA_DISPLAY } from '../../lib/whatsapp.mjs';
 
-// Get all valid slugs for static generation
+// Get all valid slugs for static generation. Sold-out (delisted) offers keep
+// their pages — live offers are slugged FIRST so a re-listed line always owns
+// the canonical slug and its sold-out twin takes the -2 suffix, never the
+// other way round. The sitemap slugs the same combined list in the same order.
 export async function getStaticPaths() {
-  const { offers } = await getOffers();
-  const allOffers = offersWithSlugs(offers);
+  const { offers, delisted } = await getOffers();
+  const all = offersWithSlugs([...offers, ...delisted]);
+  const liveOffers = all.filter((o) => !o.delisted);
   // Brand page URL per brand name, for the breadcrumb link (only brands that
-  // actually get a landing page).
-  const brandSlugByName = new Map(brandPages(allOffers).map((p) => [p.brand, p.slug]));
+  // actually get a landing page — brand pages list live stock only).
+  const brandSlugByName = new Map(brandPages(liveOffers).map((p) => [p.brand, p.slug]));
 
-  return allOffers.map((offer) => ({
+  return all.map((offer) => ({
     params: { slug: offer.slug },
-    props: { offer, allOffers, brandSlug: brandSlugByName.get((offer.brand || '').trim()) || null },
+    // allOffers is live-only: related offers must always point at buyable stock.
+    props: { offer, allOffers: liveOffers, brandSlug: brandSlugByName.get((offer.brand || '').trim()) || null },
   }));
 }
 
@@ -36,9 +41,11 @@ function priceParts(detail = '') {
 
 const STOCK = { in: ['ok', 'In stock'], warn: ['warn', 'Limited'], enq: ['neu', 'Enquire'] };
 
+const isDelisted = !!offer.delisted;
+
 const { basis, other, msg } = priceParts(offer.priceDetail);
-const st = STOCK[offer.stock] || STOCK.enq;
-const wa = enquiryLink(offer, msg);
+const st = isDelisted ? ['neu', 'Out of stock'] : (STOCK[offer.stock] || STOCK.enq);
+const wa = enquiryLink(offer, msg, { soldOut: isDelisted });
 
 // Category slug for linking
 const categorySlug = offer.category.toLowerCase().replace(/\s+/g, '-');
@@ -49,8 +56,14 @@ const categorySlug = offer.category.toLowerCase().replace(/\s+/g, '-');
 // picks churned every page on every rebuild, wasting crawl budget on no-op
 // content changes).
 const sameCategory = allOffers.filter((o) => o.category === offer.category);
-const selfIndex = Math.max(0, sameCategory.findIndex((o) => o.slug === offer.slug));
 const otherOffers = sameCategory.filter((o) => o.slug !== offer.slug);
+// A delisted offer isn't in the live list (findIndex -1), so rotate by a hash
+// of its own slug instead — every sold-out page still links a different
+// window of live stock, deterministically.
+const foundIndex = sameCategory.findIndex((o) => o.slug === offer.slug);
+const selfIndex = foundIndex >= 0
+  ? foundIndex
+  : [...offer.slug].reduce((s, c) => s + c.charCodeAt(0), 0) % Math.max(1, otherOffers.length);
 const relatedOffers = Array.from(
   { length: Math.min(4, otherOffers.length) },
   (_, k) => otherOffers[(selfIndex + k) % otherOffers.length]
@@ -65,19 +78,18 @@ const breadcrumbData = breadcrumbSchema(offer.name, offer.category, slug);
 // price per case but some price per bottle/piece, and labelling those "/case"
 // would misstate the price in search results.
 const priceText = `${offer.currency}${offer.amount?.toFixed(2) || '—'}${basisSuffix(offer.priceBasis)}`;
-const pageTitle = `${offer.name} ${offer.spec || ''} wholesale — ${priceText} | AKAY Trade`;
-const pageDesc = `${offer.name} ${offer.spec || ''} wholesale: ${priceText}, ${offer.tier || 'trade pricing'}, ${offer.terms || 'terms available'}. Buy by the case from AKAY Trade.`;
+const pageTitle = isDelisted
+  ? `${offer.name} ${offer.spec || ''} wholesale — out of stock, request a quote | AKAY Trade`
+  : `${offer.name} ${offer.spec || ''} wholesale — ${priceText} | AKAY Trade`;
+const pageDesc = isDelisted
+  ? `${offer.name} ${offer.spec || ''} wholesale is currently sold out at AKAY Trade. Request a quote for this or a similar line via WhatsApp — stock turns over daily.`
+  : `${offer.name} ${offer.spec || ''} wholesale: ${priceText}, ${offer.tier || 'trade pricing'}, ${offer.terms || 'terms available'}. Buy by the case from AKAY Trade.`;
 
-// Determine availability status for display
-let stockStatus = 'Enquire on request';
+// Determine availability status for display. A delisted offer's stock fields
+// are frozen at the moment it sold, so they are never echoed.
 let stockDetail = '';
-if (offer.stock === 'in') {
-  stockStatus = 'In stock';
-  if (offer.qty) {
-    stockDetail = `${offer.qty.toLocaleString()} cases available`;
-  }
-} else if (offer.stock === 'warn') {
-  stockStatus = 'Limited availability';
+if (!isDelisted && offer.stock === 'in' && offer.qty) {
+  stockDetail = `${offer.qty.toLocaleString()} cases available`;
 }
 ---
 
@@ -197,6 +209,16 @@ if (offer.stock === 'in') {
       font: 600 1.8em var(--serif);
       color: var(--brass);
       margin: 0.5em 0;
+    }
+
+    .soldout-banner {
+      background: var(--warn-bg);
+      color: var(--warn);
+      border: 1px solid var(--warn);
+      border-radius: 8px;
+      padding: 0.8em 1em;
+      margin: 1em 0 0.5em;
+      font-size: 0.95em;
     }
 
     .stock-badge {
@@ -319,8 +341,16 @@ if (offer.stock === 'in') {
       <h1>{offer.name}</h1>
       {offer.spec && <p style="margin: 0; color: var(--muted); font-size: 0.95em;">{offer.spec}</p>}
 
+      {isDelisted && (
+        <div class="soldout-banner">
+          <strong>Out of stock</strong> — this line has sold out. Request a quote for this
+          or a similar line: wholesale stock turns over daily.
+        </div>
+      )}
+
       <div class="price-display">
         {offer.currency}{offer.amount?.toFixed(2) || '—'}{basis}
+        {isDelisted && <span style="font-size: 0.55em; font-weight: normal; color: var(--muted); display: block; margin-top: 0.3em;">Last listed price</span>}
         {other && <span style="font-size: 0.7em; font-weight: normal; display: block; margin-top: 0.3em;">{other}</span>}
       </div>
 
@@ -355,18 +385,20 @@ if (offer.stock === 'in') {
       </div>
 
       <div style="margin-top: 1.5em;">
-        <a href={wa} class="cta-button">WhatsApp Enquiry</a>
+        <a href={wa} class="cta-button">{isDelisted ? 'Request a Quote' : 'WhatsApp Enquiry'}</a>
         <a href={`mailto:offers@akay.ie?subject=Interest in ${offer.name}`} class="cta-button cta-secondary">Email</a>
       </div>
 
       <p style="font-size: 0.85em; color: var(--muted); margin-top: 1.5em; margin-bottom: 0;">
-        Trade pricing for B2B wholesale buyers. Prices updated daily.
+        {isDelisted
+          ? 'Trade enquiries for B2B wholesale buyers. Similar lines are often available on request.'
+          : 'Trade pricing for B2B wholesale buyers. Prices updated daily.'}
       </p>
     </div>
 
     {relatedOffers.length > 0 && (
       <div class="related-offers">
-        <h2>Related {offer.category} Offers</h2>
+        <h2>{isDelisted ? `Available ${offer.category} Offers` : `Related ${offer.category} Offers`}</h2>
         <div class="offer-grid">
           {relatedOffers.map((rel) => (
             <div class="offer-card">

@@ -5,11 +5,15 @@ import { guides } from '../data/guides.mjs';
 export const prerender = true;
 
 export async function GET() {
-  const { offers } = await getOffers();
-  const offersWithSlugsList = offersWithSlugs(offers);
+  const { offers, delisted } = await getOffers();
+  // Same combined list, same order, as offers/[slug].astro — live first — or
+  // the dedup suffixes drift and the sitemap points at pages that don't exist.
+  const offersWithSlugsList = offersWithSlugs([...offers, ...delisted]);
+  const liveOffers = offersWithSlugsList.filter((o) => !o.delisted);
 
-  const categories = Array.from(new Set(offersWithSlugsList.map((o) => o.category))).sort();
-  const brands = brandPages(offersWithSlugsList);
+  // Category and brand pages are built from live stock only.
+  const categories = Array.from(new Set(liveOffers.map((o) => o.category))).sort();
+  const brands = brandPages(liveOffers);
 
   const now = new Date().toISOString().split('T')[0];
   const url = (loc: string, changefreq: string, priority: string) => `  <url>
@@ -36,7 +40,11 @@ export async function GET() {
   }
 
   for (const offer of offersWithSlugsList) {
-    sitemap += url(`https://offers.akay.ie/offers/${offer.slug}/`, 'daily', '0.8');
+    // Sold-out pages stay in the map so crawlers find the SoldOut state
+    // instead of a 404, but at archive priority.
+    sitemap += offer.delisted
+      ? url(`https://offers.akay.ie/offers/${offer.slug}/`, 'monthly', '0.3')
+      : url(`https://offers.akay.ie/offers/${offer.slug}/`, 'daily', '0.8');
   }
 
   for (const guide of guides) {
