@@ -9,7 +9,10 @@ export function organizationSchema() {
     '@id': `${SITE_URL}/#org`,
     name: 'Akay Irl Ltd',
     alternateName: 'AKAY Trade',
-    url: SITE_URL,
+    // The company's canonical home is the main site; this catalogue is one of
+    // its properties. sameAs ties the two together for the knowledge graph.
+    url: 'https://www.akay.ie',
+    sameAs: [SITE_URL],
     logo: `${SITE_URL}/akay-bird.png`,
     description:
       'Ireland-based B2B wholesale trading company dealing in spirits, beer, soft drinks and FMCG products by the case and pallet. Duty-paid and export (under-bond) supply across Europe, Asia and the Caribbean.',
