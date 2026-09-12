@@ -1,0 +1,98 @@
+---
+// Every <head> on akay.ie is built from this component, so canonical URLs,
+// Open Graph, Twitter cards, JSON-LD and analytics can never drift apart
+// between the homepage, offer pages, category pages and guides.
+import {
+  SITE_NAME,
+  DEFAULT_OG_IMAGE,
+  DEFAULT_OG_IMAGE_WIDTH,
+  DEFAULT_OG_IMAGE_HEIGHT,
+  DEFAULT_OG_IMAGE_ALT,
+  LOCALE,
+  absoluteUrl,
+} from '../lib/site.mjs';
+
+const {
+  title,
+  description,
+  path = '/',
+  type = 'website',
+  image = DEFAULT_OG_IMAGE,
+  imageAlt = DEFAULT_OG_IMAGE_ALT,
+  noindex = false,
+  ogTitle,
+  schemas = [],
+} = Astro.props;
+
+const url = absoluteUrl(path);
+const socialTitle = ogTitle || title;
+
+// GA4 measurement IDs are public, client-side values (safe to commit).
+// PUBLIC_GA4_ID overrides it at build time to point at another property.
+const GA4_ID = import.meta.env.PUBLIC_GA4_ID || 'G-FW42J5609V';
+
+// Verification token for the akay.ie property in Google Search Console.
+const GSC_TOKEN = 'n-kPO53_aRgc4Z7FR01ZOu5YqmAQBiKwOA6A9_UIniw';
+
+// JSON.stringify leaves "<" intact, so a product name containing "</script>"
+// would close the block early and spill the rest of the schema into the page.
+// Product names come from Airtable, so escape rather than trust them.
+function jsonLd(schema) {
+  return JSON.stringify(schema).replace(/</g, '\\u003c');
+}
+---
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>{title}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={url} />
+{noindex
+  ? <meta name="robots" content="noindex, follow" />
+  : <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />}
+
+<link rel="icon" href="/akay-bird.png" />
+<link rel="apple-touch-icon" href="/akay-bird.png" />
+<meta name="theme-color" content="#B4231F" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#0C140F" media="(prefers-color-scheme: dark)" />
+
+<meta property="og:type" content={type} />
+<meta property="og:site_name" content={SITE_NAME} />
+<meta property="og:locale" content={LOCALE} />
+<meta property="og:url" content={url} />
+<meta property="og:title" content={socialTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:image" content={image} />
+<meta property="og:image:alt" content={imageAlt} />
+{image === DEFAULT_OG_IMAGE && (
+  <>
+    <meta property="og:image:width" content={DEFAULT_OG_IMAGE_WIDTH} />
+    <meta property="og:image:height" content={DEFAULT_OG_IMAGE_HEIGHT} />
+  </>
+)}
+
+<meta name="twitter:card" content={image === DEFAULT_OG_IMAGE ? 'summary_large_image' : 'summary'} />
+<meta name="twitter:title" content={socialTitle} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={image} />
+<meta name="twitter:image:alt" content={imageAlt} />
+
+<meta name="google-site-verification" content={GSC_TOKEN} />
+
+{/* Preconnect to the analytics origin so the tag never blocks first paint. */}
+{GA4_ID && <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin />}
+
+{schemas.filter(Boolean).map((schema) => (
+  <script type="application/ld+json" set:html={jsonLd(schema)} />
+))}
+
+{GA4_ID && (
+  <>
+    <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${GA4_ID}`}></script>
+    <script is:inline define:vars={{ GA4_ID }}>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){ dataLayer.push(arguments); }
+      gtag('js', new Date());
+      gtag('config', GA4_ID);
+    </script>
+  </>
+)}

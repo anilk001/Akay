@@ -1,8 +1,10 @@
 ---
+import SiteSearch from '../../components/SiteSearch.astro';
 import { getOffers } from '../../data/airtable.mjs';
-import { offersWithSlugs, brandPages } from '../../lib/slug.mjs';
+import { withSlugs, brandPages } from '../../lib/slug.mjs';
 import { productOfferSchema, breadcrumbSchema, organizationSchema } from '../../lib/schema.mjs';
-import { basisLabel, basisSuffix } from '../../lib/price.mjs';
+import Seo from '../../components/Seo.astro';
+import { priceLabel } from '../../lib/price.mjs';
 import { enquiryLink, WA_LINK, WA_DISPLAY } from '../../lib/whatsapp.mjs';
 
 // Get all valid slugs for static generation. Sold-out (delisted) offers keep
@@ -11,7 +13,7 @@ import { enquiryLink, WA_LINK, WA_DISPLAY } from '../../lib/whatsapp.mjs';
 // other way round. The sitemap slugs the same combined list in the same order.
 export async function getStaticPaths() {
   const { offers, delisted } = await getOffers();
-  const all = offersWithSlugs([...offers, ...delisted]);
+  const all = withSlugs([...offers, ...delisted]);
   const liveOffers = all.filter((o) => !o.delisted);
   // Brand page URL per brand name, for the breadcrumb link (only brands that
   // actually get a landing page — brand pages list live stock only).
@@ -26,6 +28,11 @@ export async function getStaticPaths() {
 
 const { offer, allOffers, brandSlug } = Astro.props;
 const slug = offer.slug;
+
+// Airtable lists the same product more than once (different lot or supplier).
+// Those pages all point their canonical at one representative URL so search
+// engines index a single page per product — see withSlugs() in lib/slug.mjs.
+const canonicalPath = `/offers/${offer.canonicalSlug || slug}/`;
 
 // Helper functions
 function priceParts(detail = '') {
@@ -50,20 +57,18 @@ const wa = enquiryLink(offer, msg, { soldOut: isDelisted });
 // Category slug for linking
 const categorySlug = offer.category.toLowerCase().replace(/\s+/g, '-');
 
-// Related offers (same category, max 4). Deterministic: each offer takes a
-// different window of its category, rotated by its own position, so internal
-// links vary across pages but the HTML is stable from build to build (random
-// picks churned every page on every rebuild, wasting crawl budget on no-op
-// content changes).
+// Related offers (same category, max 4, live stock only). Deterministic:
+// each offer takes a different window of its category, rotated by its own
+// position, so internal links vary across pages but the HTML is stable from
+// build to build (random picks churned every page on every rebuild, wasting
+// crawl budget on no-op content changes). A delisted offer isn't in the live
+// list (findIndex -1), so it rotates by a hash of its own slug instead.
 const sameCategory = allOffers.filter((o) => o.category === offer.category);
 const otherOffers = sameCategory.filter((o) => o.slug !== offer.slug);
-// A delisted offer isn't in the live list (findIndex -1), so rotate by a hash
-// of its own slug instead — every sold-out page still links a different
-// window of live stock, deterministically.
 const foundIndex = sameCategory.findIndex((o) => o.slug === offer.slug);
 const selfIndex = foundIndex >= 0
   ? foundIndex
-  : [...offer.slug].reduce((s, c) => s + c.charCodeAt(0), 0) % Math.max(1, otherOffers.length);
+  : [...offer.slug].reduce((sum, c) => sum + c.charCodeAt(0), 0) % Math.max(1, otherOffers.length);
 const relatedOffers = Array.from(
   { length: Math.min(4, otherOffers.length) },
   (_, k) => otherOffers[(selfIndex + k) % otherOffers.length]
@@ -71,22 +76,48 @@ const relatedOffers = Array.from(
 
 // Build schemas
 const orgSchema = organizationSchema();
-const productSchema = productOfferSchema(offer, slug);
-const breadcrumbData = breadcrumbSchema(offer.name, offer.category, slug);
+const productSchema = productOfferSchema(offer, offer.canonicalSlug || slug);
+const breadcrumbData = breadcrumbSchema(offer.name, offer.category, offer.canonicalSlug || slug);
 
-// Title and meta. The price basis comes from the offer itself — most lines
-// price per case but some price per bottle/piece, and labelling those "/case"
-// would misstate the price in search results.
-const priceText = `${offer.currency}${offer.amount?.toFixed(2) || '—'}${basisSuffix(offer.priceBasis)}`;
-const pageTitle = isDelisted
-  ? `${offer.name} ${offer.spec || ''} wholesale — out of stock, request a quote | AKAY Trade`
-  : `${offer.name} ${offer.spec || ''} wholesale — ${priceText} | AKAY Trade`;
-const pageDesc = isDelisted
-  ? `${offer.name} ${offer.spec || ''} wholesale is currently sold out at AKAY Trade. Request a quote for this or a similar line via WhatsApp — stock turns over daily.`
-  : `${offer.name} ${offer.spec || ''} wholesale: ${priceText}, ${offer.tier || 'trade pricing'}, ${offer.terms || 'terms available'}. Buy by the case from AKAY Trade.`;
-
-// Determine availability status for display. A delisted offer's stock fields
+// Short availability phrase for the meta description (the on-page version
+// with case counts is built further down). A delisted offer's stock fields
 // are frozen at the moment it sold, so they are never echoed.
+const stockLine = isDelisted ? 'sold out — request a quote'
+  : offer.stock === 'in'
+  ? (offer.qty ? `${offer.qty.toLocaleString()} cases in stock` : 'in stock')
+  : offer.stock === 'warn' ? 'limited availability' : 'enquire for availability';
+
+// Title and meta. priceLabel() reads the parsed basis, so a per-bottle line
+// never gets a "/case" price in its SERP snippet. Sold-out pages trade the
+// price for the out-of-stock state — quoting a dead price in a SERP snippet
+// invites clicks the page can't honour.
+const price = priceLabel(offer);
+
+// Product names run to 200+ characters on multi-variant lines. Budget the
+// title so the whole string stays near 110 characters — the product name is
+// the part that gets shortened, since the pack size and price are what make
+// one line distinguishable from the next.
+const titleTail = isDelisted
+  ? `${offer.spec ? ` ${offer.spec}` : ''} wholesale — out of stock, request a quote | AKAY Trade`
+  : `${offer.spec ? ` ${offer.spec}` : ''} wholesale — ${price} | AKAY Trade`;
+const nameBudget = Math.max(24, 110 - titleTail.length);
+const shortName = offer.name.length > nameBudget
+  ? `${offer.name.slice(0, nameBudget - 1).trimEnd().replace(/[\s,;·—-]+$/, '')}…`
+  : offer.name;
+
+const pageTitle = `${shortName}${titleTail}`;
+const pageDesc = isDelisted
+  ? `${offer.name}${offer.spec ? ` (${offer.spec})` : ''} wholesale is currently sold out at AKAY Trade. Request a quote for this or a similar line via WhatsApp — stock turns over daily.`
+  : [
+      `Buy ${offer.name}${offer.spec ? ` (${offer.spec})` : ''} wholesale from AKAY Trade`,
+      price,
+      offer.tier,
+      offer.terms,
+      offer.origin ? `origin ${offer.origin}` : null,
+      stockLine,
+    ].filter(Boolean).join(' · ').slice(0, 300);
+
+// On-page stock detail (never echoed for a delisted offer).
 let stockDetail = '';
 if (!isDelisted && offer.stock === 'in' && offer.qty) {
   stockDetail = `${offer.qty.toLocaleString()} cases available`;
@@ -96,26 +127,14 @@ if (!isDelisted && offer.stock === 'in' && offer.qty) {
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>{pageTitle}</title>
-  <meta name="description" content={pageDesc} />
-  <link rel="icon" href="/akay-bird.png" />
-  <link rel="canonical" href={`https://offers.akay.ie/offers/${slug}/`} />
-  <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="AKAY Trade" />
-  <meta property="og:url" content={`https://offers.akay.ie/offers/${slug}/`} />
-  <meta property="og:title" content={offer.name} />
-  <meta property="og:description" content={pageDesc} />
-  <meta property="og:image" content="https://offers.akay.ie/akay-bird.png" />
-  <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content={offer.name} />
-  <meta name="twitter:description" content={pageDesc} />
-  <meta name="robots" content="max-snippet:-1, max-image-preview:large" />
-
-  <script type="application/ld+json" set:html={JSON.stringify(orgSchema)} />
-  <script type="application/ld+json" set:html={JSON.stringify(productSchema)} />
-  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+  <Seo
+    title={pageTitle}
+    description={pageDesc}
+    ogTitle={shortName}
+    path={canonicalPath}
+    type="product"
+    schemas={[orgSchema, productSchema, breadcrumbData]}
+  />
 
   <style>
     :root {
@@ -332,6 +351,7 @@ if (!isDelisted && offer.stock === 'in' && offer.qty) {
 </head>
 <body>
   <div class="container">
+    <SiteSearch />
     <div class="breadcrumb">
       <a href="/">Home</a> / <a href={`/category/${categorySlug}/`}>{offer.category}</a>
       {brandSlug && <> / <a href={`/brands/${brandSlug}/`}>{offer.brand}</a></>} / {offer.name}
@@ -402,10 +422,10 @@ if (!isDelisted && offer.stock === 'in' && offer.qty) {
         <div class="offer-grid">
           {relatedOffers.map((rel) => (
             <div class="offer-card">
-              <h3><a href={`/offers/${rel.slug}/`}>{rel.name}</a></h3>
+              <h3><a href={`/offers/${rel.canonicalSlug || rel.slug}/`}>{rel.name}</a></h3>
               {rel.spec && <p style="margin: 0.5em 0; color: var(--muted); font-size: 0.9em;">{rel.spec}</p>}
-              <div class="price">{rel.currency}{rel.amount?.toFixed(2) || '—'} {basisLabel(rel.priceBasis)}</div>
-              <a href={`/offers/${rel.slug}/`} style="font-weight: 600;">View offer →</a>
+              <div class="price">{priceLabel(rel, { short: true })}</div>
+              <a href={`/offers/${rel.canonicalSlug || rel.slug}/`} style="font-weight: 600;">View offer →</a>
             </div>
           ))}
         </div>

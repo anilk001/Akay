@@ -1,0 +1,26 @@
+name: CI
+
+# Runs on every push and pull request:
+#   1. unit tests (search normaliser + engine, WhatsApp classifier),
+#   2. a full static build from the committed snapshot,
+#   3. the public-safety assertion over dist/ — the build fails if any
+#      non-public Airtable field name or a token reaches the output.
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run build   # includes scripts/check-public-safety.mjs

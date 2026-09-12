@@ -1,0 +1,32 @@
+---
+// Header search box shown on every page. A plain GET form, so it works with
+// no JavaScript: submitting lands on /search/?q=… where the client-side
+// engine takes over. Styled with the page's own design tokens (each page
+// defines the same --line/--card/--ink/--brass set); fallbacks cover any
+// template that lacks one.
+interface Props { compact?: boolean; value?: string; }
+const { compact = false, value = '' } = Astro.props;
+---
+<form class:list={['site-search', { compact }]} action="/search/" method="get" role="search">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+  <input type="search" name="q" value={value} placeholder="Search offers — e.g. guinness 44cl, jameson 70cl" aria-label="Search all offers" autocomplete="off" />
+  <button type="submit">Search</button>
+</form>
+
+<style>
+  .site-search{position:relative;display:flex;align-items:center;gap:8px;width:100%;max-width:560px;margin:0 0 18px}
+  .site-search svg{position:absolute;left:12px;color:var(--muted,#767E72);pointer-events:none}
+  .site-search input{flex:1;min-width:0;height:40px;border:1px solid var(--line,#E4E0D4);background:var(--card,#fff);color:var(--ink,#17140F);
+    border-radius:10px;padding:0 12px 0 36px;font-size:14px;font-family:var(--sans,system-ui,sans-serif)}
+  .site-search input:focus{outline:2px solid var(--brass-2,var(--brass,#B4231F));outline-offset:1px;border-color:transparent}
+  .site-search button{height:40px;padding:0 14px;border:1px solid transparent;border-radius:10px;background:var(--forest,#0E7A3B);color:#fff;
+    font-weight:600;font-size:13px;cursor:pointer;white-space:nowrap;font-family:var(--sans,system-ui,sans-serif)}
+  .site-search button:hover{background:var(--brass,#B4231F)}
+  .site-search.compact{margin:0;max-width:420px}
+  .site-search.compact input{height:34px;font-size:13px;border-radius:9px}
+  .site-search.compact button{height:34px;padding:0 12px;border-radius:9px}
+  @media (max-width:640px){
+    .site-search.compact button{display:none}
+    .site-search.compact input{padding-right:10px}
+  }
+</style>

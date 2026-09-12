@@ -7,32 +7,34 @@ export async function GET() {
 
 ## Catalogue
 
-- [All live offers](https://offers.akay.ie/): full catalogue, updated continuously
-- [Spirits](https://offers.akay.ie/category/spirits/)
-- [Beer](https://offers.akay.ie/category/beer/)
-- [Soft Drinks](https://offers.akay.ie/category/soft-drinks/)
-- [Grocery](https://offers.akay.ie/category/grocery/)
-- [Toiletries](https://offers.akay.ie/category/toiletries/)
-- [Confectionery](https://offers.akay.ie/category/confectionery/)
-- [Wine](https://offers.akay.ie/category/wine/)
-- [Champagne](https://offers.akay.ie/category/champagne/)
-- [Other FMCG](https://offers.akay.ie/category/other-fmcg/)
-- [Brands A–Z](https://offers.akay.ie/brands/): every stocked brand with its live wholesale offers
+- [All live offers](https://akay.ie/): full catalogue, updated continuously
+- [Search offers](https://akay.ie/search/): typo-tolerant search with brand, size, pack, bond and warehouse filters
+- [Spirits](https://akay.ie/category/spirits/)
+- [Beer](https://akay.ie/category/beer/)
+- [Soft Drinks](https://akay.ie/category/soft-drinks/)
+- [Grocery](https://akay.ie/category/grocery/)
+- [Toiletries](https://akay.ie/category/toiletries/)
+- [Confectionery](https://akay.ie/category/confectionery/)
+- [Wine](https://akay.ie/category/wine/)
+- [Champagne](https://akay.ie/category/champagne/)
+- [Other FMCG](https://akay.ie/category/other-fmcg/)
+- [Brands A–Z](https://akay.ie/brands/): every stocked brand with its live wholesale offers
 
 ## Guides
 
-- [T1 vs T2 duty status](https://offers.akay.ie/guides/t1-vs-t2-duty-status/): duty-paid vs under-bond explained for beverage trading
-- [Incoterms explained](https://offers.akay.ie/guides/incoterms-exw-dap-cfr/): EXW, FCA, DAP, CIF, FOB, CFR shipping terms
-- [How to buy wholesale](https://offers.akay.ie/guides/how-to-buy-wholesale-spirits-eu/): step-by-step wholesale purchasing, MOQs, pricing, enquiry process
-- [Requirement list format](https://offers.akay.ie/guides/requirement-list-format/): how to structure requests for wholesale pricing
+- [T1 vs T2 duty status](https://akay.ie/guides/t1-vs-t2-duty-status/): duty-paid vs under-bond explained for beverage trading
+- [Incoterms explained](https://akay.ie/guides/incoterms-exw-dap-cfr/): EXW, FCA, DAP, CIF, FOB, CFR shipping terms
+- [How to buy wholesale](https://akay.ie/guides/how-to-buy-wholesale-spirits-eu/): step-by-step wholesale purchasing, MOQs, pricing, enquiry process
+- [Requirement list format](https://akay.ie/guides/requirement-list-format/): how to structure requests for wholesale pricing
 
 ## Company
 
-- [About AKAY](https://offers.akay.ie/about/): 36 years in trade, Ireland-based, 1,000+ suppliers, 6,000+ clients
+- [About AKAY](https://akay.ie/about/): 36 years in trade, Ireland-based, 1,000+ suppliers, 6,000+ clients
+- [All guides](https://akay.ie/guides/): index of the buyer's guides above
 
 ## How to Enquire
 
-1. Browse [offers.akay.ie](https://offers.akay.ie/)
+1. Browse [akay.ie](https://akay.ie/)
 2. Send a requirement list with product names and quantities
 3. Receive a quote within 24 hours
 
@@ -47,7 +49,8 @@ Minimum order: 1 case. Optimal: 1+ pallets (40–60 cases). Worldwide delivery. 
 
   return new Response(llmsTxt, {
     headers: {
-      'Content-Type': 'text/plain',
+      'Content-Type': 'text/plain; charset=utf-8',
+      'Cache-Control': 'public, max-age=3600',
     },
   });
 }

@@ -1,18 +1,14 @@
 // JSON-LD schema generation for SEO
-
-const SITE_URL = 'https://offers.akay.ie';
+import { SITE_URL, SITE_NAME, LEGAL_NAME, SAME_AS } from './site.mjs';
 
 export function organizationSchema() {
   return {
     '@context': 'https://schema.org',
     '@type': 'Organization',
     '@id': `${SITE_URL}/#org`,
-    name: 'Akay Irl Ltd',
-    alternateName: 'AKAY Trade',
-    // The company's canonical home is the main site; this catalogue is one of
-    // its properties. sameAs ties the two together for the knowledge graph.
-    url: 'https://www.akay.ie',
-    sameAs: [SITE_URL],
+    name: LEGAL_NAME,
+    alternateName: SITE_NAME,
+    url: SITE_URL,
     logo: `${SITE_URL}/akay-bird.png`,
     description:
       'Ireland-based B2B wholesale trading company dealing in spirits, beer, soft drinks and FMCG products by the case and pallet. Duty-paid and export (under-bond) supply across Europe, Asia and the Caribbean.',
@@ -32,6 +28,33 @@ export function organizationSchema() {
       'under-bond trading',
       'parallel trading',
     ],
+    sameAs: SAME_AS,
+    contactPoint: [
+      {
+        '@type': 'ContactPoint',
+        contactType: 'sales',
+        email: 'offers@akay.ie',
+        telephone: '+353872382368',
+        availableLanguage: ['en'],
+        areaServed: 'Worldwide',
+      },
+    ],
+  };
+}
+
+// WebSite entity for the homepage. Ties every page on the domain back to one
+// site node so Google can attribute the name 'AKAY Trade' to akay.ie.
+export function websiteSchema() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    '@id': `${SITE_URL}/#website`,
+    url: SITE_URL,
+    name: SITE_NAME,
+    inLanguage: 'en-IE',
+    description:
+      'Live B2B wholesale catalogue of spirits, beer, soft drinks and FMCG by the case and pallet, with duty-paid (T2) and export (T1) pricing.',
+    publisher: { '@id': `${SITE_URL}/#org` },
   };
 }
 
@@ -216,7 +239,7 @@ export function brandCollectionSchema(brandName, brandUrlSlug, offers) {
       itemListElement: offers.map((offer, index) => ({
         '@type': 'ListItem',
         position: index + 1,
-        url: `${SITE_URL}/offers/${offer.slug}/`,
+        url: `${SITE_URL}/offers/${offer.canonicalSlug || offer.slug}/`,
         name: offer.name,
       })),
     },
@@ -237,5 +260,20 @@ export function articleSchema(title, content, slug) {
       name: 'AKAY Trade',
       logo: { '@type': 'ImageObject', url: `${SITE_URL}/akay-bird.png` },
     },
+  };
+}
+
+// Generic breadcrumb builder: takes [{ name, path }] in trail order and
+// returns the BreadcrumbList Google renders above the blue link.
+export function crumbs(trail) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: trail.map((crumb, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: crumb.name,
+      item: `${SITE_URL}${crumb.path}`,
+    })),
   };
 }

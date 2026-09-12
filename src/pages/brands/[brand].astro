@@ -1,12 +1,16 @@
 ---
 import { getOffers } from '../../data/airtable.mjs';
-import { offersWithSlugs, brandPages, categorySlug } from '../../lib/slug.mjs';
+import { withSlugs, brandPages, categorySlug } from '../../lib/slug.mjs';
 import { brandCollectionSchema, organizationSchema } from '../../lib/schema.mjs';
-import { basisLabel } from '../../lib/price.mjs';
+import { priceLabel } from '../../lib/price.mjs';
+import Seo from '../../components/Seo.astro';
 
 export async function getStaticPaths() {
-  const { offers } = await getOffers();
-  const all = offersWithSlugs(offers);
+  // Live stock only — sold-out archive pages link back here, never the
+  // other way round. Slugs come through the same combined derivation as
+  // offers/[slug].astro so brand-card links always hit built pages.
+  const { offers, delisted } = await getOffers();
+  const all = withSlugs([...offers, ...delisted]).filter((o) => !o.delisted);
   return brandPages(all).map(({ brand, slug, offers: brandOffers }) => ({
     params: { brand: slug },
     props: { brand, brandUrlSlug: slug, brandOffers },
@@ -35,25 +39,13 @@ const pageDesc = `Buy ${brand} wholesale from AKAY Trade: ${sorted.length} live 
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>{pageTitle}</title>
-  <meta name="description" content={pageDesc} />
-  <link rel="icon" href="/akay-bird.png" />
-  <link rel="canonical" href={`https://offers.akay.ie/brands/${brandUrlSlug}/`} />
-  <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="AKAY Trade" />
-  <meta property="og:url" content={`https://offers.akay.ie/brands/${brandUrlSlug}/`} />
-  <meta property="og:title" content={`${brand} Wholesale Offers`} />
-  <meta property="og:description" content={pageDesc} />
-  <meta property="og:image" content="https://offers.akay.ie/akay-bird.png" />
-  <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content={`${brand} Wholesale Offers`} />
-  <meta name="twitter:description" content={pageDesc} />
-  <meta name="robots" content="max-snippet:-1, max-image-preview:large" />
-
-  <script type="application/ld+json" set:html={JSON.stringify(orgSchema)} />
-  <script type="application/ld+json" set:html={JSON.stringify(collectionSchema)} />
+  <Seo
+    title={pageTitle}
+    description={pageDesc}
+    ogTitle={`${brand} Wholesale Offers`}
+    path={`/brands/${brandUrlSlug}/`}
+    schemas={[orgSchema, collectionSchema]}
+  />
 
   <style>
     :root {
@@ -235,12 +227,12 @@ const pageDesc = `Buy ${brand} wholesale from AKAY Trade: ${sorted.length} live 
         const stockText = offer.stock === 'in' ? 'In stock' : offer.stock === 'warn' ? 'Limited' : 'Enquire';
         return (
           <div class="offer-card">
-            <h2><a href={`/offers/${offer.slug}/`}>{offer.name}</a></h2>
+            <h2><a href={`/offers/${offer.canonicalSlug || offer.slug}/`}>{offer.name}</a></h2>
             {offer.spec && <p>{offer.spec}</p>}
-            <div class="price">{offer.currency}{offer.amount?.toFixed(2) || '—'} {basisLabel(offer.priceBasis)}</div>
+            <div class="price">{priceLabel(offer, { short: true })}</div>
             <span class={`stock stock-${stockStatus}`}>{stockText}</span>
             {offer.tier && <p><strong>Duty:</strong> {offer.tier}</p>}
-            <a href={`/offers/${offer.slug}/`} class="view-link">View offer →</a>
+            <a href={`/offers/${offer.canonicalSlug || offer.slug}/`} class="view-link">View offer →</a>
           </div>
         );
       })}

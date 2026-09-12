@@ -2,6 +2,7 @@
 import { getOffers } from '../../data/airtable.mjs';
 import { brandPages, categorySlug } from '../../lib/slug.mjs';
 import { organizationSchema } from '../../lib/schema.mjs';
+import Seo from '../../components/Seo.astro';
 
 const { offers } = await getOffers();
 // The directory only lists brands, so raw offers (no slugs) are enough here.
@@ -24,24 +25,13 @@ const pageDesc = `Browse ${pages.length} wholesale brands stocked by AKAY Trade 
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>{pageTitle}</title>
-  <meta name="description" content={pageDesc} />
-  <link rel="icon" href="/akay-bird.png" />
-  <link rel="canonical" href="https://offers.akay.ie/brands/" />
-  <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="AKAY Trade" />
-  <meta property="og:url" content="https://offers.akay.ie/brands/" />
-  <meta property="og:title" content="Wholesale Brands A–Z" />
-  <meta property="og:description" content={pageDesc} />
-  <meta property="og:image" content="https://offers.akay.ie/akay-bird.png" />
-  <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Wholesale Brands A–Z" />
-  <meta name="twitter:description" content={pageDesc} />
-  <meta name="robots" content="max-snippet:-1, max-image-preview:large" />
-
-  <script type="application/ld+json" set:html={JSON.stringify(orgSchema)} />
+  <Seo
+    title={pageTitle}
+    description={pageDesc}
+    ogTitle="Wholesale Brands A–Z"
+    path="/brands/"
+    schemas={[orgSchema]}
+  />
 
   <style>
     :root {

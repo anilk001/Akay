@@ -1,6 +1,6 @@
 name: Scheduled catalogue refresh
 
-# Keeps offers.akay.ie current with Airtable.
+# Keeps akay.ie current with Airtable.
 #
 # The site is a STATIC build. It can only show what is committed in
 # src/data/offers-snapshot.json at deploy time. Netlify's own build does not

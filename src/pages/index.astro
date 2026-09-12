@@ -1,16 +1,18 @@
 ---
 import { getOffers } from '../data/airtable.mjs';
-import { organizationSchema } from '../lib/schema.mjs';
-import { brandPages, categorySlug } from '../lib/slug.mjs';
+import { organizationSchema, websiteSchema } from '../lib/schema.mjs';
+import Seo from '../components/Seo.astro';
+import { withSlugs, categorySlug, brandPages } from '../lib/slug.mjs';
 import { guides } from '../data/guides.mjs';
 import { enquiryLink, WA_LINK } from '../lib/whatsapp.mjs';
+import SiteSearch from '../components/SiteSearch.astro';
 
-const { offers, source } = await getOffers();
+const { offers: rawOffers, source } = await getOffers();
 
-// Google Analytics 4 for offers.akay.ie. The Measurement ID is a public,
-// client-side value (safe to commit). PUBLIC_GA4_ID overrides it at build time
-// if you ever need to point at a different property without a code change.
-const GA4_ID = import.meta.env.PUBLIC_GA4_ID || 'G-FW42J5609V';
+// Slugs come from the shared helper so every card links to a page the build
+// actually generated (see src/lib/slug.mjs). Analytics and the rest of the
+// <head> live in the shared <Seo> component.
+const offers = withSlugs(rawOffers);
 
 // ---- derive per-offer view data (basis split so the price never repeats) ----
 function priceParts(detail = '') {
@@ -35,7 +37,18 @@ const gridItems = [...view].sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 
 const featuredCount = view.filter((o) => o.featured).length;
 
 const categories = ['All', ...Array.from(new Set(view.map((o) => o.category))).sort()];
+// Real <a> links to the category pages. The filter chips above are buttons
+// (client-side filtering), so without these the /category/ pages — and the
+// 6,000 offer pages behind them — would have no crawlable path in.
+const categoryLinks = categories
+  .filter((c) => c !== 'All')
+  .map((c) => ({ name: c, href: `/category/${categorySlug(c)}/`, count: view.filter((o) => o.category === c).length }));
 const brandCount = new Set(view.map((o) => o.brand)).size;
+// Brand landing pages (live stock, 2+ offers). The most-stocked two dozen get
+// homepage links; the /brands/ hub carries the rest, so every brand page has
+// a crawlable path from here.
+const allBrandPages = brandPages(offers);
+const topBrands = [...allBrandPages].sort((a, b) => b.offers.length - a.offers.length).slice(0, 24);
 const currencies = Array.from(new Set(view.map((o) => o.currency).filter(Boolean))).sort();
 const stats = [
   [view.length, 'live offers'],
@@ -43,47 +56,22 @@ const stats = [
   [currencies.join(' / ') || '—', 'currencies'],
   [brandCount, 'brands'],
 ];
-
-// Crawlable links to the category and brand landing pages. The filter chips
-// above the grid are JS buttons, so without these anchors search engines have
-// no path from the homepage into /category/ and /brands/ at all.
-const allBrandPages = brandPages(offers);
-const topBrands = [...allBrandPages].sort((a, b) => b.offers.length - a.offers.length).slice(0, 24);
 ---
 
 <!doctype html>
 <html lang="en" data-source={source}>
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>AKAY — Trade Offers</title>
-  <meta name="description" content="AKAY wholesale beverage offers — spirits and beer by the case, live trade pricing, pack specs and duty tier on every line." />
-  <link rel="icon" href="/akay-bird.png" />
-  <link rel="canonical" href="https://offers.akay.ie/" />
-  <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="AKAY Trade" />
-  <meta property="og:url" content="https://offers.akay.ie/" />
-  <meta property="og:title" content="AKAY — Trade Offers" />
-  <meta property="og:description" content="Wholesale spirits, beer and FMCG by the case. Live trade pricing, pack specs and duty tier on every line." />
-  <meta property="og:image" content="https://offers.akay.ie/akay-bird.png" />
-  <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="AKAY — Trade Offers" />
-  <meta name="twitter:description" content="Wholesale spirits, beer and FMCG by the case. Live trade pricing on every line." />
-  <meta name="google-site-verification" content="n-kPO53_aRgc4Z7FR01ZOu5YqmAQBiKwOA6A9_UIniw" />
-  {GA4_ID && (
-    <>
-      <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${GA4_ID}`}></script>
-      <script is:inline define:vars={{ GA4_ID }}>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){ dataLayer.push(arguments); }
-        gtag('js', new Date());
-        gtag('config', GA4_ID);
-      </script>
-    </>
-  )}
-
-  <script type="application/ld+json" set:html={JSON.stringify(organizationSchema())} />
-  <style>
+  <Seo
+    title="Wholesale Spirits, Beer &amp; FMCG Offers — Live Trade Pricing | AKAY Trade"
+    description="Live wholesale beverage and FMCG offers from AKAY Trade, Ireland. Spirits, beer, soft drinks and grocery by the case and pallet — current trade pricing, pack specs and T1/T2 duty status on every line."
+    ogTitle="AKAY Trade — Live Wholesale Beverage Offers"
+    path="/"
+    schemas={[organizationSchema(), websiteSchema()]}
+  />
+  {/* is:global — scoped styles would stamp a data-astro-cid attribute on
+      every element of all 6,098 cards, adding megabytes to the HTML. This
+      page renders a whole document, so nothing else can collide. */}
+  <style is:global>
     :root{
       --paper:#F7F5F0; --paper-2:#EFEDE4; --card:#FFFFFF; --ink:#17140F; --ink-soft:#41473F;
       --muted:#767E72; --line:#E4E0D4; --line-soft:#ECE8DD;
@@ -127,6 +115,7 @@ const topBrands = [...allBrandPages].sort((a, b) => b.offers.length - a.offers.l
     .mark b{color:var(--brass)}
     .dot{width:6px;height:6px;border-radius:50%;background:var(--brass-2);display:inline-block;margin:0 2px 2px 2px}
     .bar-sub{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.04em}
+    @media (max-width:640px){.bar-sub{display:none}}
     .bar-spacer{flex:1}
     .theme-btn{border:1px solid var(--line);background:var(--card);color:var(--ink-soft);border-radius:9px;
       height:34px;padding:0 12px;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
@@ -190,7 +179,7 @@ const topBrands = [...allBrandPages].sort((a, b) => b.offers.length - a.offers.l
     .controls{position:sticky;top:60px;z-index:30;background:color-mix(in srgb,var(--paper) 90%,transparent);
       backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:14px 0}
     .controls-in{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
-    .search{position:relative;flex:1;min-width:220px}
+    .search{position:relative;flex:1;min-width:220px;margin:0}
     .search input{width:100%;height:42px;border:1px solid var(--line);background:var(--card);color:var(--ink);
       border-radius:11px;padding:0 14px 0 40px;font-size:15px;font-family:var(--sans)}
     .search input:focus{outline:2px solid var(--brass-2);outline-offset:1px;border-color:transparent}
@@ -242,6 +231,21 @@ const topBrands = [...allBrandPages].sort((a, b) => b.offers.length - a.offers.l
     .qty{font-family:var(--mono);font-size:11.5px;font-weight:600;color:var(--ok);font-variant-numeric:tabular-nums;letter-spacing:.02em}
     .qty.muted{color:var(--muted);font-weight:400}
     .c-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:16px}
+    .pname a{color:inherit;text-decoration:none}
+    .pname a:hover{color:var(--brass);text-decoration:underline}
+    .details{font-size:12.5px;font-weight:600;color:var(--brass);text-decoration:none;white-space:nowrap}
+    .details:hover{text-decoration:underline}
+    .catnav{border-top:1px solid var(--line);padding:36px 20px 30px;scroll-margin-top:76px}
+    .catnav h2{font-family:var(--serif);font-size:24px;margin:0 0 8px;color:var(--ink)}
+    .catnav-lede{color:var(--muted);margin:0 0 18px;font-size:14px}
+    .catnav-list{list-style:none;display:flex;flex-wrap:wrap;gap:10px;margin:0;padding:0}
+    .catnav-list a{display:inline-flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);
+      border-radius:999px;padding:8px 14px;font-size:14px;font-weight:600;color:var(--ink);text-decoration:none}
+    .catnav-list a:hover{border-color:var(--brass);color:var(--brass)}
+    .catnav-count{font-family:var(--mono);font-size:11.5px;font-weight:400;color:var(--muted)}
+    .catnav-more{margin:20px 0 0;font-size:14px;color:var(--muted)}
+    .catnav-more a{color:var(--brass);text-decoration:none}
+    .catnav-more a:hover{text-decoration:underline}
     .incoterm{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
     .enquire{display:inline-flex;align-items:center;gap:7px;background:var(--forest);color:var(--paper);
       text-decoration:none;font-size:13px;font-weight:600;padding:8px 13px;border-radius:9px;transition:.14s;border:1px solid transparent}
@@ -258,13 +262,18 @@ const topBrands = [...allBrandPages].sort((a, b) => b.offers.length - a.offers.l
   </style>
 </head>
 <body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <symbol id="i-wa" viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.5A10 10 0 1 0 12 2Zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-1.7-.1-.4-.1-.9-.3-1.6-.6-2.8-1.2-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8 0-1.3.7-2 .9-2.2.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5.2.6.8 2 .9 2.1.1.1.1.3 0 .5-.1.2-.1.3-.3.5l-.4.5c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.4 1.5.3.1.5.1.6-.1.2-.2.7-.8.9-1.1.2-.3.4-.2.6-.1l1.8.9c.3.1.5.2.5.3.1.2.1.7-.1 1.4Z"/></symbol>
+  </svg>
+
   <header class="bar">
     <div class="wrap bar-in">
       <a class="mark" href="/" aria-label="AKAY home">
         <img class="logo-slot" src="/akay-bird.png" alt="" width="320" height="279" />AKAY<span class="dot"></span><b>trade</b>
       </a>
-      <span class="bar-sub">offers.akay.ie</span>
+      <span class="bar-sub">akay.ie</span>
       <span class="bar-spacer"></span>
+      <SiteSearch compact />
       <button class="theme-btn" id="themeBtn" aria-label="Toggle light or dark theme">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5 19 19M19 5l-1.5 1.5M6.5 17.5 5 19"/></svg>
         <span id="themeLbl">Theme</span>
@@ -313,10 +322,10 @@ const topBrands = [...allBrandPages].sort((a, b) => b.offers.length - a.offers.l
 
   <section class="controls">
     <div class="wrap controls-in">
-      <label class="search">
+      <form class="search" action="/search/" method="get" role="search" title="Type to filter this page; press Enter for full search with size, pack and bond filters">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-        <input id="q" type="search" placeholder="Search brand or product — e.g. Jameson, gin, Glenfiddich" autocomplete="off" />
-      </label>
+        <input id="q" name="q" type="search" placeholder="Filter brand or product — press Enter for full search" autocomplete="off" />
+      </form>
       <div class="chips" id="cats">
         {categories.map((c) => (
           <button class="chip" data-cat={c} aria-pressed={c === 'All' ? 'true' : 'false'}>{c}</button>
@@ -340,7 +349,7 @@ const topBrands = [...allBrandPages].sort((a, b) => b.offers.length - a.offers.l
           <div class="c-top">
             <div>
               <div class="brand">{o.brand}</div>
-              <h3 class="pname" title={o.name}>{o.name}</h3>
+              <h3 class="pname"><a href={`/offers/${o.slug}/`} title={o.name}>{o.name}</a></h3>
               {o.variants && <div class="variants" title={o.variants}>{o.variants}</div>}
             </div>
             <span class="cat-tag">{o.category}</span>
@@ -362,11 +371,12 @@ const topBrands = [...allBrandPages].sort((a, b) => b.offers.length - a.offers.l
             </div>
           </div>
           <div class="c-foot">
+            <a class="details" href={`/offers/${o.slug}/`}>Details</a>
             <span class="incoterm">{o.terms}</span>
             <a class="enquire" href={o.wa} target="_blank" rel="noopener"
                data-offer={o.name} data-brand={o.brand} data-category={o.category}
                data-currency={o.currency} data-amount={o.amount}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.5A10 10 0 1 0 12 2Zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-1.7-.1-.4-.1-.9-.3-1.6-.6-2.8-1.2-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8 0-1.3.7-2 .9-2.2.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5.2.6.8 2 .9 2.1.1.1.1.3 0 .5-.1.2-.1.3-.3.5l-.4.5c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.4 1.5.3.1.5.1.6-.1.2-.2.7-.8.9-1.1.2-.3.4-.2.6-.1l1.8.9c.3.1.5.2.5.3.1.2.1.7-.1 1.4Z"/></svg>
+              <svg width="14" height="14" aria-hidden="true"><use href="#i-wa" /></svg>
               Enquire
             </a>
           </div>
@@ -376,10 +386,40 @@ const topBrands = [...allBrandPages].sort((a, b) => b.offers.length - a.offers.l
     <div class="empty" id="empty" hidden>No offers match that filter. Try clearing the search.</div>
   </main>
 
-  <section id="guides" style="border-top:1px solid var(--line);padding:40px 20px;background:var(--paper-2)">
+  <section id="categories" class="catnav">
     <div class="wrap">
-      <h2 style="font-family:var(--serif);font-size:24px;margin:0 0 12px;color:var(--ink)">Learning</h2>
-      <p style="color:var(--muted);margin:0 0 26px;font-size:14px">Guides for wholesale buyers: duty status, shipping terms, how to order.</p>
+      <h2>Browse by category</h2>
+      <p class="catnav-lede">Every category has its own page with the full live list, trade pricing and duty status.</p>
+      <nav aria-label="Offer categories">
+        <ul class="catnav-list">
+          {categoryLinks.map((c) => (
+            <li><a href={c.href}>{c.name}<span class="catnav-count">{c.count}</span></a></li>
+          ))}
+        </ul>
+      </nav>
+      <h2 style="margin-top:34px">Browse by brand</h2>
+      <p class="catnav-lede">The most-stocked brands, each with its own wholesale landing page.</p>
+      <nav aria-label="Brand pages">
+        <ul class="catnav-list">
+          {topBrands.map((b) => (
+            <li><a href={`/brands/${b.slug}/`}>{b.brand}<span class="catnav-count">{b.offers.length}</span></a></li>
+          ))}
+          <li><a href="/brands/">All {allBrandPages.length} brands A–Z</a></li>
+        </ul>
+      </nav>
+      <p class="catnav-more">
+        New to trade buying? Read <a href="/guides/t1-vs-t2-duty-status/">T1 vs T2 duty status</a>,
+        <a href="/guides/incoterms-exw-dap-cfr/">Incoterms explained</a> and
+        <a href="/guides/how-to-buy-wholesale-spirits-eu/">how to buy wholesale in the EU</a>,
+        or read more <a href="/about/">about AKAY Trade</a>.
+      </p>
+    </div>
+  </section>
+
+  <section id="guides" style="border-top:1px solid var(--line);padding:40px 20px;background:var(--paper-2);scroll-margin-top:76px">
+    <div class="wrap">
+      <h2 style="font-family:var(--serif);font-size:24px;margin:0 0 12px;color:var(--ink)"><a href="/guides/" style="color:inherit;text-decoration:none">Buyer's guides</a></h2>
+      <p style="color:var(--muted);margin:0 0 26px;font-size:14px">Guides for wholesale buyers: duty status, shipping terms, how to order. <a href="/guides/" style="color:var(--brass);text-decoration:none">See all guides →</a></p>
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px">
         {guides.map((guide) => (
           <a href={`/guides/${guide.slug}/`} style="background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px;text-decoration:none;transition:.16s;display:flex;flex-direction:column">
@@ -392,32 +432,12 @@ const topBrands = [...allBrandPages].sort((a, b) => b.offers.length - a.offers.l
     </div>
   </section>
 
-  <section class="browse" style="border-top:1px solid var(--line);padding:34px 0">
-    <div class="wrap">
-      <h2 style="font-family:var(--serif);font-size:22px;margin:0 0 6px;color:var(--ink)">Browse the catalogue</h2>
-      <p style="color:var(--muted);margin:0 0 18px;font-size:13.5px">Wholesale offers by category and brand — every page lists live case pricing and duty status.</p>
-      <h3 style="font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--brass);margin:0 0 8px">By category</h3>
-      <p style="margin:0 0 18px;line-height:2">
-        {categories.filter((c) => c !== 'All').map((c) => (
-          <a href={`/category/${categorySlug(c)}/`} style="color:var(--ink-soft);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:5px 13px;font-size:13px;margin:0 6px 6px 0;display:inline-block">Wholesale {c}</a>
-        ))}
-      </p>
-      <h3 style="font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--brass);margin:0 0 8px">Popular brands</h3>
-      <p style="margin:0;line-height:2">
-        {topBrands.map((b) => (
-          <a href={`/brands/${b.slug}/`} style="color:var(--ink-soft);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:5px 13px;font-size:13px;margin:0 6px 6px 0;display:inline-block">{b.brand}</a>
-        ))}
-        <a href="/brands/" style="color:var(--brass);text-decoration:none;font-weight:600;font-size:13px;padding:5px 6px;display:inline-block">All {allBrandPages.length} brands →</a>
-      </p>
-    </div>
-  </section>
-
   <footer>
     <div class="wrap">
       <div class="note">
         Live catalogue from AKAY's Airtable. Prices are indicative and shown per the listing basis; supplier identity, buy prices and margins are never published. <strong>T1</strong> = export / under-bond · <strong>T2</strong> = for sale in the EU.
         <br /><br />
-        <a href="/about/" style="color:var(--brass);text-decoration:none">About AKAY</a> · <a href="/brands/" style="color:var(--brass);text-decoration:none">Brands A–Z</a> · <a href="/#guides" style="color:var(--brass);text-decoration:none">Guides</a> · <a href="/guides/requirement-list-format/" style="color:var(--brass);text-decoration:none">How to order</a>
+        <a href="/about/" style="color:var(--brass);text-decoration:none">About AKAY</a> · <a href="/guides/" style="color:var(--brass);text-decoration:none">Guides</a> · <a href="/guides/requirement-list-format/" style="color:var(--brass);text-decoration:none">How to order</a>
       </div>
       <div style="font-family:var(--mono);text-align:right">© AKAY · Shannon<br /><a href={WA_LINK} style="color:var(--brass);text-decoration:none">WhatsApp</a> · <a href="mailto:hello@akay.ie" style="color:var(--brass);text-decoration:none">hello@akay.ie</a></div>
     </div>
@@ -497,6 +517,15 @@ const topBrands = [...allBrandPages].sort((a, b) => b.offers.length - a.offers.l
       Array.from(cats.children).forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
       filter();
     });
+
+    // Deep link: akay.ie/#spirits (or #beer, #grocery …) preselects that
+    // category chip. Used by the email-signature link bar and shareable links;
+    // an unknown hash is ignored. Matched case-insensitively against the chips.
+    const hashCat = decodeURIComponent(location.hash.slice(1)).trim().toLowerCase();
+    if (hashCat) {
+      const chip = Array.from(cats.children).find((x) => (x.dataset.cat || '').toLowerCase() === hashCat);
+      if (chip) chip.click();
+    }
 
     // Category request form -> n8n webhook (emails the caller our live offers in that category).
     const reqForm = document.getElementById('reqForm');
