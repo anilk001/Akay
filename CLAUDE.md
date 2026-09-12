@@ -1,7 +1,9 @@
 # AKAY trade offers catalogue
 
-Static [Astro 4](https://astro.build) site for **offers.akay.ie** — AKAY's
-public B2B beverage catalogue. Every offer card is rendered to plain HTML at
+Static [Astro 4](https://astro.build) site for **akay.ie** — AKAY's
+public B2B beverage catalogue. (It moved from `offers.akay.ie`; the 301s live
+in `netlify.toml` and `SITE_URL` in `src/lib/site.mjs` is the one place the
+origin is written down.) Every offer card is rendered to plain HTML at
 build time; the published site runs no server.
 
 ## Data pipeline
@@ -48,6 +50,10 @@ node n8n/tests/split-quantity.test.js
 ## Layout
 
 - `src/data/airtable.mjs` — live fetch + normalize (public-safe fields only)
+- `src/lib/site.mjs` — origin + site-wide SEO constants (`SITE_URL`)
+- `src/components/Seo.astro` — the `<head>` for every page: title, canonical,
+  robots, Open Graph, Twitter, GA4 and JSON-LD. Pages pass props, never
+  hand-roll meta tags
 - `src/data/guides.mjs` — buyer's guides content (see `/new-guide` skill)
 - `src/pages/` — index, category/offer/guide pages, sitemap, robots, llms.txt
 - `src/lib/` — fetch script, schema, slugs, WhatsApp link helpers,

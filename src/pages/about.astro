@@ -1,9 +1,14 @@
 ---
 import SiteSearch from '../components/SiteSearch.astro';
-import { organizationSchema } from '../lib/schema.mjs';
+import { organizationSchema, crumbs } from '../lib/schema.mjs';
+import Seo from '../components/Seo.astro';
 import { WA_LINK, WA_DISPLAY } from '../lib/whatsapp.mjs';
 
 const orgSchema = organizationSchema();
+const breadcrumbData = crumbs([
+  { name: 'Home', path: '/' },
+  { name: 'About', path: '/about/' },
+]);
 const pageTitle = 'About AKAY Trade — 36 Years in Wholesale';
 const pageDesc = 'AKAY Trade: Ireland-based B2B wholesale trading company specializing in spirits, beer, soft drinks and FMCG for 1,000+ suppliers and 6,000+ clients worldwide.';
 ---
@@ -11,24 +16,13 @@ const pageDesc = 'AKAY Trade: Ireland-based B2B wholesale trading company specia
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>{pageTitle}</title>
-  <meta name="description" content={pageDesc} />
-  <link rel="icon" href="/akay-bird.png" />
-  <link rel="canonical" href="https://akay.ie/about/" />
-  <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="AKAY Trade" />
-  <meta property="og:url" content="https://akay.ie/about/" />
-  <meta property="og:title" content="About AKAY Trade" />
-  <meta property="og:description" content={pageDesc} />
-  <meta property="og:image" content="https://akay.ie/akay-bird.png" />
-  <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="About AKAY Trade" />
-  <meta name="twitter:description" content={pageDesc} />
-  <meta name="robots" content="max-snippet:-1, max-image-preview:large" />
-
-  <script type="application/ld+json" set:html={JSON.stringify(orgSchema)} />
+  <Seo
+    title={pageTitle}
+    description={pageDesc}
+    ogTitle="About AKAY Trade"
+    path="/about/"
+    schemas={[orgSchema, breadcrumbData]}
+  />
 
   <style>
     :root {
@@ -378,7 +372,7 @@ const pageDesc = 'AKAY Trade: Ireland-based B2B wholesale trading company specia
 
     <div class="footer">
       <p>
-        <a href="/">← Back to catalogue</a> | <a href="/#guides">Read our guides</a>
+        <a href="/">← Back to catalogue</a> | <a href="/guides/">Read our guides</a>
       </p>
       <p>
         AKAY Trade — Shannon, Ireland. Licensed B2B wholesale trader serving Europe, Middle East, Africa, and Asia.

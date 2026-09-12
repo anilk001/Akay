@@ -103,19 +103,55 @@ The site is static, so it reflects Airtable as of the last build. To refresh:
 
 ---
 
-## Go-live — serve the site at `akay.ie` (DNS on Cloudflare)
+## Domain — the site is served from `akay.ie`
 
-1. In Netlify → your site → **Domain management** → *Add a domain* → enter `akay.ie`
-   and set it as the **primary domain**. Keep `offers.akay.ie` listed as a domain alias
-   so Netlify still answers for it while the redirect below is live.
-2. In **Cloudflare** → DNS: point the apex `akay.ie` at Netlify (`A`/`ALIAS`/flattened `CNAME`
-   to the load-balancer/hostname Netlify shows), **proxied** (orange cloud). Leave the
-   `offers` record in place and proxied — a Cloudflare redirect rule only runs on proxied hosts.
-3. In **Cloudflare** → Rules → **Redirect Rules** → create a dynamic rule:
-   - When: `(http.host eq "offers.akay.ie")`
-   - Then: 301, URL = `concat("https://akay.ie", http.request.uri.path)`, preserve query string.
-4. Wait for DNS + automatic HTTPS to provision (usually minutes). Verify with
-   `curl -sI https://offers.akay.ie/about/` → `301` + `location: https://akay.ie/about/`.
+The catalogue moved from `offers.akay.ie` to the apex domain. Paths did not
+change, so every old URL maps 1:1 onto the same path on `akay.ie`.
+
+1. In Netlify → **Domain management**, `akay.ie` is the **primary domain**.
+   Keep `offers.akay.ie` attached as a domain alias, with its DNS still
+   pointing at Netlify, for at least 12 months — the 301s below only fire for
+   requests that actually reach the site.
+2. `netlify.toml` holds the redirects: `offers.akay.ie/*` and `www.akay.ie/*`
+   → `https://akay.ie/:splat`, status 301, `force = true`.
+3. A Cloudflare **Redirect Rule** can do the same at the edge (When
+   `(http.host eq "offers.akay.ie")` → 301 to
+   `concat("https://akay.ie", http.request.uri.path)`). Either is enough; the
+   `netlify.toml` rules are the fallback if the Cloudflare rule is ever
+   removed, and they cost nothing when Cloudflare answers first.
+4. Verify: `curl -sI https://offers.akay.ie/about/` → `301` +
+   `location: https://akay.ie/about/`.
+
+---
+
+## SEO
+
+Everything below is generated at build time; there is nothing to maintain by
+hand except the copy.
+
+| Concern | Where it lives |
+| --- | --- |
+| Origin, site name, social profiles | `src/lib/site.mjs` — one constant, `SITE_URL` |
+| `<head>` for every page | `src/components/Seo.astro` (title, description, canonical, robots, Open Graph, Twitter, GA4, JSON-LD) |
+| JSON-LD | `src/lib/schema.mjs` — Organization, WebSite, Product, BreadcrumbList, CollectionPage, Article |
+| Price wording in titles/cards | `src/lib/price.mjs` — reads the parsed basis so a per-bottle line never says "/case" |
+| Slugs | `src/lib/slug.mjs` — `withSlugs()` is the single ordering, shared by the offer pages, sitemap and homepage |
+| `sitemap.xml`, `robots.txt`, `llms.txt` | `src/pages/*.ts`, generated from the live catalogue |
+| Redirects, security + cache headers | `netlify.toml` |
+
+Crawl paths matter more than any tag here: the homepage links to every offer
+page and to `/category/<name>/`, category pages cross-link their siblings, and
+offer pages link back to their category. Breaking those links orphans several
+thousand pages, whatever the sitemap says.
+
+**After a deploy that changes the domain or URL structure:**
+
+1. Add `akay.ie` as a property in Google Search Console and verify it (the
+   verification token is in `src/components/Seo.astro`).
+2. Submit `https://akay.ie/sitemap.xml`.
+3. In the **old** `offers.akay.ie` property, use *Settings → Change of
+   address* to point it at `akay.ie`. This only works while the 301s are live.
+4. Check Bing Webmaster Tools the same way (it can import from GSC).
 
 ---
 
