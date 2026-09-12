@@ -24,7 +24,16 @@ const articleData = articleSchema(guide.title, guide.content, guide.slug);
 //
 // Content is repo-authored, never user input, but it is still escaped before
 // any tag is added so a stray < in a guide can't become markup.
-const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+// " is escaped alongside <, & and >: the link rules below drop matched text
+// straight into a double-quoted href, so an unescaped quote in a URL would
+// close the attribute and let the rest of the text become new attributes —
+// a bare https://…"onmouseover="… in a guide would ship a live handler.
+// Escaped, it decodes to a literal quote inside the value and stays inert.
+const esc = (s) => s
+  .replace(/&/g, '&amp;')
+  .replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;')
+  .replace(/"/g, '&quot;');
 
 function inline(text) {
   return esc(text)
