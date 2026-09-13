@@ -179,6 +179,19 @@ const MIXED_NO = /\b(?:no\s+mix(?:ing|ed)?\w*|not\s+mixed|cannot\s+be\s+mixed|ca
 const EX_STOCK = /\b(?:ex[\s-]?stock|in\s+stock|on\s+(?:the\s+)?floor|immediate(?:ly)?|prompt|readily\s+available|available\s+(?:now|immediately)|ready\s+(?:now|to\s+ship|to\s+load|for\s+(?:collection|loading|pickup))|stock\s+available|direct(?:ly)?\s+available)\b/i;
 const NOT_IN_STOCK = /\b(?:not?\s+(?:in\s+)?stock|out\s+of\s+stock|no\s+stock)\b/i;
 
+// A dedicated lead-time cell whose ENTIRE value is one of these is ex-stock.
+// EX_STOCK above needs a qualifier — "ready now", "stock available" — so a
+// supplier who wrote just "READY" or "Stock" matched nothing, fell through the
+// cascade to their default lead time, and had "ready now" published as three
+// weeks. A wrong value, not a missing one, which is the worse failure.
+//
+// Whole-string, and only ever applied to a cell whose entire job is the lead
+// time, so "ready to quote" sitting in a product name cannot become zero.
+//
+// Kept deliberately identical to LEGACY_EX_STOCK in src/lib/trade-terms.mjs,
+// which does the same job for rows this parser has not reached yet. Edit both.
+const BARE_EX_STOCK = /^(?:ready|stock|in\s*stock|ex[\s-]?stock|on\s+(?:the\s+)?floor|immediate(?:ly)?|prompt|available(?:\s+now)?)\.?$/i;
+
 const LEAD_KEYWORD = /\b(?:lead\s*-?\s*time|leadtime|delivery\s*(?:lead\s*time|time|term|in|within)?|dispatch(?:ed)?|shipping\s*time|ship(?:ped|ment)?\s*(?:in|within)|ready\s+in|available\s+in|collection|loading\s*time|eta|production\s*time|availability)\b/i;
 
 const DUR_UNIT = '(?:working\\s*days?|business\\s*days?|work\\s*days?|working\\s*weeks?|days?|weeks?|wks?|months?|mths?|mos?|hours?|hrs?|h)';
@@ -589,7 +602,9 @@ function readLeadTime(text, requireKeyword) {
 
   if (!requireKeyword) {
     const hit = readLeadValue(s);
-    return hit ? { days: hit.days, span: [0, s.length] } : null;
+    if (hit) return { days: hit.days, span: [0, s.length] };
+    if (BARE_EX_STOCK.test(s.trim())) return { days: 0, span: [0, s.length] };
+    return null;
   }
 
   for (const { seg, offset } of segments(s)) {

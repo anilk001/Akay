@@ -20,14 +20,15 @@ between 2026-07-29 and 2026-08-27. A draft in n8n is invisible until published.
 | `whatsapp-filter-layer/classify-message.buy-side-guard.js` | `DO2ltjkISp2YDNnc` | Classify Message | patch only, **published 2026-08-30** |
 | `whatsapp-offer-broadcast/plan-broadcast.js` | `BeGfFpgxmI7hdCTI` | Plan Broadcast | full source, **published 2026-09-04** |
 | `whatsapp-offer-broadcast/build-results.js` | `BeGfFpgxmI7hdCTI` | Build Results | full source, **published 2026-09-04** |
-| `trade-terms-normaliser/normalise-trade-terms.js` | `WQ6A8IVLSAd72fnk` | Normalise Trade Terms | full source, **published 2026-09-13** (v2: unsupported currencies) |
+| `trade-terms-normaliser/normalise-trade-terms.js` | `WQ6A8IVLSAd72fnk` | Normalise Trade Terms | full source, **published 2026-09-13** (v3: bare ex-stock) |
 | `trade-terms-digest/build-parse-digest.js` | *(not built in n8n yet)* | Build Parse Digest | full source, **not published** |
 
-The four WhatsApp nodes and the trade-terms normaliser are live. The
-normaliser is published but **nothing calls it yet** — a sub-workflow with no
-caller is inert, which is rollout step 1. Wiring the four pipelines to it is
-step 2 onwards, in `trade-terms-normaliser/README.md`, and starts with one
-pipeline in dry run.
+The four WhatsApp nodes and the trade-terms normaliser are live. **Excel Offer
+Ingestion** (`j1NAhQEKz9hzi1T2`) now calls the normaliser on every line — as a
+dead-end observation branch in DRY RUN, so it writes nothing and the live
+Create Offers path is untouched. That is rollout step 2. Email, PDF and
+WhatsApp are still to come, and going live needs the mapping node described in
+`trade-terms-normaliser/README.md`.
 
 The exception digest is not built in n8n at all yet, because publishing it
 starts sending a weekly email. Its two inputs are ready: `Parse Status` and

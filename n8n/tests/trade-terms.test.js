@@ -167,6 +167,21 @@ for (const [text, days] of leads) {
 r = one({ rawLeadTime: 'in stock, delivery 3 days' });
 check('a stated duration beats a stated availability', lead(r), 3);
 
+// A dedicated cell that says only this is ex-stock. Before this, "READY" matched
+// nothing, fell through to the supplier default and published 21 days for a line
+// the supplier said was ready now. 37 rows in the snapshot say exactly "READY".
+for (const text of ['READY', 'Ready', 'Stock', 'On the floor', 'Available', 'Prompt', 'Immediate']) {
+  check(`bare "${text}" is ex-stock`, one({ rawLeadTime: text }).tradeTerms.leadTimeDays, 0);
+}
+check('and a supplier default cannot override it',
+  one({ rawLeadTime: 'READY', supplierDefaults: { 'Default Lead Time Days': 21 } }).tradeTerms.leadTimeDays, 0);
+// Whole-string only: a real duration still wins, and prose is untouched.
+check('"5-7 days" is a range, not ex-stock', one({ rawLeadTime: '5-7 days' }).tradeTerms.leadTimeDays, 7);
+check('"2 weeks from stock" keeps its duration', one({ rawLeadTime: '2 weeks from stock' }).tradeTerms.leadTimeDays, 14);
+// The dangerous direction: bare "ready" in a NAME must never become zero.
+check('"Ready Mix Cocktails 12x70cl" is not ex-stock',
+  one({ rawName: 'Ready Mix Cocktails 12x70cl' }).tradeTerms.leadTimeDays, null);
+
 r = one({ rawLeadTime: 'out of stock' });
 check('"out of stock" is not ex-stock', lead(r), null);
 

@@ -157,6 +157,20 @@ against real supplier behaviour.
    list, and compare `fieldsPreview` against the source file by hand.
 3. Roll to the other three. Excel and Email share a shape; PDF and WhatsApp are
    the noisy ones and go last.
+
+   **Excel is wired (2026-09-13) as a DEAD-END OBSERVATION BRANCH, not in-line.**
+   `Create Offers` maps with `autoMapInputData`, so every key on the item
+   becomes an Airtable field — routing this node's output through the main path
+   would send `tradeTerms`, `parse`, `fields` and `fieldsPreview` as unknown
+   columns and fail the entire create batch, dry run included, because `dryRun`
+   only empties `fields` and does not remove the scaffolding.
+
+   Going live therefore needs an **Apply Trade Terms** node after the
+   sub-workflow that returns only the original payload merged with `fields`,
+   and Essential Fields Gate rerouted to read from it. Two open items before
+   that: `headerText` is empty for Excel (order-level terms sit in the rows
+   above the table, which Detect Header consumes and does not pass on), and
+   `DRY_RUN` in Build Trade Terms Input has to be flipped at the same time.
 4. ~~Add `Parse Notes` / `Parse Status` to the Offers table.~~ Done 2026-09-13,
    verified with a real write at `typecast: false`. Still to do: schedule the
    exception digest (`../trade-terms-digest/`).
