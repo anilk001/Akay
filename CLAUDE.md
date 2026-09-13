@@ -42,9 +42,11 @@ npm run dev          # local dev server
 npm run build        # static build to dist/ (works offline via snapshot)
 npm run preview      # serve the built site
 npm run sync-offers  # refresh offers-snapshot.json from Airtable (needs token)
-npm test             # normaliser + search engine + WhatsApp classifier tests
+npm test             # normaliser + search engine + n8n node tests
 node n8n/tests/buy-side-guard.test.js     # WhatsApp classifier tests
 node n8n/tests/split-quantity.test.js
+node n8n/tests/trade-terms.test.js        # MOQ / lead-time ingestion parser
+node n8n/tests/trade-terms-digest.test.js
 ```
 
 ## Layout
@@ -61,8 +63,10 @@ node n8n/tests/split-quantity.test.js
 - `src/components/SiteSearch.astro` — header search form on every page
 - `src/pages/search.astro` + `search-index.json.ts` — client-side search over
   the public-safe index (see `tests/` for the acceptance cases)
-- `n8n/` — WhatsApp offer-ingestion scripts + plain-Node tests (a PostToolUse
-  hook runs them after any edit under `n8n/`)
+- `n8n/` — mirrors of the JavaScript inside n8n Code nodes + plain-Node tests
+  (a PostToolUse hook runs them after any edit under `n8n/`). Includes
+  `trade-terms-normaliser/` — the one sub-workflow all four ingestion pipelines
+  call to parse MOQ and lead time into typed fields at ingestion
 - `.claude/` — skills (offers-catalogue, offer-data-validator,
   price-list-intake, new-guide, plus vendored design skills — see
   `.claude/skills/VENDORED.md`), agents (public-safety-reviewer, test-writer),

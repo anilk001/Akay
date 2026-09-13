@@ -20,8 +20,14 @@ between 2026-07-29 and 2026-08-27. A draft in n8n is invisible until published.
 | `whatsapp-filter-layer/classify-message.buy-side-guard.js` | `DO2ltjkISp2YDNnc` | Classify Message | patch only, **published 2026-08-30** |
 | `whatsapp-offer-broadcast/plan-broadcast.js` | `BeGfFpgxmI7hdCTI` | Plan Broadcast | full source, **published 2026-09-04** |
 | `whatsapp-offer-broadcast/build-results.js` | `BeGfFpgxmI7hdCTI` | Build Results | full source, **published 2026-09-04** |
+| `trade-terms-normaliser/normalise-trade-terms.js` | *(new sub-workflow)* | Normalise Trade Terms | full source, **not yet published** |
+| `trade-terms-digest/build-parse-digest.js` | *(new)* | Build Parse Digest | full source, **not yet published** |
 
-Both changes are live. `classify-message` is a patch rather than full source
+The four WhatsApp nodes are live; the two trade-terms nodes are new in this
+commit and still have to be pasted in and published — the rollout in
+`trade-terms-normaliser/README.md` starts with one pipeline in dry run.
+
+`classify-message` is a patch rather than full source
 because the node could not be exported verbatim at the time; replace it with the
 full source when convenient rather than transcribing it by hand.
 
@@ -44,6 +50,34 @@ characters is unreadable, and some editors strip them silently, which would
 break the pattern without any visible change to the source.
 
 ## Changes in this commit
+
+**Trade terms are parsed at ingestion instead of being backfilled later**
+(`trade-terms-normaliser/`, `trade-terms-digest/`)
+
+On 12 September a backfill had to be built because minimum order quantity and
+lead time were sitting in the base as free text — and in many cases not even in
+their own fields, but inside product names: *"Jim Beam Apple 12x70cl MOQ 50
+cases"*. The same fact was written 63 different ways across 2,052 records, two
+competing lead-time fields covered 23% of public lines between them, and the
+site could show neither.
+
+None of that was caused by suppliers being inconsistent. Suppliers will always
+be inconsistent. It was caused by the pipelines storing what arrived instead of
+resolving what it meant, so every day it stayed unfixed the backfill became more
+of a recurring chore.
+
+`normalise-trade-terms.js` is one sub-workflow called from all four ingestion
+pipelines, sitting immediately after the **Apply Default Margin** node that
+already proved the pattern. It extracts, resolves through the cascade
+line → header → supplier default → category rule, and labels the result in
+`MOQ Source` so nothing downstream has to choose between over-claiming and
+saying nothing. `build-parse-digest.js` is the weekly exception email that makes
+new wording visible the week it starts rather than two years later.
+
+Neither is published yet — see the rollout in
+`trade-terms-normaliser/README.md`, which starts with one pipeline in dry run.
+
+## Earlier changes (published 2026-08-30)
 
 **1. Leading quantity swallowed into product identity** (`extract-wa-offers.js`)
 
@@ -81,10 +115,18 @@ a real Pilsner Urquell offer opens "Do you need Pilsner Urquell".
 
 ## Tests
 
-Plain node, no framework:
+Plain node, no framework. `npm test` runs all of them:
 
     node n8n/tests/split-quantity.test.js
     node n8n/tests/buy-side-guard.test.js
+    node n8n/tests/trade-terms.test.js
+    node n8n/tests/trade-terms-digest.test.js
+
+The two trade-terms tests **load and execute the node source** rather than
+re-typing it — `new Function('$input', src)`, since a Code node is a function
+body — so the test and the text pasted into n8n cannot drift. The two older
+tests predate that harness and still hold their own copy of the logic; worth
+converting when either is next touched.
 
 Cases are real messages from the WhatsApp Log. The buy-side test asserts both
 directions: sell-side messages must stay `Supplier Offer`, buy-side must become
