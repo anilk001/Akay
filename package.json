@@ -9,7 +9,7 @@
     "build": "astro build && node scripts/check-public-safety.mjs",
     "preview": "astro preview",
     "sync-offers": "node src/lib/fetch-offers.mjs",
-    "test": "node tests/normalise.test.js && node tests/search-engine.test.js && node tests/public-keys.test.js && node n8n/tests/buy-side-guard.test.js && node n8n/tests/split-quantity.test.js && node n8n/tests/trade-terms.test.js && node n8n/tests/trade-terms-digest.test.js",
+    "test": "node tests/normalise.test.js && node tests/search-engine.test.js && node tests/public-keys.test.js && node tests/trade-terms-display.test.js && node tests/site.test.js && node n8n/tests/buy-side-guard.test.js && node n8n/tests/split-quantity.test.js && node n8n/tests/trade-terms.test.js && node n8n/tests/trade-terms-digest.test.js",
     "check:public-safety": "node scripts/check-public-safety.mjs"
   },
   "dependencies": {

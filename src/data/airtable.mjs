@@ -10,6 +10,7 @@
 
 import snapshot from './offers-snapshot.json' with { type: 'json' };
 import { parseVolumeMl } from '../lib/normalise.mjs';
+import { tradeTermsView } from '../lib/trade-terms.mjs';
 
 const TOKEN = process.env.AIRTABLE_TOKEN || process.env.Airtable_Pat || '';
 const BASE = process.env.AIRTABLE_BASE_ID || 'appaDSdZkAE9PGkjT';
@@ -23,6 +24,11 @@ const FIELDS = [
   'Stock Display', 'Stock Cases', 'Public Terms', 'Warehouse', 'Incoterm',
   'Bond/Customs Status', 'Origin Country', 'Public Listing', 'Featured',
   'MOQ', 'Lead Time', 'BBD', 'Public Note', 'Offer Date', 'Auto Expiry Date',
+  // Structured trade terms, parsed at ingestion by the n8n normaliser. The two
+  // free-text columns above stay in the list as the fallback for rows the
+  // parser has not reached yet.
+  'MOQ Type', 'MOQ Qty', 'MOQ Currency', 'MOQ Source', 'Mixed Load Allowed',
+  'Lead Time Days',
 ];
 
 // Fields that must never be requested, whatever the allowlist above says.
@@ -39,8 +45,13 @@ export const FORBIDDEN_FIELDS = [
 ];
 export const FORBIDDEN_PATTERN = /supplier|buy|cost|markup|margin|trader|vendor|contact|internal|source|bundle|target|excluded|trust|\bnotes?\b|comparable|feedback|broadcast/i;
 // Public-by-design names the pattern would otherwise trip on: the Airtable
-// field "Public Note" and the `note` key it becomes in the search index.
-const PATTERN_EXCEPTIONS = new Set(['Public Note', 'note']);
+// field "Public Note" and the `note` key it becomes in the search index, plus
+// "MOQ Source" — which records which tier of the cascade supplied a minimum
+// (Supplier Stated / Parsed From Text / Supplier Default / Category Rule), not
+// who the supplier is. It is read at BUILD time only, to decide whether the
+// page may state a minimum or must hedge it; `moqSource` is deliberately kept
+// out of PUBLIC_KEYS so it never reaches the browser.
+const PATTERN_EXCEPTIONS = new Set(['Public Note', 'note', 'MOQ Source']);
 
 export function isForbiddenField(name) {
   if (FORBIDDEN_FIELDS.includes(name)) return true;
@@ -90,6 +101,9 @@ function deriveExtras(o) {
     unitType,
     incoterm: o.incoterm || split.incoterm,
     warehouse: o.warehouse || split.warehouse,
+    // Worded once here so the offer page, the cards and the search index all
+    // say the same thing, and a supplier default never reads as a commitment.
+    ...tradeTermsView(o),
   };
 }
 
@@ -208,6 +222,14 @@ function normalize(fields, recordId = null) {
     incoterm: fields['Incoterm'] && fields['Incoterm'] !== 'Other' ? fields['Incoterm'] : '',
     moq: fields['MOQ'] || '',
     leadTime: fields['Lead Time'] || '',
+    moqType: fields['MOQ Type'] || '',
+    moqQty: typeof fields['MOQ Qty'] === 'number' ? fields['MOQ Qty'] : null,
+    moqCurrency: fields['MOQ Currency'] || '',
+    // Build-time only — see PATTERN_EXCEPTIONS above.
+    moqSource: fields['MOQ Source'] || '',
+    mixedLoad: fields['Mixed Load Allowed'] === true,
+    // 0 is ex-stock, which is a real answer; only a missing field is null.
+    leadTimeDays: typeof fields['Lead Time Days'] === 'number' ? fields['Lead Time Days'] : null,
     bbd: fields['BBD'] || '',
     note: fields['Public Note'] || '',
     offerDate: fields['Offer Date'] || '',
@@ -318,6 +340,8 @@ function renormalizeSnapshotOffer(o, index, idPrefix = 'snapshot') {
   return deriveExtras({
     moq: '', leadTime: '', bbd: '', note: '', offerDate: '', expiryDate: '',
     volumeMl: null, pack: null, unitType: '', warehouse: '', incoterm: '',
+    moqType: '', moqQty: null, moqCurrency: '', moqSource: '', mixedLoad: false,
+    leadTimeDays: null,
     ...o,
     id: o.id || `${idPrefix}-${index}`,
     name,

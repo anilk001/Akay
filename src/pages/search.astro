@@ -325,17 +325,28 @@ const pageDesc = 'Search AKAY\'s live wholesale catalogue: spirits, beer, soft d
     // key = URL param; get = value(s) shown as chips. Counts are computed over
     // rows that pass every OTHER facet, so a chip always tells the buyer how
     // many results adding it would leave.
+    const BOND_ORDER = ['T1', 'T2', 'Bonded', 'Duty Paid', 'On Floor', 'Other', 'Enquire'];
+    const MOQ_ORDER = ['No minimum', 'Unit minimum', 'Pallet minimum', 'Full load only', 'Minimum order value'];
+    const LEAD_ORDER = ['Ex-stock', 'Within a week', '1–4 weeks', 'Over 4 weeks'];
+
     const FACETS = [
       { key: 'cat',   label: 'Category',       get: (o) => o.category || '' },
       { key: 'brand', label: 'Brand',          get: (o) => o.brand || '', top: 14, searchable: true },
       { key: 'size',  label: 'Size',           get: (o) => o.sizeLabel || '', top: 14, num: (v) => sizeMl(v) },
       { key: 'pack',  label: 'Pack (per case)', get: (o) => (o.pack ? String(o.pack) : ''), top: 12, num: (v) => parseInt(v, 10) },
       { key: 'unit',  label: 'Unit type',      get: (o) => o.unitType || '' },
-      { key: 'bond',  label: 'Bond / customs', get: (o) => o.tier || 'Enquire' },
+      { key: 'bond',  label: 'Bond / customs', get: (o) => o.tier || 'Enquire', order: BOND_ORDER },
       { key: 'wh',    label: 'Warehouse',      get: (o) => o.warehouse || '', top: 10, searchable: true },
       { key: 'inco',  label: 'Incoterm',       get: (o) => o.incoterm || '' },
+      // Trade terms. Both are ordered by how much they ask of the buyer rather
+      // than by how many offers carry them — a buyer scanning for "can I take
+      // less than a pallet?" wants the smallest commitment at the top, and a
+      // count-ordered list buries it wherever the catalogue happens to sit.
+      // Rows whose terms were never stated return '' and drop out entirely,
+      // so an empty facet is never shown as a filter.
+      { key: 'moq',   label: 'Minimum order',  get: (o) => o.moqBucket || '', order: MOQ_ORDER },
+      { key: 'lead',  label: 'Lead time',      get: (o) => o.leadBucket || '', order: LEAD_ORDER },
     ];
-    const BOND_ORDER = ['T1', 'T2', 'Bonded', 'Duty Paid', 'On Floor', 'Other', 'Enquire'];
     const STOCK = { in: ['ok', 'In stock'], warn: ['warn', 'Limited'], enq: ['neu', 'Enquire'] };
     const PAGE = 50;
 
@@ -518,8 +529,8 @@ const pageDesc = 'Search AKAY\'s live wholesale catalogue: spirits, beer, soft d
         o.terms ? `<span class="tag">${esc(o.terms)}</span>` : '',
         o.category ? `<span class="tag cat">${esc(o.category)}</span>` : '',
         o.unitType ? `<span class="tag">${esc(o.unitType)}</span>` : '',
-        o.moq ? `<span class="tag">MOQ ${esc(o.moq)}</span>` : '',
-        o.leadTime ? `<span class="tag">Lead ${esc(o.leadTime)}</span>` : '',
+        o.moqLabel ? `<span class="tag">MOQ ${o.moqEstimated ? 'typically ' : ''}${esc(o.moqLabel)}</span>` : '',
+        o.leadLabel ? `<span class="tag">Lead ${esc(o.leadLabel)}</span>` : '',
         o.bbd ? `<span class="tag">BBD ${esc(fmtDate(o.bbd))}</span>` : '',
         o.origin ? `<span class="tag">${esc(o.origin)}</span>` : '',
       ].join('');
@@ -566,6 +577,10 @@ const pageDesc = 'Search AKAY\'s live wholesale catalogue: spirits, beer, soft d
       }
     }
 
+    // A facet with a fixed `order` sorts by that list, not by count. Values not
+    // in the list fall to the end rather than disappearing.
+    const byOrder = (f) => (a, b) => (f.order.indexOf(a[0]) + 1 || 99) - (f.order.indexOf(b[0]) + 1 || 99);
+
     const facetOpen = {};   // key -> show all values
     const facetFilter = {}; // key -> text typed into the facet's own search box
 
@@ -575,7 +590,7 @@ const pageDesc = 'Search AKAY\'s live wholesale catalogue: spirits, beer, soft d
         const sel = state.f[f.key];
         let entries = Array.from(counts[i].entries());
         for (const v of sel) if (!counts[i].has(v)) entries.push([v, 0]);
-        if (f.key === 'bond') entries.sort((a, b) => (BOND_ORDER.indexOf(a[0]) + 1 || 99) - (BOND_ORDER.indexOf(b[0]) + 1 || 99));
+        if (f.order) entries.sort(byOrder(f));
         else if (f.num) entries.sort((a, b) => f.num(a[0]) - f.num(b[0]));
         else entries.sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
         if (!entries.length) return;
@@ -586,7 +601,7 @@ const pageDesc = 'Search AKAY\'s live wholesale catalogue: spirits, beer, soft d
         const byCount = entries.slice().sort((a, b) => b[1] - a[1]);
         let visible = entries.filter(([v]) => sel.includes(v)).concat(byCount.filter(([v]) => !sel.includes(v))).slice(0, limit);
         if (f.num) visible.sort((a, b) => f.num(a[0]) - f.num(b[0]));
-        else if (f.key === 'bond') visible.sort((a, b) => (BOND_ORDER.indexOf(a[0]) + 1 || 99) - (BOND_ORDER.indexOf(b[0]) + 1 || 99));
+        else if (f.order) visible.sort(byOrder(f));
         else visible.sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
         const hidden = entries.length - visible.length;
         frag.push(`<section class="facet" data-key="${f.key}">

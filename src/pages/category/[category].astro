@@ -5,6 +5,7 @@ import { withSlugs } from '../../lib/slug.mjs';
 import { categoryItemListSchema, organizationSchema, crumbs } from '../../lib/schema.mjs';
 import Seo from '../../components/Seo.astro';
 import { priceLabel } from '../../lib/price.mjs';
+import { listingTermsLine } from '../../lib/trade-terms.mjs';
 
 export async function getStaticPaths() {
   const { offers } = await getOffers();
@@ -205,6 +206,13 @@ const breadcrumbData = crumbs([
       font-size: 0.9em;
     }
 
+    /* MOQ and lead time on a scanning card: present but subordinate to the
+       price and stock, which are what a buyer sorts on. */
+    .offer-card p.terms-line {
+      font-size: 0.85em;
+      color: var(--muted);
+    }
+
     .offer-card .price {
       font: 600 1.3em var(--serif);
       color: var(--brass);
@@ -322,6 +330,7 @@ const breadcrumbData = crumbs([
             <div class="price">{priceLabel(offer, { short: true })}</div>
             <span class={`stock stock-${stockStatus}`}>{stockText}</span>
             {offer.tier && <p><strong>Duty:</strong> {offer.tier}</p>}
+            {listingTermsLine(offer) && <p class="terms-line">{listingTermsLine(offer)}</p>}
             <a href={`/offers/${offer.canonicalSlug || offer.slug}/`} class="view-link">View offer →</a>
           </div>
         );
