@@ -20,12 +20,18 @@ between 2026-07-29 and 2026-08-27. A draft in n8n is invisible until published.
 | `whatsapp-filter-layer/classify-message.buy-side-guard.js` | `DO2ltjkISp2YDNnc` | Classify Message | patch only, **published 2026-08-30** |
 | `whatsapp-offer-broadcast/plan-broadcast.js` | `BeGfFpgxmI7hdCTI` | Plan Broadcast | full source, **published 2026-09-04** |
 | `whatsapp-offer-broadcast/build-results.js` | `BeGfFpgxmI7hdCTI` | Build Results | full source, **published 2026-09-04** |
-| `trade-terms-normaliser/normalise-trade-terms.js` | *(new sub-workflow)* | Normalise Trade Terms | full source, **not yet published** |
-| `trade-terms-digest/build-parse-digest.js` | *(new)* | Build Parse Digest | full source, **not yet published** |
+| `trade-terms-normaliser/normalise-trade-terms.js` | `WQ6A8IVLSAd72fnk` | Normalise Trade Terms | full source, **published 2026-09-13** |
+| `trade-terms-digest/build-parse-digest.js` | *(not built in n8n yet)* | Build Parse Digest | full source, **not published** |
 
-The four WhatsApp nodes are live; the two trade-terms nodes are new in this
-commit and still have to be pasted in and published — the rollout in
-`trade-terms-normaliser/README.md` starts with one pipeline in dry run.
+The four WhatsApp nodes and the trade-terms normaliser are live. The
+normaliser is published but **nothing calls it yet** — a sub-workflow with no
+caller is inert, which is rollout step 1. Wiring the four pipelines to it is
+step 2 onwards, in `trade-terms-normaliser/README.md`, and starts with one
+pipeline in dry run.
+
+The exception digest is not built in n8n at all yet: publishing it starts
+sending a weekly email, and it reads `Parse Status` / `Parse Notes`, which do
+not exist on the Offers table until rollout step 4.
 
 `classify-message` is a patch rather than full source
 because the node could not be exported verbatim at the time; replace it with the
@@ -74,8 +80,12 @@ line → header → supplier default → category rule, and labels the result in
 saying nothing. `build-parse-digest.js` is the weekly exception email that makes
 new wording visible the week it starts rather than two years later.
 
-Neither is published yet — see the rollout in
-`trade-terms-normaliser/README.md`, which starts with one pipeline in dry run.
+The normaliser is published as `WQ6A8IVLSAd72fnk`, verified against the repo
+source by running a 12-case battery through the deployed node and diffing the
+output against the same battery run locally — all four MOQ Source tiers, both
+range directions, ex-stock, the fail-open path and the never-guess path match
+exactly. Nothing calls it yet, which is deliberate: see the rollout in
+`trade-terms-normaliser/README.md`.
 
 ## Earlier changes (published 2026-08-30)
 

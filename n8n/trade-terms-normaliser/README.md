@@ -16,7 +16,10 @@ sub-workflow, called from all four pipelines, means one edit.
 
 | File | Node | Workflow |
 |---|---|---|
-| `normalise-trade-terms.js` | Normalise Trade Terms | Trade Terms Normaliser — Akay (sub-workflow) |
+| `normalise-trade-terms.js` | Normalise Trade Terms | `WQ6A8IVLSAd72fnk` — Trade Terms Normaliser — Akay (sub-workflow, **published 2026-09-13**) |
+
+Published, but **nothing calls it yet**. A sub-workflow with no caller runs
+nothing and changes nothing, so this is rollout step 1 only.
 
 ## Where it goes in each pipeline
 
@@ -134,7 +137,9 @@ against real supplier behaviour.
 
 ## Rollout
 
-1. ~~Build the sub-workflow.~~ This file.
+1. ~~Build the sub-workflow.~~ Done — `WQ6A8IVLSAd72fnk`, published
+   2026-09-13, verified against this file with a 12-case battery run through
+   the deployed node.
 2. Wire it into **one** pipeline with `DEFAULT_DRY_RUN = true`, ingest a real
    list, and compare `fieldsPreview` against the source file by hand.
 3. Roll to the other three. Excel and Email share a shape; PDF and WhatsApp are
