@@ -7,6 +7,7 @@
 import assert from 'node:assert/strict';
 import {
   moqLabel, leadTimeLabel, isEstimated, moqBucket, leadTimeBucket, tradeTermsView,
+  listingTermsLine,
 } from '../src/lib/trade-terms.mjs';
 
 let n = 0;
@@ -100,5 +101,34 @@ eq(tradeTermsView({ moqType: 'Cases', moqQty: 100, moqSource: 'Supplier Default'
 });
 // The view never carries moqSource onward — it must not reach the browser.
 eq(Object.prototype.hasOwnProperty.call(tradeTermsView({ moqSource: 'Supplier Default' }), 'moqSource'), false);
+
+// ── The listing-card one-liner ──────────────────────────────────────────────
+eq(listingTermsLine({ moqType: 'Cases', moqQty: 50, moqSource: 'Supplier Stated', leadTimeDays: 21 }),
+  'MOQ 50 cases \u00b7 Lead 3 weeks');
+eq(listingTermsLine({ moqType: 'Cases', moqQty: 100, moqSource: 'Supplier Default' }),
+  'MOQ typically 100 cases');
+eq(listingTermsLine({ leadTimeDays: 0 }), 'Lead Ex-stock');
+// Already says "min" — labelling it again would read "MOQ min 3 mixed pallets".
+eq(listingTermsLine({ moq: 'min 3 mixed pallets' }), 'min 3 mixed pallets');
+// Nothing stated means nothing rendered — the card must not grow an empty row.
+eq(listingTermsLine({}), '');
+
+// Legacy text that already labels itself is not labelled twice.
+eq(listingTermsLine({ moq: 'Minimum mixed order USD 35,000' }), 'Minimum mixed order USD 35,000');
+eq(listingTermsLine({ moq: 'GBP 10,000 MOV (whole offer)' }), 'GBP 10,000 MOV (whole offer)');
+eq(listingTermsLine({ moq: '50 cartons' }), 'MOQ 50 cartons');
+// A hedge always needs the label, or "typically" dangles with nothing to qualify.
+eq(listingTermsLine({ moqType: 'Cases', moqQty: 5, moqSource: 'Supplier Default', moq: 'minimum 5' }),
+  'MOQ typically 5 cases');
+
+// The legacy column's dozen ways of saying ex-stock, which read as "Lead Stock".
+eq(leadTimeLabel({ leadTime: 'READY' }), 'Ex-stock');
+eq(leadTimeLabel({ leadTime: 'Stock' }), 'Ex-stock');
+eq(leadTimeLabel({ leadTime: 'On the floor' }), 'Ex-stock');
+eq(leadTimeLabel({ leadTime: 'Immediate' }), 'Ex-stock');
+// Whole-string only: these keep the supplier's own words.
+eq(leadTimeLabel({ leadTime: '5-7 days' }), '5-7 days');
+eq(leadTimeLabel({ leadTime: '2 weeks from stock' }), '2 weeks from stock');
+eq(leadTimeLabel({ leadTime: 'Approx. 2-3 weeks' }), 'Approx. 2-3 weeks');
 
 console.log(`trade-terms-display: ${n} assertions passed`);

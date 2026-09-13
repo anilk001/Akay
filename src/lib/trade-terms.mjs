@@ -30,6 +30,13 @@ const UNIT_WORDS = {
   'Full Truckload': ['full load', 'full loads'],
 };
 
+const LEGACY_EX_STOCK = /^(?:ready|stock|in\s*stock|ex[\s-]?stock|on\s+(?:the\s+)?floor|immediate(?:ly)?|prompt|available(?:\s+now)?)\.?$/i;
+
+// Legacy free text that already names itself — "Minimum mixed order USD
+// 35,000", "GBP 10,000 MOV" — must not be prefixed again on a listing card.
+const SAYS_MINIMUM = /\bmoq\b|\bmov\b|\bminimum\b|^min\b/i;
+const SAYS_LEAD = /\blead\s*time\b/i;
+
 export function isEstimated(moqSource = '') {
   return ESTIMATED_SOURCES.has(String(moqSource).trim());
 }
@@ -85,6 +92,11 @@ export function leadTimeLabel(offer = {}) {
 
   if (days === null) {
     const legacy = String(offer.leadTime || '').trim();
+    // The legacy column says ex-stock a dozen ways — "READY", "Stock", "On the
+    // floor". Prefixed with a label those render as "Lead Stock", which is not
+    // English. Matched WHOLE-STRING only, so "2 weeks from stock" and
+    // "5-7 days" pass through exactly as the supplier wrote them.
+    if (LEGACY_EX_STOCK.test(legacy)) return 'Ex-stock';
     return legacy || '';
   }
   if (days === 0) return 'Ex-stock';
@@ -135,6 +147,28 @@ export function tradeTermsView(offer = {}) {
     leadLabel: leadTimeLabel(offer),
     leadBucket: leadTimeBucket(offer),
   };
+}
+
+/**
+ * The one-line form for a listing card, where vertical space is scarce and a
+ * buyer is scanning rather than reading: "MOQ 50 cases · Lead 3 weeks".
+ *
+ * Lives here rather than in the two card templates so the category grid, the
+ * brand grid and any future listing can never drift into wording a minimum
+ * three different ways.
+ */
+export function listingTermsLine(offer = {}) {
+  const moq = moqLabel(offer);
+  const lead = leadTimeLabel(offer);
+  const parts = [];
+  if (moq.text) {
+    const hedge = moq.estimated ? 'typically ' : '';
+    // Only label it when the value does not already label itself, or the card
+    // reads "MOQ Minimum mixed order USD 35,000".
+    parts.push(SAYS_MINIMUM.test(moq.text) && !hedge ? moq.text : `MOQ ${hedge}${moq.text}`);
+  }
+  if (lead) parts.push(SAYS_LEAD.test(lead) ? lead : `Lead ${lead}`);
+  return parts.join(' \u00b7 ');
 }
 
 function formatNumber(n) {
