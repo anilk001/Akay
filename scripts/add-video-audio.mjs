@@ -34,13 +34,18 @@ function usage(message) {
   console.error(`Usage: node scripts/add-video-audio.mjs <video> [options]
 
   -o, --out <file>       Output path (default: <video>-with-audio.mp4)
-      --variant <name>   Music bed: ${VARIANT_NAMES.join(' | ')} (default: calm)
+      --music-file <f>   Use this track as the music instead of the synth bed;
+                         it is looped or trimmed to length and faded
+      --variant <name>   Synth bed: ${VARIANT_NAMES.join(' | ')} (default: calm)
       --voice-file <f>   Mix this audio file in as a voiceover
       --say <text>       Synthesise a voiceover with espeak-ng (robotic — drafts only)
       --voice-delay <s>  Hold the voiceover back this long (default: 0.8)
       --music-level <n>  Music gain when there is a voiceover (default: 0.55)
-      --no-sting         Drop the opening bell
-      --keep-audio       Keep the video's existing audio and mix the bed under it
+      --hold <s|auto>    Freeze the last frame for this long, so a voiceover
+                         that overruns the picture still fits. "auto" works out
+                         the length needed. Re-encodes the video
+      --no-sting         Drop the opening bell (synth bed only)
+      --keep-audio       Keep the video's existing audio and mix the music under it
 `);
   process.exit(message ? 1 : 0);
 }
@@ -50,10 +55,12 @@ function parseArgs(argv) {
     input: null,
     out: null,
     variant: 'calm',
+    musicFile: null,
     voiceFile: null,
     say: null,
     voiceDelay: 0.8,
     musicLevel: 0.55,
+    hold: 0, // seconds, or the string 'auto'
     sting: true,
     keepAudio: false,
   };
@@ -69,6 +76,12 @@ function parseArgs(argv) {
       case '-h': case '--help': usage(); break;
       case '-o': case '--out': opts.out = next(); break;
       case '--variant': opts.variant = next(); break;
+      case '--music-file': opts.musicFile = next(); break;
+      case '--hold': {
+        const v = next();
+        opts.hold = v === 'auto' ? 'auto' : Number(v);
+        break;
+      }
       case '--voice-file': opts.voiceFile = next(); break;
       case '--say': opts.say = next(); break;
       case '--voice-delay': opts.voiceDelay = Number(next()); break;
@@ -89,6 +102,13 @@ function parseArgs(argv) {
   }
   if (opts.voiceFile && opts.say) usage('use --voice-file or --say, not both');
   if (opts.voiceFile && !existsSync(opts.voiceFile)) usage(`no such file: ${opts.voiceFile}`);
+  if (opts.musicFile && !existsSync(opts.musicFile)) usage(`no such file: ${opts.musicFile}`);
+  if (opts.hold !== 'auto' && (!Number.isFinite(opts.hold) || opts.hold < 0)) {
+    usage('--hold takes a number of seconds or "auto"');
+  }
+  if (opts.hold === 'auto' && !opts.voiceFile && !opts.say) {
+    usage('--hold auto needs a voiceover to measure against');
+  }
   if (!Number.isFinite(opts.voiceDelay) || opts.voiceDelay < 0) usage('--voice-delay must be >= 0');
   if (!Number.isFinite(opts.musicLevel) || opts.musicLevel <= 0) usage('--music-level must be > 0');
 
@@ -138,6 +158,15 @@ function probeDuration(ffmpeg, file) {
   return Number(h) * 3600 + Number(m) * 60 + Number(s);
 }
 
+/** The video's frame rate, so a re-encode keeps it. Null when unreadable. */
+function probeFps(ffmpeg, file) {
+  const res = run(ffmpeg, ['-hide_banner', '-i', file], { capture: true });
+  const match = /,\s*([\d.]+)\s*fps\b/.exec(res.stderr || '');
+  if (!match) return null;
+  const fps = Number(match[1]);
+  return Number.isFinite(fps) && fps > 0 ? fps : null;
+}
+
 /** True when the file carries at least one audio stream. */
 function hasAudio(ffmpeg, file) {
   const res = run(ffmpeg, ['-hide_banner', '-i', file], { capture: true });
@@ -165,10 +194,6 @@ function main() {
 
   try {
     const duration = probeDuration(ffmpeg, opts.input);
-    console.log(`Clip is ${duration.toFixed(2)}s — rendering a "${opts.variant}" bed to match.`);
-
-    const bedPath = path.join(work, 'bed.wav');
-    writeFileSync(bedPath, renderBed({ seconds: duration, variant: opts.variant, sting: opts.sting }));
 
     let voicePath = opts.voiceFile;
     if (opts.say) {
@@ -176,20 +201,48 @@ function main() {
       synthesiseSpeech(opts.say, voicePath);
     }
 
-    // A voiceover longer than the picture gets cut off mid-sentence, and it is
-    // easy not to notice until it is already posted. Say so loudly.
-    if (voicePath) {
-      const voiceSeconds = probeDuration(ffmpeg, voicePath);
-      const needed = voiceSeconds + opts.voiceDelay;
-      if (needed > duration + 0.05) {
-        const over = needed - duration;
-        console.warn(
-          `\nWARNING: the voiceover runs ${needed.toFixed(2)}s (including the ` +
-            `${opts.voiceDelay}s delay) but the clip is only ${duration.toFixed(2)}s.\n` +
-            `         The last ${over.toFixed(2)}s of speech will be cut off.\n` +
-            `         Lengthen the video, shorten the script, or drop --voice-delay.\n`,
-        );
-      }
+    // How long the voiceover needs the picture to stay up for.
+    const voiceNeeds = voicePath ? probeDuration(ffmpeg, voicePath) + opts.voiceDelay : 0;
+
+    // Holding the last frame lets a slightly-long voiceover finish. On these
+    // videos the last frame is the call to action, so the extra beat is time
+    // the viewer can use rather than dead air.
+    const TAIL = 0.6; // a breath after the last word
+    let hold = opts.hold === 'auto' ? Math.max(0, voiceNeeds + TAIL - duration) : opts.hold;
+    hold = Math.round(hold * 100) / 100;
+    const finalDuration = duration + hold;
+
+    console.log(`Clip is ${duration.toFixed(2)}s.`);
+    if (voicePath) console.log(`Voiceover needs ${voiceNeeds.toFixed(2)}s.`);
+    if (hold > 0) {
+      console.log(`Holding the last frame for ${hold.toFixed(2)}s → ${finalDuration.toFixed(2)}s total.`);
+    }
+
+    // Still too short? Then the voiceover really will be clipped — say so.
+    if (voicePath && voiceNeeds > finalDuration + 0.05) {
+      const over = voiceNeeds - finalDuration;
+      console.warn(
+        `\nWARNING: the voiceover runs ${voiceNeeds.toFixed(2)}s (including the ` +
+          `${opts.voiceDelay}s delay) but the video is only ${finalDuration.toFixed(2)}s.\n` +
+          `         The last ${over.toFixed(2)}s of speech will be cut off.\n` +
+          `         Try --hold auto, shorten the script, or drop --voice-delay.\n`,
+      );
+    }
+
+    let musicPath = opts.musicFile;
+    if (!musicPath) {
+      musicPath = path.join(work, 'bed.wav');
+      console.log(`Rendering a "${opts.variant}" bed to match.`);
+      writeFileSync(
+        musicPath,
+        renderBed({ seconds: finalDuration, variant: opts.variant, sting: opts.sting }),
+      );
+    } else {
+      const musicSeconds = probeDuration(ffmpeg, musicPath);
+      const action = musicSeconds < finalDuration ? 'looped' : 'trimmed';
+      console.log(
+        `Music is ${musicSeconds.toFixed(2)}s — ${action} to ${finalDuration.toFixed(2)}s and faded.`,
+      );
     }
 
     const keepExisting = opts.keepAudio && hasAudio(ffmpeg, opts.input);
@@ -197,13 +250,30 @@ function main() {
       console.log('No existing audio track to keep — using the bed on its own.');
     }
 
-    // Input 0 is the video, input 1 the bed, then any voiceover.
-    const inputs = ['-i', opts.input, '-i', bedPath];
+    // Input 0 is the video, input 1 the music, then any voiceover. A supplied
+    // track is looped so a short one still covers the whole clip; the synth bed
+    // is already the exact length.
+    const inputs = ['-i', opts.input];
+    if (opts.musicFile) inputs.push('-stream_loop', '-1');
+    inputs.push('-i', musicPath);
     if (voicePath) inputs.push('-i', voicePath);
 
     const voiceIndex = 2;
     const filters = [];
     let musicLabel = '[1:a]';
+
+    if (opts.musicFile) {
+      // Cut the supplied track to length and top and tail it, so it never just
+      // stops dead when the picture ends.
+      const fadeOut = Math.min(2.5, finalDuration * 0.2);
+      filters.push(
+        `[1:a]atrim=0:${finalDuration.toFixed(3)},asetpts=PTS-STARTPTS,` +
+          `aformat=sample_fmts=fltp:sample_rates=48000:channel_layouts=stereo,` +
+          `afade=t=in:st=0:d=0.6,` +
+          `afade=t=out:st=${(finalDuration - fadeOut).toFixed(3)}:d=${fadeOut.toFixed(3)}[music]`,
+      );
+      musicLabel = '[music]';
+    }
 
     if (voicePath || keepExisting) {
       // Anything sitting on top of the bed both plays and drives the ducking.
@@ -234,7 +304,7 @@ function main() {
       // the key signal with silence so only the bed decides the length.
       filters.push('[topkey0]apad[topkey]');
       filters.push(
-        `[1:a]volume=${opts.musicLevel}[bedlvl]`,
+        `${musicLabel}volume=${opts.musicLevel}[bedlvl]`,
         // Pull the music down whenever the voice is speaking, then let it back up.
         '[bedlvl][topkey]sidechaincompress=threshold=0.04:ratio=9:attack=25:release=450[ducked]',
       );
@@ -249,19 +319,33 @@ function main() {
     // -16 LUFS is the usual target for social video; the limiter catches peaks.
     filters.push(`${musicLabel}loudnorm=I=-16:TP=-1.5:LRA=11,alimiter=limit=0.95[aout]`);
 
+    // Only touch the picture when a hold was asked for — otherwise the original
+    // video stream is copied through untouched.
+    const videoArgs = [];
+    let videoMap = '0:v:0';
+    if (hold > 0) {
+      filters.push(`[0:v]tpad=stop_mode=clone:stop_duration=${hold.toFixed(3)}[vout]`);
+      videoMap = '[vout]';
+      videoArgs.push('-c:v', 'libx264', '-crf', '18', '-preset', 'medium', '-pix_fmt', 'yuv420p');
+      const fps = probeFps(ffmpeg, opts.input);
+      if (fps) videoArgs.push('-r', String(fps));
+    } else {
+      videoArgs.push('-c:v', 'copy');
+    }
+
     const args = [
       '-hide_banner',
       '-y',
       ...inputs,
       '-filter_complex', filters.join(';'),
-      '-map', '0:v:0',
+      '-map', videoMap,
       '-map', '[aout]',
-      '-c:v', 'copy', // never re-encode the picture
+      ...videoArgs,
       '-c:a', 'aac',
       '-b:a', '192k',
       '-ar', '48000',
       '-ac', '2',
-      '-shortest',
+      '-t', finalDuration.toFixed(3),
       '-movflags', '+faststart',
       opts.out,
     ];

@@ -67,11 +67,14 @@ node scripts/add-video-audio.mjs offer.mp4
 - `src/components/SiteSearch.astro` — header search form on every page
 - `src/pages/search.astro` + `search-index.json.ts` — client-side search over
   the public-safe index (see `tests/` for the acceptance cases)
-- `scripts/add-video-audio.mjs` — adds an original, self-synthesised music
-  bed (and optionally a voiceover, ducked underneath) to a silent offer
-  video; the bed itself lives in `scripts/music-bed.mjs`. The audio is
-  generated from scratch rather than taken from a stock library, so there is
-  no music licence to track on anything AKAY posts
+- `scripts/add-video-audio.mjs` — puts a soundtrack on a silent offer video:
+  a voiceover, music ducked underneath it, normalised to -16 LUFS for social.
+  Music is either a supplied track (`--music-file`, looped or trimmed and
+  faded to fit) or the original bed synthesised by `scripts/music-bed.mjs`,
+  which owes nothing to a stock library and so carries no licence to track.
+  `--hold auto` freezes the closing frame for as long as a slightly-long
+  voiceover needs — on these videos that frame is the call to action, so the
+  extra beat is time the viewer can use
 - `n8n/` — mirrors of the JavaScript inside n8n Code nodes + plain-Node tests
   (a PostToolUse hook runs them after any edit under `n8n/`). Includes
   `trade-terms-normaliser/` — the one sub-workflow all four ingestion pipelines
