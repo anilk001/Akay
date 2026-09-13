@@ -66,7 +66,19 @@ node n8n/tests/split-quantity.test.js
 - `.claude/` — skills (offers-catalogue, offer-data-validator,
   price-list-intake, new-guide, plus vendored design skills — see
   `.claude/skills/VENDORED.md`), agents (public-safety-reviewer, test-writer),
-  hooks, plugin config
+  hooks, scripts, plugin config
+
+## Browsing the site with Playwright
+
+The `playwright` MCP server in `.mcp.json` starts via
+`.claude/scripts/playwright-mcp.sh`, which picks the browser per environment:
+the pre-installed Chromium (headless, no sandbox) in Claude Code on the web,
+and the normal headed Chrome locally.
+
+Point it at a built site (`npm run build && npm run preview`, port 4321) rather
+than `/` — the index inlines every offer into a single ~14 MB page, and the
+accessibility snapshot of it exceeds the MCP tool timeout. Category and
+`/offers/<slug>/` pages are small and load fine.
 
 After changing the data layer or page templates, run the
 **public-safety-reviewer** agent to confirm nothing private can leak.
