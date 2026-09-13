@@ -1,0 +1,6 @@
+# Render artefacts — regenerate with `node render.mjs && node encode.mjs`.
+frames-*/
+probe*/
+out/
+node_modules/
+package*.json
