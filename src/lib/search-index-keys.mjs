@@ -12,4 +12,14 @@ export const PUBLIC_KEYS = [
   'stock', 'qty', 'tier', 'origin', 'featured',
   'volumeMl', 'pack', 'unitType', 'warehouse', 'incoterm',
   'moq', 'leadTime', 'bbd', 'note', 'offerDate', 'expiryDate',
+  // Structured trade terms. `moqLabel` / `leadLabel` are the worded values the
+  // result rows print; the buckets drive the facets. `moqEstimated` is what
+  // lets a row say "typically 100 cases" instead of stating a minimum the
+  // supplier never gave.
+  //
+  // `moqSource` is deliberately ABSENT: it is read at build time to compute
+  // moqEstimated and must not reach the browser. isForbiddenField() would
+  // reject the key anyway, which is the guard working as intended.
+  'moqLabel', 'moqEstimated', 'moqBucket', 'leadLabel', 'leadBucket',
+  'moqType', 'leadTimeDays', 'mixedLoad',
 ];
