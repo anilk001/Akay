@@ -6,6 +6,7 @@ import { productOfferSchema, breadcrumbSchema, organizationSchema } from '../../
 import Seo from '../../components/Seo.astro';
 import { priceLabel } from '../../lib/price.mjs';
 import { enquiryLink, WA_LINK, WA_DISPLAY } from '../../lib/whatsapp.mjs';
+import { reconfirmUrl } from '../../lib/site.mjs';
 
 // Get all valid slugs for static generation. Sold-out (delisted) offers keep
 // their pages — live offers are slugged FIRST so a re-listed line always owns
@@ -283,6 +284,18 @@ if (!isDelisted && offer.stock === 'in' && offer.qty) {
     /* "estimated" marks a minimum taken from the supplier's usual terms rather
        than stated for this line. Deliberately quiet — it is a caveat on the
        number beside it, not a feature to advertise. */
+    /* Deliberately a sentence, not a third button: re-confirming is a fallback
+       for an ageing price, not a competitor to the two ways of actually
+       enquiring. */
+    .reconfirm {
+      font-size: 0.85em;
+      color: var(--muted);
+      margin-top: 1em;
+      margin-bottom: 0;
+      line-height: 1.5;
+    }
+    .reconfirm a { color: inherit; text-decoration: underline; }
+
     .spec-hedge {
       display: inline-block;
       margin-left: 0.5em;
@@ -447,6 +460,14 @@ if (!isDelisted && offer.stock === 'in' && offer.qty) {
         <a href={wa} class="cta-button">{isDelisted ? 'Request a Quote' : 'WhatsApp Enquiry'}</a>
         <a href={`mailto:offers@akay.ie?subject=Interest in ${offer.name}`} class="cta-button cta-secondary">Email</a>
       </div>
+
+      {!isDelisted && reconfirmUrl(offer.id) && (
+        <p class="reconfirm">
+          Price listed{offer.offerDate ? ` ${offer.offerDate}` : ''}.
+          {' '}<a href={reconfirmUrl(offer.id)} rel="nofollow noopener" target="_blank">Ask us to re-confirm it</a>
+          {' '}and we will come back with the current price and availability.
+        </p>
+      )}
 
       <p style="font-size: 0.85em; color: var(--muted); margin-top: 1.5em; margin-bottom: 0;">
         {isDelisted
