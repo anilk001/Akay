@@ -176,6 +176,22 @@ function main() {
       synthesiseSpeech(opts.say, voicePath);
     }
 
+    // A voiceover longer than the picture gets cut off mid-sentence, and it is
+    // easy not to notice until it is already posted. Say so loudly.
+    if (voicePath) {
+      const voiceSeconds = probeDuration(ffmpeg, voicePath);
+      const needed = voiceSeconds + opts.voiceDelay;
+      if (needed > duration + 0.05) {
+        const over = needed - duration;
+        console.warn(
+          `\nWARNING: the voiceover runs ${needed.toFixed(2)}s (including the ` +
+            `${opts.voiceDelay}s delay) but the clip is only ${duration.toFixed(2)}s.\n` +
+            `         The last ${over.toFixed(2)}s of speech will be cut off.\n` +
+            `         Lengthen the video, shorten the script, or drop --voice-delay.\n`,
+        );
+      }
+    }
+
     const keepExisting = opts.keepAudio && hasAudio(ffmpeg, opts.input);
     if (opts.keepAudio && !keepExisting) {
       console.log('No existing audio track to keep — using the bed on its own.');
