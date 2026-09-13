@@ -280,6 +280,23 @@ if (!isDelisted && offer.stock === 'in' && offer.qty) {
       text-align: right;
       color: var(--ink);
     }
+    /* "estimated" marks a minimum taken from the supplier's usual terms rather
+       than stated for this line. Deliberately quiet — it is a caveat on the
+       number beside it, not a feature to advertise. */
+    .spec-hedge {
+      display: inline-block;
+      margin-left: 0.5em;
+      font-family: var(--mono, monospace);
+      font-size: 0.72em;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      padding: 0.1em 0.4em;
+      vertical-align: middle;
+      cursor: help;
+    }
 
     .cta-button {
       display: inline-block;
@@ -400,6 +417,28 @@ if (!isDelisted && offer.stock === 'in' && offer.qty) {
           <div class="spec-row">
             <span class="spec-label">Pack Size</span>
             <span class="spec-value">{offer.spec}</span>
+          </div>
+        )}
+        <div class="spec-row">
+          <span class="spec-label">Minimum Order</span>
+          <span class="spec-value">
+            {offer.moqLabel
+              ? (offer.moqEstimated
+                  ? <>Typically {offer.moqLabel}<span class="spec-hedge" title="This supplier has not stated a minimum for this line. Shown from their usual terms — confirm on enquiry.">estimated</span></>
+                  : offer.moqLabel)
+              : 'On request'}
+          </span>
+        </div>
+        {offer.leadLabel && (
+          <div class="spec-row">
+            <span class="spec-label">Lead Time</span>
+            <span class="spec-value">{offer.leadLabel}</span>
+          </div>
+        )}
+        {offer.mixedLoad && (
+          <div class="spec-row">
+            <span class="spec-label">Mixed Loads</span>
+            <span class="spec-value">Can be mixed with other lines</span>
           </div>
         )}
       </div>
