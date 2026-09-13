@@ -84,9 +84,15 @@ actually resolved, so it can never write a blank over an existing value.
 | `Parse Status` | Clean / Partial / Unrecognised |
 | `Parse Notes` | what could not be resolved on this line |
 
-`Parse Status` and `Parse Notes` are rollout step 4. Until those two columns
-exist in the Offers table, set `PARSE_FIELDS_LIVE = false` at the top of the
-node — an Airtable node handed an unknown field name errors the whole batch.
+`Parse Status` (Clean / Partial / Unrecognised) and `Parse Notes` were added to
+the Offers table on 2026-09-13, so `PARSE_FIELDS_LIVE` is correctly `true`. Set
+it false only if they are ever removed — an Airtable node handed an unknown
+field name errors the whole batch, taking every good line in it down with the
+one it could not write.
+
+`MOQ Currency` offers EUR, USD, GBP, AED and SGD. A minimum stated in any other
+currency is read, refused and reported rather than published; see **Never
+guess** below.
 
 ## The cascade
 
@@ -127,6 +133,13 @@ against real supplier behaviour.
    carries a `Default MOQ Unit`, otherwise the qty is left blank. A wrong MOQ on
    a public page costs more than a missing one, and the site already renders
    "MOQ on request" gracefully.
+
+   The same rule covers a currency the base cannot store. `MOQ Currency` offers
+   five codes; a minimum in a sixth is recognised **precisely so that it can be
+   refused**. Dropping the code from the vocabulary instead looks like the
+   obvious fix and is the dangerous one: with `chf` unrecognised, "Minimum order
+   35,000 CHF" stops matching as money, falls through to the bare-number rule,
+   borrows the supplier's default unit and publishes **MOQ 35,000 cases**.
 2. **Never let a default overwrite a stated value.** Cascade order, enforced.
 3. **Never block ingestion on a parse failure.** Every line is parsed inside a
    try/catch; a throw emits the line untouched with the error in `Parse Notes`.
@@ -144,9 +157,9 @@ against real supplier behaviour.
    list, and compare `fieldsPreview` against the source file by hand.
 3. Roll to the other three. Excel and Email share a shape; PDF and WhatsApp are
    the noisy ones and go last.
-4. Add `Parse Notes` / `Parse Status` to the Offers table, flip
-   `PARSE_FIELDS_LIVE`, and schedule the exception digest
-   (`../trade-terms-digest/`).
+4. ~~Add `Parse Notes` / `Parse Status` to the Offers table.~~ Done 2026-09-13,
+   verified with a real write at `typecast: false`. Still to do: schedule the
+   exception digest (`../trade-terms-digest/`).
 5. Only then set the historic backfill (`6bQp3mZgAvfq8Wfo`) live, so old and new
    data land in the same shape.
 

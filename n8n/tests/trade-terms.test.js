@@ -73,6 +73,39 @@ r = one({ rawMoq: 'MOQ EUR 20,000 or 500 cases' });
 check('value beats count when both stated', moq(r), ['Order Value', 20000, 'EUR', 'Supplier Stated']);
 check('and it is noted', r.parse.notes.some((n) => /order value was taken/i.test(n)), true);
 
+// ── 2b. A currency the MOQ Currency field cannot hold ───────────────────────
+section('Unsupported currency');
+
+r = one({ rawMoq: 'Minimum order 35,000 CHF' });
+check('CHF is read but not published', moq(r), ['Applies \u2014 Unspecified', null, '', 'Supplier Stated']);
+check('and the raw text reaches the digest', r.parse.unrecognised, ['Minimum order 35,000 CHF']);
+check('with a note naming the currency',
+  r.parse.notes.some((n) => /CHF/.test(n) && /not published/.test(n)), true);
+
+// The dangerous case. Dropping CHF from the vocabulary instead would leave
+// "35,000" to the bare-number rule, which would borrow the supplier's default
+// unit and publish MOQ 35,000 CASES. Recognising it in order to refuse it is
+// what stops that.
+r = one({ rawMoq: 'Minimum order 35,000 CHF', supplierDefaults: { 'Default MOQ Unit': 'Cases' } });
+check('a default unit cannot capture the amount', [r.tradeTerms.moqType, r.tradeTerms.moqQty],
+  ['Applies \u2014 Unspecified', null]);
+
+r = one({ rawMoq: 'min PLN 40 000', supplierDefaults: { 'Default MOQ Unit': 'Pallets' } });
+check('same for PLN', [r.tradeTerms.moqType, r.tradeTerms.moqQty], ['Applies \u2014 Unspecified', null]);
+
+// Every currency the field does offer still resolves normally.
+for (const [text, cur, amt] of [
+  ['Minimum mixed order USD 35,000', 'USD', 35000],
+  ['min EUR 25,000', 'EUR', 25000],
+  ['min GBP 10,000', 'GBP', 10000],
+  ['minimum order AED 50,000', 'AED', 50000],
+  ['min SGD 12,000', 'SGD', 12000],
+]) {
+  r = one({ rawMoq: text });
+  check(`"${text}"`, [r.tradeTerms.moqType, r.tradeTerms.moqQty, r.tradeTerms.moqCurrency],
+    ['Order Value', amt, cur]);
+}
+
 // ── 3. Counts, units and ranges ─────────────────────────────────────────────
 section('Counts, units and ranges');
 
