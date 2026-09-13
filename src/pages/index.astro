@@ -34,7 +34,6 @@ function toView(o) {
 const view = offers.map(toView);
 // Pin Featured offers to the front of the catalogue; stable sort keeps original order otherwise.
 const gridItems = [...view].sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
-const featuredCount = view.filter((o) => o.featured).length;
 
 const categories = ['All', ...Array.from(new Set(view.map((o) => o.category))).sort()];
 // Real <a> links to the category pages. The filter chips above are buttons
@@ -71,8 +70,8 @@ const stats = [
 <head>
   <Seo
     title="Wholesale Spirits, Beer &amp; FMCG Offers — Live Trade Pricing | AKAY Trade"
-    description="Live wholesale beverage and FMCG offers from AKAY Trade, Ireland. Spirits, beer, soft drinks and grocery by the case and pallet — current trade pricing, pack specs and T1/T2 duty status on every line."
-    ogTitle="AKAY Trade — Live Wholesale Beverage Offers"
+    description="Wholesale spirits, toiletries, confectionery, grocery and beer from AKAY Trade, Ireland — by the case and pallet, with live trade pricing and T1/T2 duty status."
+    ogTitle="AKAY Trade — Live Wholesale Drinks &amp; FMCG Offers"
     path="/"
     schemas={[organizationSchema(), websiteSchema()]}
   />
@@ -247,18 +246,12 @@ const stats = [
        motion with no pause control would fail WCAG 2.2.2, and the settled
        state tells the same story. With reduced motion it starts settled. */
     @keyframes iq-match{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
-    @media (prefers-reduced-motion:reduce){.iq-row .pr{animation:none;opacity:1;transform:none}}
+    @media (prefers-reduced-motion:reduce){.iq-add{animation:none;opacity:1;transform:none}}
     /* Real recording, when one is dropped in */
     .iq-video{width:100%;display:block;border-radius:var(--radius);border:1px solid var(--line);box-shadow:var(--shadow);background:var(--card)}
 
-    /* Featured section */
-    .feat{background:color-mix(in srgb,var(--forest) 6%,var(--paper));border-bottom:1px solid var(--line)}
-    .feat-in{padding-top:26px;padding-bottom:30px}
-    .feat-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:12px;margin:0 0 16px}
-    .feat-eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--brass);font-weight:bold}
-    .feat-head h2{font-family:var(--serif);font-size:22px;font-weight:600;margin:0;color:var(--ink)}
-    .feat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
-    .feat .card{border-color:color-mix(in srgb,var(--brass-2) 40%,var(--line))}
+    /* Featured offers are pinned to the front of the main grid; these style
+       the badge and the card that carries it. */
     .feat-badge{align-self:flex-start;font-family:var(--mono);font-size:10px;font-weight:bold;letter-spacing:.08em;
       text-transform:uppercase;color:#fff;background:#B4231F;padding:3px 8px;border-radius:6px;margin-bottom:12px}
     .card.feat-on{border-color:color-mix(in srgb,var(--brass-2) 50%,var(--line))}
@@ -330,9 +323,6 @@ const stats = [
       border-radius:999px;padding:8px 14px;font-size:14px;font-weight:600;color:var(--ink);text-decoration:none}
     .catnav-list a:hover{border-color:var(--brass);color:var(--brass)}
     .catnav-count{font-family:var(--mono);font-size:11.5px;font-weight:400;color:var(--muted)}
-    .catnav-more{margin:20px 0 0;font-size:14px;color:var(--muted)}
-    .catnav-more a{color:var(--brass);text-decoration:none}
-    .catnav-more a:hover{text-decoration:underline}
     .incoterm{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
     .enquire{display:inline-flex;align-items:center;gap:7px;background:var(--forest);color:var(--paper);
       text-decoration:none;font-size:13px;font-weight:600;padding:8px 13px;border-radius:9px;transition:.14s;border:1px solid transparent}
@@ -370,11 +360,11 @@ const stats = [
 
   <section class="hero">
     <div class="wrap hero-in">
-      <p class="eyebrow">Wholesale beverage offers · duty-paid &amp; export</p>
+      <p class="eyebrow">Wholesale drinks &amp; FMCG offers · duty-paid &amp; export</p>
       <h1>Live trade pricing, straight from the desk.</h1>
-      <p class="lede">Spirits and beer by the case, with current pricing, pack specs and duty tier on every line. Filter, compare, and send a WhatsApp enquiry in one tap — no login, no PDF.</p>
+      <p class="lede">Spirits, toiletries, confectionery and grocery by the case, with current pricing and pack specs on every line and duty status on the drinks. Filter, compare, and send a WhatsApp enquiry in one tap — no login, no PDF.</p>
       <p class="cta-note">
-        Got a buying list? <a class="cta-jump" href="#instant-quote">Upload it in any format and download it <span class="nb">priced<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 4v13m0 0-5.5-5.5M12 17l5.5-5.5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a> — no template, no login.
+        Already have a buying list? <a class="cta-jump" href="#instant-quote">Get it back <span class="nb">priced<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 4v13m0 0-5.5-5.5M12 17l5.5-5.5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
       </p>
       <div class="ticker">
         {stats.map((s) => (
@@ -389,7 +379,7 @@ const stats = [
       <div class="iq-copy">
         <p class="iq-eyebrow"><span class="new">New</span> Instant Quote</p>
         <h2>Send your list in any format. Get it back priced.</h2>
-        <p class="iq-lede">No rep, no callback, no template to fill in. Upload the list exactly as you already keep it — we read it, write our selling price into it, and hand it straight back to download.</p>
+        <p class="iq-lede">No rep, no callback, no waiting on a quote. Send the list exactly as you already keep it — we read it, write our selling price into it, and hand it straight back.</p>
         <ol class="iq-steps">
           <li>
             <span class="iq-n" aria-hidden="true">1</span>
@@ -397,7 +387,7 @@ const stats = [
           </li>
           <li>
             <span class="iq-n" aria-hidden="true">2</span>
-            <div><b>We price it against live stock</b><span class="t">Every line is matched against the {view.length.toLocaleString('en-IE')} offers live on this site right now, and our selling price goes straight into your own file.</span></div>
+            <div><b>We price it against live stock</b><span class="t">Every line is matched against every offer live on this site right now, and our selling price goes straight into your own file.</span></div>
           </li>
           <li>
             <span class="iq-n" aria-hidden="true">3</span>
@@ -410,9 +400,9 @@ const stats = [
               <path d="M12 15.5V3.5m0 0L7.8 7.7M12 3.5l4.2 4.2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               <path d="M4 15.5V18a2.5 2.5 0 0 0 2.5 2.5h11A2.5 2.5 0 0 0 20 18v-2.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
             </svg>
-            Upload your list — download it priced
+            Upload your list
           </a>
-          <span class="iq-alt">Rather use email? Send it to <a href="mailto:offers@akay.ie?subject=Requirement%20List">offers@akay.ie</a> with "Requirement List" in the subject — any format, same automatic pricing.</span>
+          <span class="iq-alt">Rather use email? Send it to <a href="mailto:offers@akay.ie?subject=Requirement%20List">offers@akay.ie</a> with "Requirement List" in the subject — same automatic pricing.</span>
         </div>
       </div>
 
@@ -457,16 +447,16 @@ const stats = [
             </div>
           </div>
         )}
-        <figcaption class="iq-cap">Example figures. Your own file comes back with our live selling price written in beside your cost, and the saving worked out on every line.</figcaption>
+        <figcaption class="iq-cap">Example figures — not live prices.</figcaption>
       </figure>
     </div>
   </section>
 
   <section class="controls">
     <div class="wrap controls-in">
-      <form class="search" action="/search/" method="get" role="search" title="Type to filter this page; press Enter for full search with size, pack and bond filters">
+      <form class="search" action="/search/" method="get" role="search">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-        <input id="q" name="q" type="search" placeholder="Filter brand or product — press Enter for full search" autocomplete="off" />
+        <input id="q" name="q" type="search" placeholder={`Filter the ${view.length.toLocaleString('en-IE')} offers below`} autocomplete="off" />
       </form>
       <div class="chips" id="cats">
         {categories.map((c) => (
@@ -531,7 +521,7 @@ const stats = [
   <section id="categories" class="catnav">
     <div class="wrap">
       <h2>Browse by category</h2>
-      <p class="catnav-lede">Every category has its own page with the full live list, trade pricing and duty status.</p>
+      <p class="catnav-lede">{categoryLinks.length} categories, each with its own page and the full live list.</p>
       <nav aria-label="Offer categories">
         <ul class="catnav-list">
           {categoryLinks.map((c) => (
@@ -549,12 +539,6 @@ const stats = [
           <li><a href="/brands/">All {allBrandPages.length} brands A–Z</a></li>
         </ul>
       </nav>
-      <p class="catnav-more">
-        New to trade buying? Read <a href="/guides/t1-vs-t2-duty-status/">T1 vs T2 duty status</a>,
-        <a href="/guides/incoterms-exw-dap-cfr/">Incoterms explained</a> and
-        <a href="/guides/how-to-buy-wholesale-spirits-eu/">how to buy wholesale in the EU</a>,
-        or read more <a href="/about/">about AKAY Trade</a>.
-      </p>
     </div>
   </section>
 
