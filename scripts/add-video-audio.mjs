@@ -44,6 +44,11 @@ function usage(message) {
       --hold <s|auto>    Freeze the last frame for this long, so a voiceover
                          that overruns the picture still fits. "auto" works out
                          the length needed. Re-encodes the video
+      --stretch <n|fit>  Slow the whole picture by this factor, giving every
+                         screen more time. "fit" slows it just enough to cover
+                         the voiceover. Re-encodes the video.
+                         Note: if the video was already cut to the narration,
+                         this pushes it out of sync — prefer --hold auto
       --no-sting         Drop the opening bell (synth bed only)
       --keep-audio       Keep the video's existing audio and mix the music under it
 `);
@@ -61,6 +66,7 @@ function parseArgs(argv) {
     voiceDelay: 0.8,
     musicLevel: 0.55,
     hold: 0, // seconds, or the string 'auto'
+    stretch: 1, // factor, or the string 'fit'
     sting: true,
     keepAudio: false,
   };
@@ -80,6 +86,11 @@ function parseArgs(argv) {
       case '--hold': {
         const v = next();
         opts.hold = v === 'auto' ? 'auto' : Number(v);
+        break;
+      }
+      case '--stretch': {
+        const v = next();
+        opts.stretch = v === 'fit' ? 'fit' : Number(v);
         break;
       }
       case '--voice-file': opts.voiceFile = next(); break;
@@ -108,6 +119,12 @@ function parseArgs(argv) {
   }
   if (opts.hold === 'auto' && !opts.voiceFile && !opts.say) {
     usage('--hold auto needs a voiceover to measure against');
+  }
+  if (opts.stretch !== 'fit' && (!Number.isFinite(opts.stretch) || opts.stretch <= 0)) {
+    usage('--stretch takes a positive factor or "fit"');
+  }
+  if (opts.stretch === 'fit' && !opts.voiceFile && !opts.say) {
+    usage('--stretch fit needs a voiceover to measure against');
   }
   if (!Number.isFinite(opts.voiceDelay) || opts.voiceDelay < 0) usage('--voice-delay must be >= 0');
   if (!Number.isFinite(opts.musicLevel) || opts.musicLevel <= 0) usage('--music-level must be > 0');
@@ -208,12 +225,26 @@ function main() {
     // videos the last frame is the call to action, so the extra beat is time
     // the viewer can use rather than dead air.
     const TAIL = 0.6; // a breath after the last word
-    let hold = opts.hold === 'auto' ? Math.max(0, voiceNeeds + TAIL - duration) : opts.hold;
+
+    // Slowing the whole picture comes first; a hold then tops up whatever is
+    // still short.
+    let stretch =
+      opts.stretch === 'fit' ? Math.max(1, (voiceNeeds + TAIL) / duration) : opts.stretch;
+    stretch = Math.round(stretch * 10000) / 10000;
+    const stretched = duration * stretch;
+
+    let hold = opts.hold === 'auto' ? Math.max(0, voiceNeeds + TAIL - stretched) : opts.hold;
     hold = Math.round(hold * 100) / 100;
-    const finalDuration = duration + hold;
+    const finalDuration = stretched + hold;
 
     console.log(`Clip is ${duration.toFixed(2)}s.`);
     if (voicePath) console.log(`Voiceover needs ${voiceNeeds.toFixed(2)}s.`);
+    if (stretch !== 1) {
+      console.log(
+        `Slowing the picture ${stretch.toFixed(4)}x → ${stretched.toFixed(2)}s ` +
+          `(every screen is on ${((stretch - 1) * 100).toFixed(1)}% longer).`,
+      );
+    }
     if (hold > 0) {
       console.log(`Holding the last frame for ${hold.toFixed(2)}s → ${finalDuration.toFixed(2)}s total.`);
     }
@@ -323,8 +354,13 @@ function main() {
     // video stream is copied through untouched.
     const videoArgs = [];
     let videoMap = '0:v:0';
-    if (hold > 0) {
-      filters.push(`[0:v]tpad=stop_mode=clone:stop_duration=${hold.toFixed(3)}[vout]`);
+    if (hold > 0 || stretch !== 1) {
+      const steps = [];
+      // setpts rescales the timestamps; the output frame rate is pinned below,
+      // so ffmpeg repeats frames to fill the extra time.
+      if (stretch !== 1) steps.push(`setpts=${stretch.toFixed(6)}*PTS`);
+      if (hold > 0) steps.push(`tpad=stop_mode=clone:stop_duration=${hold.toFixed(3)}`);
+      filters.push(`[0:v]${steps.join(',')}[vout]`);
       videoMap = '[vout]';
       videoArgs.push('-c:v', 'libx264', '-crf', '18', '-preset', 'medium', '-pix_fmt', 'yuv420p');
       const fps = probeFps(ffmpeg, opts.input);
