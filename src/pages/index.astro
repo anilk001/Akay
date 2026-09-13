@@ -2,7 +2,7 @@
 import { getOffers } from '../data/airtable.mjs';
 import { organizationSchema, websiteSchema } from '../lib/schema.mjs';
 import Seo from '../components/Seo.astro';
-import { withSlugs, categorySlug } from '../lib/slug.mjs';
+import { withSlugs, categorySlug, brandPages } from '../lib/slug.mjs';
 import { guides } from '../data/guides.mjs';
 import { enquiryLink, WA_LINK } from '../lib/whatsapp.mjs';
 import SiteSearch from '../components/SiteSearch.astro';
@@ -44,6 +44,11 @@ const categoryLinks = categories
   .filter((c) => c !== 'All')
   .map((c) => ({ name: c, href: `/category/${categorySlug(c)}/`, count: view.filter((o) => o.category === c).length }));
 const brandCount = new Set(view.map((o) => o.brand)).size;
+// Brand landing pages (live stock, 2+ offers). The most-stocked two dozen get
+// homepage links; the /brands/ hub carries the rest, so every brand page has
+// a crawlable path from here.
+const allBrandPages = brandPages(offers);
+const topBrands = [...allBrandPages].sort((a, b) => b.offers.length - a.offers.length).slice(0, 24);
 const currencies = Array.from(new Set(view.map((o) => o.currency).filter(Boolean))).sort();
 // Instant Quote explainer (the .iq section below). Point QUOTE_VIDEO at an
 // MP4/WebM — put it in public/ and use an absolute path like
@@ -532,6 +537,16 @@ const stats = [
           {categoryLinks.map((c) => (
             <li><a href={c.href}>{c.name}<span class="catnav-count">{c.count}</span></a></li>
           ))}
+        </ul>
+      </nav>
+      <h2 style="margin-top:34px">Browse by brand</h2>
+      <p class="catnav-lede">The most-stocked brands, each with its own wholesale landing page.</p>
+      <nav aria-label="Brand pages">
+        <ul class="catnav-list">
+          {topBrands.map((b) => (
+            <li><a href={`/brands/${b.slug}/`}>{b.brand}<span class="catnav-count">{b.offers.length}</span></a></li>
+          ))}
+          <li><a href="/brands/">All {allBrandPages.length} brands A–Z</a></li>
         </ul>
       </nav>
       <p class="catnav-more">

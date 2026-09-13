@@ -31,6 +31,32 @@ export function dedupeSlug(slug, allSlugs) {
   return `${slug}-${counter}`;
 }
 
+// Brand landing pages: one per brand carrying at least `minOffers` live offers
+// (single-offer brands would be thin doorway pages). Slugs take a "-wholesale"
+// suffix — the search term the pages target — and are deduped in alphabetical
+// brand order so every caller derives identical URLs.
+export function brandPages(offers, minOffers = 2) {
+  const byBrand = new Map();
+  for (const offer of offers) {
+    const brand = (offer.brand || '').trim();
+    if (!brand) continue;
+    if (!byBrand.has(brand)) byBrand.set(brand, []);
+    byBrand.get(brand).push(offer);
+  }
+  const slugs = [];
+  const pages = [];
+  for (const brand of [...byBrand.keys()].sort((a, b) => a.localeCompare(b))) {
+    const brandOffers = byBrand.get(brand);
+    if (brandOffers.length < minOffers) continue;
+    const base = generateSlug(brand);
+    if (!base) continue;
+    const slug = dedupeSlug(`${base}-wholesale`, slugs);
+    slugs.push(slug);
+    pages.push({ brand, slug, offers: brandOffers });
+  }
+  return pages;
+}
+
 // Build a map of offer ID -> slug for routing
 export function buildSlugMap(offers) {
   const slugs = [];
@@ -92,7 +118,11 @@ export function withSlugs(offers) {
   // The representative is the row a buyer would rather land on: in stock
   // first, then the deepest stock, then the keenest price.
   const STOCK_RANK = { in: 0, warn: 1 };
+  // Delisted (sold-out archive) rows rank below every live row: their stock
+  // fields are frozen from before the sale, so they must never win the
+  // canonical over a live listing of the same product.
   const rank = (o) => [
+    o.delisted ? 1 : 0,
     STOCK_RANK[o.stock] ?? 2,
     -(o.qty ?? 0),
     o.amount ?? Number.POSITIVE_INFINITY,

@@ -21,7 +21,16 @@ export const WA_LINK = `https://wa.me/${WA_NUMBER}`;
 // interpolated blank: 24 of the ~2,500 live offers have no Public Spec, and at
 // least one has no price. Interpolating those unguarded produced messages like
 // "quote for Indomie Noodles () listed at USD " landing in the customer's chat.
-export function enquiryLink(offer, basisMsg = '') {
+export function enquiryLink(offer, basisMsg = '', { soldOut = false } = {}) {
+  // A sold-out page's price is history, not an offer — quoting it back at us
+  // would anchor the chat to a number that no longer exists. Ask about
+  // availability instead.
+  if (soldOut) {
+    const what = offer.spec ? `${offer.name} (${offer.spec})` : offer.name;
+    const text = `Hi, I'm looking for ${what} — is this or a similar line available?`;
+    return `${WA_LINK}?text=${encodeURIComponent(text)}`;
+  }
+
   const parts = [`Hi, I'd like a quote for ${offer.name}`];
 
   if (offer.spec) parts.push(`(${offer.spec})`);

@@ -254,15 +254,22 @@ async function fetchWithRetry(url, init, tries = 4) {
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-async function fetchLive() {
+async function fetchRows({ filterByFormula, sort = null, maxRecords = null }) {
   const base = `https://api.airtable.com/v0/${BASE}/${encodeURIComponent(TABLE)}`;
   const headers = { Authorization: `Bearer ${TOKEN}` };
   const out = [];
   let offset;
   do {
     const url = new URL(base);
-    url.searchParams.set('filterByFormula', "{Public Listing}='Yes'");
+    url.searchParams.set('filterByFormula', filterByFormula);
     url.searchParams.set('pageSize', '100');
+    if (maxRecords) url.searchParams.set('maxRecords', String(maxRecords));
+    // Sort/filter fields don't have to be in fields[] — Airtable applies them
+    // server-side and still returns only the requested fields.
+    if (sort) sort.forEach((s, i) => {
+      url.searchParams.set(`sort[${i}][field]`, s.field);
+      url.searchParams.set(`sort[${i}][direction]`, s.direction);
+    });
     FIELDS.forEach((f) => url.searchParams.append('fields[]', f));
     if (offset) url.searchParams.set('offset', offset);
 
@@ -274,15 +281,35 @@ async function fetchLive() {
       if (o.name && !isTestRow(o.name)) out.push(o);
     }
     offset = data.offset;
-  } while (offset);
-  return out;
+  } while (offset && (!maxRecords || out.length < maxRecords));
+  return maxRecords ? out.slice(0, maxRecords) : out;
+}
+
+function fetchLive() {
+  return fetchRows({ filterByFormula: "{Public Listing}='Yes'" });
+}
+
+// Sold-out offers keep their URLs alive with an "out of stock — request quote"
+// page instead of a 404, so indexed pages and inbound links survive stock
+// turnover. These rows passed the same approval gates as live ones — only
+// their Status flipped to Sold/Expired — and the fetch requests the identical
+// public-safe FIELDS, so nothing non-public can leak. Newest first, capped so
+// the archive can't grow without bound as offers churn.
+const DELISTED_CAP = 800;
+async function fetchDelisted() {
+  const rows = await fetchRows({
+    filterByFormula: "AND(OR({Status}='Sold',{Status}='Expired'),{Offer Approval Status}='Approved',{Listing Approved})",
+    sort: [{ field: 'Offer Date', direction: 'desc' }],
+    maxRecords: DELISTED_CAP,
+  });
+  return rows.map((o) => ({ ...o, delisted: true }));
 }
 
 // The committed snapshot was baked by an earlier version of normalize(), and a
 // fresh deploy serves it until the next refresh runs. Applying the same
 // corrections on read keeps both paths — live and snapshot — showing identical
 // figures, so a fallback build can never resurrect the old per-unit/per-case mix-up.
-function renormalizeSnapshotOffer(o, index) {
+function renormalizeSnapshotOffer(o, index, idPrefix = 'snapshot') {
   const parts = parsePriceParts(o.priceDetail || '');
   const headline = parts[0] || null;
   const perUnit = parts.find((p) => /unit|btl|bottle|can|piece|jar/.test(p.basis));
@@ -292,7 +319,7 @@ function renormalizeSnapshotOffer(o, index) {
     moq: '', leadTime: '', bbd: '', note: '', offerDate: '', expiryDate: '',
     volumeMl: null, pack: null, unitType: '', warehouse: '', incoterm: '',
     ...o,
-    id: o.id || `snapshot-${index}`,
+    id: o.id || `${idPrefix}-${index}`,
     name,
     variants,
     amount: headline ? headline.amount : o.amount,
@@ -306,13 +333,31 @@ function renormalizeSnapshotOffer(o, index) {
   });
 }
 
+// Older snapshots predate the delisted archive — `|| []` keeps them building.
+function snapshotDelisted() {
+  return (snapshot.delisted || []).map((o, i) => ({
+    ...renormalizeSnapshotOffer(o, i, 'snapshot-delisted'),
+    delisted: true,
+  }));
+}
+
 export async function getOffers() {
   if (TOKEN) {
     try {
       const offers = await fetchLive();
       if (offers.length) {
         console.log(`[airtable] fetched ${offers.length} live public offers`);
-        return { offers, source: 'live' };
+        // Sold-out pages are an SEO nicety — if only this fetch fails, fall
+        // back to the snapshot's archive rather than failing a live build.
+        let delisted;
+        try {
+          delisted = await fetchDelisted();
+          console.log(`[airtable] fetched ${delisted.length} delisted (sold-out) offers`);
+        } catch (err) {
+          console.warn(`[airtable] delisted fetch failed (${err.message.slice(0, 120)}) — using snapshot archive`);
+          delisted = snapshotDelisted();
+        }
+        return { offers, delisted, source: 'live' };
       }
       console.warn('[airtable] live fetch returned 0 rows — using snapshot');
     } catch (err) {
@@ -321,7 +366,11 @@ export async function getOffers() {
   } else {
     console.warn('[airtable] no AIRTABLE_TOKEN set — using snapshot');
   }
-  return { offers: snapshot.offers.map((o, i) => renormalizeSnapshotOffer(o, i)), source: 'snapshot' };
+  return {
+    offers: snapshot.offers.map((o, i) => renormalizeSnapshotOffer(o, i)),
+    delisted: snapshotDelisted(),
+    source: 'snapshot',
+  };
 }
 
 // Featured offers are flagged per-record by the `Featured` field and rendered

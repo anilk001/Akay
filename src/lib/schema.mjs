@@ -58,10 +58,13 @@ export function websiteSchema() {
   };
 }
 
-// Map stock status to schema.org availability
-function mapAvailability(stock) {
-  if (stock === 'in') return 'https://schema.org/InStock';
-  if (stock === 'warn') return 'https://schema.org/LimitedAvailability';
+// Map stock status to schema.org availability. Delisted offers are the pages
+// kept alive after their stock sold — always SoldOut, whatever the stale
+// stock field says.
+function mapAvailability(offer) {
+  if (offer.delisted) return 'https://schema.org/SoldOut';
+  if (offer.stock === 'in') return 'https://schema.org/InStock';
+  if (offer.stock === 'warn') return 'https://schema.org/LimitedAvailability';
   return null; // Enquire = omit availability field
 }
 
@@ -77,7 +80,7 @@ function eligibleUnitText(basis) {
 }
 
 export function productOfferSchema(offer, slug) {
-  const availability = mapAvailability(offer.stock);
+  const availability = mapAvailability(offer);
   const unitText = eligibleUnitText(offer.priceBasis || '');
   const offerBlock =
     offer.amount && offer.currency
@@ -99,10 +102,15 @@ export function productOfferSchema(offer, slug) {
               }
             : {}),
           seller: { '@id': `${SITE_URL}/#org` },
-          // Price valid for 14 days from build time
-          priceValidUntil: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)
-            .toISOString()
-            .split('T')[0],
+          // Price valid for 14 days from build time. A sold-out price has no
+          // validity to assert, so the field is omitted there.
+          ...(offer.delisted
+            ? {}
+            : {
+                priceValidUntil: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)
+                  .toISOString()
+                  .split('T')[0],
+              }),
         }
       : null;
 
@@ -149,7 +157,7 @@ export function productOfferSchema(offer, slug) {
       value: offer.terms,
     });
   }
-  if (offer.qty) {
+  if (offer.qty && !offer.delisted) {
     additionalProperty.push({
       '@type': 'PropertyValue',
       name: 'Stock',
@@ -212,6 +220,26 @@ export function categoryItemListSchema(categoryName, offers) {
         '@type': 'ListItem',
         position: index + 1,
         url: `${SITE_URL}/offers/${offer.slug}/`,
+        name: offer.name,
+      })),
+    },
+  };
+}
+
+// Brand landing page CollectionPage schema
+export function brandCollectionSchema(brandName, brandUrlSlug, offers) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: `${brandName} Wholesale Offers`,
+    url: `${SITE_URL}/brands/${brandUrlSlug}/`,
+    about: { '@type': 'Brand', name: brandName },
+    mainEntity: {
+      '@type': 'ItemList',
+      itemListElement: offers.map((offer, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        url: `${SITE_URL}/offers/${offer.canonicalSlug || offer.slug}/`,
         name: offer.name,
       })),
     },
