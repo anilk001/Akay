@@ -50,6 +50,14 @@ const brandCount = new Set(view.map((o) => o.brand)).size;
 const allBrandPages = brandPages(offers);
 const topBrands = [...allBrandPages].sort((a, b) => b.offers.length - a.offers.length).slice(0, 24);
 const currencies = Array.from(new Set(view.map((o) => o.currency).filter(Boolean))).sort();
+// Instant Quote explainer (the .iq section below). Point QUOTE_VIDEO at an
+// MP4/WebM — put it in public/ and use an absolute path like
+// '/instant-quote.mp4' — to replace the animated banner with a real screen
+// recording; QUOTE_VIDEO_POSTER is the still frame shown before it plays.
+// Left null, the CSS banner renders instead: no asset to host, no extra bytes.
+const QUOTE_VIDEO = null;
+const QUOTE_VIDEO_POSTER = null;
+
 const stats = [
   [view.length, 'live offers'],
   [categories.length - 1, 'categories'],
@@ -128,41 +136,120 @@ const stats = [
     .eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--brass);margin:0 0 12px}
     h1{font-family:var(--serif);font-weight:600;font-size:clamp(30px,5vw,46px);line-height:1.04;margin:0;max-width:16ch;text-wrap:balance;letter-spacing:-.01em}
     .lede{margin:14px 0 0;max-width:56ch;color:var(--ink-soft);font-size:16px}
+    /* A line pointing down to the Instant Quote section rather than a second
+       button straight to quote.akay.ie — the section right below carries the
+       real CTA, and two identical buttons a screen apart read as a mistake. */
+    .cta-note{margin:16px 0 0;font-size:14.5px;color:var(--ink-soft);max-width:56ch}
+    /* inline, not inline-flex: the link is mid-sentence and has to be able to
+       wrap with the text around it rather than jumping to its own line. */
+    .cta-jump{color:var(--brass);font-weight:600;text-decoration:none;
+      border-bottom:1px solid color-mix(in srgb,var(--brass) 40%,transparent)}
+    .cta-jump:hover{color:var(--forest);border-bottom-color:color-mix(in srgb,var(--forest) 45%,transparent)}
+    .cta-jump svg{width:13px;height:13px;margin-left:5px;vertical-align:-1px}
+    /* Keeps the arrow tied to the last word so it can't orphan onto its own line. */
+    .cta-jump .nb{white-space:nowrap}
+    /* The Instant Quote button. Brass rather than forest so it reads as the
+       primary action on the page. */
+    .cta-quote{display:inline-flex;align-items:center;gap:10px;height:50px;padding:0 22px;border-radius:12px;
+      background:var(--brass);color:#fff;font-weight:600;font-size:15.5px;line-height:1;text-decoration:none;
+      border:1px solid transparent;box-shadow:var(--shadow);transition:background .14s,transform .14s}
+    .cta-quote:hover{background:var(--forest);transform:translateY(-1px)}
+    .cta-quote:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+    .cta-quote svg{flex-shrink:0;width:19px;height:19px}
+    /* Dark palettes lighten --brass, so flip the label to ink to keep contrast. */
+    @media (prefers-color-scheme:dark){.cta-quote{color:#17140F}}
+    :root[data-theme="dark"] .cta-quote{color:#17140F}
+    :root[data-theme="light"] .cta-quote{color:#fff}
+    @media (prefers-reduced-motion:reduce){.cta-quote{transition:none}.cta-quote:hover{transform:none}}
+    @media (max-width:520px){.cta-quote{width:100%;justify-content:center;padding:0 16px}}
     .ticker{display:flex;flex-wrap:wrap;gap:26px;margin-top:24px;padding-top:20px;border-top:1px solid var(--line-soft)}
     .stat .n{font-family:var(--mono);font-size:22px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
     .stat .l{font-size:12px;color:var(--muted);letter-spacing:.03em}
 
-    /* Category request form */
-    .req{border-bottom:1px solid var(--line);background:color-mix(in srgb,var(--forest) 5%,transparent)}
-    .req-in{padding-top:20px;padding-bottom:20px;display:flex;flex-wrap:wrap;align-items:center;gap:16px 22px}
-    .req-copy{flex:1;min-width:230px}
-    .req-copy h2{font-family:var(--serif);font-size:20px;font-weight:600;margin:0 0 3px;color:var(--ink);text-wrap:balance}
-    .req-copy p{margin:0;color:var(--ink-soft);font-size:13.5px;max-width:44ch}
-    .req-form{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-    .req-form select,.req-form input{height:42px;border:1px solid var(--line);background:var(--card);color:var(--ink);
-      border-radius:10px;padding:0 12px;font-size:14px;font-family:var(--sans)}
-    .req-form select{min-width:180px;cursor:pointer}
-    .req-form input[type=email]{min-width:190px}
-    .req-form input[type=text]{min-width:180px}
-    .req-form select:focus,.req-form input:focus{outline:2px solid var(--brass-2);outline-offset:1px;border-color:transparent}
-    .req-form button{height:42px;padding:0 18px;border:1px solid transparent;border-radius:10px;background:var(--forest);
-      color:var(--paper);font-weight:600;font-size:14px;cursor:pointer;transition:.14s;white-space:nowrap}
-    :root[data-theme="dark"] .req-form button{color:#0A140F}
-    @media (prefers-color-scheme:dark){.req-form button{color:#0A140F}}
-    .req-form button:hover{background:var(--brass);color:#fff}
-    .req-form button:disabled{opacity:.55;cursor:default}
-    .req-msg{flex-basis:100%;margin:2px 0 0;font-size:13px;font-family:var(--mono);line-height:1.5}
-    .req-msg.ok{color:var(--ok)}
-    .req-msg.err{color:var(--brass)}
-    .req-msg a{color:inherit}
-    /* Requirement-list (email) intake — static content, paired under the category form */
-    .requirement-list-note{flex-basis:100%;margin-top:16px;padding-top:15px;border-top:1px dashed var(--line);
-      display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px}
-    .requirement-list-note h3{font-family:var(--serif);font-size:15px;font-weight:600;margin:0;color:var(--ink);white-space:nowrap}
-    .requirement-list-note p{margin:0;color:var(--ink-soft);font-size:13.5px;line-height:1.55;max-width:82ch}
-    .requirement-list-note a{color:var(--brass);font-weight:600;text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--brass) 40%,transparent)}
-    .requirement-list-note a:hover{color:var(--forest)}
-    .requirement-list-note strong{color:var(--ink);font-weight:600}
+    /* ── Instant Quote ─────────────────────────────────────────────────
+       The site's USP, in the slot the category-email form used to hold.
+       Copy on the left, an explainer banner on the right. The banner is
+       plain HTML/CSS rather than a video: nothing to host, nothing to
+       download, and it renders with JS off. Set QUOTE_VIDEO in the
+       frontmatter to swap in a real screen recording instead. */
+    /* scroll-margin-top clears the sticky header when the hero link jumps here. */
+    .iq{border-bottom:1px solid var(--line);scroll-margin-top:76px;background:
+      radial-gradient(90% 140% at 0 0,color-mix(in srgb,var(--brass) 8%,transparent),transparent 58%),
+      color-mix(in srgb,var(--forest) 5%,transparent)}
+    .iq-in{padding-top:26px;padding-bottom:28px;display:grid;gap:24px 36px;
+      grid-template-columns:minmax(320px,1.05fr) minmax(290px,.95fr);align-items:center}
+    @media (max-width:900px){.iq-in{grid-template-columns:1fr}}
+    .iq-eyebrow{display:flex;align-items:center;gap:9px;margin:0 0 9px;font-family:var(--mono);font-size:11.5px;
+      letter-spacing:.16em;text-transform:uppercase;color:var(--brass);font-weight:bold}
+    .iq-eyebrow .new{background:var(--brass);color:#fff;border-radius:5px;padding:2px 7px;font-size:10px;letter-spacing:.1em}
+    /* Dark palettes lighten --brass, so flip the label to ink to keep contrast. */
+    @media (prefers-color-scheme:dark){.iq-eyebrow .new{color:#17140F}}
+    :root[data-theme="dark"] .iq-eyebrow .new{color:#17140F}
+    :root[data-theme="light"] .iq-eyebrow .new{color:#fff}
+    .iq-copy h2{font-family:var(--serif);font-size:clamp(21px,2.7vw,28px);font-weight:600;margin:0;
+      color:var(--ink);text-wrap:balance;letter-spacing:-.01em}
+    .iq-lede{margin:9px 0 0;color:var(--ink-soft);font-size:14.5px;max-width:58ch}
+    .iq-steps{list-style:none;margin:17px 0 0;padding:0;display:grid;gap:11px}
+    .iq-steps li{display:flex;gap:11px;align-items:flex-start}
+    .iq-n{flex-shrink:0;width:23px;height:23px;margin-top:1px;border-radius:50%;background:var(--forest);color:var(--paper);
+      font-family:var(--mono);font-size:12px;font-weight:600;display:inline-flex;align-items:center;justify-content:center}
+    :root[data-theme="dark"] .iq-n{color:#0A140F}
+    @media (prefers-color-scheme:dark){.iq-n{color:#0A140F}}
+    :root[data-theme="light"] .iq-n{color:var(--paper)}
+    .iq-steps b{display:block;color:var(--ink);font-size:14px;font-weight:600}
+    .iq-steps .t{display:block;color:var(--ink-soft);font-size:13.5px;line-height:1.5;max-width:54ch}
+    .iq-steps .t strong{color:var(--ink);font-weight:600}
+    .iq-cta{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;margin-top:19px}
+    .iq-alt{font-size:13px;color:var(--ink-soft);max-width:40ch}
+    .iq-alt a{color:var(--brass);font-weight:600;text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--brass) 40%,transparent)}
+    .iq-alt a:hover{color:var(--forest)}
+
+    /* Explainer banner — the customer's own file with our price written into
+       it. What they uploaded (product, their cost) sits static; what we add
+       (our price, the saving) animates in beside it, which is the whole story
+       in one picture. Figures are illustrative and captioned as such. */
+    .iq-demo{margin:0;width:100%;max-width:460px;justify-self:end}
+    @media (max-width:900px){.iq-demo{justify-self:stretch;max-width:none}}
+    .iq-win{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+      box-shadow:var(--shadow);overflow:hidden}
+    .iq-bar{display:flex;align-items:center;gap:7px;padding:10px 13px;border-bottom:1px solid var(--line-soft);
+      background:color-mix(in srgb,var(--paper-2) 55%,var(--card))}
+    .iq-bar i{width:8px;height:8px;border-radius:50%;background:var(--line)}
+    .iq-bar .fn{margin-left:5px;font-family:var(--mono);font-size:11.5px;color:var(--muted);
+      overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .iq-bar .tag{margin-left:auto;flex-shrink:0;font-family:var(--mono);font-size:9.5px;letter-spacing:.07em;
+      background:var(--ok-bg);color:var(--ok);border-radius:5px;padding:3px 7px;font-weight:600}
+    .iq-rows{padding:2px 13px 8px}
+    /* Wraps to two lines rather than squeezing four columns onto a phone. */
+    .iq-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:3px 10px;
+      padding:10px 0;border-bottom:1px solid var(--line-soft);font-size:13px}
+    .iq-row:last-child{border-bottom:0}
+    .iq-row .nm{color:var(--ink);flex:1 1 auto;min-width:115px}
+    /* Narrow enough that a long name would wrap on its own: stack every row
+       the same way rather than letting only the long ones break. */
+    @media (max-width:560px){.iq-row{justify-content:flex-start}.iq-row .nm{flex-basis:100%}}
+    .iq-cmp{display:inline-flex;align-items:center;gap:7px;flex-shrink:0;
+      font-family:var(--mono);font-size:12px;font-variant-numeric:tabular-nums;white-space:nowrap}
+    .iq-cmp .was{color:var(--muted)}
+    .iq-add{display:inline-flex;align-items:center;gap:7px;
+      animation:iq-match .5s ease-out both;animation-delay:var(--d,0s)}
+    .iq-add .arw{width:11px;height:11px;flex-shrink:0;color:var(--muted)}
+    .iq-add .now{color:var(--ink);font-weight:600}
+    .iq-add .sv{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:999px;
+      background:var(--ok-bg);color:var(--ok);font-size:10.5px;font-weight:600}
+    .iq-add .sv svg{width:9px;height:9px;flex-shrink:0}
+    .iq-foot{display:flex;align-items:center;gap:7px;padding:10px 13px;border-top:1px solid var(--line-soft);
+      background:color-mix(in srgb,var(--forest) 7%,var(--card));font-family:var(--mono);font-size:11.5px;color:var(--ok)}
+    .iq-foot svg{width:13px;height:13px;flex-shrink:0}
+    .iq-cap{margin:10px 2px 0;font-size:12.5px;color:var(--muted);line-height:1.5}
+    /* The lines land one after another — the stagger is what reads as
+       "matching". It plays once and settles rather than looping: indefinite
+       motion with no pause control would fail WCAG 2.2.2, and the settled
+       state tells the same story. With reduced motion it starts settled. */
+    @keyframes iq-match{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+    @media (prefers-reduced-motion:reduce){.iq-row .pr{animation:none;opacity:1;transform:none}}
+    /* Real recording, when one is dropped in */
+    .iq-video{width:100%;display:block;border-radius:var(--radius);border:1px solid var(--line);box-shadow:var(--shadow);background:var(--card)}
 
     /* Featured section */
     .feat{background:color-mix(in srgb,var(--forest) 6%,var(--paper));border-bottom:1px solid var(--line)}
@@ -286,6 +373,9 @@ const stats = [
       <p class="eyebrow">Wholesale beverage offers · duty-paid &amp; export</p>
       <h1>Live trade pricing, straight from the desk.</h1>
       <p class="lede">Spirits and beer by the case, with current pricing, pack specs and duty tier on every line. Filter, compare, and send a WhatsApp enquiry in one tap — no login, no PDF.</p>
+      <p class="cta-note">
+        Got a buying list? <a class="cta-jump" href="#instant-quote">Upload it in any format and download it <span class="nb">priced<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 4v13m0 0-5.5-5.5M12 17l5.5-5.5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a> — no template, no login.
+      </p>
       <div class="ticker">
         {stats.map((s) => (
           <div class="stat"><div class="n">{s[0]}</div><div class="l">{s[1]}</div></div>
@@ -294,29 +384,81 @@ const stats = [
     </div>
   </section>
 
-  <section class="req">
-    <div class="wrap req-in">
-      <div class="req-copy">
-        <h2>Offers straight to your inbox</h2>
-        <p>Pick a category and we'll email you our current live offers — no login, no PDF.</p>
+  <section class="iq" id="instant-quote">
+    <div class="wrap iq-in">
+      <div class="iq-copy">
+        <p class="iq-eyebrow"><span class="new">New</span> Instant Quote</p>
+        <h2>Send your list in any format. Get it back priced.</h2>
+        <p class="iq-lede">No rep, no callback, no template to fill in. Upload the list exactly as you already keep it — we read it, write our selling price into it, and hand it straight back to download.</p>
+        <ol class="iq-steps">
+          <li>
+            <span class="iq-n" aria-hidden="true">1</span>
+            <div><b>Upload it however you have it</b><span class="t">Excel, CSV, or whatever your buying list already looks like. No fixed columns and no template — we parse it as it comes.</span></div>
+          </li>
+          <li>
+            <span class="iq-n" aria-hidden="true">2</span>
+            <div><b>We price it against live stock</b><span class="t">Every line is matched against the {view.length.toLocaleString('en-IE')} offers live on this site right now, and our selling price goes straight into your own file.</span></div>
+          </li>
+          <li>
+            <span class="iq-n" aria-hidden="true">3</span>
+            <div><b>Download it back — with your savings</b><span class="t">Include your current cost or target price and we mark the difference on every line, so what you save is there in black and white.</span></div>
+          </li>
+        </ol>
+        <div class="iq-cta">
+          <a class="cta-quote" href="https://quote.akay.ie">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M12 15.5V3.5m0 0L7.8 7.7M12 3.5l4.2 4.2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M4 15.5V18a2.5 2.5 0 0 0 2.5 2.5h11A2.5 2.5 0 0 0 20 18v-2.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            Upload your list — download it priced
+          </a>
+          <span class="iq-alt">Rather use email? Send it to <a href="mailto:offers@akay.ie?subject=Requirement%20List">offers@akay.ie</a> with "Requirement List" in the subject — any format, same automatic pricing.</span>
+        </div>
       </div>
-      <form class="req-form" id="reqForm">
-        <select name="category" id="reqCat" required aria-label="Category">
-          <option value="" disabled selected>Choose a category…</option>
-          <option value="Special Offers">★ Special Offers — best deals</option>
-          {categories.filter((c) => c !== 'All').map((c) => (
-            <option value={c}>{c}</option>
-          ))}
-        </select>
-        <input type="email" id="reqEmail" name="email" placeholder="you@company.com" required aria-label="Your email" />
-        <input type="text" id="reqNote" name="note" placeholder="Anything specific? (optional)" aria-label="Optional note" />
-        <button type="submit" id="reqBtn">Email me offers</button>
-        <p class="req-msg" id="reqMsg" role="status" hidden></p>
-      </form>
-      <div class="requirement-list-note">
-        <h3>Have a full requirement list?</h3>
-        <p>Email it to <a href="mailto:offers@akay.ie?subject=Requirement%20List">offers@akay.ie</a> with "Requirement List" in the subject line, and attach an Excel file with three columns: <strong>Brand</strong>, <strong>Product Name</strong>, and <strong>Quantity</strong>. We'll price whatever matches our current stock automatically.</p>
-      </div>
+
+      <figure class="iq-demo">
+        {QUOTE_VIDEO ? (
+          /* Play on tap, not on load: autoplay would spend a phone's data
+             before anyone asked, and looping motion with no pause control
+             fails WCAG 2.2.2. */
+          <video class="iq-video" src={QUOTE_VIDEO} poster={QUOTE_VIDEO_POSTER} width="460" height="300"
+                 controls muted playsinline preload="none"
+                 aria-label="Screen recording: a buying list uploaded to the Instant Quote tool and downloaded back with our prices and the savings marked."></video>
+        ) : (
+          /* aria-hidden: it's a picture of the three steps spelled out above,
+             so a screen reader gets the caption instead of a mock table. The
+             figures are made up — generic product types, never a real line —
+             and the caption says so. */
+          <div class="iq-win" aria-hidden="true">
+            <div class="iq-bar"><i></i><i></i><i></i><span class="fn">my-buying-list.xlsx</span><span class="tag">+ AKAY PRICE</span></div>
+            <div class="iq-rows">
+              {[['Irish whiskey · 12 × 70cl', '142.00', '131.50', '7%', '.1s'],
+                ['Lager · 24 × 330ml can', '21.40', '19.95', '7%', '.55s'],
+                ['Vodka · 6 × 1L', '78.00', '74.25', '5%', '1s']].map(([nm, was, now, save, d]) => (
+                <div class="iq-row">
+                  <span class="nm">{nm}</span>
+                  <span class="iq-cmp">
+                    <span class="was">€{was}</span>
+                    <span class="iq-add" style={`--d:${d}`}>
+                      <svg class="arw" viewBox="0 0 24 24" fill="none"><path d="M4 12h15m0 0-5.5-5.5M19 12l-5.5 5.5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                      <span class="now">€{now}</span>
+                      <span class="sv">
+                        <svg viewBox="0 0 24 24" fill="none"><path d="M12 4v15m0 0-6-6m6 6 6-6" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        {save}
+                      </span>
+                    </span>
+                  </span>
+                </div>
+              ))}
+            </div>
+            <div class="iq-foot">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 16v2.5A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5V16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              3 of 3 lines priced · ready to download
+            </div>
+          </div>
+        )}
+        <figcaption class="iq-cap">Example figures. Your own file comes back with our live selling price written in beside your cost, and the saving worked out on every line.</figcaption>
+      </figure>
     </div>
   </section>
 
@@ -527,40 +669,9 @@ const stats = [
       if (chip) chip.click();
     }
 
-    // Category request form -> n8n webhook (emails the caller our live offers in that category).
-    const reqForm = document.getElementById('reqForm');
-    if (reqForm) {
-      const WEBHOOK = 'https://akay-team.app.n8n.cloud/webhook/71907212-6830-4914-b56c-0fb89d93eda2/category-request';
-      reqForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const btn = document.getElementById('reqBtn');
-        const msg = document.getElementById('reqMsg');
-        const category = document.getElementById('reqCat').value;
-        const email = document.getElementById('reqEmail').value.trim();
-        const note = document.getElementById('reqNote').value.trim();
-        if (!category || !email) return;
-        const label = btn.textContent;
-        btn.disabled = true; btn.textContent = 'Sending…';
-        try {
-          await fetch(WEBHOOK, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
-            body: new URLSearchParams({ category, email, note }).toString(),
-          });
-          msg.className = 'req-msg ok';
-          msg.textContent = `Thanks — your request for ${category} offers is in. We'll email them to ${email} shortly; if nothing arrives in a few minutes, check spam or email offers@akay.ie.`;
-          msg.hidden = false;
-          reqForm.reset();
-        } catch (err) {
-          msg.className = 'req-msg err';
-          msg.innerHTML = `Sorry, that didn't send. Email us at <a href="mailto:offers@akay.ie">offers@akay.ie</a> and we'll get them straight over.`;
-          msg.hidden = false;
-        } finally {
-          btn.disabled = false; btn.textContent = label;
-        }
-      });
-    }
+    // The category-request form that posted to the n8n category-request webhook
+    // was retired with the "offers straight to your inbox" block; the Instant
+    // Quote section that replaced it is static markup and needs no script.
 
     const root = document.documentElement;
     document.getElementById('themeBtn').addEventListener('click', () => {

@@ -25,7 +25,7 @@ export async function GET() {
 - [T1 vs T2 duty status](https://akay.ie/guides/t1-vs-t2-duty-status/): duty-paid vs under-bond explained for beverage trading
 - [Incoterms explained](https://akay.ie/guides/incoterms-exw-dap-cfr/): EXW, FCA, DAP, CIF, FOB, CFR shipping terms
 - [How to buy wholesale](https://akay.ie/guides/how-to-buy-wholesale-spirits-eu/): step-by-step wholesale purchasing, MOQs, pricing, enquiry process
-- [Requirement list format](https://akay.ie/guides/requirement-list-format/): how to structure requests for wholesale pricing
+- [How to send a requirement list](https://akay.ie/guides/requirement-list-format/): uploading a buying list for instant pricing, and what to include so more lines match
 
 ## Company
 
@@ -35,8 +35,10 @@ export async function GET() {
 ## How to Enquire
 
 1. Browse [akay.ie](https://akay.ie/)
-2. Send a requirement list with product names and quantities
-3. Receive a quote within 24 hours
+2. Upload your buying list at [quote.akay.ie](https://quote.akay.ie) — any format, no template
+3. Download it back with our selling price on every matched line, and the saving marked against your cost if your list carries one
+
+Or send a requirement list by email or WhatsApp and receive a quote within 24 hours.
 
 **Email:** offers@akay.ie
 **WhatsApp:** +353 87 238 2368
