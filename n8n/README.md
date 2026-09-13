@@ -20,7 +20,7 @@ between 2026-07-29 and 2026-08-27. A draft in n8n is invisible until published.
 | `whatsapp-filter-layer/classify-message.buy-side-guard.js` | `DO2ltjkISp2YDNnc` | Classify Message | patch only, **published 2026-08-30** |
 | `whatsapp-offer-broadcast/plan-broadcast.js` | `BeGfFpgxmI7hdCTI` | Plan Broadcast | full source, **published 2026-09-04** |
 | `whatsapp-offer-broadcast/build-results.js` | `BeGfFpgxmI7hdCTI` | Build Results | full source, **published 2026-09-04** |
-| `trade-terms-normaliser/normalise-trade-terms.js` | `WQ6A8IVLSAd72fnk` | Normalise Trade Terms | full source, **published 2026-09-13** |
+| `trade-terms-normaliser/normalise-trade-terms.js` | `WQ6A8IVLSAd72fnk` | Normalise Trade Terms | full source, **published 2026-09-13** (v2: unsupported currencies) |
 | `trade-terms-digest/build-parse-digest.js` | *(not built in n8n yet)* | Build Parse Digest | full source, **not published** |
 
 The four WhatsApp nodes and the trade-terms normaliser are live. The
@@ -29,9 +29,9 @@ caller is inert, which is rollout step 1. Wiring the four pipelines to it is
 step 2 onwards, in `trade-terms-normaliser/README.md`, and starts with one
 pipeline in dry run.
 
-The exception digest is not built in n8n at all yet: publishing it starts
-sending a weekly email, and it reads `Parse Status` / `Parse Notes`, which do
-not exist on the Offers table until rollout step 4.
+The exception digest is not built in n8n at all yet, because publishing it
+starts sending a weekly email. Its two inputs are ready: `Parse Status` and
+`Parse Notes` were added to the Offers table on 2026-09-13.
 
 `classify-message` is a patch rather than full source
 because the node could not be exported verbatim at the time; replace it with the

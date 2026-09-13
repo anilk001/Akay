@@ -72,9 +72,10 @@
 // compare the parsed output against the source file by hand before it writes.
 const DEFAULT_DRY_RUN = false;
 
-// Rollout step 4 adds `Parse Notes` and `Parse Status` to the Offers table.
-// Set false while wiring a pipeline before those two columns exist — an
-// Airtable node handed an unknown field name errors the whole batch.
+// `Parse Status` and `Parse Notes` exist on the Offers table (added 2026-09-13,
+// rollout step 4). Set false only if they are ever removed — an Airtable node
+// handed an unknown field name errors the whole batch, taking every good line
+// in it down with the one it could not write.
 const PARSE_FIELDS_LIVE = true;
 
 // The category-rule tier of the cascade. Shipped EMPTY on purpose.
@@ -109,6 +110,18 @@ const CURRENCY = {
   aed: 'AED', sgd: 'SGD', chf: 'CHF', pln: 'PLN', czk: 'CZK',
   ron: 'RON', dkk: 'DKK', sek: 'SEK', nok: 'NOK',
 };
+
+// The options the `MOQ Currency` field actually offers. An amount in anything
+// else cannot be written, and must not be quietly converted into something
+// that can.
+//
+// Note this deliberately does NOT shrink CURRENCY above. Dropping a code from
+// the vocabulary looks like the obvious fix and is the dangerous one: with
+// "chf" unrecognised, "Minimum order 35,000 CHF" stops matching as money, falls
+// through to the bare-number rule, borrows the supplier's default unit and
+// publishes MOQ 35,000 CASES. A currency we cannot store has to be recognised
+// precisely so that it can be refused.
+const SUPPORTED_MOQ_CURRENCIES = new Set(['EUR', 'USD', 'GBP', 'AED', 'SGD']);
 
 const CUR_SYM = '€|£|\\$';
 const CUR_WORD = 'eur|euros?|usd|dollars?|gbp|pounds?|sterling|aed|sgd|chf|pln|czk|ron|dkk|sek|nok';
@@ -303,6 +316,10 @@ function normaliseLine(line) {
   }
 
   if (moq && moq.note) notes.push(moq.note);
+  // Surface it in the weekly digest: a currency arriving that the field cannot
+  // hold is either a one-off, or a supplier we now trade with in a new
+  // currency and the field needs another option.
+  if (moq && moq.unsupportedCurrency) unrecognised.push(trim60(moq.raw || ''));
 
   // `MOQ Currency` is only meaningful on an order value.
   if (moq && moq.type !== 'Order Value') moq.currency = '';
@@ -475,6 +492,16 @@ function readMoqValue(window, fromEnd) {
   const money = allMoney(w);
   if (money.length) {
     const best = money.reduce((a, b) => (b.amount < a.amount ? b : a));
+    if (!SUPPORTED_MOQ_CURRENCIES.has(best.currency)) {
+      // A minimum exists and we have read it correctly — we simply cannot
+      // store it. Returning here (rather than falling through) is the whole
+      // point: it stops the bare-number rule downstream from taking the
+      // amount and pairing it with the supplier's default unit.
+      return { type: 'Applies — Unspecified', qty: null, currency: '',
+               start: best.start, end: best.end,
+               unsupportedCurrency: best.currency,
+               note: `The minimum is stated in ${best.currency}, which MOQ Currency has no option for — the amount was read but not published` };
+    }
     const note = allCounts(w).length
       ? 'Both an order value and a unit count were stated as the minimum; the order value was taken'
       : '';
