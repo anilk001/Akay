@@ -47,6 +47,10 @@ node n8n/tests/buy-side-guard.test.js     # WhatsApp classifier tests
 node n8n/tests/split-quantity.test.js
 node n8n/tests/trade-terms.test.js        # MOQ / lead-time ingestion parser
 node n8n/tests/trade-terms-digest.test.js
+
+# put a soundtrack on a silent offer video (needs ffmpeg on PATH,
+# or a one-off `npm i -D ffmpeg-static` — deliberately not a dependency)
+node scripts/add-video-audio.mjs offer.mp4
 ```
 
 ## Layout
@@ -63,6 +67,11 @@ node n8n/tests/trade-terms-digest.test.js
 - `src/components/SiteSearch.astro` — header search form on every page
 - `src/pages/search.astro` + `search-index.json.ts` — client-side search over
   the public-safe index (see `tests/` for the acceptance cases)
+- `scripts/add-video-audio.mjs` — adds an original, self-synthesised music
+  bed (and optionally a voiceover, ducked underneath) to a silent offer
+  video; the bed itself lives in `scripts/music-bed.mjs`. The audio is
+  generated from scratch rather than taken from a stock library, so there is
+  no music licence to track on anything AKAY posts
 - `n8n/` — mirrors of the JavaScript inside n8n Code nodes + plain-Node tests
   (a PostToolUse hook runs them after any edit under `n8n/`). Includes
   `trade-terms-normaliser/` — the one sub-workflow all four ingestion pipelines
