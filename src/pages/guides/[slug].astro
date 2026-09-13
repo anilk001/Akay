@@ -1,5 +1,5 @@
 ---
-import SiteSearch from '../../components/SiteSearch.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
 import { guides, getGuideBySlug, getAllGuidesSlugs } from '../../data/guides.mjs';
 import { articleSchema, organizationSchema, crumbs } from '../../lib/schema.mjs';
 import Seo from '../../components/Seo.astro';
@@ -149,7 +149,7 @@ const breadcrumbData = crumbs([
 
     body {
       margin: 0;
-      padding: 20px;
+      padding: 0;
       background: var(--paper);
       color: var(--ink);
       font: 16px / 1.6 var(--sans);
@@ -249,6 +249,7 @@ const breadcrumbData = crumbs([
     .container {
       max-width: 780px;
       margin: 0 auto;
+      padding: 20px;
     }
 
     .breadcrumb {
@@ -422,8 +423,8 @@ const breadcrumbData = crumbs([
   </style>
 </head>
 <body>
+  <SiteHeader section="Guides" width={780} />
   <div class="container">
-    <SiteSearch />
     <div class="breadcrumb">
       <a href="/">Home</a> / <a href="/guides/">Guides</a> / {guide.title}
     </div>

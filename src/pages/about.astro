@@ -1,5 +1,5 @@
 ---
-import SiteSearch from '../components/SiteSearch.astro';
+import SiteHeader from '../components/SiteHeader.astro';
 import { organizationSchema, crumbs } from '../lib/schema.mjs';
 import Seo from '../components/Seo.astro';
 import { WA_LINK, WA_DISPLAY } from '../lib/whatsapp.mjs';
@@ -55,7 +55,7 @@ const pageDesc = 'AKAY Trade: Ireland-based B2B wholesale trading company specia
 
     body {
       margin: 0;
-      padding: 20px;
+      padding: 0;
       background: var(--paper);
       color: var(--ink);
       font: 16px / 1.6 var(--sans);
@@ -84,6 +84,7 @@ const pageDesc = 'AKAY Trade: Ireland-based B2B wholesale trading company specia
     .container {
       max-width: 780px;
       margin: 0 auto;
+      padding: 20px;
     }
 
     .breadcrumb {
@@ -192,8 +193,8 @@ const pageDesc = 'AKAY Trade: Ireland-based B2B wholesale trading company specia
   </style>
 </head>
 <body>
+  <SiteHeader section="About" width={780} />
   <div class="container">
-    <SiteSearch />
     <div class="breadcrumb">
       <a href="/">Home</a> / About
     </div>

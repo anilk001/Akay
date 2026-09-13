@@ -1,5 +1,5 @@
 ---
-import SiteSearch from '../../components/SiteSearch.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
 import { getOffers } from '../../data/airtable.mjs';
 import { withSlugs } from '../../lib/slug.mjs';
 import { productOfferSchema, breadcrumbSchema, organizationSchema } from '../../lib/schema.mjs';
@@ -159,7 +159,7 @@ if (offer.stock === 'in') {
 
     body {
       margin: 0;
-      padding: 20px;
+      padding: 0;
       background: var(--paper);
       color: var(--ink);
       font: 16px / 1.5 var(--sans);
@@ -184,6 +184,7 @@ if (offer.stock === 'in') {
     .container {
       max-width: 720px;
       margin: 0 auto;
+      padding: 20px;
     }
 
     .breadcrumb {
@@ -320,8 +321,8 @@ if (offer.stock === 'in') {
   </style>
 </head>
 <body>
+  <SiteHeader section={offer.category} width={720} />
   <div class="container">
-    <SiteSearch />
     <div class="breadcrumb">
       <a href="/">Home</a> / <a href={`/category/${categorySlug}/`}>{offer.category}</a> / {offer.name}
     </div>

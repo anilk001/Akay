@@ -5,7 +5,7 @@ import Seo from '../components/Seo.astro';
 import { withSlugs, categorySlug } from '../lib/slug.mjs';
 import { guides } from '../data/guides.mjs';
 import { enquiryLink, WA_LINK } from '../lib/whatsapp.mjs';
-import SiteSearch from '../components/SiteSearch.astro';
+import SiteHeader from '../components/SiteHeader.astro';
 
 const { offers: rawOffers, source } = await getOffers();
 
@@ -110,19 +110,8 @@ const stats = [
     body{background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.5;-webkit-font-smoothing:antialiased}
     .wrap{max-width:1200px;margin:0 auto;padding:0 20px}
 
-    header.bar{position:sticky;top:0;z-index:40;background:color-mix(in srgb,var(--paper) 86%,transparent);
-      backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
-    .bar-in{display:flex;align-items:center;gap:16px;height:60px}
-    .mark{display:inline-flex;align-items:center;gap:9px;font-family:var(--serif);font-weight:600;font-size:26px;letter-spacing:.02em;color:var(--ink);text-decoration:none;line-height:1}
-    .logo-slot{flex-shrink:0;height:34px;width:auto;filter:drop-shadow(0 1px 2px rgba(0,0,0,.18))}
-    .mark b{color:var(--brass)}
-    .dot{width:6px;height:6px;border-radius:50%;background:var(--brass-2);display:inline-block;margin:0 2px 2px 2px}
-    .bar-sub{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.04em}
-    @media (max-width:640px){.bar-sub{display:none}}
-    .bar-spacer{flex:1}
-    .theme-btn{border:1px solid var(--line);background:var(--card);color:var(--ink-soft);border-radius:9px;
-      height:34px;padding:0 12px;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
-    .theme-btn:hover{border-color:var(--brass-2);color:var(--ink)}
+    /* The header bar lives in src/components/SiteHeader.astro — the one
+       header every page renders. Sticky elements below it assume 60px. */
 
     .hero{border-bottom:1px solid var(--line);background:
       radial-gradient(120% 140% at 100% 0,color-mix(in srgb,var(--forest) 12%,transparent),transparent 55%),
@@ -348,20 +337,7 @@ const stats = [
     <symbol id="i-wa" viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.5A10 10 0 1 0 12 2Zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-1.7-.1-.4-.1-.9-.3-1.6-.6-2.8-1.2-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8 0-1.3.7-2 .9-2.2.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5.2.6.8 2 .9 2.1.1.1.1.3 0 .5-.1.2-.1.3-.3.5l-.4.5c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.4 1.5.3.1.5.1.6-.1.2-.2.7-.8.9-1.1.2-.3.4-.2.6-.1l1.8.9c.3.1.5.2.5.3.1.2.1.7-.1 1.4Z"/></symbol>
   </svg>
 
-  <header class="bar">
-    <div class="wrap bar-in">
-      <a class="mark" href="/" aria-label="AKAY home">
-        <img class="logo-slot" src="/akay-bird.png" alt="" width="320" height="279" />AKAY<span class="dot"></span><b>trade</b>
-      </a>
-      <span class="bar-sub">akay.ie</span>
-      <span class="bar-spacer"></span>
-      <SiteSearch compact />
-      <button class="theme-btn" id="themeBtn" aria-label="Toggle light or dark theme">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5 19 19M19 5l-1.5 1.5M6.5 17.5 5 19"/></svg>
-        <span id="themeLbl">Theme</span>
-      </button>
-    </div>
-  </header>
+  <SiteHeader theme />
 
   <section class="hero">
     <div class="wrap hero-in">

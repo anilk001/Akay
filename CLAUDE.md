@@ -58,7 +58,12 @@ node n8n/tests/split-quantity.test.js
 - `src/pages/` — index, category/offer/guide pages, sitemap, robots, llms.txt
 - `src/lib/` — fetch script, schema, slugs, WhatsApp link helpers,
   `normalise.mjs` + `search-engine.mjs` (shared by build, browser and tests)
-- `src/components/SiteSearch.astro` — header search form on every page
+- `src/components/SiteHeader.astro` — the one header every page renders: the
+  akay.ie wordmark, an optional section label, the search box and (home and
+  search only) the theme toggle. The site shows a single identity — akay.ie —
+  so no page should hand-roll a masthead or a second brand name. The bar is
+  60px tall; sticky elements below it assume that
+- `src/components/SiteSearch.astro` — the search form inside the header
 - `src/pages/search.astro` + `search-index.json.ts` — client-side search over
   the public-safe index (see `tests/` for the acceptance cases)
 - `n8n/` — WhatsApp offer-ingestion scripts + plain-Node tests (a PostToolUse

@@ -1,5 +1,5 @@
 ---
-import SiteSearch from '../../components/SiteSearch.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
 import { getOffers } from '../../data/airtable.mjs';
 import { withSlugs } from '../../lib/slug.mjs';
 import { categoryItemListSchema, organizationSchema, crumbs } from '../../lib/schema.mjs';
@@ -130,7 +130,7 @@ const breadcrumbData = crumbs([
 
     body {
       margin: 0;
-      padding: 20px;
+      padding: 0;
       background: var(--paper);
       color: var(--ink);
       font: 16px / 1.5 var(--sans);
@@ -155,6 +155,7 @@ const breadcrumbData = crumbs([
     .container {
       max-width: 1000px;
       margin: 0 auto;
+      padding: 20px;
     }
 
     .breadcrumb {
@@ -288,8 +289,8 @@ const breadcrumbData = crumbs([
   </style>
 </head>
 <body>
+  <SiteHeader section={category} width={1000} />
   <div class="container">
-    <SiteSearch />
     <div class="breadcrumb">
       <a href="/">Home</a> / {category}
     </div>

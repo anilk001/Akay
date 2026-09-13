@@ -52,6 +52,16 @@ for (const f of FIELDS) {
   if (isForbiddenField(f)) throw new Error(`[airtable] FIELDS contains a non-public field: "${f}"`);
 }
 
+// The catalogue moved to the apex domain, but Public Notes written before the
+// move still send buyers to offers.akay.ie. That host only 301s here, and in a
+// note it reads as a separate site, so it is rewritten on read — live rows and
+// the committed snapshot alike. akay.ie is the one name the site shows.
+const LEGACY_HOST = /(https?:\/\/)?(?:www\.)?\boffers\.akay\.ie/gi;
+
+export function publicNote(text = '') {
+  return String(text).replace(LEGACY_HOST, (_m, scheme) => `${scheme || ''}akay.ie`);
+}
+
 const INCOTERMS = ['EXW', 'FCA', 'FOB', 'CFR', 'CIF', 'DAP', 'DDP', 'DPU', 'CPT', 'CIP', 'FAS'];
 
 // Keyword fallback for Unit Type when the Airtable field is blank. Only fires on
@@ -209,7 +219,7 @@ function normalize(fields, recordId = null) {
     moq: fields['MOQ'] || '',
     leadTime: fields['Lead Time'] || '',
     bbd: fields['BBD'] || '',
-    note: fields['Public Note'] || '',
+    note: publicNote(fields['Public Note'] || ''),
     offerDate: fields['Offer Date'] || '',
     expiryDate: fields['Auto Expiry Date'] || '',
   };
@@ -302,6 +312,7 @@ function renormalizeSnapshotOffer(o, index) {
         : headline ? headline.amount
         : o.amount,
     priceBasis: headline ? (headline.basis || '') : (o.priceBasis || ''),
+    note: publicNote(o.note || ''),
     qty: typeof o.qty === 'number' ? Math.round(o.qty) : o.qty,
   });
 }

@@ -8,6 +8,7 @@ import { categorySlug } from '../lib/slug.mjs';
 import { guides } from '../data/guides.mjs';
 import Seo from '../components/Seo.astro';
 import { WA_LINK, WA_DISPLAY } from '../lib/whatsapp.mjs';
+import SiteHeader from '../components/SiteHeader.astro';
 
 const { offers } = await getOffers();
 const categories = Array.from(new Set(offers.map((o) => o.category).filter(Boolean))).sort();
@@ -34,7 +35,7 @@ const categories = Array.from(new Set(offers.map((o) => o.category).filter(Boole
     }
     *{box-sizing:border-box}
     body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.6}
-    .container{max-width:720px;margin:0 auto;padding:60px 20px}
+    .container{max-width:720px;margin:0 auto;padding:44px 20px 60px}
     h1{font-family:var(--serif);font-size:clamp(28px,5vw,40px);margin:0 0 12px;line-height:1.1}
     .lede{color:var(--muted);margin:0 0 28px}
     h2{font-size:15px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:32px 0 12px}
@@ -47,6 +48,7 @@ const categories = Array.from(new Set(offers.map((o) => o.category).filter(Boole
   </style>
 </head>
 <body>
+  <SiteHeader width={720} />
   <div class="container">
     <h1>That page isn't here</h1>
     <p class="lede">

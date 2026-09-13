@@ -8,6 +8,7 @@ import { organizationSchema, crumbs } from '../../lib/schema.mjs';
 import { SITE_URL } from '../../lib/site.mjs';
 import Seo from '../../components/Seo.astro';
 import { WA_LINK, WA_DISPLAY } from '../../lib/whatsapp.mjs';
+import SiteHeader from '../../components/SiteHeader.astro';
 
 const orgSchema = organizationSchema();
 const breadcrumbData = crumbs([
@@ -76,6 +77,7 @@ const pageDesc =
   </style>
 </head>
 <body>
+  <SiteHeader section="Guides" width={820} />
   <div class="container">
     <nav class="breadcrumb" aria-label="Breadcrumb">
       <a href="/">Home</a> / Guides

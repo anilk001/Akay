@@ -8,7 +8,7 @@
 // restores the previous state. No Airtable call ever happens client-side.
 import { organizationSchema } from '../lib/schema.mjs';
 import { WA_LINK } from '../lib/whatsapp.mjs';
-import SiteSearch from '../components/SiteSearch.astro';
+import SiteHeader from '../components/SiteHeader.astro';
 
 const GA4_ID = import.meta.env.PUBLIC_GA4_ID || 'G-FW42J5609V';
 const pageTitle = 'Search offers — AKAY Trade';
@@ -86,19 +86,8 @@ const pageDesc = 'Search AKAY\'s live wholesale catalogue: spirits, beer, soft d
     .wrap{max-width:1200px;margin:0 auto;padding:0 20px}
     a{color:var(--brass)}
 
-    header.bar{position:sticky;top:0;z-index:40;background:color-mix(in srgb,var(--paper) 86%,transparent);
-      backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
-    .bar-in{display:flex;align-items:center;gap:16px;height:60px}
-    .mark{display:inline-flex;align-items:center;gap:9px;font-family:var(--serif);font-weight:600;font-size:26px;letter-spacing:.02em;color:var(--ink);text-decoration:none;line-height:1}
-    .logo-slot{flex-shrink:0;height:34px;width:auto;filter:drop-shadow(0 1px 2px rgba(0,0,0,.18))}
-    .mark b{color:var(--brass)}
-    .dot{width:6px;height:6px;border-radius:50%;background:var(--brass-2);display:inline-block;margin:0 2px 2px 2px}
-    .bar-sub{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.04em}
-    .bar-spacer{flex:1}
-    .theme-btn{border:1px solid var(--line);background:var(--card);color:var(--ink-soft);border-radius:9px;
-      height:34px;padding:0 12px;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
-    .theme-btn:hover{border-color:var(--brass-2);color:var(--ink)}
-    @media (max-width:640px){.bar-sub,.theme-btn span{display:none}}
+    /* The header bar lives in src/components/SiteHeader.astro — the one
+       header every page renders. .sbar below sticks under its 60px. */
 
     /* Sticky search bar */
     .sbar{position:sticky;top:60px;z-index:30;background:color-mix(in srgb,var(--paper) 92%,transparent);
@@ -235,19 +224,7 @@ const pageDesc = 'Search AKAY\'s live wholesale catalogue: spirits, beer, soft d
   </style>
 </head>
 <body>
-  <header class="bar">
-    <div class="wrap bar-in">
-      <a class="mark" href="/" aria-label="AKAY home">
-        <img class="logo-slot" src="/akay-bird.png" alt="" width="320" height="279" />AKAY<span class="dot"></span><b>trade</b>
-      </a>
-      <span class="bar-sub">akay.ie / search</span>
-      <span class="bar-spacer"></span>
-      <button class="theme-btn" id="themeBtn" aria-label="Toggle light or dark theme">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5 19 19M19 5l-1.5 1.5M6.5 17.5 5 19"/></svg>
-        <span id="themeLbl">Theme</span>
-      </button>
-    </div>
-  </header>
+  <SiteHeader section="Search" search={false} theme />
 
   <section class="sbar">
     <div class="wrap sbar-in">

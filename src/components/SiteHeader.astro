@@ -1,0 +1,81 @@
+---
+// The site's ONE header. Every page renders this and nothing else at the top,
+// so the catalogue presents a single identity — akay.ie — instead of the three
+// it used to show (an "AKAY·trade" wordmark on the home and search pages, an
+// "akay.ie" sub-label beside it, and no header at all on the inner pages).
+//
+// Self-contained: the bar reads the page's own design tokens (--paper, --ink,
+// --line, --brass …) with fallbacks, so it looks native on both the home page's
+// full token set and the leaner inner-page palettes.
+//
+// The row is 60px tall on purpose. The home and search pages park their own
+// sticky elements at `top:60px` underneath it.
+import SiteSearch from './SiteSearch.astro';
+
+interface Props {
+  /** Small mono label for the site area, e.g. "Guides". Omit on the home page. */
+  section?: string;
+  /** Compact search box in the bar. Off on /search/, which has its own. */
+  search?: boolean;
+  /** Light/dark toggle. Only pages that define [data-theme] overrides and the
+   *  toggle script (home, search) should ask for it. */
+  theme?: boolean;
+  /** Width of the content column this header sits above, so the wordmark lines
+   *  up with the page body. */
+  width?: number;
+}
+const { section = '', search = true, theme = false, width = 1200 } = Astro.props;
+---
+<header class="sh-bar">
+  <div class="sh-in" style={`--sh-max:${width}px`}>
+    <a class="sh-mark" href="/" aria-label="akay.ie home">
+      <img class="sh-logo" src="/akay-bird.png" alt="" width="320" height="279" /><span class="sh-name">AKAY<b>.ie</b></span>
+    </a>
+    {section && <span class="sh-sub">{section}</span>}
+    <span class="sh-spacer"></span>
+    {search && <SiteSearch compact />}
+    {theme && (
+      <button class="sh-theme" id="themeBtn" aria-label="Toggle light or dark theme">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5 19 19M19 5l-1.5 1.5M6.5 17.5 5 19"/></svg>
+        <span id="themeLbl">Theme</span>
+      </button>
+    )}
+  </div>
+</header>
+
+<style>
+  .sh-bar{position:sticky;top:0;z-index:40;background:var(--paper,#F7F5F0);
+    border-bottom:1px solid var(--line,#E4E0D4)}
+  /* Translucent only where color-mix is supported; the flat --paper above is
+     the fallback, so the bar is never transparent over scrolling content. */
+  @supports (background:color-mix(in srgb,#000 50%,transparent)){
+    .sh-bar{background:color-mix(in srgb,var(--paper,#F7F5F0) 86%,transparent);backdrop-filter:blur(10px)}
+  }
+  .sh-in{max-width:var(--sh-max,1200px);margin:0 auto;padding:0 20px;
+    display:flex;align-items:center;gap:16px;height:60px}
+  .sh-mark{flex-shrink:0;display:inline-flex;align-items:center;gap:9px;text-decoration:none;line-height:1;
+    font-family:var(--serif,Georgia,"Times New Roman",serif);font-weight:600;font-size:26px;
+    letter-spacing:.02em;color:var(--ink,#17140F)}
+  /* One word, one name: "AKAY.ie" — the dot is a real full stop so the
+     wordmark spells the domain instead of reading as two labels. */
+  .sh-name{white-space:nowrap}
+  .sh-mark b{color:var(--brass,#B4231F);font-weight:600}
+  .sh-logo{flex-shrink:0;height:34px;width:auto;filter:drop-shadow(0 1px 2px rgba(0,0,0,.18))}
+  .sh-sub{font-family:var(--mono,ui-monospace,Menlo,Consolas,monospace);font-size:12px;
+    color:var(--muted,#767E72);letter-spacing:.04em}
+  .sh-spacer{flex:1}
+  /* The search box is the only element allowed to shrink, so a narrow bar
+     squeezes it instead of pushing it off the right edge. */
+  .sh-in :global(.site-search){flex:1 1 auto;min-width:0}
+  .sh-theme{border:1px solid var(--line,#E4E0D4);background:var(--card,#fff);
+    color:var(--ink-soft,var(--muted,#41473F));border-radius:9px;height:34px;padding:0 12px;
+    font-size:13px;font-family:inherit;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+  .sh-theme:hover{border-color:var(--brass-2,var(--brass,#B4231F));color:var(--ink,#17140F)}
+  @media (max-width:640px){
+    .sh-in{gap:10px}
+    .sh-mark{font-size:22px}
+    .sh-logo{height:28px}
+    /* Nothing to push against on a phone — the search takes the rest of the row. */
+    .sh-sub,.sh-theme span,.sh-spacer{display:none}
+  }
+</style>
