@@ -29,11 +29,7 @@
       }
     },
     "playwright": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@playwright/mcp@latest"
-      ]
+      "command": "${CLAUDE_PROJECT_DIR:-.}/.claude/scripts/playwright-mcp.sh"
     },
     "context7": {
       "command": "npx",
