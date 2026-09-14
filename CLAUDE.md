@@ -47,6 +47,7 @@ node n8n/tests/buy-side-guard.test.js     # WhatsApp classifier tests
 node n8n/tests/split-quantity.test.js
 node n8n/tests/trade-terms.test.js        # MOQ / lead-time ingestion parser
 node n8n/tests/trade-terms-digest.test.js
+node n8n/tests/instant-quote-intake.test.js   # Instant Quote intake payload rules
 ```
 
 ## Layout
@@ -66,7 +67,10 @@ node n8n/tests/trade-terms-digest.test.js
 - `n8n/` — mirrors of the JavaScript inside n8n Code nodes + plain-Node tests
   (a PostToolUse hook runs them after any edit under `n8n/`). Includes
   `trade-terms-normaliser/` — the one sub-workflow all four ingestion pipelines
-  call to parse MOQ and lead time into typed fields at ingestion
+  call to parse MOQ and lead time into typed fields at ingestion, and
+  `instant-quote-intake/` — the webhook the Trade Desk API calls after pricing a
+  buyer's uploaded list: logs it to Airtable against the client and emails the
+  priced file to ak@akay.ie
 - `quote/` — the **Trade Desk** SPA published at quote.akay.ie: a pre-built
   React bundle deployed by its own Netlify project (`sellnin-trade-desk`), not
   by this build — `.github/workflows/deploy-quote.yml` publishes it whenever
