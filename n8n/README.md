@@ -22,6 +22,7 @@ between 2026-07-29 and 2026-08-27. A draft in n8n is invisible until published.
 | `whatsapp-offer-broadcast/build-results.js` | `BeGfFpgxmI7hdCTI` | Build Results | full source, **published 2026-09-04** |
 | `trade-terms-normaliser/normalise-trade-terms.js` | `WQ6A8IVLSAd72fnk` | Normalise Trade Terms | full source, **published 2026-09-13** (v3: bare ex-stock) |
 | `trade-terms-digest/build-parse-digest.js` | *(not built in n8n yet)* | Build Parse Digest | full source, **not published** |
+| `signature-harvest/harvest-contact-details.js` | *(not built in n8n yet)* | Harvest Contact Details | full source, **not published** |
 
 The four WhatsApp nodes and the trade-terms normaliser are live. **Excel Offer
 Ingestion** (`j1NAhQEKz9hzi1T2`) now calls the normaliser on every line — as a
@@ -57,6 +58,57 @@ characters is unreadable, and some editors strip them silently, which would
 break the pattern without any visible change to the source.
 
 ## Changes in this commit
+
+**Reply signatures fill blank contact fields instead of being thrown away**
+(`signature-harvest/`)
+
+Offer emails reply to ak@akay.ie, so every auto-reply, out-of-office and short
+"not this month, try me in October" lands in the mailbox `Email Enquiry Intake`
+already polls. That workflow discards them on purpose — `NOISE_SUBJECT` matches
+"out of office" and "automatic reply" — which is correct for enquiries and
+throws away the best contact data we receive. An out-of-office is the one
+message that reliably carries a full signature block.
+
+`harvest-contact-details.js` reads those messages and fills **blank** Contacts
+fields: `Contact Name`, `Company`, `Phone (E.164)`. It never overwrites.
+
+The whole design is shaped by one instruction (Anil, 2026-09-14): use the
+details of the person we emailed; if they belong to somebody else, do not
+process the message. That is not fussiness. A large share of out-of-office
+replies read "in my absence please contact Jane Murphy, jane@other.com,
++353 87 …", and harvesting that writes Jane onto the buyer's row — a
+plausible-looking contact belonging to nobody, in the table used for outreach.
+Worse than the blank it replaced, because a blank is visibly missing and a wrong
+name is not. So two independent signals reject the WHOLE message rather than the
+offending line: a handover phrase anywhere in the harvest region, or any email
+address there that is not the sender's own. Both fail closed. The cost is missed
+harvests, which is the right way round.
+
+Our own addresses are exempt from the second guard — auto-responders echo
+"your email to offers@akay.ie", and without the exemption almost nothing would
+ever be harvested.
+
+Two things it deliberately does NOT do:
+
+- **Company is never derived from the email domain.** That turns gmail.com into
+  "Gmail" and a personal address into a fake employer. Only a line carrying a
+  real company suffix (Ltd, GmbH, B.V., …) is read.
+- **WhatsApp is never written.** A number in a signature is not proof of a
+  WhatsApp account. Contact Sync already establishes that properly by checking
+  numbers against Whapi and setting `On WhatsApp` / `WhatsApp Chat ID` from a
+  real sighting, so a harvested number goes into `Phone (E.164)` and the Monday
+  sync confirms it. Asserting WhatsApp here would put unverified numbers into
+  the broadcast audience.
+
+Phone normalisation is lifted from Contact Sync's `norm()` rather than rewritten,
+so a number harvested here produces the identical E.164 key — otherwise the same
+person becomes two Contacts rows. Never-guess is preserved: a national-format
+number with no country evidence is left unwritten.
+
+`DEFAULT_DRY_RUN` is `true`. It stays that way until a batch of real proposals
+has been eyeballed.
+
+## Earlier changes (published 2026-09-13)
 
 **Trade terms are parsed at ingestion instead of being backfilled later**
 (`trade-terms-normaliser/`, `trade-terms-digest/`)
@@ -132,8 +184,10 @@ Plain node, no framework. `npm test` runs all of them:
     node n8n/tests/buy-side-guard.test.js
     node n8n/tests/trade-terms.test.js
     node n8n/tests/trade-terms-digest.test.js
+    node n8n/tests/signature-harvest.test.js
 
-The two trade-terms tests **load and execute the node source** rather than
+The two trade-terms tests and the signature-harvest test **load and execute the
+node source** rather than
 re-typing it — `new Function('$input', src)`, since a Code node is a function
 body — so the test and the text pasted into n8n cannot drift. The two older
 tests predate that harness and still hold their own copy of the logic; worth
@@ -142,6 +196,16 @@ converting when either is next touched.
 Cases are real messages from the WhatsApp Log. The buy-side test asserts both
 directions: sell-side messages must stay `Supplier Offer`, buy-side must become
 `Other`.
+
+The signature-harvest cases are mostly REFUSALS, because that node's entire risk
+is writing one person's details onto another person's row: the handover phrase,
+the colleague's address on the same domain, the national number with no country
+evidence, the domain that must not become a company name. Its first version of
+the test helper merged the per-case override into `json` instead of into
+`fields`, so three "never overwrite" assertions silently tested a row whose
+fields were still blank and passed for the wrong reason. Worth remembering when
+adding cases: assert the refusals hardest, and check a passing test is testing
+what it claims.
 
 Note `node --check` fails on `extract-wa-offers.js` with "Illegal return
 statement". That is expected — an n8n Code node is a function *body*, so
