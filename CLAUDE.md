@@ -53,6 +53,9 @@ build time → static HTML → Netlify.
    workflow rather than building another one-shot; a one-shot is for a genuine
    one-off, and each one adds another template that can disagree with the
    others. Sending is never auto-approved: the content prompt stays.
+   Enforced: a PreToolUse hook (`.claude/hooks/protect-send-path.mjs`) blocks
+   any Gmail `send_message` or `forward` with a recipient outside `@akay.ie`.
+   Replies on a client's own thread, drafts, and internal mail are not blocked.
 
 ## Commands
 
@@ -70,6 +73,7 @@ node n8n/tests/instant-quote-intake.test.js   # Instant Quote intake payload rul
 node n8n/tests/offer-invariants.test.js       # the gate before every Create Offers
 node n8n/tests/supplier-identity.test.js      # shared supplier resolution
 node tests/approval-gate-hook.test.js         # the human-only-gate hook
+node tests/send-path-hook.test.js             # client mail goes through Resend
 ```
 
 ## Layout

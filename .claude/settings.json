@@ -53,6 +53,15 @@
             "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/protect-airtable-fields.mjs\""
           }
         ]
+      },
+      {
+        "matcher": "mcp__Gmail__.*|mcp__gmail__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/protect-send-path.mjs\""
+          }
+        ]
       }
     ],
     "PostToolUse": [
