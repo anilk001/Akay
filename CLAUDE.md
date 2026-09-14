@@ -34,6 +34,12 @@ build time → static HTML → Netlify.
    in `dist/` or any non-allowlisted key in `dist/search-index.json`. The
    allowlist is `PUBLIC_KEYS` in `src/lib/search-index-keys.mjs`, shared by
    the endpoint and the checker.
+5. **`Listing Approved` is a human-only field.** It is Anil's go/no-go on
+   publishing an offer and is set by a person in Airtable, never by Claude or
+   any automation. When ingesting offers, leave it empty and leave any
+   existing value untouched — do not set it even when every other field
+   parses cleanly and the rest of the batch is approved. Say in your summary
+   that the rows are waiting on approval.
 
 ## Commands
 
