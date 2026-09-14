@@ -9,6 +9,7 @@
 import { organizationSchema } from '../lib/schema.mjs';
 import { WA_LINK } from '../lib/whatsapp.mjs';
 import SiteSearch from '../components/SiteSearch.astro';
+import QuoteLink from '../components/QuoteLink.astro';
 
 const GA4_ID = import.meta.env.PUBLIC_GA4_ID || 'G-FW42J5609V';
 const pageTitle = 'Search offers — AKAY Trade';
@@ -98,7 +99,20 @@ const pageDesc = 'Search AKAY\'s live wholesale catalogue: spirits, beer, soft d
     .theme-btn{border:1px solid var(--line);background:var(--card);color:var(--ink-soft);border-radius:9px;
       height:34px;padding:0 12px;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
     .theme-btn:hover{border-color:var(--brass-2);color:var(--ink)}
-    @media (max-width:640px){.bar-sub,.theme-btn span{display:none}}
+    /* The bar also carries the Trade Desk link now. It has to stay exactly one
+       60px row — .sbar and the facet column below it are sticky at fixed
+       offsets from the bar's bottom edge — so on a phone the wordmark shrinks
+       and the link keeps its icon only. (Unlike the catalogue's bar, this one
+       has no search box for a lone bubble icon to be confused with.) */
+    @media (max-width:640px){
+      .bar-sub,.theme-btn span{display:none}
+      .bar-in{gap:10px}
+      .mark{font-size:20px;gap:7px}
+      .logo-slot{height:26px}
+      .theme-btn{padding:0 9px}
+      .bar-in > .quote-link span{display:none}
+      .bar-in > .quote-link{padding:0 9px}
+    }
 
     /* Sticky search bar */
     .sbar{position:sticky;top:60px;z-index:30;background:color-mix(in srgb,var(--paper) 92%,transparent);
@@ -242,6 +256,7 @@ const pageDesc = 'Search AKAY\'s live wholesale catalogue: spirits, beer, soft d
       </a>
       <span class="bar-sub">akay.ie / search</span>
       <span class="bar-spacer"></span>
+      <QuoteLink compact />
       <button class="theme-btn" id="themeBtn" aria-label="Toggle light or dark theme">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5 19 19M19 5l-1.5 1.5M6.5 17.5 5 19"/></svg>
         <span id="themeLbl">Theme</span>

@@ -21,6 +21,23 @@ export const LOCALE = 'en_IE';
 // belongs here once confirmed.)
 export const SAME_AS = ['https://www.facebook.com/163964083657461'];
 
+// The Trade Desk (the React app in quote/, deployed to its own Netlify
+// project). It is a separate origin from the catalogue, and its two tabs are
+// hash routed — an unknown hash falls back to the chat tab. Written down once
+// here, like SITE_URL, so moving the tool is one edit rather than a grep.
+export const QUOTE_URL = 'https://quote.akay.ie';
+const QUOTE_TABS = ['chat', 'excel'];
+
+/**
+ * Link into the Trade Desk. `quoteUrl('chat')` opens Ask AKAY, `'excel'` the
+ * buying-list upload. An unknown tab returns the bare origin rather than a
+ * hash the app would silently drop.
+ */
+export function quoteUrl(tab = 'chat') {
+  const id = String(tab || '').replace(/^#/, '').toLowerCase();
+  return QUOTE_TABS.includes(id) ? `${QUOTE_URL}/#${id}` : QUOTE_URL;
+}
+
 // The "ask us to re-confirm this price" endpoint (n8n workflow
 // GHZu605lfGOlf2eW). Written down once here for the same reason SITE_URL is:
 // if the automation moves, it is one edit rather than a grep.

@@ -1,5 +1,5 @@
 ---
-import SiteSearch from '../../components/SiteSearch.astro';
+import HeaderTools from '../../components/HeaderTools.astro';
 import { getOffers } from '../../data/airtable.mjs';
 import { withSlugs, brandPages } from '../../lib/slug.mjs';
 import { productOfferSchema, breadcrumbSchema, organizationSchema } from '../../lib/schema.mjs';
@@ -381,7 +381,7 @@ if (!isDelisted && offer.stock === 'in' && offer.qty) {
 </head>
 <body>
   <div class="container">
-    <SiteSearch />
+    <HeaderTools />
     <div class="breadcrumb">
       <a href="/">Home</a> / <a href={`/category/${categorySlug}/`}>{offer.category}</a>
       {brandSlug && <> / <a href={`/brands/${brandSlug}/`}>{offer.brand}</a></>} / {offer.name}

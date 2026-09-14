@@ -5,6 +5,7 @@ import { brandCollectionSchema, organizationSchema } from '../../lib/schema.mjs'
 import { priceLabel } from '../../lib/price.mjs';
 import { listingTermsLine } from '../../lib/trade-terms.mjs';
 import Seo from '../../components/Seo.astro';
+import QuoteLink from '../../components/QuoteLink.astro';
 
 export async function getStaticPaths() {
   // Live stock only — sold-out archive pages link back here, never the
@@ -211,6 +212,7 @@ const pageDesc = `Buy ${brand} wholesale from AKAY Trade: ${sorted.length} live 
 </head>
 <body>
   <div class="container">
+    <QuoteLink />
     <div class="breadcrumb">
       <a href="/">Home</a> / <a href="/brands/">Brands</a> / {brand}
     </div>

@@ -8,6 +8,7 @@ import { categorySlug } from '../lib/slug.mjs';
 import { guides } from '../data/guides.mjs';
 import Seo from '../components/Seo.astro';
 import { WA_LINK, WA_DISPLAY } from '../lib/whatsapp.mjs';
+import QuoteLink from '../components/QuoteLink.astro';
 
 const { offers } = await getOffers();
 const categories = Array.from(new Set(offers.map((o) => o.category).filter(Boolean))).sort();
@@ -48,6 +49,7 @@ const categories = Array.from(new Set(offers.map((o) => o.category).filter(Boole
 </head>
 <body>
   <div class="container">
+    <QuoteLink />
     <h1>That page isn't here</h1>
     <p class="lede">
       The offer may have sold out, or its listing changed name — our catalogue

@@ -1,0 +1,13 @@
+# Netlify configuration for the AKAY Trade Desk at quote.akay.ie
+# (Netlify project "sellnin-trade-desk").
+#
+# This directory holds a *pre-built* Vite bundle, so there is no build command:
+# Netlify publishes these files as they are. Point the project at this folder
+# with Site configuration → Build & deploy → Base directory: `quote`, and
+# Netlify reads this file rather than the catalogue's root netlify.toml.
+#
+# Routing and caching stay in `_redirects` / `_headers` next to this file so a
+# drag-and-drop deploy of this same folder behaves identically.
+
+[build]
+  publish = "."

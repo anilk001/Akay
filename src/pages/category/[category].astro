@@ -1,11 +1,12 @@
 ---
-import SiteSearch from '../../components/SiteSearch.astro';
+import HeaderTools from '../../components/HeaderTools.astro';
 import { getOffers } from '../../data/airtable.mjs';
 import { withSlugs } from '../../lib/slug.mjs';
 import { categoryItemListSchema, organizationSchema, crumbs } from '../../lib/schema.mjs';
 import Seo from '../../components/Seo.astro';
 import { priceLabel } from '../../lib/price.mjs';
 import { listingTermsLine } from '../../lib/trade-terms.mjs';
+import { QUOTE_URL, quoteUrl } from '../../lib/site.mjs';
 
 export async function getStaticPaths() {
   const { offers } = await getOffers();
@@ -297,7 +298,7 @@ const breadcrumbData = crumbs([
 </head>
 <body>
   <div class="container">
-    <SiteSearch />
+    <HeaderTools />
     <div class="breadcrumb">
       <a href="/">Home</a> / {category}
     </div>
@@ -307,7 +308,7 @@ const breadcrumbData = crumbs([
       <p>{introLine}</p>
       <p>
         Prices are indicative and move with the market. Upload your buying list in
-        any format at <a href="https://quote.akay.ie">quote.akay.ie</a> and get it
+        any format at <a href={quoteUrl('excel')} rel="nofollow">{QUOTE_URL.replace('https://', '')}</a> and get it
         back priced on the spot — see
         <a href="/guides/requirement-list-format/">how to send a requirement list</a>.
         {tiers.length > 0 && <> Duty status on this page: {listPhrase(tiers, 5)} — see <a href="/guides/t1-vs-t2-duty-status/">T1 vs T2 explained</a>.</>}

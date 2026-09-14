@@ -1,0 +1,36 @@
+---
+// Header entry point to the Trade Desk at quote.akay.ie. It is a separate
+// origin (its own Netlify project), so this is an external link — but a first
+// party one, hence no rel="noopener" dance and no new tab: buyers who came to
+// price a list should not end up with two AKAY tabs open.
+//
+// The tool is noindex, so the link carries rel="nofollow": there is nothing
+// for a crawler to fetch behind it, and the catalogue's own pages are what
+// should absorb the crawl budget.
+//
+// Styled with the same design tokens SiteSearch uses, with fallbacks, because
+// every page template defines its own copy of the --line/--card/--ink set.
+import { quoteUrl } from '../lib/site.mjs';
+interface Props { compact?: boolean; }
+const { compact = false } = Astro.props;
+---
+<a class:list={['quote-link', { compact }]} href={quoteUrl('chat')} rel="nofollow"
+   title="Ask AKAY for prices, or upload your buying list and get it back priced">
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M20 12.2c0 3.8-3.6 6.9-8 6.9-.9 0-1.8-.1-2.6-.4L4 20.5l1.5-3.4A6.4 6.4 0 0 1 4 12.2c0-3.8 3.6-6.9 8-6.9s8 3.1 8 6.9Z"
+          stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+  </svg>
+  <span>Ask AKAY</span>
+</a>
+
+<style>
+  .quote-link{display:inline-flex;align-items:center;gap:7px;height:40px;padding:0 14px;flex:0 0 auto;margin:0 0 18px;
+    border:1px solid var(--line,#E4E0D4);border-radius:10px;background:var(--card,#fff);
+    color:var(--ink,#17140F);font-family:var(--sans,system-ui,sans-serif);font-size:13px;font-weight:600;
+    text-decoration:none;white-space:nowrap}
+  .quote-link svg{color:var(--brass,#B4231F);flex:0 0 auto}
+  .quote-link:hover{border-color:var(--brass,#B4231F);color:var(--brass,#B4231F)}
+  .quote-link:focus-visible{outline:2px solid var(--brass-2,var(--brass,#B4231F));outline-offset:1px}
+  /* In a header row the parent owns the spacing. */
+  .quote-link.compact{margin:0;height:34px;padding:0 11px;border-radius:9px;font-size:12.5px}
+</style>

@@ -94,6 +94,18 @@ Node 20), so Netlify needs almost no dashboard config.
    (and optionally `AIRTABLE_BASE_ID`). Build-time only; never shipped to the browser.
 3. **Deploy.** Netlify builds the site; the build fetches live offers.
 
+### The Trade Desk — a second Netlify project
+
+`quote/` is a separate, pre-built React app published at **quote.akay.ie** (Netlify
+project `sellnin-trade-desk`), not part of this build: the catalogue's `npm run build`
+never looks at it, and its own project publishes the folder as-is with no build
+command. `.github/workflows/deploy-quote.yml` pushes it to Netlify whenever
+`quote/` changes on this branch (repository secret: `NETLIFY_AUTH_TOKEN`), and
+gives a pull request that touches it a draft URL to check first.
+Catalogue pages link to it, so the two ship together — see
+[`quote/README.md`](./quote/README.md) for how to deploy it and what has to be true
+outside the repo (API CORS, Turnstile domain).
+
 ### Refresh when offers change
 The site is static, so it reflects Airtable as of the last build. To refresh:
 - Create a **Build Hook** (Site configuration → Build & deploy → Build hooks) and
@@ -168,6 +180,8 @@ src/
     search-engine.mjs     inverted index with exact/prefix/fuzzy matching
   components/
     SiteSearch.astro      header search form used on every page
+    QuoteLink.astro       "Ask AKAY" link to the Trade Desk (quote.akay.ie)
+    HeaderTools.astro     search box + Trade Desk link, as one header row
   pages/
     index.astro           the catalogue (design + interactivity)
     search.astro          instant search with facets (/search)
@@ -177,4 +191,5 @@ scripts/
 tests/                    node tests for the normaliser and engine
 public/
   akay-bird.png           logo (hummingbird, transparent)
+quote/                    the Trade Desk SPA published at quote.akay.ie
 ```

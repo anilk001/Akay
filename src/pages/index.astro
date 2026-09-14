@@ -6,6 +6,8 @@ import { withSlugs, categorySlug, brandPages } from '../lib/slug.mjs';
 import { guides } from '../data/guides.mjs';
 import { enquiryLink, WA_LINK } from '../lib/whatsapp.mjs';
 import SiteSearch from '../components/SiteSearch.astro';
+import QuoteLink from '../components/QuoteLink.astro';
+import { quoteUrl } from '../lib/site.mjs';
 
 const { offers: rawOffers, source } = await getOffers();
 
@@ -123,7 +125,28 @@ const stats = [
     .mark b{color:var(--brass)}
     .dot{width:6px;height:6px;border-radius:50%;background:var(--brass-2);display:inline-block;margin:0 2px 2px 2px}
     .bar-sub{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.04em}
-    @media (max-width:640px){.bar-sub{display:none}}
+    /* Between the phone breakpoint and a wide desktop the bar holds the
+       wordmark, search, the Trade Desk link and the toggle: search yields its
+       width first (its min-content floor is lifted), but never below a box a
+       query is still readable in — under that the phone layout takes over. */
+    .bar-in > .site-search{min-width:200px}
+    /* The bar carries the wordmark, search, the Trade Desk link and the theme
+       toggle. Below 760px that is more than one row can hold: the wordmark and
+       the toggle shrink, and search moves to a second row rather than being
+       squeezed into what is left. (Without this the bar overflowed the
+       viewport and the whole page scrolled sideways.) */
+    /* "akay.ie" is the first thing the bar can afford to lose. */
+    @media (max-width:900px){.bar-sub{display:none}}
+    @media (max-width:760px){
+      .bar-in{gap:10px;height:auto;flex-wrap:wrap;padding:9px 0}
+      .mark{font-size:20px;gap:7px}
+      .logo-slot{height:26px}
+      #themeLbl{display:none}
+      .theme-btn{padding:0 9px}
+      /* Search drops to its own full-width row rather than being squeezed to a
+         box too narrow to read a query in. */
+      .bar-in > .site-search{order:5;flex:1 0 100%;max-width:none}
+    }
     .bar-spacer{flex:1}
     .theme-btn{border:1px solid var(--line);background:var(--card);color:var(--ink-soft);border-radius:9px;
       height:34px;padding:0 12px;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
@@ -263,7 +286,11 @@ const stats = [
       text-transform:uppercase;color:#fff;background:#B4231F;padding:3px 8px;border-radius:6px;margin-bottom:12px}
     .card.feat-on{border-color:color-mix(in srgb,var(--brass-2) 50%,var(--line))}
 
-    .controls{position:sticky;top:60px;z-index:30;background:color-mix(in srgb,var(--paper) 90%,transparent);
+    /* --bar-h is the header's real height, set from the DOM (see the script at
+       the end of the page): the bar wraps to a second row on narrow screens,
+       so this cannot be the flat 60px it used to be or the filter bar sticks
+       underneath the header and disappears behind it. */
+    .controls{position:sticky;top:var(--bar-h,60px);z-index:30;background:color-mix(in srgb,var(--paper) 90%,transparent);
       backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:14px 0}
     .controls-in{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
     .search{position:relative;flex:1;min-width:220px;margin:0}
@@ -361,6 +388,7 @@ const stats = [
       <span class="bar-sub">akay.ie</span>
       <span class="bar-spacer"></span>
       <SiteSearch compact />
+      <QuoteLink compact />
       <button class="theme-btn" id="themeBtn" aria-label="Toggle light or dark theme">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5 19 19M19 5l-1.5 1.5M6.5 17.5 5 19"/></svg>
         <span id="themeLbl">Theme</span>
@@ -405,7 +433,7 @@ const stats = [
           </li>
         </ol>
         <div class="iq-cta">
-          <a class="cta-quote" href="https://quote.akay.ie">
+          <a class="cta-quote" href={quoteUrl('excel')} rel="nofollow">
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M12 15.5V3.5m0 0L7.8 7.7M12 3.5l4.2 4.2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               <path d="M4 15.5V18a2.5 2.5 0 0 0 2.5 2.5h11A2.5 2.5 0 0 0 20 18v-2.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -586,6 +614,15 @@ const stats = [
   </footer>
 
   <script>
+    // The header holds the wordmark, search, the Trade Desk link and the theme
+    // toggle, and wraps to a second row on narrow screens. Publish its real
+    // height so the sticky filter bar sits directly under it at every width.
+    const bar = document.querySelector('header.bar');
+    const setBarHeight = () =>
+      document.documentElement.style.setProperty('--bar-h', `${bar.offsetHeight}px`);
+    setBarHeight();
+    new ResizeObserver(setBarHeight).observe(bar);
+
     const grid = document.getElementById('grid');
     const cards = Array.from(grid.children);
 

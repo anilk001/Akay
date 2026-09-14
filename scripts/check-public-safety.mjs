@@ -1,11 +1,14 @@
 #!/usr/bin/env node
-// Post-build assertion: nothing private may exist in dist/.
+// Post-build assertion: nothing private may exist in dist/ — or in quote/.
 //
 // Runs as part of `npm run build` (and in CI). Fails the build if:
 //   1. dist/search-index.json carries any key outside the public allowlist, or
 //      any key/value that looks like a forbidden Airtable field;
 //   2. any generated HTML/JS/JSON/TXT/XML contains a forbidden field name,
-//      an Airtable token, or the token environment variable name.
+//      an Airtable token, or the token environment variable name. quote/ is
+//      scanned by the same rule: it is a hand-dropped bundle that deploys
+//      straight to quote.akay.ie with no build step of its own to catch a
+//      private field someone baked into it.
 //
 // Field names are matched case-sensitively as they are spelled in Airtable so
 // ordinary prose ("1,000+ suppliers", "we never publish supplier names") is
@@ -17,6 +20,8 @@ import { generateSlug } from '../src/lib/slug.mjs';
 import { PUBLIC_KEYS as PUBLIC_KEYS_LIST } from '../src/lib/search-index-keys.mjs';
 
 const DIST = join(process.cwd(), 'dist');
+const QUOTE = join(process.cwd(), 'quote');
+const rel = (p) => p.replace(process.cwd() + '/', '');
 const PUBLIC_KEYS = new Set(PUBLIC_KEYS_LIST);
 
 // Exact Airtable column names that must never appear in output.
@@ -77,17 +82,17 @@ if (!existsSync(indexPath)) {
   console.log(`[public-safety] search-index.json: ${data.offers?.length ?? 0} offers, ${(bytes / 1024).toFixed(0)} KB, keys OK`);
 }
 
-// 2. Every generated text file.
-const files = walk(DIST);
+// 2. Every generated text file, and the Trade Desk bundle beside it.
+const files = [...walk(DIST), ...(existsSync(QUOTE) ? walk(QUOTE) : [])];
 let scanned = 0;
 for (const file of files) {
   const text = readFileSync(file, 'utf8');
   scanned += 1;
   for (const s of FORBIDDEN_STRINGS) {
-    if (text.includes(s)) problems.push(`${file.replace(DIST, 'dist')}: contains forbidden field name "${s}"`);
+    if (text.includes(s)) problems.push(`${rel(file)}: contains forbidden field name "${s}"`);
   }
   for (const re of FORBIDDEN_REGEX) {
-    if (re.test(text)) problems.push(`${file.replace(DIST, 'dist')}: matches ${re}`);
+    if (re.test(text)) problems.push(`${rel(file)}: matches ${re}`);
   }
 }
 console.log(`[public-safety] scanned ${scanned} files`);
@@ -98,4 +103,4 @@ if (problems.length) {
   if (problems.length > 50) console.error(`  … and ${problems.length - 50} more`);
   process.exit(1);
 }
-console.log('[public-safety] OK — no forbidden fields or secrets in dist/');
+console.log(`[public-safety] OK — no forbidden fields or secrets in dist/${existsSync(QUOTE) ? ' or quote/' : ''}`);
