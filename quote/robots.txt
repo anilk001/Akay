@@ -1,0 +1,7 @@
+# The Trade Desk is a tool, not content: it is behind a human-verification
+# check and every answer is generated per buyer. `_headers` already sends
+# X-Robots-Tag: noindex for every path; this file keeps crawlers from spending
+# requests on the SPA shell in the first place. The catalogue at akay.ie is
+# what should be indexed.
+User-agent: *
+Disallow: /
