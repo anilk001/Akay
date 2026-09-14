@@ -1,0 +1,106 @@
+name: Deploy the Trade Desk
+
+# Publishes quote/ to quote.akay.ie (Netlify project "sellnin-trade-desk").
+#
+# That project is NOT connected to this repo: it has always been fed by zip
+# upload, which means a patched bundle only reached buyers when somebody
+# remembered to drag it into the Netlify UI. This workflow makes the commit the
+# deploy — push a new build into quote/ on the site branch and it goes live.
+#
+# The catalogue itself is untouched by this: akay.ie is a different Netlify
+# project that builds dist/ from the same branch, and it ignores quote/.
+#
+# REQUIRED: add a repository secret named NETLIFY_AUTH_TOKEN
+#   (Settings -> Secrets and variables -> Actions -> New repository secret).
+#   Netlify -> User settings -> Applications -> Personal access tokens -> New
+#   access token. It can deploy anything in the team, so keep it to Actions.
+#   The site id below is not a secret — it identifies the project, and the
+#   token is what authorises the deploy.
+#
+# A pull request that touches quote/ gets a DRAFT deploy instead: a throwaway
+# URL (printed in the run summary) serving that bundle, so a patched build can
+# be opened and clicked through before it replaces the live one.
+
+on:
+  push:
+    branches: [claude/softr-webflow-migration-50kj20]
+    paths:
+      - 'quote/**'
+      - '.github/workflows/deploy-quote.yml'
+  pull_request:
+    paths:
+      - 'quote/**'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+# Never let two deploys of the same ref race each other to production.
+concurrency:
+  group: trade-desk-deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    # A fork's PR cannot see the secret, so the deploy step would fail for a
+    # reason the contributor cannot fix. Skip it there instead.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      # Only to run the Netlify CLI — nothing here is built. The CLI needs a
+      # newer Node than the catalogue's own build pins.
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Publish quote/ to Netlify
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: b2702e95-028a-4547-ba48-994858190bda
+          # Production for the site branch and for a manual run; a draft URL
+          # for a pull request.
+          IS_PROD: ${{ github.event_name != 'pull_request' }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${NETLIFY_AUTH_TOKEN:-}" ]; then
+            echo "::error::NETLIFY_AUTH_TOKEN is not set — quote.akay.ie was NOT updated."
+            echo "::error::Add it in Settings -> Secrets and variables -> Actions."
+            exit 1
+          fi
+
+          # quote/ is a pre-built bundle: it is published exactly as committed,
+          # with its own _redirects, _headers and robots.txt beside it.
+          ARGS=(deploy --dir=quote --site="$NETLIFY_SITE_ID" --json
+                --message="${GITHUB_REF_NAME} ${GITHUB_SHA:0:7}")
+          if [ "$IS_PROD" = "true" ]; then
+            ARGS+=(--prod)
+          fi
+
+          npx --yes netlify-cli@27 "${ARGS[@]}" | tee deploy.json
+
+          # --json puts the result on stdout, but be tolerant of anything the
+          # CLI prints around it: a missing URL must not fail a good deploy.
+          URL=$(node -e '
+            const t = require("fs").readFileSync("deploy.json", "utf8");
+            const m = t.match(/\{[\s\S]*\}/);
+            let u = "";
+            try { const d = JSON.parse(m ? m[0] : "{}"); u = d.deploy_url || d.url || ""; } catch {}
+            console.log(u);
+          ')
+
+          {
+            if [ "$IS_PROD" = "true" ]; then
+              echo "### Trade Desk deployed to production"
+              echo ""
+              echo "Live at https://quote.akay.ie${URL:+ — this deploy: $URL}"
+            else
+              echo "### Trade Desk draft deploy"
+              echo ""
+              echo "Preview this bundle${URL:+ at $URL} — quote.akay.ie is unchanged."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

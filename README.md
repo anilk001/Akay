@@ -98,7 +98,10 @@ Node 20), so Netlify needs almost no dashboard config.
 
 `quote/` is a separate, pre-built React app published at **quote.akay.ie** (Netlify
 project `sellnin-trade-desk`), not part of this build: the catalogue's `npm run build`
-never looks at it, and its own project publishes the folder as-is with no build command.
+never looks at it, and its own project publishes the folder as-is with no build
+command. `.github/workflows/deploy-quote.yml` pushes it to Netlify whenever
+`quote/` changes on this branch (repository secret: `NETLIFY_AUTH_TOKEN`), and
+gives a pull request that touches it a draft URL to check first.
 Catalogue pages link to it, so the two ship together — see
 [`quote/README.md`](./quote/README.md) for how to deploy it and what has to be true
 outside the repo (API CORS, Turnstile domain).

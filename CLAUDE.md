@@ -69,7 +69,8 @@ node n8n/tests/trade-terms-digest.test.js
   call to parse MOQ and lead time into typed fields at ingestion
 - `quote/` — the **Trade Desk** SPA published at quote.akay.ie: a pre-built
   React bundle deployed by its own Netlify project (`sellnin-trade-desk`), not
-  by this build. Catalogue pages link into it through `quoteUrl()` in
+  by this build — `.github/workflows/deploy-quote.yml` publishes it whenever
+  `quote/` changes. Catalogue pages link into it through `quoteUrl()` in
   `src/lib/site.mjs`; `quote/README.md` covers deploys and the API/Turnstile
   settings it depends on
 - `.claude/` — skills (offers-catalogue, offer-data-validator,

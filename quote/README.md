@@ -32,17 +32,26 @@ accumulate), keep the files below, and deploy.
 
 ## Deploying
 
-The Netlify project is **sellnin-trade-desk** (`quote.akay.ie`). It has been
-deployed by zip upload so far, which works but leaves no trail:
+The Netlify project is **sellnin-trade-desk** (`quote.akay.ie`). It is not
+connected to this repo — it has always been fed by zip upload — so
+[`.github/workflows/deploy-quote.yml`](../.github/workflows/deploy-quote.yml)
+does the upload instead:
 
-- **Preferred — connect it to this repo.** Site configuration → Build & deploy:
-  Repository `anilk001/Akay`, **Base directory `quote`**, no build command,
-  publish directory `.` (Netlify reads this folder's `netlify.toml`). Every
-  push that touches `quote/` then redeploys the tool, and nothing else in the
-  repo can trigger it. The catalogue's own project (`thunderous-florentine`)
-  keeps building `dist/` from the root and never sees this folder.
-- **Fallback — drag and drop.** Zip the *contents* of this folder (not the
-  folder itself) onto the project's Deploys tab.
+- **Push a new build into `quote/` on the site branch and it goes live.** The
+  workflow runs only when something under `quote/` changed (or from the Actions
+  tab, *Run workflow*). It needs one repository secret, `NETLIFY_AUTH_TOKEN`
+  (Netlify → User settings → Applications → Personal access tokens); without it
+  the run fails loudly rather than pretending to deploy.
+- **A pull request that touches `quote/` gets a draft deploy** on a throwaway
+  URL, printed in the run summary, so a patched bundle can be clicked through
+  before it replaces the live one.
+
+Two ways to do it without the workflow, if you ever need them: drag the
+*contents* of this folder (not the folder itself) onto the project's Deploys
+tab, or connect the project to this repo with **Base directory `quote`**, no
+build command, publish directory `.` — it then reads this folder's
+`netlify.toml`. The catalogue's own project (`thunderous-florentine`) keeps
+building `dist/` from the repo root and never sees this folder either way.
 
 ## What has to be true outside this repo
 
