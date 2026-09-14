@@ -104,3 +104,32 @@ jobs:
               echo "Preview this bundle${URL:+ at $URL} — quote.akay.ie is unchanged."
             fi
           } >> "$GITHUB_STEP_SUMMARY"
+
+      # A deploy that "succeeded" but left the old bundle up is the failure
+      # mode this whole workflow exists to remove, so prove it rather than
+      # trust it: the asset filenames are content hashes, so the live page
+      # naming the committed one is proof it is really serving this build.
+      - name: Check the live page serves this bundle
+        if: github.event_name != 'pull_request'
+        env:
+          BASE_URL: https://quote.akay.ie
+        run: |
+          set -euo pipefail
+
+          ASSET=$(grep -o '/assets/[A-Za-z0-9._-]*\.js' quote/index.html | head -1)
+          if [ -z "$ASSET" ]; then
+            echo "::warning::quote/index.html names no hashed script — nothing to verify."
+            exit 0
+          fi
+
+          for attempt in 1 2 3 4 5; do
+            if curl -fsS --max-time 20 "$BASE_URL/" | grep -qF "$ASSET"; then
+              echo "$BASE_URL is serving $ASSET." >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+            echo "Attempt $attempt: $BASE_URL is not serving $ASSET yet."
+            sleep 6
+          done
+
+          echo "::error::$BASE_URL is not serving $ASSET — the deploy reported success but the live page still has an older bundle. Check the project's published deploy in Netlify."
+          exit 1
