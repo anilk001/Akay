@@ -1,0 +1,20 @@
+---
+// The one-row page header used by the catalogue templates that open with a
+// search box: search on the left, the Trade Desk link beside it. Pages import
+// this instead of SiteSearch so the two stay aligned in a single place.
+import SiteSearch from './SiteSearch.astro';
+import QuoteLink from './QuoteLink.astro';
+interface Props { value?: string; }
+const { value = '' } = Astro.props;
+---
+<div class="hdr-tools">
+  <SiteSearch value={value} />
+  <QuoteLink />
+</div>
+
+<style>
+  .hdr-tools{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 18px}
+  /* SiteSearch carries its own bottom margin for pages that use it alone. */
+  .hdr-tools > :global(.site-search){margin:0;flex:1 1 300px}
+  .hdr-tools > :global(.quote-link){margin:0}
+</style>

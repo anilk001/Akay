@@ -8,6 +8,7 @@ import { organizationSchema, crumbs } from '../../lib/schema.mjs';
 import { SITE_URL } from '../../lib/site.mjs';
 import Seo from '../../components/Seo.astro';
 import { WA_LINK, WA_DISPLAY } from '../../lib/whatsapp.mjs';
+import QuoteLink from '../../components/QuoteLink.astro';
 
 const orgSchema = organizationSchema();
 const breadcrumbData = crumbs([
@@ -77,6 +78,7 @@ const pageDesc =
 </head>
 <body>
   <div class="container">
+    <QuoteLink />
     <nav class="breadcrumb" aria-label="Breadcrumb">
       <a href="/">Home</a> / Guides
     </nav>

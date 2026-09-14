@@ -1,8 +1,9 @@
 ---
-import SiteSearch from '../components/SiteSearch.astro';
+import HeaderTools from '../components/HeaderTools.astro';
 import { organizationSchema, crumbs } from '../lib/schema.mjs';
 import Seo from '../components/Seo.astro';
 import { WA_LINK, WA_DISPLAY } from '../lib/whatsapp.mjs';
+import { QUOTE_URL, quoteUrl } from '../lib/site.mjs';
 
 const orgSchema = organizationSchema();
 const breadcrumbData = crumbs([
@@ -193,7 +194,7 @@ const pageDesc = 'AKAY Trade: Ireland-based B2B wholesale trading company specia
 </head>
 <body>
   <div class="container">
-    <SiteSearch />
+    <HeaderTools />
     <div class="breadcrumb">
       <a href="/">Home</a> / About
     </div>
@@ -352,7 +353,7 @@ const pageDesc = 'AKAY Trade: Ireland-based B2B wholesale trading company specia
     <div class="section" style="background: var(--paper-2); border: 2px solid var(--brass);">
       <h2 style="margin-top: 0; color: var(--brass);">How to Enquire</h2>
       <p>
-        Browse the live catalogue at <a href="/">akay.ie</a>, then upload your buying list at <a href="https://quote.akay.ie">quote.akay.ie</a> — any format, no template — and download it back with our selling price on every line. Or send the list to us directly:
+        Browse the live catalogue at <a href="/">akay.ie</a>, then upload your buying list at <a href={quoteUrl('excel')} rel="nofollow">{QUOTE_URL.replace('https://', '')}</a> — any format, no template — and download it back with our selling price on every line. Or send the list to us directly:
       </p>
       <div class="contact-info">
         <p>
