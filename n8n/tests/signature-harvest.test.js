@@ -213,9 +213,9 @@ check('no sender address at all', r.reason, 'no-sender');
 section('Dry run');
 
 r = one({ fromEmail: 'john@dutchbev.nl', fromName: 'John de Vries', body: 'Regards,\nJohn de Vries\nDutch Beverages B.V.' });
-check('DEFAULT_DRY_RUN is on until deliberately flipped', r.dryRun, true);
-r = one({ fromEmail: 'john@dutchbev.nl', fromName: 'John de Vries', body: 'Regards,\nJohn de Vries\nDutch Beverages B.V.', dryRun: false });
-check('per-item override works', r.dryRun, false);
+check('DEFAULT_DRY_RUN is off - writes are live by instruction', r.dryRun, false);
+r = one({ fromEmail: 'john@dutchbev.nl', fromName: 'John de Vries', body: 'Regards,\nJohn de Vries\nDutch Beverages B.V.', dryRun: true });
+check('per-item override works', r.dryRun, true);
 
 // ── 9. Order and shape ─────────────────────────────────────────────────────
 section('Batch shape');
@@ -227,6 +227,70 @@ const batch = run([
 ]);
 check('one output item per input item', batch.length, 3);
 check('order preserved', batch.map((b) => b._action), ['update', 'skip', 'skip']);
+
+// ── 10. The Gmail node's own output shapes ─────────────────────────────────
+section('Consumes Gmail output directly');
+
+r = one({
+  from: { value: [{ address: 'John@DutchBev.nl', name: 'John de Vries' }] },
+  subject: 'Automatic reply',
+  text: 'Away until Monday.\n\nRegards,\nJohn de Vries\nDutch Beverages B.V.',
+});
+check('parsed From object', r._action, 'update');
+check('  address lower-cased for matching', r.fromEmail, 'john@dutchbev.nl');
+check('  name taken from the header', r.fields['Contact Name'], 'John de Vries');
+
+r = one({
+  from: '"de Vries, John" <john@dutchbev.nl>',
+  text: 'Regards,\nJohn de Vries\nDutch Beverages B.V.',
+});
+check('From as a raw header string', r._action, 'update');
+check('  address extracted from angle brackets', r.fromEmail, 'john@dutchbev.nl');
+
+r = one({
+  from: { text: 'John de Vries <john@dutchbev.nl>' },
+  text: 'Regards,\nJohn de Vries\nDutch Beverages B.V.',
+});
+check('From as { text }', r.fromEmail, 'john@dutchbev.nl');
+
+r = one({
+  from: { value: [{ address: 'john@dutchbev.nl', name: 'John de Vries' }] },
+  snippet: 'Regards, John de Vries Dutch Beverages B.V.',
+});
+check('falls back to snippet when text is absent', r._action, 'update');
+
+// ── 11. The PATCH payload ──────────────────────────────────────────────────
+section('PATCH payload carries only resolved keys');
+
+r = one({
+  fromEmail: 'john@dutchbev.nl', fromName: 'John de Vries',
+  body: 'Regards,\nJohn de Vries\nSenior Buyer',
+});
+check('only the name was found', r.fields, { 'Contact Name': 'John de Vries' });
+check('  so only that key is in the payload', JSON.parse(r.body), { fields: { 'Contact Name': 'John de Vries' }, typecast: true });
+check('  and Company is absent, not empty', Object.prototype.hasOwnProperty.call(JSON.parse(r.body).fields, 'Company'), false);
+
+r = one({ fromEmail: 'stranger@nowhere.com', body: 'hi' });
+check('skips carry no payload', r.body, undefined);
+
+// ── 12. Mail is read from the trigger by name, not from $input ─────────────
+section('Reads Inbox Poll by name when it is in the chain');
+
+{
+  const rows = [contact()];
+  const mail = { fromEmail: 'john@dutchbev.nl', fromName: 'John de Vries', body: 'Regards,\nJohn de Vries\nDutch Beverages B.V.' };
+  const $ = (name) => {
+    if (name === 'Contacts') return { all: () => rows };
+    if (name === 'Inbox Poll') return { all: () => [{ json: mail }] };
+    throw new Error('unexpected node ' + name);
+  };
+  // $input deliberately carries the CONTACT rows, which is what the real chain
+  // delivers here. If the node read $input it would find no messages at all.
+  const got = nodeFn({ all: () => rows }, $).map((i) => i.json);
+  check('messages come from Inbox Poll', got.length, 1);
+  check('  and are parsed, not the contact rows', got[0]._action, 'update');
+  check('  filling the blanks', got[0].fields['Company'], 'Dutch Beverages B.V.');
+}
 
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

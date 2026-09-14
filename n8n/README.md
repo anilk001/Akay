@@ -22,7 +22,7 @@ between 2026-07-29 and 2026-08-27. A draft in n8n is invisible until published.
 | `whatsapp-offer-broadcast/build-results.js` | `BeGfFpgxmI7hdCTI` | Build Results | full source, **published 2026-09-04** |
 | `trade-terms-normaliser/normalise-trade-terms.js` | `WQ6A8IVLSAd72fnk` | Normalise Trade Terms | full source, **published 2026-09-13** (v3: bare ex-stock) |
 | `trade-terms-digest/build-parse-digest.js` | *(not built in n8n yet)* | Build Parse Digest | full source, **not published** |
-| `signature-harvest/harvest-contact-details.js` | *(not built in n8n yet)* | Harvest Contact Details | full source, **not published** |
+| `signature-harvest/harvest-contact-details.js` | `dKuv3Ltxw9BmhTkS` | Harvest Contact Details | full source, **published 2026-09-14** |
 
 The four WhatsApp nodes and the trade-terms normaliser are live. **Excel Offer
 Ingestion** (`j1NAhQEKz9hzi1T2`) now calls the normaliser on every line — as a
@@ -105,8 +105,22 @@ so a number harvested here produces the identical E.164 key — otherwise the sa
 person becomes two Contacts rows. Never-guess is preserved: a national-format
 number with no country evidence is left unwritten.
 
-`DEFAULT_DRY_RUN` is `true`. It stays that way until a batch of real proposals
-has been eyeballed.
+`DEFAULT_DRY_RUN` is `false` and the workflow is LIVE (`dKuv3Ltxw9BmhTkS`,
+published 2026-09-14): harvested details go straight onto the Contacts row with
+no approval queue, per Anil — a review queue was more work than the risk
+justified. The safety is not a human check, it is the two fail-closed guards
+plus blanks-only writing, so the worst case is a wrong value in a field that was
+empty, never a good value replaced.
+
+Writes go through an HTTP Request PATCH rather than the Airtable node. The
+Airtable node maps a fixed set of columns, so a field a given run did not find
+would be sent as an empty string and would wipe whatever was already there —
+the exact opposite of this node's one promise. Client Self-Update already writes
+this way for the same reason.
+
+The workflow points at `ERROR HANDLER — Akay Alerts` (`OnCFbngmILTKsdkw`), so a
+broken run emails ak@akay.ie rather than failing quietly — which is how the
+Contact Sync outage ran for ten days before anyone noticed.
 
 ## Earlier changes (published 2026-09-13)
 

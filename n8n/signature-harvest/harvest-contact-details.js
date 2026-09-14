@@ -54,25 +54,51 @@
  * confirms WhatsApp instead of this node asserting it. Asserting it here would
  * put unverified numbers into the broadcast audience.
  *
- * INPUT (one item per candidate email, `json`):
- *   fromEmail   sender address from the From header
- *   fromName    display name from the From header  (may be absent)
- *   subject     subject line                        (may be absent)
- *   body        plain-text body                     (may be absent)
+ * INPUT (one item per candidate email, `json`): the Gmail node's own output,
+ * consumed directly so there is no untyped mapper node between the mailbox and
+ * the tested logic.
+ *   from        From header, in any of the three shapes the Gmail node emits
+ *               (object with .value[], object with .text, or a plain string)
+ *   text        plain-text body      (snippet is used if absent)
+ *   subject     subject line         (may be absent)
+ *   fromEmail   explicit override, used by the tests and by a re-run harness
+ *   fromName    explicit override
+ *   body        explicit override of `text`
  *   dryRun      optional per-item override of DEFAULT_DRY_RUN
  *
  * Contacts are read from the "Contacts" node ($('Contacts').all()), fetched
  * once upstream, so matching happens in memory rather than one lookup per mail.
  *
+ * Mail is read from the "Inbox Poll" node BY NAME, not from $input. The Contacts
+ * fetch sits between the trigger and this node in the chain, so $input here is
+ * the contact rows, not the messages - the same reason Email Enquiry Intake
+ * reads $('ak@akay.ie Inbox') rather than its own input. $input is the fallback
+ * so the node stays runnable (and testable) when fed messages directly.
+ *
  * OUTPUT (one item per input item, order preserved):
  *   _action   'update' when there is something to write, otherwise 'skip'
  *   id        Contacts record id            (update only)
  *   fields    ONLY the blank fields now filled (update only)
+ *   body      the PATCH payload, ready for the HTTP Request node (update only)
  *   reason    why it was skipped            (skip only)
  *   evidence  what matched, for the review log
+ *
+ * WHY `body` AND NOT THE AIRTABLE NODE.
+ * The Airtable node maps a fixed set of columns, so a field this run did not
+ * find would be sent as an empty string and would WIPE the value already in the
+ * row - the exact opposite of this node's one promise. A PATCH carrying only
+ * the keys that were actually resolved cannot do that. Client Self-Update
+ * already writes this way for the same reason.
  */
 
-const DEFAULT_DRY_RUN = true;
+/**
+ * LIVE (Anil, 2026-09-14): harvested details are written straight to the
+ * Contacts row, with no approval queue. The safety here is not a human check,
+ * it is the two fail-closed guards above plus blanks-only writing: the worst
+ * case is a wrong value in a field that was empty, never a good value replaced.
+ * Set to true to have the node report what it would write and write nothing.
+ */
+const DEFAULT_DRY_RUN = false;
 
 /** Handover phrases. Any hit rejects the message: the text names someone else. */
 const HANDOVER = new RegExp([
@@ -176,6 +202,22 @@ function toE164(raw, knownCountry) {
 }
 
 const norm = (e) => String(e == null ? '' : e).trim().toLowerCase();
+
+/**
+ * The Gmail node emits From in three different shapes depending on version and
+ * on whether the header parsed cleanly. Same helper Email Enquiry Intake uses.
+ */
+function addr(x) {
+  if (!x) return { email: '', name: '' };
+  if (typeof x === 'string') {
+    const m = x.match(/<([^>]+)>/);
+    return { email: norm(m ? m[1] : x), name: m ? x.replace(/<[^>]+>/, '').replace(/"/g, '').trim() : '' };
+  }
+  const v = Array.isArray(x.value) ? x.value[0] : null;
+  if (v) return { email: norm(v.address), name: v.name || '' };
+  if (x.text) return addr(x.text);
+  return { email: '', name: '' };
+}
 const clean = (s, n) => String(s == null ? '' : s).replace(/[\r\n\t]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, n);
 const blank = (v) => v === null || v === undefined || String(v).trim() === '';
 
@@ -257,10 +299,16 @@ for (const it of contacts) {
   if (e && !byEmail[e]) byEmail[e] = { id: j.id, f: f };
 }
 
-for (const item of $input.all()) {
+let mails;
+try { mails = $('Inbox Poll').all(); } catch (e) { mails = $input.all(); }
+
+for (const item of mails) {
   const j = (item && item.json) || {};
   const dryRun = j.dryRun === undefined ? DEFAULT_DRY_RUN : !!j.dryRun;
-  const fromEmail = norm(j.fromEmail);
+  const parsed = addr(j.from || j.From);
+  const fromEmail = norm(j.fromEmail || parsed.email);
+  const fromName = j.fromName || parsed.name;
+  const rawBody = j.body !== undefined && j.body !== null ? j.body : (j.text || j.snippet || '');
   const push = (o) => out.push({ json: Object.assign({ fromEmail: fromEmail, dryRun: dryRun }, o) });
 
   if (!fromEmail) { push({ _action: 'skip', reason: 'no-sender' }); continue; }
@@ -274,7 +322,7 @@ for (const item of $input.all()) {
   const wantPhone = blank(cur['Phone (E.164)']);
   if (!wantName && !wantCompany && !wantPhone) { push({ _action: 'skip', reason: 'nothing-missing' }); continue; }
 
-  const region = harvestRegion(j.body);
+  const region = harvestRegion(rawBody);
 
   // Guard 1 — the text hands off to somebody else.
   if (HANDOVER.test(region)) { push({ _action: 'skip', reason: 'handover-phrase' }); continue; }
@@ -290,7 +338,7 @@ for (const item of $input.all()) {
   const evidence = [];
 
   if (wantName) {
-    const nm = plausibleName(j.fromName) || nameFromSignoff(lines);
+    const nm = plausibleName(fromName) || nameFromSignoff(lines);
     if (nm) { fields['Contact Name'] = nm; evidence.push('name'); }
   }
   if (wantCompany) {
@@ -304,7 +352,13 @@ for (const item of $input.all()) {
 
   if (!Object.keys(fields).length) { push({ _action: 'skip', reason: 'nothing-found' }); continue; }
 
-  push({ _action: 'update', id: hit.id, fields: fields, evidence: evidence.join('+') });
+  push({
+    _action: 'update',
+    id: hit.id,
+    fields: fields,
+    body: JSON.stringify({ fields: fields, typecast: true }),
+    evidence: evidence.join('+'),
+  });
 }
 
 const upd = out.filter((o) => o.json._action === 'update').length;
