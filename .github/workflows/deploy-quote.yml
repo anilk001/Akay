@@ -81,19 +81,29 @@ jobs:
           fi
 
           # quote/ is a pre-built bundle: it is published exactly as committed,
-          # with its own _redirects, _headers and robots.txt beside it.
-          ARGS=(deploy --dir=quote --site="$NETLIFY_SITE_ID" --json
+          # with its own _redirects, _headers and robots.txt beside it. Hence
+          # --no-build — the CLI builds before deploying by default since v27,
+          # and there is nothing here to build.
+          ARGS=(deploy --dir=. --no-build --site="$NETLIFY_SITE_ID" --json
                 --message="${GITHUB_REF_NAME} ${GITHUB_SHA:0:7}")
           if [ "$IS_PROD" = "true" ]; then
             ARGS+=(--prod)
+          else
+            ARGS+=(--draft)
           fi
 
-          npx --yes netlify-cli@27 "${ARGS[@]}" | tee deploy.json
+          # Run it from inside quote/ so it reads that folder's netlify.toml.
+          # From the repo root the CLI picks up the catalogue's config instead:
+          # it tried to build the Astro site (`astro: not found`), and had that
+          # worked it would have attached the catalogue's redirect and header
+          # rules to the Trade Desk's deploy.
+          ( cd quote && npx --yes netlify-cli@27 "${ARGS[@]}" ) \
+            | tee "$RUNNER_TEMP/deploy.json"
 
           # --json puts the result on stdout, but be tolerant of anything the
           # CLI prints around it: a missing URL must not fail a good deploy.
           URL=$(node -e '
-            const t = require("fs").readFileSync("deploy.json", "utf8");
+            const t = require("fs").readFileSync(process.env.RUNNER_TEMP + "/deploy.json", "utf8");
             const m = t.match(/\{[\s\S]*\}/);
             let u = "";
             try { const d = JSON.parse(m ? m[0] : "{}"); u = d.deploy_url || d.url || ""; } catch {}
