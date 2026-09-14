@@ -170,6 +170,46 @@ check('a short or generic name never matches',
 check('an unrelated company does not match',
   run({ channel: 'whatsapp', senderName: 'Javana Foods' }).supplierRecordId, null);
 
+section('Placeholder names — the old auto-create left 98 of 395 records named "Person (domain)"');
+
+const LEGACY = [
+  sup('recGK1', 'Garry (greeneking.co.uk)', 'garry@greeneking.co.uk'),
+  sup('recGK2', 'Fraser (greeneking.co.uk)', 'fraser@greeneking.co.uk'),
+  sup('recSN1', 'Garry (shepherd-neame.co.uk)', 'garry@shepherd-neame.co.uk'),
+  sup('recSN2', 'C Holland', 'c.holland@shepherd-neame.co.uk'),
+  sup('recST1', 'Standard Trading', 'alfred@standardtrading.co'),
+  sup('recST2', 'standardtrading.co', 'sales@standardtrading.co'),
+  sup('recBT1', 'Innes Mcbeath', 'innes@btinternet.com'),
+  sup('recBT2', 'David Taylor', 'david@btinternet.com'),
+  sup('recREAL', 'Halitlar Gida Ltd', 'sales@halitlar.com'),
+];
+
+r = run({ channel: 'email', fromAddress: 'newperson@greeneking.co.uk', senderName: 'New Person' }, LEGACY);
+check('two placeholder names on one domain are ONE company', r.supplierRecordId, 'recGK1');
+check('not ambiguous', r.ambiguous, false);
+check('nothing created', r.needCreate, false);
+
+r = run({ channel: 'email', fromAddress: 'newperson@shepherd-neame.co.uk' }, LEGACY);
+check('a placeholder cannot contradict a real name — resolves', r.supplierRecordId !== null, true);
+check('and links to the properly named record, not the placeholder', r.supplierName, 'C Holland');
+
+r = run({ channel: 'email', fromAddress: 'newperson@standardtrading.co' }, LEGACY);
+check('a bare-domain name is a placeholder too', r.supplierName, 'Standard Trading');
+
+r = run({ channel: 'email', fromAddress: 'someone@btinternet.com', senderName: 'Someone' }, LEGACY);
+check('a consumer ISP domain is generic: two BT users are not one company', r.supplierRecordId, null);
+check('and not flagged ambiguous either', r.ambiguous, false);
+check('and never auto-created off it', r.needCreate, false);
+
+r = run({ channel: 'whatsapp', senderNumber: '+44 7000 000000', senderName: 'Garry' }, LEGACY);
+check('a placeholder is never matched BY NAME — another Garry is not Greene King', r.supplierRecordId, null);
+
+check('a placeholder is still reached through its own address',
+  run({ channel: 'email', fromAddress: 'garry@greeneking.co.uk' }, LEGACY).supplierRecordId, 'recGK1');
+
+check('a real company name is unaffected by any of this',
+  run({ channel: 'whatsapp', senderName: 'Halitlar Gida' }, LEGACY).supplierRecordId, 'recREAL');
+
 section('No supplier book at all is not a crash');
 
 r = run({ channel: 'email', fromAddress: 'x@new-co.com' }, []);

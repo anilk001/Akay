@@ -161,6 +161,40 @@ Offers` reads this node **positionally**
 still one item per original email, in the original order. The tests assert that
 first, before anything about matching.
 
+## Verified against the real supplier book, 2026-09-14
+
+The deployed source is byte-identical to the mirror, so the mirror was run
+against the live 395-record Suppliers table. Two findings, both fixed and
+redeployed the same day:
+
+**The base is already full of the old bug's damage.** 98 of 395 supplier
+records (25%) are named `Person (domain)` — `Garry (greeneking.co.uk)`,
+`Fraser (greeneking.co.uk)` — the old auto-create's naming. Eight more are a
+bare domain string (`standardtrading.co`, and `akay.ie` — our own address, as
+a supplier). The first version of this resolver read two such records on one
+domain as two *different companies* and flagged them ambiguous. Measured: of 17
+domains carrying more than one record, 2 resolved and **15 went to a human**,
+every one of them plainly one company.
+
+Fix: a name of that shape carries no company identity, so it cannot contradict
+a real name. Only real names on a domain decide; a domain carrying nothing but
+placeholders is one company by construction; and a placeholder is never matched
+*by name*, so a WhatsApp sender called Garry is not filed against Greene King.
+When a domain has both, the properly named record is the one linked to
+(`shepherd-neame.co.uk` → `C Holland`, not `Garry (shepherd-neame.co.uk)`).
+
+**Consumer ISP domains were being treated as company domains.** Two unrelated
+suppliers on `btinternet.com` were compared as if colleagues. `btinternet.com`
+and 27 others are now generic.
+
+Re-measured after the fix: **16 of 16 multi-record domains resolve, 0 need a
+human, 0 create a duplicate**, and all 343 existing supplier addresses still
+resolve to their own record. `btinternet.com` correctly dropped out of the list.
+
+None of this had been exercised on live traffic at the time — every ingestion
+run since the first deploy had been an empty poll — which is exactly why the
+real-data check was worth doing instead of waiting.
+
 ## Known, pre-existing, and not introduced here
 
 That positional read misaligns when a single batch contains **both** a matched

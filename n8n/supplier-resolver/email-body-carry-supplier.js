@@ -25,7 +25,7 @@
  * — the bare domain string. That is where supplier records called
  * "halitlar.com" come from, sitting beside the real "Halitlar Gida Ltd".
  *
- * ── WHAT CHANGED ───────────────────────────────────────────────────────
+ * ── WHAT CHANGED ─────────────────────────────────────────────────────
  * The search node now returns the WHOLE supplier book (no filter, executeOnce)
  * and the matching happens here, against the same cascade the Excel, PDF and
  * WhatsApp pipelines run:
@@ -70,6 +70,13 @@ const GENERIC_DOMAINS = new Set([
   'live.com', 'live.co.uk', 'icloud.com', 'me.com', 'aol.com',
   'protonmail.com', 'proton.me', 'gmx.com', 'gmx.de', 'web.de', 'mail.ru',
   'yandex.ru', 'qq.com', '163.com', 'sina.com', 'naver.com', 'zoho.com',
+  // Consumer and ISP mailboxes seen on real supplier records. Two unrelated
+  // suppliers on btinternet.com are not one company — measured 2026-09-14.
+  'btinternet.com', 'btconnect.com', 'talktalk.net', 'virginmedia.com', 'sky.com',
+  'orange.fr', 'wanadoo.fr', 'free.fr', 'libero.it', 'virgilio.it', 'tiscali.it',
+  'seznam.cz', 'onet.pl', 'wp.pl', 'o2.pl', 't-online.de', 'bluewin.ch',
+  'telenet.be', 'skynet.be', 'xtra.co.nz', 'bigpond.com', 'inbox.lv', 'ymail.com',
+  'rocketmail.com', 'mail.com', 'list.ru', 'bk.ru', 'inbox.ru',
 ]);
 
 const OURS = /@akay\.ie$/i;
@@ -200,9 +207,18 @@ function buildIndexes(rows) {
     if (!byDomain.has(domain)) byDomain.set(domain, { records: [], sameCompany: true });
     byDomain.get(domain).records.push(s);
   }
-  for (const group of byDomain.values()) {
-    const tokens = group.records.map((s) => companyTokens(text(s.f['Supplier Name'])));
-    group.sameCompany = tokens.every((t) => sameCompany(t, tokens[0]));
+  for (const [domain, group] of byDomain.entries()) {
+    // The old auto-create named its records "Garry (greeneking.co.uk)" or just
+    // "greeneking.co.uk" — 98 of 395 supplier records carry that shape
+    // (measured 2026-09-14). Such a name says nothing about the COMPANY, only
+    // about who wrote first, so it cannot contradict a real name. Only the real
+    // names on a domain decide whether it is one company; a domain carrying
+    // nothing but placeholders is one company by construction.
+    const real = group.records.filter((s) => !isPlaceholderName(text(s.f['Supplier Name']), domain));
+    const tokens = real.map((s) => companyTokens(text(s.f['Supplier Name'])));
+    group.sameCompany = tokens.length <= 1 || tokens.every((t) => sameCompany(t, tokens[0]));
+    // Link to a properly named record when there is one.
+    if (real.length) group.records = [...real, ...group.records.filter((s) => !real.includes(s))];
   }
   return { byAddress, byDomain };
 }
@@ -226,7 +242,14 @@ function companyTokens(name) {
 function matchByName(candidate, rows) {
   const tokens = companyTokens(candidate);
   if (!tokens.length) return [];
-  const hits = rows.filter((s) => sameCompany(tokens, companyTokens(text(s.f['Supplier Name']))));
+  // A placeholder-named record is never matched BY NAME: "Garry (greeneking.co.uk)"
+  // would otherwise match any sender called Garry, and file another Garry's
+  // offer against Greene King. Such records are still reached through their
+  // address and domain, which is the evidence that actually identifies them.
+  const hits = rows.filter((s) => {
+    const n = text(s.f['Supplier Name']);
+    return !isPlaceholderName(n, domainOf(s)) && sameCompany(tokens, companyTokens(n));
+  });
   const distinct = [];
   for (const h of hits) {
     const hTokens = companyTokens(text(h.f['Supplier Name']));
@@ -272,6 +295,26 @@ function companyFromDomain(domain) {
   if (sld.length < 2) return '';
   return sld.split(/[-_]+/).filter(Boolean)
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+}
+
+/**
+ * A supplier name that carries no company identity: the old auto-create's
+ * "Firstname (domain)" where the bracketed domain is the record's own, or a
+ * bare domain string. Judged against the record's OWN email domain so a real
+ * company that happens to put a different domain in brackets is untouched.
+ */
+function isPlaceholderName(name, domain) {
+  const n = String(name || '').trim().toLowerCase();
+  const d = String(domain || '').trim().toLowerCase();
+  if (!n) return true;
+  const m = n.match(/\(([a-z0-9.-]+\.[a-z]{2,})\)$/);
+  if (m) return !d || m[1] === d;
+  return /^[a-z0-9.-]+\.[a-z]{2,}$/.test(n) && (!d || n === d);
+}
+
+function domainOf(s) {
+  const email = cleanAddress(s.f['Email']);
+  return email ? email.split('@')[1] : '';
 }
 
 function cleanAddress(v) {
