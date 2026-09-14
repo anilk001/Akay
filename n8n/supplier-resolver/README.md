@@ -98,8 +98,44 @@ Industry words (`trading`, `beverages`, `drinks`, `foods`, `distri`, `global`,
 they are not: dropping them collapses `Newport Global` and `Pika Trading` into
 one identity, which is the exact mistake this resolver exists to prevent.
 
+## What is deployed, and where
+
+`resolve-supplier-identity.js` is the canonical, channel-neutral cascade and
+its test battery. It is **not** itself deployed. Two nodes derived from it are:
+
+| File | Workflow(s) | Node |
+|---|---|---|
+| `email-resolve-supplier.js` | Excel **and** PDF/Image ingestion | `Resolve Supplier` |
+| `whatsapp-rescue-supplier.js` | WhatsApp ingestion | `Resolve WA Supplier` |
+
+**The email node is byte-identical in both pipelines**, verified by SHA-256
+against this file after deploying. That is the guard against the drift that
+caused these issues: the two copies cannot disagree, because they are the same
+16,676 bytes.
+
+Each keeps its pipeline's existing **output contract**, so nothing downstream
+was rewired — `Need Supplier?`, `Create Missing Supplier` and `Merge Supplier`
+read exactly the keys they always did.
+
+### The WhatsApp node is a rescue, not a replacement
+
+The phone-only resolver also carries the duplicate guard, the unparseable-type
+check and the Skip/Blacklist gates. None of that failed, so none of it was
+touched: the original is still there as `Resolve WA Supplier (Phone)` and the
+rescue runs after it. It can **only** turn unknown into known — it never
+overrides a phone match, never revives a duplicate or skipped message, and
+never creates a supplier, because on WhatsApp a name in the text is evidence of
+who is *speaking*, not proof of who is *selling*.
+
+Both new nodes had to take the name the workflow already reads
+(`$('Resolve Supplier')`, `$('Resolve WA Supplier')`): n8n does not rewrite a
+node name inside Code node source or inside an IF expression when a node is
+renamed — verified against these workflows, not assumed.
+
 ## Tests
 
-    node n8n/tests/supplier-identity.test.js
+    node n8n/tests/supplier-identity.test.js        # the canonical cascade (43)
+    node n8n/tests/email-resolve-supplier.test.js   # what Excel and PDF run (33)
+    node n8n/tests/whatsapp-rescue-supplier.test.js # what WhatsApp runs (36)
 
-The node source is loaded and executed, not re-typed.
+Every node source is loaded and executed, not re-typed.
