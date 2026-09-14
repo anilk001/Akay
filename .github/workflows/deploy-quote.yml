@@ -68,9 +68,16 @@ jobs:
           set -euo pipefail
 
           if [ -z "${NETLIFY_AUTH_TOKEN:-}" ]; then
-            echo "::error::NETLIFY_AUTH_TOKEN is not set — quote.akay.ie was NOT updated."
-            echo "::error::Add it in Settings -> Secrets and variables -> Actions."
-            exit 1
+            # A production deploy that quietly did nothing is worse than a red
+            # run. A pull request's draft deploy is a convenience, so a missing
+            # secret there is a note, not a failed check on someone's PR.
+            if [ "$IS_PROD" = "true" ]; then
+              echo "::error::NETLIFY_AUTH_TOKEN is not set — quote.akay.ie was NOT updated."
+              echo "::error::Add it in Settings -> Secrets and variables -> Actions."
+              exit 1
+            fi
+            echo "::warning::NETLIFY_AUTH_TOKEN is not set — no draft deploy for this pull request."
+            exit 0
           fi
 
           # quote/ is a pre-built bundle: it is published exactly as committed,
