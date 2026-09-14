@@ -31,6 +31,8 @@ rewire in n8n.
 | `supplier-resolver/resolve-supplier-identity.js` | all four ingestion pipelines | Resolve Supplier Identity | full source, **not published** |
 | `supplier-resolver/email-resolve-supplier.js` | `j1NAhQEKz9hzi1T2` **and** `aZvwBunq4W07XqL3` | Resolve Supplier | full source, **published 2026-09-14** (byte-identical in both, verified by hash) |
 | `supplier-resolver/whatsapp-rescue-supplier.js` | `Bn6Irz2Yx7MTRnKu` | Resolve WA Supplier | full source, **published 2026-09-14** |
+| `supplier-resolver/email-body-carry-supplier.js` | `8oPUD8d9NPVBEime` | Carry Existing Supplier Id Forward | full source, **published 2026-09-14** |
+| `supplier-resolver/email-body-attach-supplier.js` | `8oPUD8d9NPVBEime` | Attach New Supplier & Finalize Offers | full source, **published 2026-09-14** |
 | `offer-dispatch/compose-email.js` | `dAYMAj6mZD3hTV4T` | Compose Email | full source, **published 2026-09-14** |
 | `offer-dispatch/leak-guard.patch.js` | `dAYMAj6mZD3hTV4T` | Compose From Fields + Verify HTML | patch only, **not applied** |
 
@@ -147,6 +149,7 @@ Plain node, no framework. `npm test` runs all of them:
     node n8n/tests/supplier-identity.test.js
     node n8n/tests/email-resolve-supplier.test.js
     node n8n/tests/whatsapp-rescue-supplier.test.js
+    node n8n/tests/email-body-carry-supplier.test.js
 
 The trade-terms, offer-invariants and supplier-identity tests **load and
 execute the node source** rather than

@@ -107,6 +107,7 @@ its test battery. It is **not** itself deployed. Two nodes derived from it are:
 |---|---|---|
 | `email-resolve-supplier.js` | Excel **and** PDF/Image ingestion | `Resolve Supplier` |
 | `whatsapp-rescue-supplier.js` | WhatsApp ingestion | `Resolve WA Supplier` |
+| `email-body-carry-supplier.js` | Email Body ingestion | `Carry Existing Supplier Id Forward` |
 
 **The email node is byte-identical in both pipelines**, verified by SHA-256
 against this file after deploying. That is the guard against the drift that
@@ -132,10 +133,58 @@ Both new nodes had to take the name the workflow already reads
 node name inside Code node source or inside an IF expression when a node is
 renamed — verified against these workflows, not assumed.
 
+### The Email Body pipeline had the worst version of issue 4
+
+The other three matched a domain and then threw it away when two records shared
+it. This one **never looked at the domain at all**. The Airtable search filtered
+on the address alone:
+
+    AND({Email} != '', LOWER({Email}) = LOWER("{{ $json.fromAddress }}"))
+
+so it was not the third contact at a supplier that became a duplicate — it was
+the **second**, and every one after. And `Create New Supplier` named it
+`{{ $json.senderDomain || $json.fromAddress }}`: the bare domain string. That is
+where a supplier record called `halitlar.com` comes from, sitting beside the
+real `Halitlar Gida Ltd`.
+
+The search now returns the whole supplier book once (`executeOnce`, no filter)
+and the matching moved into the Code node, where the cascade can run.
+
+**Ambiguity is not allowed to fall through into a create.** `Need New Supplier?`
+used to gate on `existingSupplierId` being null — and an ambiguous match is also
+null, so it would have created a third record for a domain that already had two
+companies on it. It now gates on an explicit `createSupplier` boolean.
+
+One contract had to be preserved exactly: `Attach New Supplier & Finalize
+Offers` reads this node **positionally**
+(`$('Carry Existing Supplier Id Forward').all()[$itemIndex]`), so the output is
+still one item per original email, in the original order. The tests assert that
+first, before anything about matching.
+
+## Known, pre-existing, and not introduced here
+
+That positional read misaligns when a single batch contains **both** a matched
+sender and an unmatched one: the matched item goes straight to
+`LLM Extract Offers` while the unmatched one detours through
+`Create New Supplier`, and the two arrive in a different order than
+`Carry Existing Supplier Id Forward` emitted them. The Airtable create nodes
+replace the item, so there is no key to correlate on — which is why the original
+author reached back positionally in the first place.
+
+This predates these changes and is untouched by them. It is recorded here rather
+than quietly worked around, because the fix is a restructure of that branch, not
+a line.
+
+`update_workflow` also reports a `MISSING_EXPRESSION_PREFIX` warning on
+`Carry Existing Supplier Id Forward`. It is a false positive: the two `{{ }}`
+it finds are inside the header comment, quoting the old filter formula and the
+old `Supplier Name` expression. `jsCode` is not an expression field.
+
 ## Tests
 
-    node n8n/tests/supplier-identity.test.js        # the canonical cascade (43)
-    node n8n/tests/email-resolve-supplier.test.js   # what Excel and PDF run (33)
-    node n8n/tests/whatsapp-rescue-supplier.test.js # what WhatsApp runs (36)
+    node n8n/tests/supplier-identity.test.js          # the canonical cascade (43)
+    node n8n/tests/email-resolve-supplier.test.js     # what Excel and PDF run (33)
+    node n8n/tests/whatsapp-rescue-supplier.test.js   # what WhatsApp runs (36)
+    node n8n/tests/email-body-carry-supplier.test.js  # what Email Body runs (30)
 
 Every node source is loaded and executed, not re-typed.
