@@ -140,3 +140,34 @@ jobs:
 
           echo "::error::$BASE_URL is not serving $ASSET — the deploy reported success but the live page still has an older bundle. Check the project's published deploy in Netlify."
           exit 1
+
+      # The page is static: everything it does is a cross-origin call to the
+      # API, so the API refusing the quote.akay.ie origin breaks the tool just
+      # as completely as a failed deploy — and does it silently, in the
+      # browser, where nothing here would ever see it. The origin comes out of
+      # the bundle so this cannot drift from what was just published.
+      - name: Smoke-test the API the page calls
+        if: github.event_name != 'pull_request'
+        run: |
+          set -uo pipefail
+
+          API=$(grep -ho 'https://[A-Za-z0-9.-]*\.up\.railway\.app' quote/assets/*.js | head -1 || true)
+          if [ -z "$API" ]; then
+            echo "::warning::No API origin found in the bundle — skipping the smoke test."
+            exit 0
+          fi
+
+          HEADERS=$(curl -sS -D - -o /dev/null --max-time 20 \
+                      -H "Origin: https://quote.akay.ie" "$API/api/health" || true)
+          STATUS=$(printf '%s' "$HEADERS" | head -1 | tr -d '\r')
+          ALLOW=$(printf '%s' "$HEADERS" | grep -i '^access-control-allow-origin:' | head -1 | tr -d '\r')
+
+          if [ -z "$STATUS" ]; then
+            echo "::warning::$API/api/health did not answer — chat and list pricing will fail until it does."
+            echo "API: $API/api/health did not answer." >> "$GITHUB_STEP_SUMMARY"
+          elif [ -z "$ALLOW" ]; then
+            echo "::warning::$API answered ($STATUS) but sent no Access-Control-Allow-Origin for https://quote.akay.ie — the browser will block every call."
+            echo "API: answered \`$STATUS\` with **no CORS header** for quote.akay.ie — the page cannot use it." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "API: \`$STATUS\`, \`$ALLOW\`." >> "$GITHUB_STEP_SUMMARY"
+          fi
