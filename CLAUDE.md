@@ -35,6 +35,25 @@ build time → static HTML → Netlify.
    allowlist is `PUBLIC_KEYS` in `src/lib/search-index-keys.mjs`, shared by
    the endpoint and the checker.
 
+5. **`Listing Approved` and `Send Approval Status` are ticked by a human only.**
+   `Listing Approved` publishes an offer to akay.ie; `Send Approval Status`
+   (Gate 2) releases it to client inboxes. Anil or Annika tick both, by hand,
+   in Airtable. No pipeline, script, agent or "just this once" writes either —
+   a PreToolUse hook (`.claude/hooks/protect-airtable-fields.mjs`) blocks the
+   Airtable MCP call outright. Unticking is allowed; that is how a mistake is
+   undone.
+
+   Why it is absolute: `Sell Price` falls back to `Buy Price` when `Margin %`
+   is blank, and the dispatch leak guard switches itself off when sell equals
+   buy. A ticked listing on a margin-less offer therefore publishes the **cost
+   price** to the site and mails it to clients, with nothing raising an alarm.
+
+6. **Every client-facing send goes through Resend from `offers@akay.ie`.**
+   Never Gmail, never a personal mailbox. Use the `Offer Dispatch — Akay`
+   workflow rather than building another one-shot; a one-shot is for a genuine
+   one-off, and each one adds another template that can disagree with the
+   others. Sending is never auto-approved: the content prompt stays.
+
 ## Commands
 
 ```bash
@@ -48,6 +67,9 @@ node n8n/tests/split-quantity.test.js
 node n8n/tests/trade-terms.test.js        # MOQ / lead-time ingestion parser
 node n8n/tests/trade-terms-digest.test.js
 node n8n/tests/instant-quote-intake.test.js   # Instant Quote intake payload rules
+node n8n/tests/offer-invariants.test.js       # the gate before every Create Offers
+node n8n/tests/supplier-identity.test.js      # shared supplier resolution
+node tests/approval-gate-hook.test.js         # the human-only-gate hook
 ```
 
 ## Layout
@@ -65,7 +87,14 @@ node n8n/tests/instant-quote-intake.test.js   # Instant Quote intake payload rul
 - `src/pages/search.astro` + `search-index.json.ts` — client-side search over
   the public-safe index (see `tests/` for the acceptance cases)
 - `n8n/` — mirrors of the JavaScript inside n8n Code nodes + plain-Node tests
-  (a PostToolUse hook runs them after any edit under `n8n/`). Includes
+  (a PostToolUse hook runs them after any edit under `n8n/`).
+  `FIXES-2026-09-14.md` traces the nine reported ingestion/dispatch failures to
+  their causes and lists what still needs a rewire in n8n. Includes
+  `offer-invariants/` — the one gate before every `Create Offers`, which holds
+  any offer missing a margin, supplier, price, currency or name rather than
+  letting it go Live, and `supplier-resolver/` — one supplier identity cascade
+  for all four channels (address, phone, domain, company name), replacing four
+  copies that had drifted apart. Also
   `trade-terms-normaliser/` — the one sub-workflow all four ingestion pipelines
   call to parse MOQ and lead time into typed fields at ingestion, and
   `instant-quote-intake/` — the webhook the Trade Desk API calls after pricing a

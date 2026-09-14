@@ -44,6 +44,15 @@
             "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/protect-files.sh"
           }
         ]
+      },
+      {
+        "matcher": "mcp__airtable__.*|mcp__Airtable__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/protect-airtable-fields.mjs\""
+          }
+        ]
       }
     ],
     "PostToolUse": [
@@ -66,6 +75,50 @@
           }
         ]
       }
+    ]
+  },
+  "permissions": {
+    "allow": [
+      "mcp__Resend__list-broadcasts",
+      "mcp__Resend__get-broadcast",
+      "mcp__Resend__list-contacts",
+      "mcp__Resend__get-contact",
+      "mcp__Resend__list-segments",
+      "mcp__Resend__get-segment",
+      "mcp__Resend__list-domains",
+      "mcp__Resend__get-domain",
+      "mcp__Resend__list-emails",
+      "mcp__Resend__get-email",
+      "mcp__Resend__get-email-metrics",
+      "mcp__Resend__list-logs",
+      "mcp__Resend__get-log",
+      "mcp__Resend__list-templates",
+      "mcp__Resend__get-template",
+      "mcp__Resend__list-suppressions",
+      "mcp__Resend__get-suppression",
+      "mcp__Resend__list-broadcast-recipients",
+      "mcp__Resend__list-broadcast-clicked-links",
+      "mcp__airtable__list_bases",
+      "mcp__airtable__list_tables",
+      "mcp__airtable__describe_table",
+      "mcp__airtable__list_records",
+      "mcp__airtable__search_records",
+      "mcp__airtable__get_record",
+      "mcp__Airtable__list_bases",
+      "mcp__Airtable__search_bases",
+      "mcp__Airtable__list_tables_for_base",
+      "mcp__Airtable__get_table_schema",
+      "mcp__Airtable__list_records_for_table",
+      "mcp__Airtable__search_records",
+      "mcp__n8n__search_workflows",
+      "mcp__n8n__get_workflow_details",
+      "mcp__n8n__search_workflow_executions",
+      "mcp__n8n__get_workflow_execution",
+      "mcp__n8n__list_workflow_tags",
+      "Bash(npm test:*)",
+      "Bash(npm run build:*)",
+      "Bash(node n8n/tests/:*)",
+      "Bash(node tests/:*)"
     ]
   }
 }

@@ -12,6 +12,11 @@ and left as an unpublished draft; the active workflow stayed on the previous
 3-node version, so ~5,000 WhatsApp messages were captured and never classified
 between 2026-07-29 and 2026-08-27. A draft in n8n is invisible until published.
 
+`FIXES-2026-09-14.md` traces the nine ingestion and dispatch failures reported
+on 14 September to their actual causes — three of which are not what the
+symptom suggests — and lists what is fixed here versus what still needs a
+rewire in n8n.
+
 ## Contents
 
 | File | Workflow | Node | State |
@@ -22,6 +27,8 @@ between 2026-07-29 and 2026-08-27. A draft in n8n is invisible until published.
 | `whatsapp-offer-broadcast/build-results.js` | `BeGfFpgxmI7hdCTI` | Build Results | full source, **published 2026-09-04** |
 | `trade-terms-normaliser/normalise-trade-terms.js` | `WQ6A8IVLSAd72fnk` | Normalise Trade Terms | full source, **published 2026-09-13** (v3: bare ex-stock) |
 | `trade-terms-digest/build-parse-digest.js` | *(not built in n8n yet)* | Build Parse Digest | full source, **not published** |
+| `offer-invariants/enforce-offer-invariants.js` | all four ingestion pipelines | Enforce Offer Invariants | full source, **not published** |
+| `supplier-resolver/resolve-supplier-identity.js` | all four ingestion pipelines | Resolve Supplier Identity | full source, **not published** |
 
 The four WhatsApp nodes and the trade-terms normaliser are live. **Excel Offer
 Ingestion** (`j1NAhQEKz9hzi1T2`) now calls the normaliser on every line — as a
@@ -132,8 +139,11 @@ Plain node, no framework. `npm test` runs all of them:
     node n8n/tests/buy-side-guard.test.js
     node n8n/tests/trade-terms.test.js
     node n8n/tests/trade-terms-digest.test.js
+    node n8n/tests/offer-invariants.test.js
+    node n8n/tests/supplier-identity.test.js
 
-The two trade-terms tests **load and execute the node source** rather than
+The trade-terms, offer-invariants and supplier-identity tests **load and
+execute the node source** rather than
 re-typing it — `new Function('$input', src)`, since a Code node is a function
 body — so the test and the text pasted into n8n cannot drift. The two older
 tests predate that harness and still hold their own copy of the logic; worth
