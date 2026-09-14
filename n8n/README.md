@@ -29,6 +29,8 @@ rewire in n8n.
 | `trade-terms-digest/build-parse-digest.js` | *(not built in n8n yet)* | Build Parse Digest | full source, **not published** |
 | `offer-invariants/enforce-offer-invariants.js` | all four ingestion pipelines | Enforce Offer Invariants | full source, **not published** |
 | `supplier-resolver/resolve-supplier-identity.js` | all four ingestion pipelines | Resolve Supplier Identity | full source, **not published** |
+| `offer-dispatch/compose-email.js` | `dAYMAj6mZD3hTV4T` | Compose Email | full source, **published 2026-09-14** |
+| `offer-dispatch/leak-guard.patch.js` | `dAYMAj6mZD3hTV4T` | Compose From Fields + Verify HTML | patch only, **not applied** |
 
 The four WhatsApp nodes and the trade-terms normaliser are live. **Excel Offer
 Ingestion** (`j1NAhQEKz9hzi1T2`) now calls the normaliser on every line — as a
