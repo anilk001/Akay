@@ -22,7 +22,9 @@ build time → static HTML → Netlify.
   `getSiteStats()` in the same module, and ride along in the snapshot as
   `stats`. The site prints `Display Value` verbatim and only while `Publish`
   is ticked; an unreachable table, missing row or empty value renders nothing
-  and never fails the build. Only `Stat Key`, `Display Value` and `Publish`
+  and never fails the build. Unticking `Publish` removes the figure on the
+  next refresh; a failed stats fetch keeps the figure already in the snapshot
+  rather than dropping it for a cycle. Only `Stat Key`, `Display Value` and `Publish`
   are requested — the table's numeric total and coverage notes are internal.
 
 ## Golden rules

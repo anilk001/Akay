@@ -22,7 +22,7 @@ globalThis.fetch = async (url, init) => {
   };
 };
 
-const { statsFromRecords, getSiteStats, FORBIDDEN_FIELDS, isForbiddenField } = await import('../src/data/airtable.mjs');
+const { statsFromRecords, getSiteStats, statsForSnapshot, FORBIDDEN_FIELDS, isForbiddenField } = await import('../src/data/airtable.mjs');
 
 let n = 0;
 const eq = (a, b, msg) => { assert.deepEqual(a, b, msg); n += 1; };
@@ -106,5 +106,27 @@ eq(await getSiteStats(), { stats: {}, source: 'none' });
 // Malformed response body → nothing, no throw.
 respond = () => ({ status: 200, body: { nope: true } });
 eq(await getSiteStats(), { stats: {}, source: 'live' });
+
+// --- statsForSnapshot: what `npm run sync-offers` bakes ---------------------
+// A successful read always wins, so the Publish checkbox stays a kill switch:
+// an empty live map removes the figure from the snapshot, and therefore the site.
+eq(statsForSnapshot({ stats: { stock_value_eur: 'Over €65 million' }, source: 'live' },
+  { stock_value_eur: 'Over €60 million' }), { stock_value_eur: 'Over €65 million' });
+eq(statsForSnapshot({ stats: {}, source: 'live' }, { stock_value_eur: 'Over €60 million' }), {});
+
+// A FAILED read keeps what the snapshot already carried: Airtable answers 429
+// often enough that a five-minute refresh will hit one, and the figure must not
+// drop off the homepage for a cycle because of it.
+eq(statsForSnapshot({ stats: {}, source: 'none' }, { stock_value_eur: 'Over €60 million' }),
+  { stock_value_eur: 'Over €60 million' });
+// Nothing published before + a failed read is still nothing. Never invented.
+eq(statsForSnapshot({ stats: {}, source: 'none' }, {}), {});
+eq(statsForSnapshot({ stats: {}, source: 'none' }, undefined), {});
+eq(statsForSnapshot(), {});
+
+// The render path is unchanged by all this: a failed read still renders nothing,
+// which is what an Astro build sees (acceptance check 5).
+respond = () => ({ status: 404, body: { error: { type: 'TABLE_NOT_FOUND' } } });
+eq((await getSiteStats()).stats, {});
 
 console.log(`site-stats: ${n} assertions passed`);

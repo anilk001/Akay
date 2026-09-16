@@ -63,7 +63,9 @@ The same command bakes the homepage ticker's Airtable-maintained figures (the
 `Site Stats` table — today the EUR value of listed stock) into the snapshot as
 `stats`. Netlify's build has no token, so the site can only show what that
 file carries; untick `Publish` in Airtable and the next refresh removes the
-figure from the site with no code change.
+figure from the site with no code change. A refresh whose stats fetch fails
+keeps the figure already baked — only a successful read can change or remove
+it, so a transient Airtable error cannot blank the homepage figure.
 
 ---
 

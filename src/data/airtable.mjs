@@ -477,12 +477,36 @@ async function fetchStatsLive() {
 
 // The snapshot is baked by `npm run sync-offers`; older snapshots have no
 // `stats` key at all. Only string values pass, whatever the file says.
-function snapshotStats() {
+export function snapshotStats() {
   const s = snapshot.stats;
   if (!s || typeof s !== 'object' || Array.isArray(s)) return {};
   return Object.fromEntries(
     Object.entries(s).filter(([k, v]) => k && typeof v === 'string' && v.trim()),
   );
+}
+
+/**
+ * What `npm run sync-offers` should bake into the snapshot.
+ *
+ * A SUCCESSFUL read always wins, including an empty one — that is how the
+ * Publish checkbox works as a kill switch: untick it, the next refresh bakes a
+ * map without the key, and the figure leaves the site.
+ *
+ * A FAILED read (source 'none') keeps whatever the snapshot already carried.
+ * Airtable answers 429 often enough that a five-minute refresh will eventually
+ * hit one, and blanking a published figure because of a transient error would
+ * drop it off the homepage for a cycle. This is the same instinct as the guard
+ * in fetch-offers.mjs, which refuses to overwrite the catalogue when the live
+ * offers fetch fails. It is a bake-time rule only: the RENDER path
+ * (getSiteStats above, called during an Astro build) still fails to nothing.
+ */
+export function statsForSnapshot({ stats, source } = {}, previous = snapshotStats()) {
+  if (source === 'none') {
+    const kept = Object.keys(previous || {}).length;
+    console.warn(`[airtable] site stats unavailable — keeping the ${kept} stat(s) already in the snapshot`);
+    return previous || {};
+  }
+  return stats || {};
 }
 
 export async function getSiteStats() {
