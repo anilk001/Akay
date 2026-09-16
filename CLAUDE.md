@@ -48,6 +48,7 @@ node n8n/tests/split-quantity.test.js
 node n8n/tests/trade-terms.test.js        # MOQ / lead-time ingestion parser
 node n8n/tests/trade-terms-digest.test.js
 node n8n/tests/instant-quote-intake.test.js   # Instant Quote intake payload rules
+node n8n/tests/email-body-blocks.test.js       # email body table extraction
 ```
 
 ## Layout
