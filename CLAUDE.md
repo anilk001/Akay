@@ -17,6 +17,13 @@ build time → static HTML → Netlify.
 - `.github/workflows/refresh.yml` re-bakes the snapshot from Airtable every
   5 minutes and commits it only when the catalogue changed; that commit
   triggers the Netlify redeploy.
+- Headline figures for the homepage ticker (today: `stock_value_eur`, the EUR
+  value of listed stock) come from the base's `Site Stats` key/value table via
+  `getSiteStats()` in the same module, and ride along in the snapshot as
+  `stats`. The site prints `Display Value` verbatim and only while `Publish`
+  is ticked; an unreachable table, missing row or empty value renders nothing
+  and never fails the build. Only `Stat Key`, `Display Value` and `Publish`
+  are requested — the table's numeric total and coverage notes are internal.
 
 ## Golden rules
 
@@ -52,7 +59,8 @@ node n8n/tests/instant-quote-intake.test.js   # Instant Quote intake payload rul
 
 ## Layout
 
-- `src/data/airtable.mjs` — live fetch + normalize (public-safe fields only)
+- `src/data/airtable.mjs` — live fetch + normalize (public-safe fields only),
+  plus `getSiteStats()` for the ticker's Airtable-maintained figures
 - `src/lib/site.mjs` — origin + site-wide SEO constants (`SITE_URL`)
 - `src/components/Seo.astro` — the `<head>` for every page: title, canonical,
   robots, Open Graph, Twitter, GA4 and JSON-LD. Pages pass props, never

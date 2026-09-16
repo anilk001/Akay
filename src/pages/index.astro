@@ -1,5 +1,5 @@
 ---
-import { getOffers } from '../data/airtable.mjs';
+import { getOffers, getSiteStats } from '../data/airtable.mjs';
 import { organizationSchema, websiteSchema } from '../lib/schema.mjs';
 import Seo from '../components/Seo.astro';
 import { withSlugs, categorySlug, brandPages } from '../lib/slug.mjs';
@@ -10,6 +10,10 @@ import QuoteLink from '../components/QuoteLink.astro';
 import { quoteUrl } from '../lib/site.mjs';
 
 const { offers: rawOffers, source } = await getOffers();
+// Headline figures maintained in Airtable's "Site Stats" table (currently the
+// EUR value of listed stock). Read verbatim, keyed by Stat Key; a key that is
+// unpublished, empty or unreachable is simply absent from the map.
+const { stats: siteStats } = await getSiteStats();
 
 // Slugs come from the shared helper so every card links to a page the build
 // actually generated (see src/lib/slug.mjs). Analytics and the rest of the
@@ -62,6 +66,11 @@ const QUOTE_VIDEO_POSTER = null;
 
 const stats = [
   [view.length, 'live offers'],
+  // Value of listed stock, e.g. "Over €60 million" — a banded floor, so the
+  // wording is printed exactly as stored, with no timestamp beside it. When
+  // the stat is absent the row simply has one fewer figure: never €0, never
+  // a placeholder slot.
+  ...(siteStats.stock_value_eur ? [[siteStats.stock_value_eur, 'stock listed']] : []),
   [categories.length - 1, 'categories'],
   [currencies.join(' / ') || '—', 'currencies'],
   [brandCount, 'brands'],
