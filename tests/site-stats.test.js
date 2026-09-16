@@ -3,6 +3,14 @@
 // prints Airtable's `Display Value` verbatim, only when `Publish` is ticked,
 // and falls back to NOTHING — never a figure — when the table cannot be read.
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+
+// What the committed snapshot currently carries — the fallback `statsForSnapshot`
+// reaches for when a live read fails. Read it rather than hardcoding a figure:
+// the refresh bot rewrites this file every few minutes.
+const bakedStats = JSON.parse(
+  readFileSync(new URL('../src/data/offers-snapshot.json', import.meta.url), 'utf8'),
+).stats || {};
 
 // Force the live path before the module reads its env, then stub fetch so no
 // network is touched. The stub records every request for inspection.
@@ -121,7 +129,15 @@ eq(statsForSnapshot({ stats: {}, source: 'none' }, { stock_value_eur: 'Over €6
   { stock_value_eur: 'Over €60 million' });
 // Nothing published before + a failed read is still nothing. Never invented.
 eq(statsForSnapshot({ stats: {}, source: 'none' }, {}), {});
-eq(statsForSnapshot({ stats: {}, source: 'none' }, undefined), {});
+// Omitting `previous` — and passing `undefined`, which JS treats identically —
+// is the DEFAULT path: a failed read falls back to whatever the committed
+// snapshot already carries. Compare against the snapshot itself, not a literal.
+// This asserted `{}` and only passed while the snapshot happened to carry no
+// stats; the first refresh to bake a real figure in (2026-09-16, "Over €60
+// million") turned it red with nothing wrong in the code it covers.
+eq(statsForSnapshot({ stats: {}, source: 'none' }, undefined), bakedStats);
+// No arguments at all is not a failed read — there is no source, so there is
+// nothing to keep, and the answer is empty however full the snapshot is.
 eq(statsForSnapshot(), {});
 
 // The render path is unchanged by all this: a failed read still renders nothing,
