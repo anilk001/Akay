@@ -79,6 +79,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          # The verify step below runs npm ci; cache the download so a refresh
+          # that finds a changed catalogue still finishes in well under a minute.
+          cache: npm
 
       - name: Re-bake snapshot from live Airtable, commit if changed
         env:
@@ -99,9 +102,26 @@ jobs:
 
           if git diff --quiet -- src/data/offers-snapshot.json; then
             echo "Catalogue unchanged since last refresh — nothing to deploy."
-          else
-            git add src/data/offers-snapshot.json
-            git commit -m "chore: refresh catalogue snapshot from Airtable"
-            git push origin HEAD:claude/softr-webflow-migration-50kj20
-            echo "Committed a refreshed catalogue — Netlify will redeploy."
+            exit 0
           fi
+
+          # VERIFY BEFORE PUSHING. This bot commits with GITHUB_TOKEN, and
+          # GitHub deliberately does not trigger workflows from pushes made with
+          # it — so ci.yml never runs on a refresh commit. Without the checks
+          # below, a snapshot that breaks the suite or leaks a non-public field
+          # lands on the site branch and deploys with nothing reporting it.
+          # That is not hypothetical: on 2026-09-16 a refresh took the branch
+          # red for hours and the next PR was the first thing to notice.
+          #
+          # So the gate lives here instead, on the freshly-baked snapshot, and a
+          # failure means we do NOT commit: the site keeps serving the last good
+          # catalogue and this run goes red where it can be seen. Staleness is
+          # recoverable; publishing supplier identity or buy prices is not.
+          npm ci
+          npm test
+          npm run build   # ends in scripts/check-public-safety.mjs
+
+          git add src/data/offers-snapshot.json
+          git commit -m "chore: refresh catalogue snapshot from Airtable"
+          git push origin HEAD:claude/softr-webflow-migration-50kj20
+          echo "Committed a verified catalogue — Netlify will redeploy."
