@@ -59,6 +59,14 @@ Refresh the offline snapshot from live data:
 AIRTABLE_TOKEN=pat... npm run sync-offers
 ```
 
+The same command bakes the homepage ticker's Airtable-maintained figures (the
+`Site Stats` table — today the EUR value of listed stock) into the snapshot as
+`stats`. Netlify's build has no token, so the site can only show what that
+file carries; untick `Publish` in Airtable and the next refresh removes the
+figure from the site with no code change. A refresh whose stats fetch fails
+keeps the figure already baked — only a successful read can change or remove
+it, so a transient Airtable error cannot blank the homepage figure.
+
 ---
 
 ## Public-safety assertion
@@ -172,7 +180,7 @@ thousand pages, whatever the sitemap says.
 ```
 src/
   data/
-    airtable.mjs          live fetch + normalize (public-safe fields only)
+    airtable.mjs          live fetch + normalize (public-safe fields only) + site stats
     offers-snapshot.json  offline/CI fallback sample
   lib/
     fetch-offers.mjs      refresh the snapshot from live data
