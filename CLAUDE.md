@@ -14,9 +14,24 @@ build time → static HTML → Netlify.
 - With `AIRTABLE_TOKEN` set, the build fetches live from Airtable.
 - Without it (CI sandboxes, this remote environment), it falls back to the
   committed `src/data/offers-snapshot.json`, so `npm run build` always works.
-- `.github/workflows/refresh.yml` re-bakes the snapshot from Airtable every
-  5 minutes and commits it only when the catalogue changed; that commit
-  triggers the Netlify redeploy.
+- `.github/workflows/refresh.yml` re-bakes the snapshot from Airtable and
+  commits it only when the catalogue changed; that commit triggers the Netlify
+  redeploy. Netlify's own build holds no Airtable token, so this workflow is
+  the ONLY thing that can bring a change on the site — its real cadence is the
+  site's freshness.
+  - **Do not trust its cron.** GitHub deprioritises scheduled runs on free
+    runners; the original `*/5` fired every 4-6 hours in practice, which on
+    2026-09-16 left akay.ie a stale 7,809 offers against 11,598 live. The cron
+    is now staggered off the contended minutes, but it is still best-effort.
+  - The reliable path is `repository_dispatch` (`catalogue-changed`). The n8n
+    workflow **"Catalogue Refresh Poke — akay.ie"** (`2gOrnHPuBNo13eLN`) fires
+    it every 5 minutes; n8n honours schedules where GitHub does not. A poke
+    with no catalogue change costs nothing — the job exits at the `git diff`.
+  - Before committing, the job runs `npm ci && npm test && npm run build` on
+    the freshly-baked snapshot. It commits with `GITHUB_TOKEN`, and GitHub
+    does not trigger workflows from those pushes, so `ci.yml` never sees a
+    refresh commit — this in-job gate is that missing CI run. A failure means
+    no commit: the site keeps the last good catalogue and the run goes red.
 - Headline figures for the homepage ticker (today: `stock_value_eur`, the EUR
   value of listed stock) come from the base's `Site Stats` key/value table via
   `getSiteStats()` in the same module, and ride along in the snapshot as
