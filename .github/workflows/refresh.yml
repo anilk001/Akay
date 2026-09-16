@@ -17,18 +17,45 @@ name: Scheduled catalogue refresh
 #   Use a read-only Airtable Personal Access Token
 #   (scopes: data.records:read, schema.bases:read).
 #
-# Runs every 5 minutes (the tightest interval GitHub's scheduler allows), so an
-# Airtable edit reaches the site within a few minutes. This is cheap: the job
-# only COMMITS — and only triggers a Netlify build — when the catalogue actually
-# changed, so idle checks cost no Netlify build minutes. GitHub Actions minutes
-# are free on public repos. For guaranteed ~90s updates, wire an Airtable
-# automation to a Netlify build hook instead (event-driven, not polled).
+# CADENCE — read this before trusting the schedule.
+#
+# GitHub does not honour a 5-minute cron on a free runner. It queues scheduled
+# runs behind everything else and drops the ones it cannot place, hardest of all
+# on :00 and on multiples of 5, which is when most of the world schedules.
+# Measured on this repo, '*/5 * * * *' actually fired roughly every 4-6 HOURS.
+# On 2026-09-16 that silently cost us: ~3,800 offers were approved in Airtable
+# after the 12:13 run, and akay.ie sat on a stale 7,809-offer snapshot for over
+# an hour until the refresh was triggered by hand.
+#
+# Two mitigations, both below:
+#   1. The cron is staggered onto odd minutes. Same 5-minute intent, but off the
+#      contended slots, which is what makes GitHub more likely to actually place
+#      the run. It is still best-effort — never rely on it for a launch.
+#   2. repository_dispatch. The ingestion side (n8n, an Airtable automation, or
+#      any script) can POKE a refresh the moment a batch lands, instead of
+#      waiting for the next cron. That is the only path with a predictable
+#      latency. Fire it with:
+#        curl -X POST -H "Accept: application/vnd.github+json" \
+#             -H "Authorization: Bearer <PAT with repo scope>" \
+#             https://api.github.com/repos/anilk001/Akay/dispatches \
+#             -d '{"event_type":"catalogue-changed"}'
+#
+# A Netlify build hook is NOT a substitute: Netlify's build holds no Airtable
+# token, so it would only re-emit the snapshot already committed here. The fetch
+# has to happen in this workflow.
+#
+# Either way the job only COMMITS — and so only triggers a Netlify build — when
+# the catalogue actually changed, so extra pokes are cheap.
 #
 # Trigger by hand any time from the Actions tab (Run workflow).
 
 on:
   schedule:
-    - cron: '*/5 * * * *'   # every 5 minutes (GitHub's minimum interval)
+    # Every 5 minutes, staggered off :00 and off multiples of 5 — see CADENCE.
+    - cron: '2,7,12,17,22,27,32,37,42,47,52,57 * * * *'
+  # Let the ingestion pipeline poke a refresh as soon as a batch lands.
+  repository_dispatch:
+    types: [catalogue-changed]
   workflow_dispatch: {}
 
 permissions:
