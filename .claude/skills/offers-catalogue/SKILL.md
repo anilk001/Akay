@@ -64,6 +64,7 @@ succeeds**. Commit the updated snapshot so offline/CI builds stay current.
 | Variable | Purpose |
 |---|---|
 | `AIRTABLE_TOKEN` | Read-only PAT (`data.records:read`, `schema.bases:read`). Build-time only; never shipped to the browser. Falls back to snapshot when absent. |
+| `AIRTABLE_STATS_TABLE` | `Site Stats` table id (default `tblC0Bnld4aZTv7dd`) — homepage ticker figures such as `stock_value_eur`, read by `getSiteStats()` and printed verbatim. |
 | `AIRTABLE_BASE_ID` | Defaults to the `Akay Offers` base (`appaDSdZkAE9PGkjT`). |
 | `AIRTABLE_OFFERS_TABLE` | Defaults to `Offers`. |
 | `PUBLIC_GA4_ID` | Optional GA4 Measurement ID; safe to expose (the `PUBLIC_` prefix ships it to the browser). |

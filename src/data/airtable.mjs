@@ -15,6 +15,10 @@ import { tradeTermsView } from '../lib/trade-terms.mjs';
 const TOKEN = process.env.AIRTABLE_TOKEN || process.env.Airtable_Pat || '';
 const BASE = process.env.AIRTABLE_BASE_ID || 'appaDSdZkAE9PGkjT';
 const TABLE = process.env.AIRTABLE_OFFERS_TABLE || 'Offers';
+// "Site Stats": a key/value table of headline figures computed elsewhere (an
+// n8n workflow writes them daily) and only READ here. Addressed by table id so
+// a rename in Airtable cannot silently point the build at nothing.
+const STATS_TABLE = process.env.AIRTABLE_STATS_TABLE || 'tblC0Bnld4aZTv7dd';
 
 // Public-safe fields only. Anything not listed here is never pulled.
 const FIELDS = [
@@ -31,6 +35,12 @@ const FIELDS = [
   'Lead Time Days',
 ];
 
+// Site Stats columns the build may read. The rest of that table — the numeric
+// total, the plain-English coverage note, line counts, rate date — is internal
+// and listed in FORBIDDEN_FIELDS below, so it is never requested and the
+// post-build checker fails if it ever turns up in dist/.
+const STATS_FIELDS = ['Stat Key', 'Display Value', 'Publish'];
+
 // Fields that must never be requested, whatever the allowlist above says.
 // Exact names from the Offers table plus patterns that catch any future field
 // carrying supplier identity, cost, margin or internal commentary. Checked at
@@ -42,6 +52,8 @@ export const FORBIDDEN_FIELDS = [
   'Bundle ID', 'Bundle Title', 'Target Countries', 'Excluded Countries', 'Target Capsule Tags',
   'Target Region', 'Trust Level', 'Best Comparable Price', 'Price Delta %', 'Price Level',
   'Client Feedback', 'WA Broadcast Log', 'WA Target Segments',
+  // Site Stats table — everything but the display string is internal.
+  'Numeric Value', 'Detail', 'Lines Counted', 'Lines Skipped No Qty', 'Rate Date', 'Updated At',
 ];
 export const FORBIDDEN_PATTERN = /supplier|buy|cost|markup|margin|trader|vendor|contact|internal|source|bundle|target|excluded|trust|\bnotes?\b|comparable|feedback|broadcast/i;
 // Public-by-design names the pattern would otherwise trip on: the Airtable
@@ -61,6 +73,9 @@ export function isForbiddenField(name) {
 
 for (const f of FIELDS) {
   if (isForbiddenField(f)) throw new Error(`[airtable] FIELDS contains a non-public field: "${f}"`);
+}
+for (const f of STATS_FIELDS) {
+  if (isForbiddenField(f)) throw new Error(`[airtable] STATS_FIELDS contains a non-public field: "${f}"`);
 }
 
 const INCOTERMS = ['EXW', 'FCA', 'FOB', 'CFR', 'CIF', 'DAP', 'DDP', 'DPU', 'CPT', 'CIP', 'FAS'];
@@ -401,3 +416,112 @@ export async function getOffers() {
 // from the main catalogue query (see index.astro). A separate Airtable query
 // for them existed here and was never imported — removed to keep one source
 // of truth for what the page shows.
+
+// ---------------------------------------------------------------------------
+// Site stats
+//
+// Headline figures the homepage ticker shows next to the offer count — today
+// just `stock_value_eur`, the EUR value of listed stock. The number is computed
+// and banded upstream (n8n → Airtable "Site Stats"); the site's only job is to
+// read one string per key and print it verbatim.
+//
+// Rules, from the brief that introduced it:
+//   - Render `Display Value` exactly as stored. "Over €60 million" is a floor
+//     (roughly half the public lines carry no quantity), so the wording is
+//     doing real work and must never be reformatted into a precise figure.
+//   - Honour `Publish`. Unticked in Airtable → the key is simply absent.
+//   - Fail to nothing, never to a number. Unreachable table, missing row or
+//     empty value → absent, and the build still succeeds. No fallback figure.
+//   - Only STATS_FIELDS are requested; the internal columns never reach here.
+// ---------------------------------------------------------------------------
+
+// Maps Site Stats rows to { statKey: displayString }. Only published rows with
+// a non-empty Display Value make it in. First row wins on a duplicate key.
+export function statsFromRecords(records = []) {
+  const out = {};
+  for (const rec of Array.isArray(records) ? records : []) {
+    const f = (rec && rec.fields) || {};
+    const key = String(f['Stat Key'] ?? '').trim();
+    const value = String(f['Display Value'] ?? '').trim();
+    if (!key || !value || f['Publish'] !== true) continue;
+    if (key in out) {
+      console.warn(`[airtable] duplicate site stat "${key}" — keeping the first row`);
+      continue;
+    }
+    out[key] = value;
+  }
+  return out;
+}
+
+async function fetchStatsLive() {
+  const base = `https://api.airtable.com/v0/${BASE}/${encodeURIComponent(STATS_TABLE)}`;
+  const headers = { Authorization: `Bearer ${TOKEN}` };
+  const records = [];
+  let offset;
+  do {
+    const url = new URL(base);
+    // Server-side gate on the checkbox; statsFromRecords() re-checks it so a
+    // formula typo can never publish an unticked row.
+    url.searchParams.set('filterByFormula', '{Publish}=TRUE()');
+    url.searchParams.set('pageSize', '100');
+    STATS_FIELDS.forEach((f) => url.searchParams.append('fields[]', f));
+    if (offset) url.searchParams.set('offset', offset);
+    const res = await fetchWithRetry(url, { headers });
+    if (!res.ok) throw new Error(`Airtable ${res.status}: ${(await res.text()).slice(0, 200)}`);
+    const data = await res.json();
+    records.push(...(data.records || []));
+    offset = data.offset;
+  } while (offset);
+  return statsFromRecords(records);
+}
+
+// The snapshot is baked by `npm run sync-offers`; older snapshots have no
+// `stats` key at all. Only string values pass, whatever the file says.
+export function snapshotStats() {
+  const s = snapshot.stats;
+  if (!s || typeof s !== 'object' || Array.isArray(s)) return {};
+  return Object.fromEntries(
+    Object.entries(s).filter(([k, v]) => k && typeof v === 'string' && v.trim()),
+  );
+}
+
+/**
+ * What `npm run sync-offers` should bake into the snapshot.
+ *
+ * A SUCCESSFUL read always wins, including an empty one — that is how the
+ * Publish checkbox works as a kill switch: untick it, the next refresh bakes a
+ * map without the key, and the figure leaves the site.
+ *
+ * A FAILED read (source 'none') keeps whatever the snapshot already carried.
+ * Airtable answers 429 often enough that a five-minute refresh will eventually
+ * hit one, and blanking a published figure because of a transient error would
+ * drop it off the homepage for a cycle. This is the same instinct as the guard
+ * in fetch-offers.mjs, which refuses to overwrite the catalogue when the live
+ * offers fetch fails. It is a bake-time rule only: the RENDER path
+ * (getSiteStats above, called during an Astro build) still fails to nothing.
+ */
+export function statsForSnapshot({ stats, source } = {}, previous = snapshotStats()) {
+  if (source === 'none') {
+    const kept = Object.keys(previous || {}).length;
+    console.warn(`[airtable] site stats unavailable — keeping the ${kept} stat(s) already in the snapshot`);
+    return previous || {};
+  }
+  return stats || {};
+}
+
+export async function getSiteStats() {
+  if (!TOKEN) {
+    console.warn('[airtable] no AIRTABLE_TOKEN set — site stats from snapshot');
+    return { stats: snapshotStats(), source: 'snapshot' };
+  }
+  try {
+    const stats = await fetchStatsLive();
+    console.log(`[airtable] fetched ${Object.keys(stats).length} published site stat(s)`);
+    return { stats, source: 'live' };
+  } catch (err) {
+    // A missing stat is invisible; a wrong one is a commercial problem. So no
+    // stale figure, no placeholder, and no failed build.
+    console.warn(`[airtable] site stats fetch failed (${err.message.slice(0, 120)}) — publishing none`);
+    return { stats: {}, source: 'none' };
+  }
+}
