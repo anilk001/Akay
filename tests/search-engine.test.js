@@ -29,7 +29,13 @@ function top(query, n = 5) {
   const [first] = top('guiness 44cl');
   const ms = Date.now() - t1;
   assert.ok(first, 'no results for "guiness 44cl"');
-  assert.equal(first.name, 'Guinness Draught');
+  // Assert the SIZE and the BRAND, not one SKU name. The catalogue carries
+  // several Guinness lines at 24 x 440ml and which of them ranks first moves as
+  // stock turns over — a "Guinness 440ml" row loaded on 2026-09-16 took the top
+  // slot off "Guinness Draught" purely because its name repeats the size. The
+  // acceptance case in the brief is that a misspelt "guiness 44cl" finds a 44cl
+  // Guinness; pinning the winning SKU made a routine catalogue refresh fail CI.
+  assert.equal(first.brand, 'Guinness');
   assert.equal(first.spec, '24 x 440ml');
   assert.ok(ms < 300, `search took ${ms}ms`);
 }
