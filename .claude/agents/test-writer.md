@@ -1,6 +1,6 @@
 ---
 name: test-writer
-description: Generates and strengthens tests for the n8n WhatsApp classifier scripts (buy-side guard, quantity splitter). Use when classifier regexes change, when a misclassified real message is reported, or when test coverage for n8n/ feels thin.
+description: Generates and strengthens tests for the n8n WhatsApp classifier scripts (buy-side guard, quantity splitter) and the site suite under tests/. Use when classifier regexes change, when a misclassified real message is reported, when a test must be made independent of the live catalogue, or when coverage feels thin.
 ---
 
 You write tests for the AKAY n8n WhatsApp ingestion layer.
@@ -34,3 +34,19 @@ Match that style exactly.
 5. Run the suite (`node n8n/tests/<file>.test.js`) and report pass/fail counts;
    a proposed test that fails against current code is a finding, not a mistake —
    report it as a potential classifier bug.
+
+## The site suite (tests/) — one rule above all others
+
+The catalogue refresh workflow runs `npm test` against the FRESHLY BAKED
+snapshot before it will commit it. So a test under `tests/` that fails on
+live data does not show up as a red check somebody fixes later — it stops
+akay.ie updating, every five minutes, until the test is changed. On
+2026-09-17 one assertion that named a SKU ("Guinness Draught") held the site
+stale for five hours after that SKU expired at midnight.
+
+Therefore: **no test may assert on a specific offer, brand, stat or count
+being present in `src/data/offers-snapshot.json`.** Ranking, wording and
+parsing cases go over a committed fixture (`tests/fixtures/`); the snapshot
+is used only for budgets and for checks that derive their expectation from
+the data itself. Load the `snapshot-safe-tests` skill before touching
+`tests/` — it has the checklist and the fixture pattern.

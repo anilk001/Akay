@@ -36,8 +36,12 @@ public-safe offer shape — and searches it in the browser with
 - the whole state lives in the URL (`/search/?q=guinness&cat=Beer&size=440ml`)
   so searches can be bookmarked and shared, and the back button works.
 
-`npm test` runs the normaliser and engine tests against the committed snapshot,
-including the acceptance case "guiness 44cl → Guinness Draught 24 x 440ml".
+`npm test` runs the normaliser and engine tests. The acceptance cases (a
+misspelt "guiness 44cl" finds a 24 x 440ml Guinness) run over the committed
+fixture in `tests/fixtures/`, never over the live snapshot — the refresh
+workflow runs this suite before it will commit a new snapshot, so a test that
+named a live SKU would stop the site updating the day that SKU sold out. The
+snapshot is used only for the index-build and query-time budgets.
 
 ---
 
