@@ -1,0 +1,33 @@
+
+Hi {{{FIRST_NAME|there}}},
+
+Quick one. Send us the buying list you already keep - Excel, CSV, however it
+looks - and you get it back in about a minute with our price on every line.
+
+Put your own cost or target price in the file and it comes back with the
+difference worked out, line by line. No login, no template, no call-back.
+
+See how it works: https://akay.ie/instant-quote/?utm_source=email&utm_medium=email&utm_campaign=instant-quote-launch&utm_content=text
+
+What sits behind the price:
+
+ * 11,000+ live offers, over EUR 85 million of stock, 2,000+ brands - spirits,
+   beer, soft drinks, grocery and toiletries from one supplier instead of eight.
+ * Over EUR 50 million of branded spirits in one location - a mixed order ships
+   as one consignment, with one set of documents.
+ * Escrow available on payment - funds released once the stock is verified, so
+   neither side carries the other's risk on a first deal.
+
+Compare your list:
+https://quote.akay.ie/?utm_source=email&utm_medium=email&utm_campaign=instant-quote-launch&utm_content=text-button#excel
+
+If it is easier, just reply with the list attached - same pricing, same day.
+
+Anil Khetan
+AKAY Trade - akay.ie
+offers@akay.ie - +353 87 238 2368
+
+--
+Sent by Akay Irl Ltd, Ireland - trade only. You are receiving this because you
+buy or have enquired about wholesale beverages.
+Unsubscribe: {{{RESEND_UNSUBSCRIBE_URL}}}

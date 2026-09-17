@@ -8,9 +8,13 @@ page where the walkthrough plays on its own, right beside the upload CTA.
 | --- | --- |
 | `email.html` | The HTML part. 600px, tables, inline styles, one image, one button. |
 | `email.txt` | The plain-text part. Send both — a text/html-only send is a spam signal, and some buyers still read in plain text. |
+| `email.resend.html` / `email.resend.txt` | The same two files with Resend's merge tags substituted in. Generated, not edited: change `email.html`/`email.txt` and re-run the `sed` in `resend-send.md`. |
+| `resend-send.md` | Who this goes to, how that audience is defined in Airtable, and the send steps. |
 
-Both carry `{{first_name}}` and `{{unsubscribe_url}}`; swap them for whatever
-the sending tool uses before the send.
+`email.html` and `email.txt` carry `{{first_name}}` and `{{unsubscribe_url}}`;
+swap them for whatever the sending tool uses. For Resend that is
+`{{{FIRST_NAME|there}}}` and `{{{RESEND_UNSUBSCRIBE_URL}}}`, already done in the
+`.resend.*` pair.
 
 ## The three links, and why they differ
 
