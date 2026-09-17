@@ -129,6 +129,11 @@ node n8n/tests/unmatched-demand-digest.test.js # weekly buying brief from unmatc
   `.claude/skills/VENDORED.md`), agents (public-safety-reviewer, test-writer),
   hooks (snapshot/.env write guard; n8n and site tests run after edits),
   plugin config
+- `.mcp.json` — MCP servers for Claude Code sessions (not part of the site
+  build). `perplexity` (`@perplexity-ai/mcp-server`) needs `PERPLEXITY_API_KEY`
+  in the environment — a Perplexity Pro/Max subscription is not an API key, it
+  is generated separately in the Perplexity API Portal. It reaches
+  `api.perplexity.ai`, which a sandboxed session's egress policy may block.
 
 After changing the data layer or page templates, run the
 **public-safety-reviewer** agent to confirm nothing private can leak.
