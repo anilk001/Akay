@@ -32,6 +32,22 @@ build time → static HTML → Netlify.
     does not trigger workflows from those pushes, so `ci.yml` never sees a
     refresh commit — this in-job gate is that missing CI run. A failure means
     no commit: the site keeps the last good catalogue and the run goes red.
+  - **A red refresh is a stale site, and it opens an issue.** The poke retries
+    every 5 minutes, so one persistent failure is hundreds of identical red
+    runs (56 in five hours on 2026-09-17, over a test that named a SKU which
+    expired at midnight). The first failure now opens one issue labelled
+    `refresh-failing` with the log tail; the next green run closes it. When
+    you see that issue, the `pipeline-health` skill is the triage path.
+  - **Tests under `tests/` must not depend on what is in the catalogue.**
+    That gate runs the suite against a snapshot that changes every few
+    minutes; an assertion naming a live offer, count or stat fails the day the
+    data moves and blocks every refresh after it. Behaviour cases go over
+    `tests/fixtures/`; the snapshot is for budgets and self-derived checks
+    only. The `snapshot-safe-tests` skill has the checklist.
+  - `generated` in the snapshot is the date the catalogue last changed, not
+    the run date — an unchanged catalogue bakes a byte-identical file, so the
+    job exits at its `git diff` instead of committing (and deploying) at
+    midnight for nothing.
 - Headline figures for the homepage ticker (today: `stock_value_eur`, the EUR
   value of listed stock) come from the base's `Site Stats` key/value table via
   `getSiteStats()` in the same module, and ride along in the snapshot as
@@ -102,10 +118,18 @@ node n8n/tests/instant-quote-intake.test.js   # Instant Quote intake payload rul
   `quote/` changes. Catalogue pages link into it through `quoteUrl()` in
   `src/lib/site.mjs`; `quote/README.md` covers deploys and the API/Turnstile
   settings it depends on
+- `tests/` — the site suite `npm test` runs; `tests/fixtures/` holds the
+  committed rows the behaviour cases run over (never the live snapshot)
 - `.claude/` — skills (offers-catalogue, offer-data-validator,
-  price-list-intake, new-guide, plus vendored design skills — see
+  price-list-intake, new-guide, pipeline-health, snapshot-safe-tests,
+  airtable-schema-check, plus vendored design skills — see
   `.claude/skills/VENDORED.md`), agents (public-safety-reviewer, test-writer),
-  hooks, plugin config
+  hooks (snapshot/.env write guard; n8n and site tests run after edits),
+  plugin config
 
 After changing the data layer or page templates, run the
 **public-safety-reviewer** agent to confirm nothing private can leak.
+Before naming an Airtable field or select option in code or an n8n node, run
+the **airtable-schema-check** skill against the live schema. Before editing
+anything under `.github/workflows/`, read the preflight list in the
+**pipeline-health** skill.

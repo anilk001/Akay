@@ -49,6 +49,13 @@ name: Scheduled catalogue refresh
 # Either way the job only COMMITS — and so only triggers a Netlify build — when
 # the catalogue actually changed, so extra pokes are cheap.
 #
+# WHEN IT FAILS, IT SAYS SO. A red run here is invisible in practice: nobody
+# watches the Actions tab, and the poke fires 288 times a day, so a persistent
+# failure is 288 identical red runs and a site that quietly stops updating. On
+# 2026-09-17 that was five hours (56 runs) before anyone looked. So a failed run
+# now opens ONE issue (label `refresh-failing`) with the tail of the log, and
+# the next green run closes it. One notification per outage, not per run.
+#
 # Trigger by hand any time from the Actions tab (Run workflow).
 
 on:
@@ -62,23 +69,34 @@ on:
 
 permissions:
   contents: write
+  issues: write   # the failure alert below
 
-# If several runs overlap, keep only the latest.
+# Never run two refreshes at once, but QUEUE the next one rather than cancel
+# the one in flight. With cancel-in-progress a poke arriving during the
+# five-minute verify step killed the run that was about to commit — run 994 on
+# 2026-09-17 was cancelled seven seconds after its push; a slower runner would
+# have lost the commit entirely, and every later poke would have done the same,
+# so a changed catalogue could never land. GitHub keeps at most one run pending
+# per group, so queuing cannot back up either.
 concurrency:
   group: catalogue-refresh
-  cancel-in-progress: true
+  cancel-in-progress: false
+
+env:
+  SITE_BRANCH: claude/softr-webflow-migration-50kj20
+  ALERT_LABEL: refresh-failing
 
 jobs:
   refresh:
     runs-on: ubuntu-latest
     steps:
       - name: Check out the site branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
-          ref: claude/softr-webflow-migration-50kj20
+          ref: ${{ env.SITE_BRANCH }}
 
       - name: Set up Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '20'
           # The verify step below runs npm ci; cache the download so a refresh
@@ -86,18 +104,29 @@ jobs:
           cache: npm
 
       - name: Re-bake snapshot from live Airtable, commit if changed
+        id: refresh
         env:
           AIRTABLE_TOKEN: ${{ secrets.AIRTABLE_TOKEN }}
         run: |
+          # An unspecified shell is `bash -e` WITHOUT pipefail, so the
+          # `npm test | tee` lines below would report tee's exit code and a
+          # failing suite would be committed as if it had passed.
+          set -euo pipefail
+
           if [ -z "$AIRTABLE_TOKEN" ]; then
             echo "::warning::AIRTABLE_TOKEN secret is not set — cannot refresh from Airtable."
             echo "::warning::Add it in Settings -> Secrets and variables -> Actions. Skipping this run."
             exit 0
           fi
 
+          LOG="$RUNNER_TEMP/refresh.log"
+          echo "log=$LOG" >> "$GITHUB_OUTPUT"
+
           # sync-offers refuses to overwrite unless the live fetch succeeds,
           # so a transient Airtable/network error can never blank the catalogue.
-          npm run sync-offers
+          # It also keeps the previous `generated` stamp when nothing changed,
+          # so an unchanged catalogue is a byte-identical file here.
+          npm run sync-offers 2>&1 | tee "$LOG"
 
           git config user.name "akay-refresh-bot"
           git config user.email "actions@users.noreply.github.com"
@@ -119,11 +148,96 @@ jobs:
           # failure means we do NOT commit: the site keeps serving the last good
           # catalogue and this run goes red where it can be seen. Staleness is
           # recoverable; publishing supplier identity or buy prices is not.
-          npm ci
-          npm test
-          npm run build   # ends in scripts/check-public-safety.mjs
+          #
+          # Tests here must not depend on WHICH offers are live: the suite runs
+          # against a catalogue that changes under it every few minutes. A test
+          # that names a SKU fails the day that SKU sells out, and then this job
+          # fails every five minutes until someone edits the test — which is
+          # exactly what happened on 2026-09-17. See tests/search-engine.test.js.
+          #
+          # The token is dropped for the checks: with it set, the build would
+          # fetch Airtable AGAIN and verify live data as of now rather than the
+          # file about to be committed. Without it the build reads the baked
+          # snapshot — exactly what Netlify's build, which holds no token, will
+          # do with this commit.
+          npm ci 2>&1 | tee -a "$LOG"
+          env -u AIRTABLE_TOKEN npm test 2>&1 | tee -a "$LOG"
+          env -u AIRTABLE_TOKEN npm run build 2>&1 | tee -a "$LOG"   # ends in scripts/check-public-safety.mjs
 
           git add src/data/offers-snapshot.json
           git commit -m "chore: refresh catalogue snapshot from Airtable"
-          git push origin HEAD:claude/softr-webflow-migration-50kj20
+
+          # The verify step took minutes; a pull request may have merged into
+          # the site branch meanwhile and a plain push would be rejected. Bring
+          # the branch up to date under this one commit. If the snapshot itself
+          # conflicts (a merge carried an older snapshot), give up cleanly —
+          # the next poke starts from the new base and re-bakes it.
+          git fetch origin "$SITE_BRANCH"
+          if ! git rebase "origin/$SITE_BRANCH"; then
+            git rebase --abort
+            echo "::error::The site branch moved under this refresh and the snapshot conflicts — not pushing. The next poke will re-bake from the new base."
+            exit 1
+          fi
+          git push origin "HEAD:$SITE_BRANCH"
           echo "Committed a verified catalogue — Netlify will redeploy."
+
+      # ---- Failure alert: one issue per outage ------------------------------
+      - name: Open an issue if the refresh is failing
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          LOG: ${{ steps.refresh.outputs.log }}
+          OWNER: ${{ github.repository_owner }}
+        run: |
+          set -euo pipefail
+          gh label create "$ALERT_LABEL" --force \
+            --description "The catalogue refresh workflow is red and akay.ie is not updating" \
+            --color B60205 >/dev/null
+
+          existing=$(gh issue list --label "$ALERT_LABEL" --state open --json number --jq '.[0].number // empty')
+          if [ -n "$existing" ]; then
+            echo "Issue #$existing is already open for this outage — not opening another."
+            exit 0
+          fi
+
+          tail=""
+          if [ -n "${LOG:-}" ] && [ -f "$LOG" ]; then
+            # Strip colour codes, and redact anything shaped like an Airtable
+            # PAT: GitHub masks secrets on the step's stdout, not in a file we
+            # tee'd, and this body goes into a public issue.
+            tail=$(tail -n 60 "$LOG" | sed -E 's/\x1b\[[0-9;]*m//g; s/pat[A-Za-z0-9]{14}\.[a-f0-9]{64}/[redacted]/g')
+          fi
+
+          {
+            echo "@$OWNER — the catalogue refresh has started failing, so **akay.ie is no longer updating from Airtable**."
+            echo
+            echo "First failing run: $RUN_URL"
+            echo
+            echo "The job re-bakes the snapshot and then runs \`npm test\` and \`npm run build\` before it will commit. A failure at that gate means the live catalogue no longer satisfies the suite or the public-safety check — the site keeps serving the last good snapshot until this is fixed. The poke fires every five minutes, so every run until then is the same failure."
+            echo
+            echo "Last lines of the run log:"
+            echo
+            echo '```'
+            echo "${tail:-(no log captured — the failure was before sync-offers ran)}"
+            echo '```'
+            echo
+            echo "This issue closes itself on the next green run."
+          } > "$RUNNER_TEMP/issue.md"
+
+          gh issue create \
+            --title "Catalogue refresh is failing — akay.ie is not updating" \
+            --label "$ALERT_LABEL" \
+            --body-file "$RUNNER_TEMP/issue.md"
+
+      - name: Close the failure issue once the refresh is green again
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          for n in $(gh issue list --label "$ALERT_LABEL" --state open --json number --jq '.[].number'); do
+            gh issue close "$n" --comment "The refresh is green again: $RUN_URL"
+            echo "Closed #$n."
+          done
