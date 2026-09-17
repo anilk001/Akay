@@ -154,9 +154,15 @@ jobs:
           # that names a SKU fails the day that SKU sells out, and then this job
           # fails every five minutes until someone edits the test — which is
           # exactly what happened on 2026-09-17. See tests/search-engine.test.js.
+          #
+          # The token is dropped for the checks: with it set, the build would
+          # fetch Airtable AGAIN and verify live data as of now rather than the
+          # file about to be committed. Without it the build reads the baked
+          # snapshot — exactly what Netlify's build, which holds no token, will
+          # do with this commit.
           npm ci 2>&1 | tee -a "$LOG"
-          npm test 2>&1 | tee -a "$LOG"
-          npm run build 2>&1 | tee -a "$LOG"   # ends in scripts/check-public-safety.mjs
+          env -u AIRTABLE_TOKEN npm test 2>&1 | tee -a "$LOG"
+          env -u AIRTABLE_TOKEN npm run build 2>&1 | tee -a "$LOG"   # ends in scripts/check-public-safety.mjs
 
           git add src/data/offers-snapshot.json
           git commit -m "chore: refresh catalogue snapshot from Airtable"
@@ -197,7 +203,10 @@ jobs:
 
           tail=""
           if [ -n "${LOG:-}" ] && [ -f "$LOG" ]; then
-            tail=$(tail -n 60 "$LOG" | sed 's/\x1b\[[0-9;]*m//g')
+            # Strip colour codes, and redact anything shaped like an Airtable
+            # PAT: GitHub masks secrets on the step's stdout, not in a file we
+            # tee'd, and this body goes into a public issue.
+            tail=$(tail -n 60 "$LOG" | sed -E 's/\x1b\[[0-9;]*m//g; s/pat[A-Za-z0-9]{14}\.[a-f0-9]{64}/[redacted]/g')
           fi
 
           {
