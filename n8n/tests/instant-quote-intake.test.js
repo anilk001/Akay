@@ -16,6 +16,8 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
+import { buildIntakePayload } from '../instant-quote-intake/trade-desk-api/post-to-intake.js';
+
 const SRC = join(dirname(fileURLToPath(import.meta.url)), '..', 'instant-quote-intake', 'validate-and-compose.js');
 const nodeFn = new Function('$input', '$now', readFileSync(SRC, 'utf8'));
 
@@ -199,5 +201,88 @@ eq(anonWanted.length, 3, 'an unattributed upload still produces rows');
 ok(!('Client' in anonWanted[0]), 'with no client link rather than an empty one');
 
 eq(extract(allMatched, { id: 'recENQUIRY1234567', fields: {} }).length, 0, 'a fully priced upload writes nothing');
+
+// --- the other end of the contract ------------------------------------------
+// `post-to-intake.js` is the module that belongs in trade-desk-api. Running a
+// REAL Trade Desk pricing result through it and then through both nodes is the
+// only place the two halves are checked against each other: if the API's
+// response shape moves, or the adapter stops marking a line as unmatched, the
+// buying brief quietly goes empty and nothing else would notice.
+//
+// The row shape below is the one the shipped SPA reads (quote/assets/*.js):
+// description, match {brand, productName, variant, volumeMl, pcsPerCase,
+// warehouse, stockCases, confidence, matchMethod}, needsReview, quantity,
+// quantityBasis, customerPriceBase, wholesalePrice, wholesaleCurrency,
+// wholesaleBasis, lineSaving, marginPct, note, sourceRow, rowId.
+const apiResult = {
+  summary: {
+    totalRows: 4, matchedRows: 2, needsReviewRows: 1, comparableRows: 2,
+    totalWholesaleValue: 8420.5, totalCustomerValue: 8991,
+    savingPct: 6.3, totalSaving: 570.5, currency: 'EUR',
+  },
+  results: [
+    {
+      rowId: 'r1', sourceRow: 2, description: 'Jameson 12 x 70cl',
+      match: { brand: 'Jameson', productName: 'Irish Whiskey', variant: '12x70cl', volumeMl: 700, pcsPerCase: 12, warehouse: 'Shannon', stockCases: 340, confidence: 0.98, matchMethod: 'exact' },
+      needsReview: false, quantity: 50, quantityBasis: 'Cases',
+      customerPriceBase: 18.4, wholesalePrice: 17.95, wholesaleCurrency: 'EUR', wholesaleBasis: 'Per Bottle',
+      lineSaving: 270, marginPct: 2.4,
+    },
+    {
+      rowId: 'r2', sourceRow: 3, description: 'Absolut blue 1ltr',
+      match: { brand: 'Absolut', productName: 'Vodka', variant: '6x1L', volumeMl: 1000, pcsPerCase: 6, stockCases: 12, confidence: 0.55, matchMethod: 'fuzzy' },
+      needsReview: true, quantity: 20, quantityBasis: 'Cases',
+      customerPriceBase: 11.2, wholesalePrice: 11.05, wholesaleCurrency: 'EUR', wholesaleBasis: 'Per Bottle',
+      lineSaving: 18, marginPct: 1.3,
+    },
+    {
+      rowId: 'r3', sourceRow: 4, description: 'Johnnie Walker Black Label 12 x 70cl T1',
+      match: null, needsReview: false, quantity: 20, quantityBasis: 'Cases',
+      customerPriceBase: 22.5, wholesalePrice: null, lineSaving: null, marginPct: null,
+      note: 'no live offer',
+    },
+    {
+      rowId: 'r4', sourceRow: 5, description: 'Hendricks Gin 6 x 0.7L',
+      match: null, needsReview: false, quantity: 10, quantityBasis: 'Cases',
+      customerPriceBase: null, wholesalePrice: null, lineSaving: null, marginPct: null,
+    },
+  ],
+};
+
+const payload = buildIntakePayload({
+  result: apiResult,
+  upload: { name: 'march-buy.xlsx', type: 'application/vnd.ms-excel', buffer: Buffer.from('Product,Qty\n') },
+  quoted: { name: 'march-buy-priced.xlsx', type: 'application/vnd.ms-excel', buffer: Buffer.from('Product,Qty,Price\n') },
+  contact: { email: 'Jane@Buyer.IE', company: 'Buyer Wholesale Ltd' },
+});
+
+eq(payload.lines.length, 4, 'every row travels, matched or not');
+ok(!!payload.lines[0].matched, 'a confident match carries the SKU it matched');
+eq(payload.lines[0].price, '17.95 EUR/Bottle', 'with our price as the buyer already saw it');
+ok(!!payload.lines[1].matched, 'a low-confidence match still counts as quoted');
+eq(payload.lines[1].needsReview, true, 'but travels flagged so the desk can look');
+ok(!('matched' in payload.lines[2]), 'an unmatched line carries no `matched` key — this is what creates the demand row');
+eq(payload.lines[2].target, 22.5, "and carries the buyer's own price, which is what makes it actionable");
+
+// Margin-shaped numbers stay in the API. `marginPct` sits under "Line saving"
+// in the SPA so it is probably the buyer's saving, but "probably" is not a
+// reason to copy it into Airtable and from there into a weekly email.
+const wire = JSON.stringify(payload);
+ok(!wire.includes('marginPct'), 'no margin field is forwarded');
+ok(!wire.includes('lineSaving'), 'nor the per-line saving');
+ok(!wire.includes('alternatives'), 'nor the alternatives list');
+
+// …and the whole chain, end to end.
+const composed = run(payload);
+eq(composed.ok, true, 'the webhook accepts a real Trade Desk payload');
+eq(composed.unmatchedCount, 2, 'two lines had nothing to price against');
+const rows = extract(composed, { id: 'recENQUIRY1234567', fields: { Client: ['recCLIENT12345678'] } });
+eq(rows.length, 2, 'so two Wanted rows are written');
+eq(rows[0].Brand, 'Johnnie Walker Black Label', 'parsed from what the buyer typed');
+eq(rows[0]['Target Price'], 22.5, "with their own target carried through from the API");
+eq(rows[0]['Bond/Customs Status'], 'T1', 'and the bond marker they wrote');
+eq(rows[0]['Qty Unit'], 'Cases', 'and the unit the API reported');
+eq(rows[1].Brand, 'Hendricks Gin', 'the second line too');
+ok(!('Target Price' in rows[1]), 'a line with no stated price says nothing rather than zero');
 
 console.log(`instant-quote-intake: ${n} assertions passed`);

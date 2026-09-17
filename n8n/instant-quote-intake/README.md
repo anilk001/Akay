@@ -123,16 +123,24 @@ is what the weekly digest counts. Add the option in Airtable and change
 
 ## Still to do outside this repo
 
-The Trade Desk asks buyers for nothing today, so `email`, `name` and `company`
-have nowhere to come from yet. Two changes are needed in the Trade Desk's own
-source (which is not in this repo — the API is a `railway up` deploy of
-`trade-desk-api`, the client a Vite build):
+The API must make the POST above from its upload handler. **That code is now
+written** — `trade-desk-api/post-to-intake.js` in this folder, with install
+instructions in its README. It is a copy-paste into `trade-desk-api` (a
+`railway up` deploy, not in this repo) plus one call after the response:
 
-- **The SPA** must collect the contact details — the open question is whether it
-  asks before pricing or at the download, which is a conversion decision, not a
-  technical one. This workflow handles either.
-- **The API** must make the POST above from its upload handler, where it already
-  holds both files.
+```js
+res.json(result);                      // the buyer never waits on us
+postToIntake({ result, upload, quoted, contact: req.body.contact || {} });
+```
+
+Until that lands, this workflow receives nothing and the buying brief has no
+Instant Quote demand in it.
+
+The SPA collecting contact details is a **separate, optional** change — the
+open question is whether it asks before pricing or at the download, which is a
+conversion decision, not a technical one. This workflow handles either, and
+handles neither: an unattributed list is still logged, and still produces
+demand rows.
 
 ## Files here
 
