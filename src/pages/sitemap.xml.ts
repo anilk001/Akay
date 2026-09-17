@@ -2,6 +2,7 @@ import { getOffers } from '../data/airtable.mjs';
 import { withSlugs, categorySlug, brandPages } from '../lib/slug.mjs';
 import { guides } from '../data/guides.mjs';
 import { SITE_URL } from '../lib/site.mjs';
+import { QUOTE_LANDING_PATH } from '../lib/quote-video.mjs';
 
 export const prerender = true;
 
@@ -59,6 +60,9 @@ export async function GET() {
       changefreq: 'monthly',
       priority: '0.3',
     })),
+    // The Instant Quote landing page — the destination for the launch
+    // email, and the only page that explains the tool on its own.
+    { path: QUOTE_LANDING_PATH, changefreq: 'monthly', priority: '0.8' },
     { path: '/guides/', changefreq: 'weekly', priority: '0.7' },
     ...guides.map((guide) => ({
       path: `/guides/${guide.slug}/`,

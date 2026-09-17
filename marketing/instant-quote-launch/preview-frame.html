@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<style>
+  :root{
+    --paper:#F7F5F0; --paper-2:#EFEDE4; --card:#FFFFFF; --ink:#17140F; --ink-soft:#41473F;
+    --muted:#767E72; --line:#E4E0D4; --line-soft:#ECE8DD;
+    --brass:#B4231F; --brass-2:#D0362E; --forest:#0E7A3B;
+    --ok:#0E7A3B; --ok-bg:#E2F0E5;
+    --serif:"Liberation Serif","DejaVu Serif",Georgia,serif;
+    --sans:"Liberation Sans","DejaVu Sans",Arial,sans-serif;
+    --mono:"DejaVu Sans Mono","Liberation Mono",monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:1200px;height:676px}
+  body{
+    background:
+      radial-gradient(1100px 520px at 50% -12%, #FFFFFF 0%, rgba(255,255,255,0) 62%),
+      linear-gradient(180deg,var(--paper) 0%,var(--paper-2) 100%);
+    font-family:var(--sans);color:var(--ink);
+    display:flex;flex-direction:column;align-items:center;
+    padding:30px 54px 26px;position:relative;overflow:hidden;
+  }
+  body::before{content:"";position:absolute;inset:0 0 auto;height:5px;
+    background:linear-gradient(90deg,var(--brass) 0%,var(--brass-2) 38%,var(--forest) 100%)}
+
+  /* ── top bar ─────────────────────────────────────────── */
+  .top{width:100%;display:flex;align-items:center;justify-content:space-between;flex:0 0 auto}
+  .mark{display:flex;align-items:center;gap:11px}
+  .mark img{height:44px;width:auto;display:block;filter:drop-shadow(0 1px 2px rgba(0,0,0,.16))}
+  .mark .wm{font-family:var(--serif);font-size:32px;font-weight:700;letter-spacing:.02em;line-height:1}
+  .mark .wm b{color:var(--brass);font-weight:700}
+  .mark .dt{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--brass-2);margin:0 4px 3px}
+  .url{font-family:var(--mono);font-size:15px;color:var(--muted);letter-spacing:.05em;
+    border:1px solid var(--line);background:rgba(255,255,255,.7);border-radius:999px;padding:8px 16px}
+
+  /* ── headline ────────────────────────────────────────── */
+  .head{width:100%;text-align:center;margin:28px 0 22px;flex:0 0 auto}
+  .head h1{font-family:var(--serif);font-size:48px;line-height:1.1;font-weight:700;letter-spacing:-.01em}
+  .head h1 em{font-style:normal;color:var(--brass)}
+  .head p{margin-top:9px;font-size:17px;color:var(--ink-soft)}
+
+  /* ── app window ──────────────────────────────────────── */
+  .stage{position:relative;width:900px;flex:0 0 auto}
+  .win{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;
+    box-shadow:0 2px 4px rgba(20,33,26,.07),0 26px 60px -24px rgba(20,33,26,.42)}
+  .win-bar{display:flex;align-items:center;gap:8px;padding:13px 18px;border-bottom:1px solid var(--line-soft);
+    background:linear-gradient(180deg,#FFF 0%,#FBFAF6 100%)}
+  .win-bar i{width:10px;height:10px;border-radius:50%;background:#E0DCCF;display:block}
+  .win-bar .fn{margin-left:8px;font-family:var(--mono);font-size:15px;color:var(--ink-soft)}
+  .win-bar .tag{margin-left:auto;font-family:var(--mono);font-size:11.5px;letter-spacing:.11em;
+    color:var(--brass);border:1px solid color-mix(in srgb,var(--brass) 34%,transparent);
+    background:color-mix(in srgb,var(--brass) 7%,#fff);border-radius:6px;padding:4px 9px}
+  .rows{padding:4px 18px 6px}
+  .row{display:flex;align-items:center;justify-content:space-between;gap:16px;
+    padding:23px 0;border-bottom:1px solid var(--line-soft);font-size:17.5px}
+  .row:last-child{border-bottom:0}
+  .nm{color:var(--ink);font-weight:500;white-space:nowrap}
+  .cmp{display:flex;align-items:center;gap:10px;flex-shrink:0;font-variant-numeric:tabular-nums}
+  .was{color:var(--muted);font-size:16px}
+  .add{display:flex;align-items:center;gap:9px;opacity:0;transform:translateY(5px);transition:none}
+  .add.on{opacity:1;transform:none}
+  .arw{width:16px;height:16px;color:var(--muted);flex-shrink:0}
+  .now{font-weight:700;font-size:17.5px}
+  .sv{display:inline-flex;align-items:center;gap:4px;background:var(--ok-bg);color:var(--ok);
+    font-size:13.5px;font-weight:700;border-radius:999px;padding:4px 10px}
+  .sv svg{width:11px;height:11px}
+  .win-foot{display:flex;align-items:center;gap:10px;padding:14px 18px;border-top:1px solid var(--line-soft);
+    background:#FBFAF6;font-size:15px;color:var(--ink-soft)}
+  .win-foot .dot-sp{width:14px;height:14px;border-radius:50%;border:2px solid var(--line);
+    border-top-color:var(--brass);display:inline-block}
+  .win-foot svg.chk{width:16px;height:16px;color:var(--forest)}
+  .win-foot .tot{margin-left:auto;font-weight:700;color:var(--forest);font-size:14.5px;
+    background:var(--ok-bg);border-radius:999px;padding:5px 12px;opacity:0}
+  .win-foot .tot.on{opacity:1}
+
+  /* progress line across the top of the window, like a player scrubber */
+  .scrub{position:absolute;left:0;right:0;bottom:0;height:4px;background:rgba(228,224,212,.85)}
+  .scrub i{display:block;height:100%;background:linear-gradient(90deg,var(--brass),var(--brass-2));width:8%}
+
+  /* ── play overlay ────────────────────────────────────── */
+  .scrim{position:absolute;inset:0;border-radius:16px;background:rgba(23,20,15,.055)}
+  .play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    width:108px;height:108px;border-radius:50%;background:rgba(255,255,255,.96);
+    box-shadow:0 0 0 10px rgba(255,255,255,.28),0 14px 34px -8px rgba(20,33,26,.55);
+    display:flex;align-items:center;justify-content:center}
+  .play svg{width:42px;height:42px;margin-left:7px;color:var(--brass)}
+  .watch{margin-top:28px;display:flex;align-items:center;justify-content:center;gap:9px;
+    font-size:17px;font-weight:700;color:var(--brass);letter-spacing:.01em}
+  .watch svg{width:13px;height:13px}
+
+  /* ── footer proof line ───────────────────────────────── */
+  .proof{margin-top:auto;padding-top:26px;width:100%;display:flex;align-items:center;justify-content:center;
+    gap:14px;font-family:var(--mono);font-size:13.5px;color:var(--muted);letter-spacing:.03em;text-align:center}
+  .proof b{color:var(--ink-soft);font-weight:700}
+  .proof span.sep{width:4px;height:4px;border-radius:50%;background:var(--line);display:inline-block}
+</style>
+</head>
+<body>
+  <div class="top">
+    <div class="mark">
+      <img src="../../public/akay-bird.png" alt="">
+      <span class="wm">AKAY<span class="dt"></span><b>trade</b></span>
+    </div>
+    <span class="url">quote.akay.ie</span>
+  </div>
+
+  <div class="head">
+    <h1>Your buying list, priced in <em>60 seconds</em></h1>
+    <p>Upload the file you already keep. Download it back with our price — and your saving — on every line.</p>
+  </div>
+
+  <div class="stage">
+    <div class="win">
+      <div class="win-bar">
+        <i></i><i></i><i></i>
+        <span class="fn">my-buying-list.xlsx</span>
+        <span class="tag">+ AKAY PRICE</span>
+      </div>
+      <div class="rows" id="rows"></div>
+      <div class="win-foot">
+        <span id="footIcon"><span class="dot-sp"></span></span>
+        <span id="footText">Reading your file — 3 lines found</span>
+        <span class="tot" id="tot">saving 6.5% on this list</span>
+      </div>
+      <div class="scrub"><i id="scrub"></i></div>
+    </div>
+    <div class="scrim"></div>
+    <div class="play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15a1 1 0 0 0 1.54.84l11.2-7.5a1 1 0 0 0 0-1.68L8.54 3.66A1 1 0 0 0 7 4.5Z"/></svg></div>
+  </div>
+
+  <div class="watch">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15a1 1 0 0 0 1.54.84l11.2-7.5a1 1 0 0 0 0-1.68L8.54 3.66A1 1 0 0 0 7 4.5Z"/></svg>
+    Watch how it works
+  </div>
+
+  <div class="proof">
+    <b>11,719 live offers</b><span class="sep"></span><b>over &euro;85 million in stock</b><span class="sep"></span><b>2,074 brands</b><span class="sep"></span>example figures
+  </div>
+
+<script>
+  const LINES = [
+    ['Irish whiskey &middot; 12 &times; 70cl', '142.00', '131.50', '7%'],
+    ['Lager &middot; 24 &times; 330ml can', '21.40', '19.95', '7%'],
+    ['Vodka &middot; 6 &times; 1L', '78.00', '74.25', '5%'],
+  ];
+  const ARW = '<svg class="arw" viewBox="0 0 24 24" fill="none"><path d="M4 12h15m0 0-5.5-5.5M19 12l-5.5 5.5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  const DWN = '<svg viewBox="0 0 24 24" fill="none"><path d="M12 4v15m0 0-6-6m6 6 6-6" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  const CHK = '<svg class="chk" viewBox="0 0 24 24" fill="none"><path d="M5 12.5 10 17.5 19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+  document.getElementById('rows').innerHTML = LINES.map(([nm, was, now, sv], i) => `
+    <div class="row">
+      <span class="nm">${nm}</span>
+      <span class="cmp">
+        <span class="was">your cost &euro;${was}</span>
+        <span class="add" id="add${i}">
+          ${ARW}<span class="now">&euro;${now}</span>
+          <span class="sv">${DWN}${sv}</span>
+        </span>
+      </span>
+    </div>`).join('');
+
+  // stage 0 = uploaded, nothing priced yet; 1..3 = lines priced; 4 = done.
+  window.setStage = function (n) {
+    for (let i = 0; i < 3; i++) document.getElementById('add' + i).classList.toggle('on', n > i);
+    const done = n >= 4;
+    document.getElementById('footIcon').innerHTML = done ? CHK : '<span class="dot-sp"></span>';
+    document.getElementById('footText').textContent = done
+      ? '3 of 3 lines priced — ready to download'
+      : (n === 0 ? 'Reading your file — 3 lines found' : `Pricing against live stock — ${n} of 3`);
+    document.getElementById('tot').classList.toggle('on', done);
+    document.getElementById('scrub').style.width = (8 + n * 23) + '%';
+  };
+  window.setStage(0);
+</script>
+</body>
+</html>

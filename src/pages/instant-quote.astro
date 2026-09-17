@@ -1,0 +1,496 @@
+---
+// The Instant Quote landing page — the destination for the launch email's
+// play-button image (see marketing/instant-quote-launch/). It is deliberately
+// the lightest page on the site: no catalogue grid, no search index, no
+// external font or script beyond the shared <head>. Someone who clicked an
+// image in an email is one tap from leaving, so the walkthrough has to be
+// moving and the CTA has to be beside it before anything else loads.
+import { getOffers, getSiteStats } from '../data/airtable.mjs';
+import { crumbs, organizationSchema } from '../lib/schema.mjs';
+import Seo from '../components/Seo.astro';
+import { quoteUrl, SITE_URL } from '../lib/site.mjs';
+import { QUOTE_VIDEO, QUOTE_VIDEO_POSTER, QUOTE_LANDING_PATH } from '../lib/quote-video.mjs';
+import { WA_LINK, WA_DISPLAY } from '../lib/whatsapp.mjs';
+
+const { offers } = await getOffers();
+const { stats: siteStats } = await getSiteStats();
+
+// Every figure on this page is counted from the same snapshot the catalogue
+// renders from, so a refresh moves the page and the catalogue together. The
+// only hand-written number is the spirits holding below.
+const offerCount = offers.length;
+const brandCount = new Set(offers.map((o) => o.brand).filter(Boolean)).size;
+const spiritsCount = offers.filter((o) => o.category === 'Spirits').length;
+const fmt = (n) => n.toLocaleString('en-IE');
+
+// Banded floors maintained in Airtable's "Site Stats" table and printed
+// verbatim (see getSiteStats). `spirits_value_eur` does not exist there yet —
+// add the row with Publish ticked and this page picks it up on the next
+// refresh; until then it prints the figure agreed for the launch.
+const stockValue = siteStats.stock_value_eur || '';
+const spiritsValue = siteStats.spirits_value_eur || 'Over €50 million';
+
+const pageTitle = 'Instant Quote — Price Your Buying List in 60 Seconds | AKAY Trade';
+const pageDesc = `Upload the buying list you already keep — any format — and download it back priced against ${fmt(offerCount)} live wholesale offers, with your saving worked out on every line. No login, no template.`;
+
+const schemas = [
+  organizationSchema(),
+  crumbs([
+    { name: 'Home', path: '/' },
+    { name: 'Instant Quote', path: QUOTE_LANDING_PATH },
+  ]),
+  // Only describe a video that exists. A VideoObject pointing at nothing is a
+  // structured-data error, not a rich result.
+  ...(QUOTE_VIDEO
+    ? [{
+        '@context': 'https://schema.org',
+        '@type': 'VideoObject',
+        name: 'AKAY Instant Quote — upload a buying list, download it priced',
+        description: 'A buying list uploaded to the AKAY Trade Desk and downloaded back with our selling price and the saving marked on every line.',
+        thumbnailUrl: [`${SITE_URL}${QUOTE_VIDEO_POSTER}`],
+        contentUrl: `${SITE_URL}${QUOTE_VIDEO}`,
+        uploadDate: '2026-09-17',
+      }]
+    : []),
+];
+
+// Example figures, never a real line — the same three the homepage explainer
+// uses, so the email image, that section and this page tell one story.
+const DEMO_ROWS = [
+  ['Irish whiskey · 12 × 70cl', '142.00', '131.50', '7%'],
+  ['Lager · 24 × 330ml can', '21.40', '19.95', '7%'],
+  ['Vodka · 6 × 1L', '78.00', '74.25', '5%'],
+];
+---
+
+<!doctype html>
+<html lang="en">
+<head>
+  <Seo
+    title={pageTitle}
+    description={pageDesc}
+    ogTitle="Compare your current invoice in 60 seconds — AKAY Instant Quote"
+    image={`${SITE_URL}${QUOTE_VIDEO_POSTER}`}
+    imageAlt="A buying list in the AKAY Instant Quote tool with our price and the saving written in beside the buyer's own cost."
+    path={QUOTE_LANDING_PATH}
+    schemas={schemas}
+  />
+  <style>
+    :root{
+      --paper:#F7F5F0; --paper-2:#EFEDE4; --card:#FFFFFF; --ink:#17140F; --ink-soft:#41473F;
+      --muted:#767E72; --line:#E4E0D4; --line-soft:#ECE8DD;
+      --brass:#B4231F; --brass-2:#D0362E; --forest:#0E7A3B;
+      --ok:#0E7A3B; --ok-bg:#E2F0E5;
+      --shadow:0 1px 2px rgba(20,33,26,.06),0 6px 20px -8px rgba(20,33,26,.14);
+      --radius:14px;
+      --serif:"Hoefler Text","Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+      --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      --mono:ui-monospace,"SF Mono","SFMono-Regular",Menlo,Consolas,monospace;
+    }
+    @media (prefers-color-scheme:dark){
+      :root{
+        --paper:#0C140F; --paper-2:#081009; --card:#13201A; --ink:#F1EFE7; --ink-soft:#C6CEC4;
+        --muted:#8A968A; --line:#243029; --line-soft:#1B2620;
+        --brass:#EC5A52; --brass-2:#F26E66; --forest:#37B866;
+        --ok:#5FC97E; --ok-bg:#123021;
+        --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px -12px rgba(0,0,0,.6);
+      }
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0}
+    body{background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.5;-webkit-font-smoothing:antialiased}
+    .wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+    a{color:inherit}
+
+    /* ── header: the way back to the catalogue, nothing else ─────────── */
+    header.bar{border-bottom:1px solid var(--line);background:var(--paper)}
+    .bar-in{display:flex;align-items:center;gap:14px;height:58px}
+    .mark{display:inline-flex;align-items:center;gap:9px;font-family:var(--serif);font-weight:600;
+      font-size:24px;letter-spacing:.02em;color:var(--ink);text-decoration:none;line-height:1}
+    .mark img{height:32px;width:auto;flex-shrink:0}
+    .mark b{color:var(--brass)}
+    .dot{width:6px;height:6px;border-radius:50%;background:var(--brass-2);display:inline-block;margin:0 2px 2px}
+    .bar-in .to-cat{margin-left:auto;font-size:13.5px;font-weight:600;color:var(--ink-soft);text-decoration:none;
+      border:1px solid var(--line);border-radius:9px;padding:8px 13px;background:var(--card);white-space:nowrap}
+    .bar-in .to-cat:hover{border-color:var(--brass);color:var(--brass)}
+    .bar-in .to-cat .short{display:none}
+    /* Below ~430px the wordmark and the full label do not fit on one row, and
+       the button pushed the page into a horizontal scroll. */
+    @media (max-width:460px){
+      .bar-in .to-cat .long{display:none}
+      .bar-in .to-cat .short{display:inline}
+      .mark{font-size:21px}
+    }
+    /* On the narrowest phones the button's own chrome is what spills; the
+       link still works, it just stops being a box. */
+    @media (max-width:400px){
+      .bar-in .to-cat{border:0;padding:0;background:none}
+    }
+
+    /* ── hero: copy and CTA on the left, the walkthrough beside it ───── */
+    .hero{background:linear-gradient(180deg,var(--paper) 0%,var(--paper-2) 100%);
+      border-bottom:1px solid var(--line)}
+    .hero-in{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,520px);gap:34px 44px;
+      align-items:center;padding:42px 0 46px}
+    @media (max-width:940px){.hero-in{grid-template-columns:1fr;padding:30px 0 34px;gap:26px}}
+    .eyebrow{display:flex;align-items:center;gap:9px;margin:0 0 12px;font-family:var(--mono);
+      font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+    .eyebrow .new{background:var(--brass);color:#fff;border-radius:5px;padding:2px 7px;font-size:10px;letter-spacing:.1em}
+    @media (prefers-color-scheme:dark){.eyebrow .new{color:#17140F}}
+    h1{font-family:var(--serif);font-size:clamp(28px,4.2vw,44px);line-height:1.08;font-weight:600;margin:0;
+      letter-spacing:-.01em}
+    h1 em{font-style:normal;color:var(--brass)}
+    .lede{margin:14px 0 0;font-size:16.5px;color:var(--ink-soft);max-width:54ch}
+    .lede b{color:var(--ink);font-weight:600}
+
+    .cta-row{display:flex;flex-wrap:wrap;align-items:center;gap:12px 16px;margin-top:24px}
+    .cta{display:inline-flex;align-items:center;gap:10px;background:var(--brass);color:#fff;
+      font-size:16px;font-weight:700;text-decoration:none;border-radius:11px;padding:15px 22px;
+      box-shadow:0 10px 24px -12px rgba(180,35,31,.85)}
+    @media (prefers-color-scheme:dark){.cta{color:#17140F}}
+    .cta:hover{background:var(--brass-2)}
+    .cta:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+    .cta svg{width:19px;height:19px;flex-shrink:0}
+    .cta-note{font-size:13.5px;color:var(--muted);max-width:30ch}
+    .alt{margin:16px 0 0;font-size:14px;color:var(--ink-soft);max-width:52ch}
+    .alt a{color:var(--brass);font-weight:600;text-decoration:none;
+      border-bottom:1px solid color-mix(in srgb,var(--brass) 40%,transparent)}
+    .alt a:hover{color:var(--forest)}
+
+    /* ── the player ──────────────────────────────────────────────────── */
+    .player{margin:0;width:100%}
+    .player video{width:100%;display:block;border-radius:var(--radius);border:1px solid var(--line);
+      box-shadow:var(--shadow);background:var(--card)}
+    .d-win{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;
+      box-shadow:0 2px 4px rgba(20,33,26,.07),0 22px 48px -26px rgba(20,33,26,.5);position:relative}
+    .d-bar{display:flex;align-items:center;gap:7px;padding:11px 14px;border-bottom:1px solid var(--line-soft);
+      background:linear-gradient(180deg,var(--card) 0%,color-mix(in srgb,var(--card) 92%,var(--paper-2)) 100%)}
+    .d-bar i{width:8px;height:8px;border-radius:50%;background:var(--line);display:block}
+    .d-bar .fn{margin-left:6px;font-family:var(--mono);font-size:12.5px;color:var(--ink-soft)}
+    .d-bar .tag{margin-left:auto;font-family:var(--mono);font-size:10px;letter-spacing:.11em;color:var(--brass);
+      border:1px solid color-mix(in srgb,var(--brass) 34%,transparent);border-radius:6px;padding:3px 8px;
+      background:color-mix(in srgb,var(--brass) 7%,var(--card))}
+    .d-rows{padding:2px 14px 4px}
+    .d-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:3px 12px;
+      padding:13px 0;border-bottom:1px solid var(--line-soft);font-size:14.5px}
+    .d-row:last-child{border-bottom:0}
+    .d-row .nm{color:var(--ink);flex:1 1 auto;min-width:120px}
+    .d-cmp{display:inline-flex;align-items:center;gap:8px;flex-shrink:0;font-variant-numeric:tabular-nums}
+    .d-cmp .was{color:var(--muted);font-size:13.5px}
+    .d-add{display:inline-flex;align-items:center;gap:8px;opacity:0}
+    .d-add .arw{width:13px;height:13px;color:var(--muted);flex-shrink:0}
+    .d-add .now{font-weight:700}
+    .d-add .sv{display:inline-flex;align-items:center;gap:3px;background:var(--ok-bg);color:var(--ok);
+      font-size:12px;font-weight:700;border-radius:999px;padding:3px 9px}
+    .d-add .sv svg{width:9px;height:9px;flex-shrink:0}
+    .d-foot{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px;padding:12px 14px;
+      border-top:1px solid var(--line-soft);font-size:13px;color:var(--ink-soft);
+      background:color-mix(in srgb,var(--card) 92%,var(--paper-2))}
+    .d-state{display:grid}
+    .d-state > span{grid-area:1/1;display:inline-flex;align-items:center;gap:7px}
+    .d-state svg{width:14px;height:14px;flex-shrink:0}
+    .d-state .chk{color:var(--forest)}
+    .d-spin{width:12px;height:12px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--brass);
+      flex-shrink:0;animation:d-spin 1s linear infinite}
+    .d-tot{font-weight:700;color:var(--ok);font-size:12.5px;background:var(--ok-bg);border-radius:999px;
+      padding:4px 11px;opacity:0;white-space:nowrap}
+    .d-scrub{position:absolute;left:0;right:0;bottom:0;height:3px;background:var(--line-soft)}
+    .d-scrub i{display:block;height:100%;width:8%;background:linear-gradient(90deg,var(--brass),var(--brass-2))}
+
+    /* One 7s cycle, run three times, then it rests on the finished file —
+       motion that sells the thing without becoming wallpaper. The control
+       below can pause or replay it at any point. */
+    .d-run .d-add{animation:d-in 7s linear 3 both}
+    .d-run .d-row:nth-child(1) .d-add{animation-name:d-r1}
+    .d-run .d-row:nth-child(2) .d-add{animation-name:d-r2}
+    .d-run .d-row:nth-child(3) .d-add{animation-name:d-r3}
+    .d-run .d-pending{animation:d-out 7s linear 3 both}
+    .d-run .d-done,.d-run .d-tot{animation:d-done 7s linear 3 both}
+    .d-run .d-scrub i{animation:d-scrub 7s linear 3 both}
+    .d-paused *{animation-play-state:paused !important}
+    @keyframes d-r1{0%,8%{opacity:0;transform:translateY(5px)}12%,100%{opacity:1;transform:none}}
+    @keyframes d-r2{0%,20%{opacity:0;transform:translateY(5px)}24%,100%{opacity:1;transform:none}}
+    @keyframes d-r3{0%,32%{opacity:0;transform:translateY(5px)}36%,100%{opacity:1;transform:none}}
+    @keyframes d-in{0%{opacity:0}100%{opacity:1}}
+    @keyframes d-out{0%,40%{opacity:1}44%,100%{opacity:0}}
+    @keyframes d-done{0%,40%{opacity:0}44%,100%{opacity:1}}
+    @keyframes d-scrub{0%{width:8%}12%{width:31%}24%{width:54%}36%{width:77%}44%,100%{width:100%}}
+    @keyframes d-spin{to{transform:rotate(360deg)}}
+
+    .player-foot{display:flex;align-items:baseline;gap:10px 14px;flex-wrap:wrap;margin:11px 2px 0}
+    .p-toggle{flex-shrink:0;display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);
+      background:var(--card);color:var(--ink-soft);font:inherit;font-size:12.5px;font-weight:600;
+      border-radius:8px;padding:5px 11px;cursor:pointer}
+    .p-toggle:hover{border-color:var(--brass);color:var(--brass)}
+    .p-toggle svg{width:11px;height:11px}
+    .p-cap{margin:0;font-size:12.5px;color:var(--muted);flex:1 1 240px;min-width:0}
+
+    /* Motion is the whole point of this page, so reduced motion gets the
+       finished file rather than a blank frame — and no control to pause
+       something that never moves. */
+    @media (prefers-reduced-motion:reduce){
+      .d-run .d-add,.d-run .d-tot{animation:none;opacity:1;transform:none}
+      .d-run .d-pending{animation:none;opacity:0}
+      .d-run .d-done{animation:none;opacity:1}
+      .d-run .d-scrub i{animation:none;width:100%}
+      .d-spin{animation:none}
+      .p-toggle{display:none}
+    }
+
+    /* ── proof strip ─────────────────────────────────────────────────── */
+    .proof{border-bottom:1px solid var(--line);background:var(--card)}
+    .proof-in{display:flex;flex-wrap:wrap;gap:14px 40px;padding:20px 0;justify-content:space-between}
+    .proof b{display:block;font-family:var(--serif);font-size:24px;font-weight:600;line-height:1.1}
+    .proof span{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.09em;
+      text-transform:uppercase;color:var(--muted);margin-top:5px}
+
+    /* ── sections ────────────────────────────────────────────────────── */
+    section.block{padding:46px 0;border-bottom:1px solid var(--line)}
+    h2{font-family:var(--serif);font-size:clamp(21px,2.8vw,28px);font-weight:600;margin:0 0 8px;letter-spacing:-.01em}
+    .sub{margin:0 0 26px;color:var(--ink-soft);font-size:15.5px;max-width:62ch}
+    .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:18px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px;
+      box-shadow:var(--shadow)}
+    .card .n{width:25px;height:25px;border-radius:50%;background:var(--forest);color:var(--paper);
+      display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;
+      font-family:var(--mono);margin-bottom:11px}
+    @media (prefers-color-scheme:dark){.card .n{color:#0A140F}}
+    .card h3{margin:0 0 6px;font-size:15.5px;font-weight:600}
+    .card p{margin:0;font-size:14px;color:var(--ink-soft);line-height:1.55}
+    .card p strong{color:var(--ink);font-weight:600}
+
+    .spirits{background:var(--paper-2)}
+    .spirits .cards{grid-template-columns:repeat(auto-fit,minmax(270px,1fr))}
+    .spirits .card{border-left:3px solid var(--brass)}
+
+    /* ── closing CTA ─────────────────────────────────────────────────── */
+    .close{padding:48px 0 54px;text-align:center}
+    .close h2{margin-bottom:10px}
+    .close .sub{margin:0 auto 24px}
+    .close .cta-row{justify-content:center}
+    footer{border-top:1px solid var(--line);background:var(--card);padding:22px 0;
+      font-size:13px;color:var(--muted)}
+    footer .f-in{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;justify-content:space-between}
+    footer a{color:var(--ink-soft);text-decoration:none}
+    footer a:hover{color:var(--brass)}
+  </style>
+</head>
+<body>
+  <header class="bar">
+    <div class="wrap bar-in">
+      <a class="mark" href="/" aria-label="AKAY home">
+        <img src="/akay-bird.png" alt="" width="320" height="279" />AKAY<span class="dot"></span><b>trade</b>
+      </a>
+      <a class="to-cat" href="/"><span class="long">Browse the catalogue</span><span class="short">Catalogue</span></a>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="wrap hero-in">
+      <div>
+        <p class="eyebrow"><span class="new">New</span> Instant Quote</p>
+        <h1>Compare your current invoice in <em>60 seconds</em></h1>
+        <p class="lede">
+          Send us the buying list you already keep — Excel, CSV, whatever format it is in.
+          It comes back priced against the <b>{fmt(offerCount)} offers live on this site right now</b>.
+          Put your own cost or target price in the file and every line comes back with the
+          difference worked out.
+        </p>
+        <div class="cta-row">
+          <a class="cta" href={quoteUrl('excel')} rel="nofollow">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M12 15.5V3.5m0 0L7.8 7.7M12 3.5l4.2 4.2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M4 15.5V18a2.5 2.5 0 0 0 2.5 2.5h11A2.5 2.5 0 0 0 20 18v-2.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            Upload your list — download it priced
+          </a>
+          <span class="cta-note">No login. No template. No call-back.</span>
+        </div>
+        <p class="alt">
+          Rather not upload? Email the list to <a href="mailto:offers@akay.ie?subject=Requirement%20List">offers@akay.ie</a>
+          with “Requirement List” in the subject, or send it on
+          <a href={WA_LINK} rel="nofollow">WhatsApp ({WA_DISPLAY})</a> — same pricing, same day.
+        </p>
+      </div>
+
+      <figure class="player" id="player">
+        {QUOTE_VIDEO ? (
+          /* Muted and looping, so it can autoplay without asking; native
+             controls because a real recording is something buyers scrub. */
+          <video src={QUOTE_VIDEO} poster={QUOTE_VIDEO_POSTER} width="520" height="293"
+                 autoplay muted loop playsinline controls preload="metadata"
+                 aria-label="Screen recording: a buying list uploaded to the Instant Quote tool and downloaded back with our prices and the savings marked."></video>
+        ) : (
+          /* aria-hidden: it is a picture of what the copy beside it already
+             says, and the caption below carries the meaning. The figures are
+             made up — generic product types, never a real line. */
+          <div class="d-win d-run" id="demo" aria-hidden="true">
+            <div class="d-bar"><i></i><i></i><i></i><span class="fn">my-buying-list.xlsx</span><span class="tag">+ AKAY PRICE</span></div>
+            <div class="d-rows">
+              {DEMO_ROWS.map(([nm, was, now, save]) => (
+                <div class="d-row">
+                  <span class="nm">{nm}</span>
+                  <span class="d-cmp">
+                    <span class="was">your cost €{was}</span>
+                    <span class="d-add">
+                      <svg class="arw" viewBox="0 0 24 24" fill="none"><path d="M4 12h15m0 0-5.5-5.5M19 12l-5.5 5.5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                      <span class="now">€{now}</span>
+                      <span class="sv">
+                        <svg viewBox="0 0 24 24" fill="none"><path d="M12 4v15m0 0-6-6m6 6 6-6" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        {save}
+                      </span>
+                    </span>
+                  </span>
+                </div>
+              ))}
+            </div>
+            <div class="d-foot">
+              <span class="d-state">
+                <span class="d-pending"><span class="d-spin"></span>Pricing against live stock…</span>
+                <span class="d-done"><svg class="chk" viewBox="0 0 24 24" fill="none"><path d="M5 12.5 10 17.5 19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>3 of 3 lines priced — ready to download</span>
+              </span>
+              <span class="d-tot">saving 6.5%</span>
+            </div>
+            <div class="d-scrub"><i></i></div>
+          </div>
+        )}
+        <div class="player-foot">
+          {!QUOTE_VIDEO && (
+            <button class="p-toggle" id="playerToggle" type="button" hidden>
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5h3v14H8zM13 5h3v14h-3z"/></svg>
+              <span id="playerToggleLabel">Pause</span>
+            </button>
+          )}
+          <figcaption class="p-cap">
+            Example figures. Your own file comes back with our live selling price written in beside
+            your cost, and the saving worked out on every line.
+          </figcaption>
+        </div>
+      </figure>
+    </div>
+  </section>
+
+  <section class="proof">
+    <div class="wrap proof-in">
+      <div><b>{fmt(offerCount)}</b><span>live offers</span></div>
+      {stockValue && <div><b>{stockValue}</b><span>stock listed</span></div>}
+      <div><b>{fmt(brandCount)}</b><span>brands</span></div>
+      <div><b>{fmt(spiritsCount)}</b><span>spirits lines</span></div>
+      <div><b>60 sec</b><span>to a priced file</span></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="wrap">
+      <h2>What comes back</h2>
+      <p class="sub">The same file you sent, with two columns added. Nothing to re-key, nothing to reformat.</p>
+      <div class="cards">
+        <div class="card">
+          <span class="n">1</span>
+          <h3>Your file, not our template</h3>
+          <p>Excel, CSV, or however your buying list already looks. <strong>No fixed columns</strong> — we parse it as it comes, including the messy ones.</p>
+        </div>
+        <div class="card">
+          <span class="n">2</span>
+          <h3>Priced against live stock</h3>
+          <p>Every line is matched against the <strong>{fmt(offerCount)} offers</strong> live on akay.ie, and our selling price goes straight into your own file.</p>
+        </div>
+        <div class="card">
+          <span class="n">3</span>
+          <h3>Your saving, line by line</h3>
+          <p>Include your current cost or target price and we mark the difference on every line — <strong>what you save is in black and white</strong> before you commit to anything.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block spirits">
+    <div class="wrap">
+      <h2>Why the price holds up</h2>
+      <p class="sub">The quote is only as good as what sits behind it. Three things do.</p>
+      <div class="cards">
+        <div class="card">
+          <h3>One place to buy all of it</h3>
+          <p><strong>{fmt(offerCount)} lines across {fmt(brandCount)} brands</strong> — spirits, beer, soft drinks, grocery, confectionery and toiletries. One supplier, one set of paperwork, instead of chasing eight.</p>
+        </div>
+        <div class="card">
+          <h3>{spiritsValue} of branded spirits, one location</h3>
+          <p><strong>{fmt(spiritsCount)} spirits lines</strong> held together rather than scattered across agents, so a mixed order ships as one consignment with one set of documents.</p>
+        </div>
+        <div class="card">
+          <h3>Escrow on the payment</h3>
+          <p>Funds can be held in escrow and released once the stock is verified, so <strong>neither side carries the other's risk</strong> on a first deal.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap close">
+    <h2>Send the list. See the difference.</h2>
+    <p class="sub">A minute to upload, a minute to read it back. If we are not cheaper on a line, the file says so.</p>
+    <div class="cta-row">
+      <a class="cta" href={quoteUrl('excel')} rel="nofollow">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 15.5V3.5m0 0L7.8 7.7M12 3.5l4.2 4.2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M4 15.5V18a2.5 2.5 0 0 0 2.5 2.5h11A2.5 2.5 0 0 0 20 18v-2.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        Upload your list — download it priced
+      </a>
+      <span class="cta-note">Or ask a question first at <a href={quoteUrl('chat')} rel="nofollow" style="color:var(--brass);font-weight:600">Ask AKAY</a>.</span>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap f-in">
+      <span>AKAY Trade — Akay Irl Ltd, Ireland. Trade only.</span>
+      <span><a href="/">Catalogue</a> · <a href="/guides/">Buyer's guides</a> · <a href="/about/">About</a> · <a href="mailto:offers@akay.ie">offers@akay.ie</a></span>
+    </div>
+  </footer>
+
+  <script is:inline>
+    // The mock autoplays, so there has to be a way to stop it (WCAG 2.2.2).
+    // The button ships hidden and is only revealed here: without JS it could
+    // not do anything, and the animation stops on its own after three passes.
+    (function () {
+      var demo = document.getElementById('demo');
+      var btn = document.getElementById('playerToggle');
+      if (!demo || !btn) return;
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+      var label = document.getElementById('playerToggleLabel');
+      var PAUSE = '<path d="M8 5h3v14H8zM13 5h3v14h-3z"/>';
+      var PLAY = '<path d="M7 4.5v15a1 1 0 0 0 1.54.84l11.2-7.5a1 1 0 0 0 0-1.68L8.54 3.66A1 1 0 0 0 7 4.5Z"/>';
+      var icon = btn.querySelector('svg');
+      var finished = false;
+
+      function render() {
+        var paused = demo.classList.contains('d-paused');
+        var text = finished ? 'Replay' : paused ? 'Play' : 'Pause';
+        label.textContent = text;
+        icon.innerHTML = finished || paused ? PLAY : PAUSE;
+        btn.setAttribute('aria-label', text + ' the Instant Quote demo');
+      }
+
+      // The scrubber runs the whole cycle, so its last animationend is the
+      // moment the demo has settled on the finished file.
+      var scrub = demo.querySelector('.d-scrub i');
+      if (scrub) scrub.addEventListener('animationend', function () { finished = true; render(); });
+
+      btn.addEventListener('click', function () {
+        if (finished) {
+          demo.classList.remove('d-run', 'd-paused');
+          void demo.offsetWidth; // restart the animations from zero
+          demo.classList.add('d-run');
+          finished = false;
+        } else {
+          demo.classList.toggle('d-paused');
+        }
+        render();
+      });
+
+      btn.hidden = false;
+      render();
+    })();
+  </script>
+</body>
+</html>

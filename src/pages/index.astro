@@ -8,6 +8,9 @@ import { enquiryLink, WA_LINK } from '../lib/whatsapp.mjs';
 import SiteSearch from '../components/SiteSearch.astro';
 import QuoteLink from '../components/QuoteLink.astro';
 import { quoteUrl } from '../lib/site.mjs';
+// The Instant Quote explainer (the .iq section below) and the /instant-quote/
+// landing page show the same walkthrough, so the asset is named in one place.
+import { QUOTE_VIDEO, QUOTE_VIDEO_POSTER, QUOTE_LANDING_PATH } from '../lib/quote-video.mjs';
 
 const { offers: rawOffers, source } = await getOffers();
 // Headline figures maintained in Airtable's "Site Stats" table (currently the
@@ -56,13 +59,6 @@ const brandCount = new Set(view.map((o) => o.brand)).size;
 const allBrandPages = brandPages(offers);
 const topBrands = [...allBrandPages].sort((a, b) => b.offers.length - a.offers.length).slice(0, 24);
 const currencies = Array.from(new Set(view.map((o) => o.currency).filter(Boolean))).sort();
-// Instant Quote explainer (the .iq section below). Point QUOTE_VIDEO at an
-// MP4/WebM — put it in public/ and use an absolute path like
-// '/instant-quote.mp4' — to replace the animated banner with a real screen
-// recording; QUOTE_VIDEO_POSTER is the still frame shown before it plays.
-// Left null, the CSS banner renders instead: no asset to host, no extra bytes.
-const QUOTE_VIDEO = null;
-const QUOTE_VIDEO_POSTER = null;
 
 const stats = [
   [view.length, 'live offers'],
@@ -274,6 +270,8 @@ const stats = [
       background:color-mix(in srgb,var(--forest) 7%,var(--card));font-family:var(--mono);font-size:11.5px;color:var(--ok)}
     .iq-foot svg{width:13px;height:13px;flex-shrink:0}
     .iq-cap{margin:10px 2px 0;font-size:12.5px;color:var(--muted);line-height:1.5}
+    .iq-cap a{color:var(--brass);font-weight:600;text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--brass) 40%,transparent)}
+    .iq-cap a:hover{color:var(--forest)}
     /* The lines land one after another — the stagger is what reads as
        "matching". It plays once and settles rather than looping: indefinite
        motion with no pause control would fail WCAG 2.2.2, and the settled
@@ -494,7 +492,7 @@ const stats = [
             </div>
           </div>
         )}
-        <figcaption class="iq-cap">Example figures. Your own file comes back with our live selling price written in beside your cost, and the saving worked out on every line.</figcaption>
+        <figcaption class="iq-cap">Example figures. Your own file comes back with our live selling price written in beside your cost, and the saving worked out on every line. <a href={QUOTE_LANDING_PATH}>See how it works</a>.</figcaption>
       </figure>
     </div>
   </section>
