@@ -258,6 +258,9 @@ const DEMO_ROWS = [
     .card h3{margin:0 0 6px;font-size:15.5px;font-weight:600}
     .card p{margin:0;font-size:14px;color:var(--ink-soft);line-height:1.55}
     .card p strong{color:var(--ink);font-weight:600}
+    .card p a{color:var(--brass);font-weight:600;text-decoration:none;
+      border-bottom:1px solid color-mix(in srgb,var(--brass) 40%,transparent)}
+    .card p a:hover{color:var(--forest)}
 
     .spirits{background:var(--paper-2)}
     .spirits .cards{grid-template-columns:repeat(auto-fit,minmax(270px,1fr))}
@@ -419,7 +422,7 @@ const DEMO_ROWS = [
         </div>
         <div class="card">
           <h3>Escrow on the payment</h3>
-          <p>Funds can be held in escrow and released once the stock is verified, so <strong>neither side carries the other's risk</strong> on a first deal.</p>
+          <p>Funds can be held in escrow and released once the stock is verified, so <strong>neither side carries the other's risk</strong> on a first deal. <a href="/guides/escrow-payment-wholesale-spirits/">How escrow works</a>.</p>
         </div>
       </div>
     </div>

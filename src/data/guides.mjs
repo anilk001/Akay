@@ -451,7 +451,7 @@ Shannon, Loendersloot (Netherlands), Riga (Latvia), and other EU licensed wareho
 2. **Upload your buying list** at https://quote.akay.ie in any format — or click WhatsApp or email it to us
 3. **Get a quote** with pricing, terms, and stock status
 4. **Send a PO** to lock the deal
-5. **Arrange payment** (typically 50% upfront, 50% on shipment)
+5. **Arrange payment** (typically 50% upfront, 50% on shipment — escrow is available on a first deal: https://akay.ie/guides/escrow-payment-wholesale-spirits/)
 6. **Receive goods** and clear customs (if required)
 
 Minimum order: 1 case. Optimal order: 1+ pallets (40–60 cases).
@@ -468,6 +468,104 @@ Minimum order: 1 case. Optimal order: 1+ pallets (40–60 cases).
 Simple: **fast, honest, transparent wholesale.** We quote what we can deliver, update you if anything changes, and stand behind the quality of every shipment.
 
 Have a question? Ask. We're here to help you build a reliable supply chain.
+    `.trim(),
+  },
+  {
+    slug: 'escrow-payment-wholesale-spirits',
+    title: 'Escrow Payment in Wholesale Spirits: How It Works, What It Costs',
+    // Optional, ISO. A guide with no `updated` prints no date and claims no
+    // freshness — never fill one in from the build date.
+    updated: '2026-09-17',
+    excerpt: 'How escrow protects both sides of a first wholesale deal — what it covers, what it does not, and when 50/50 or a letter of credit makes more sense.',
+    content: `
+## Why payment is the hard part of a first deal
+
+Two strangers, often in different countries, are asked to go first. You are asked to wire five or six figures to a company you have never met; the seller is asked to release stock to a buyer who could disappear. Neither side is being unreasonable — both are carrying a real risk, and in beverages the sums are large enough that one bad deal ends a trading year.
+
+**Escrow removes the question of who goes first.** A neutral third party holds the money while the goods move, and releases it when the agreed condition is met.
+
+## What escrow actually is
+
+An escrow agent is a regulated third party — a specialist escrow service, a solicitor's client account, or a bank offering an escrow product — that takes your payment, confirms it has it, and holds it outside both parties' control.
+
+The seller ships knowing the money exists. You pay knowing it will not be released until the condition you agreed to is satisfied. The escrow agent is not a judge of quality and not an insurer: it is a stakeholder that follows the instructions both sides signed at the start.
+
+## How an escrowed beverage deal runs
+
+1. **Agree the terms first.** Product, spec, pack, quantity, price, Incoterm, duty status (T1 or T2), and — the part people skip — **exactly what triggers release**. Collection from the warehouse? A clean bill of lading? Buyer's inspection at destination?
+2. **Open the escrow.** Both sides sign the same instruction with the escrow agent. The agent's fee and who carries it are settled here, not later.
+3. **Buyer funds the account.** The escrow agent confirms cleared funds to both sides. Nothing has moved yet, and nothing is at risk yet.
+4. **Seller releases the goods.** Allocation, loading, and documents — invoice, packing list, and the transport document your Incoterm calls for.
+5. **The trigger is met and evidenced.** The document or inspection you named in step 1 is presented to the escrow agent.
+6. **Funds are released.** The agent pays the seller. If the trigger is not met within the agreed window, the funds return to the buyer.
+
+The whole point is step 1. An escrow with a vague release condition is a dispute waiting to happen — it just moves the argument from "where is my money" to "was the condition met".
+
+## What it costs
+
+Escrow is priced as a small percentage of the deal, and it falls as the deal grows: on a pallet-sized order it is usually **well under 1% of the value**, with a flat minimum that makes very small orders uneconomic. Compare that to the two costs it removes — the discount a nervous buyer asks for to go first, and the deal that never happens at all.
+
+Who pays is negotiable. Split 50/50 is the common convention on a first deal, on the reasoning that both sides get the protection.
+
+## What escrow protects you against
+
+- **Non-delivery.** Money paid, goods never shipped. This is the risk escrow is built for, and it removes it almost entirely.
+- **A seller who cannot actually supply.** The stock has to move before anyone gets paid, so an offer that does not exist never reaches the funding stage.
+- **Disappearing counterparties.** Both sides are identified and verified by the escrow agent before a cent moves.
+
+## What escrow does not protect you against
+
+This matters more than the list above, because assuming otherwise is how buyers get hurt:
+
+- **Authenticity and provenance.** Escrow confirms that goods shipped, not that they are genuine. Ask for pedigree documentation and buy from a counterparty who will provide it.
+- **Wrong spec.** If your release trigger is "goods collected", a pallet of the wrong pack size still gets paid for. If spec matters, make **inspection before release** the trigger.
+- **Damage in transit.** That is what cargo insurance and your Incoterm are for. Escrow has no view on condition.
+- **Duty and clearance problems.** T1 goods released to a buyer without the right licence are still your compliance problem. See our guide on T1 vs T2 duty status: https://akay.ie/guides/t1-vs-t2-duty-status/
+- **A bad price.** Escrow makes a deal safe, not good. Price the list first.
+
+## Escrow versus the alternatives
+
+### Bank transfer in advance
+
+Cheapest and fastest, and the buyer carries all of the risk. Fine with a counterparty you have traded with for years. On a first deal with a new supplier it is simply a bet.
+
+### 50% deposit, 50% on shipment
+
+The wholesale default, including ours. It splits the exposure rather than removing it: the buyer risks the deposit, the seller risks the balance. Sensible once a relationship exists, and quick to arrange.
+
+### Letter of credit
+
+The bank-grade instrument for large international deals, and genuinely strong protection — but it is a documents game. It costs several hundred euro in bank charges before anything moves, takes a week or more to issue, and a discrepancy as small as a misspelled product name can hold payment for weeks. Worth it at container scale; heavy for a €40,000 order.
+
+### Escrow
+
+Sits between the two: most of the protection of a letter of credit, at a fraction of the cost and set-up time, and without the documentary hair-splitting. The trade-off is that an escrow agent is not a bank — choose one that is regulated and that both sides can verify.
+
+## A worked example
+
+A buyer takes a mixed pallet of branded spirits at **€48,000, EXW, T1**, from a supplier they have not traded with before.
+
+- **Advance transfer:** the buyer carries €48,000 of risk for the several days between payment and collection, on trust alone.
+- **50/50:** the buyer risks a €24,000 deposit; the seller risks €24,000 of released stock.
+- **Letter of credit:** strong protection, but several hundred euro in bank fees and a week of paperwork before the pallet moves — on a single pallet, the cost and delay are out of proportion.
+- **Escrow with "release on collection of goods":** the buyer funds €48,000, the seller allocates and loads knowing the money is there, and the funds release when the goods are collected. Cost: a few hundred euro, typically split. Exposure on both sides for the days that matter: effectively nil.
+
+Change one thing — make the trigger **inspection at the bonded warehouse before release** — and the buyer also covers the wrong-spec risk, at no extra cost beyond the inspection itself.
+
+## Escrow with AKAY
+
+We hold over €50 million of branded spirits in a single location and ship worldwide, and a good share of our buyers are placing a first order with us. **Escrow is available on request**, and we would rather set one up than lose a deal to a payment stand-off.
+
+Our standard terms remain 50% deposit and 50% on shipment, which most repeat buyers use. For a first deal, a large order, or a new jurisdiction, ask for escrow when you ask for the price — not after the pro-forma is issued. We will confirm the agent, the fee, who carries it, and the release trigger in writing before anything is committed.
+
+## Ask before you agree terms
+
+Payment terms are part of the price. Settle them at quotation, alongside the Incoterm and the duty status, and neither side has an uncomfortable conversation later.
+
+Price your list first at https://quote.akay.ie — upload it in any format and it comes back with our price on every line — then ask about terms on the lines you want.
+
+**Email:** offers@akay.ie
+**WhatsApp:** +353 87 238 2368
     `.trim(),
   },
 ];
