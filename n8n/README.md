@@ -22,6 +22,7 @@ between 2026-07-29 and 2026-08-27. A draft in n8n is invisible until published.
 | `whatsapp-offer-broadcast/build-results.js` | `BeGfFpgxmI7hdCTI` | Build Results | full source, **published 2026-09-04** |
 | `trade-terms-normaliser/normalise-trade-terms.js` | `WQ6A8IVLSAd72fnk` | Normalise Trade Terms | full source, **published 2026-09-13** (v3: bare ex-stock) |
 | `trade-terms-digest/build-parse-digest.js` | *(not built in n8n yet)* | Build Parse Digest | full source, **not published** |
+| `pdf-image-offer-ingestion/select-pdf-image-attachments.js` | `aZvwBunq4W07XqL3` | Select PDF/Image Attachments | full source, **published 2026-09-17** (deal price, not RRP) |
 
 The four WhatsApp nodes and the trade-terms normaliser are live. **Excel Offer
 Ingestion** (`j1NAhQEKz9hzi1T2`) now calls the normaliser on every line — as a
@@ -38,7 +39,18 @@ starts sending a weekly email. Its two inputs are ready: `Parse Status` and
 because the node could not be exported verbatim at the time; replace it with the
 full source when convenient rather than transcribing it by hand.
 
-## One known difference from the deployed node
+## Known differences from the deployed nodes
+
+`select-pdf-image-attachments.js` has the same escape-vs-literal difference on
+one line. The repo holds
+
+    const SPACER_CHARS = /[­͏​-‍⁠﻿]/g;
+
+while the copy in n8n holds the literal characters, because the update API
+decodes the escapes in transit. The two compile to the same regex — verified by
+running a probe string containing all six code points through both and diffing
+the output — so this is presentational, not drift. Keep the escapes here for the
+reason given below.
 
 In `extract-wa-offers.js` two regexes in `clean()` are written here with
 `\uXXXX` escapes:
@@ -57,6 +69,68 @@ characters is unreadable, and some editors strip them silently, which would
 break the pattern without any visible change to the source.
 
 ## Changes in this commit
+
+**Buy price is the deal price, never the RRP**
+(`pdf-image-offer-ingestion/select-pdf-image-attachments.js`, plus prompt-only
+changes in `aZvwBunq4W07XqL3` and `8oPUD8d9NPVBEime`)
+
+On 17 September two Mainline Marketing offers were ingested priced off the
+recommended retail price. L'Oreal Bright Reveal serum went in at GBP 31.99
+against a true cost of GBP 5.00 — a 6.4x overprice, sell GBP 33.59 instead of
+GBP 5.25 — and a Nivea gift set at GBP 15.00 against a true GBP 4.50. Both
+would have gone out on a quote at those numbers.
+
+The prompt was not the problem. It already said *"buyPrice is the number the
+SUPPLIER charges us. Never a retail/RRP price."* The problem was that the model
+had never been shown the price. Both emails carried a product photo — in one
+case a Superdrug/eBay listing screenshot — and stated the trade price only in
+the body text:
+
+    RRP £31.99 each              <- the only price in the attachment
+    Take ALL DEAL @ £5.00 each   <- the real cost, body text only
+
+`Select PDF/Image Attachments` read that body to recover the forwarded sender
+and then discarded it, so `Extract Offers from Image (Claude)` received the
+attachment and nothing else. Told never to use an RRP and handed a document
+containing only an RRP, the model returned the one number it had.
+
+Three changes:
+
+1. **The body travels with the attachment.** The Select node now emits
+   `bodyText` in the meta every item carries. Our own signature block and legal
+   footer are cut first — the footer says *"Prices and availability quoted are
+   subject to…"*, which is exactly the kind of sentence not to feed a price
+   extractor — along with Mailchimp zero-width padding, then capped at 6,000
+   characters. Anil's own note above a forward (*"Put 10% mark up on this"*) is
+   deliberately kept, so the whole body is passed rather than only the part
+   below the forward marker.
+
+2. **Both vision prompts gained a PRICE SOURCE block** naming the labels that
+   mark a consumer price (RRP, SRP, MSRP, retail, was, worth, and the retailers
+   whose screenshots turn up in these emails), the wordings that mark a trade
+   price (deal, take all, offer price, reduced to, `@ X each`, `X/cs`), and the
+   precedence rule: **when the email text and the attachment disagree, the email
+   text wins.** Where a product's only price is a retail figure the row is now
+   omitted rather than emitted at that price — a missing row is visible, a 6x
+   overprice is not.
+
+3. **The body-text workflow got the same block.** `LLM Extract Offers` in
+   `8oPUD8d9NPVBEime` had a careful dual-price-column rule but nothing
+   separating trade from retail, so the identical failure was available to it on
+   any email that quotes both. A retail and a trade figure for one product are
+   explicitly called out as *not* a dual price column.
+
+Both workflows were published and verified active (`versionId` equal to
+`activeVersionId`) rather than left as drafts.
+
+`n8n/tests/select-pdf-image-attachments.test.js` executes the node source and
+asserts the deal price reaches `bodyText`, that the signature and footer are
+stripped, that Anil's mark-up instruction survives at the top, and that the
+pre-existing inline-logo skip, spreadsheet hand-off and no-op sentinel still
+behave. The prompt itself cannot be unit-tested here, which is why the rules
+are written out above.
+
+## Earlier changes in this commit
 
 **Trade terms are parsed at ingestion instead of being backfilled later**
 (`trade-terms-normaliser/`, `trade-terms-digest/`)
