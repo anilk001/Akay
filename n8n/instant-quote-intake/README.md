@@ -178,6 +178,35 @@ the email and the webhook response. In parallel it just ends, and `Respond
 Success` still fires first (verified: execution index 14, ahead of the Wanted
 branch at 15–16).
 
+## Ignore Bots must stay OFF on this webhook
+
+The webhook node's **Ignore Bots** option rejected every call the Trade Desk
+API made. Railway, 2026-09-17 09:54 deploy:
+
+    [intake] webhook returned 403: Authorization data is wrong!
+
+That message is misleading. The webhook's authentication is `none`; n8n raises
+the same 403 when `ignoreBots` is on and `isbot()` matches the request's
+User-Agent. Node's `fetch` sends `User-Agent: node`, which isbot flags.
+
+There is no user-agent that fixes this. isbot v5 treats anything that is not a
+recognised browser as a bot — `akay-trade-desk-api/1.0`, `AkayTradeDesk/1.0`
+and a URL-bearing agent string were all flagged, matching on the whole string.
+So the option cannot coexist with a server-to-server caller unless the caller
+impersonates a browser, which is not worth doing.
+
+It was never protection either. With authentication `none`, anyone sending a
+browser user-agent already got through; the option only blocked honest
+non-browser clients. Leave it off.
+
+**The real protection is unused.** The API already sends
+`X-Akay-Intake-Secret` on every POST (`INTAKE_SECRET` in the Railway service,
+`src/lib/intake.js`), and this webhook does not check it. Setting the node's
+Authentication to **Header Auth** with a credential for that header name and
+value closes a public endpoint that creates Airtable Clients, Enquiries and
+Wanted rows. Do it in the n8n UI so the value is entered once and never lands
+in a repo.
+
 ## One enquiry, one extractor
 
 `Wanted Intake — Akay (Enquiries → Wanted)` (`ZPLizgoZPiEPSOcv`) runs every 15
