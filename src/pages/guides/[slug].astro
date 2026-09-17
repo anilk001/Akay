@@ -19,7 +19,17 @@ const orgSchema = organizationSchema();
 // both take the guide's excerpt, so the two can't drift apart.
 const pageTitle = `${guide.title} | AKAY Trade Guides`;
 const pageDesc = guide.excerpt;
-const articleData = articleSchema(guide.title, pageDesc, guide.slug);
+const articleData = articleSchema(guide.title, pageDesc, guide.slug, guide.updated || '');
+
+// "Last updated 2024" was printed on every guide, hard-coded, and went stale
+// the moment the year turned. A guide now carries its own `updated` date in
+// src/data/guides.mjs, and one that has not recorded a revision says nothing
+// rather than claiming a date nobody checked.
+const updatedOn = (() => {
+  const d = guide.updated ? new Date(guide.updated) : null;
+  if (!d || Number.isNaN(d.getTime())) return '';
+  return d.toLocaleDateString('en-IE', { day: 'numeric', month: 'long', year: 'numeric' });
+})();
 
 // Guide bodies in src/data/guides.mjs are written in a small subset of
 // markdown. Rendering is block-by-block on blank lines, so a bullet run
@@ -432,7 +442,7 @@ const breadcrumbData = crumbs([
       <h1>{guide.title}</h1>
 
       <div class="article-meta">
-        From the AKAY Trade guides library. Last updated 2024.
+        From the AKAY Trade guides library.{updatedOn && ` Last updated ${updatedOn}.`}
       </div>
 
       <div class="article-content" set:html={guideHtml} />

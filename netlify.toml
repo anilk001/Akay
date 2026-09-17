@@ -76,6 +76,20 @@
   [headers.values]
     Cache-Control = "public, max-age=86400"
 
+# The launch email's thumbnail and its still. Mail clients and their image
+# proxies refetch these for as long as the send keeps being opened, so they
+# get the same day-long cache as the other committed images rather than the
+# must-revalidate the catalogue pages need.
+[[headers]]
+  for = "/instant-quote-preview.gif"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+
+[[headers]]
+  for = "/instant-quote-preview.png"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+
 # The client-side search index is rebuilt on every deploy (at most every 5
 # minutes). Short cache so buyers see fresh prices, with stale-while-revalidate
 # so a repeat search never waits on the network.

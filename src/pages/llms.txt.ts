@@ -9,6 +9,7 @@ export async function GET() {
 
 - [All live offers](https://akay.ie/): full catalogue, updated continuously
 - [Search offers](https://akay.ie/search/): typo-tolerant search with brand, size, pack, bond and warehouse filters
+- [Instant Quote](https://akay.ie/instant-quote/): upload a buying list in any format and download it back priced against live stock, with the saving marked on every line
 - [Spirits](https://akay.ie/category/spirits/)
 - [Beer](https://akay.ie/category/beer/)
 - [Soft Drinks](https://akay.ie/category/soft-drinks/)
@@ -26,6 +27,7 @@ export async function GET() {
 - [Incoterms explained](https://akay.ie/guides/incoterms-exw-dap-cfr/): EXW, FCA, DAP, CIF, FOB, CFR shipping terms
 - [How to buy wholesale](https://akay.ie/guides/how-to-buy-wholesale-spirits-eu/): step-by-step wholesale purchasing, MOQs, pricing, enquiry process
 - [How to send a requirement list](https://akay.ie/guides/requirement-list-format/): uploading a buying list for instant pricing, and what to include so more lines match
+- [Escrow payment explained](https://akay.ie/guides/escrow-payment-wholesale-spirits/): how escrow works on a first wholesale deal, what it costs, what it does not cover, and how it compares to 50/50 and a letter of credit
 
 ## Company
 

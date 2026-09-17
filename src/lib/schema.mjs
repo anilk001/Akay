@@ -252,13 +252,17 @@ export function brandCollectionSchema(brandName, brandUrlSlug, offers) {
 // meta description. It used to be content.split('\n')[0], which is the body's
 // opening "## …" heading — every guide was publishing a raw markdown heading
 // as its search description.
-export function articleSchema(title, description, slug) {
+export function articleSchema(title, description, slug, updated = '') {
   return {
     '@context': 'https://schema.org',
     '@type': 'Article',
     headline: title,
     url: `${SITE_URL}/guides/${slug}/`,
     description,
+    // Only for a guide that records when it was last revised. A dateModified
+    // invented from the build date would be false — this site rebuilds every
+    // five minutes, and the guides do not change with it.
+    ...(updated ? { dateModified: updated } : {}),
     author: { '@type': 'Organization', name: 'AKAY Trade' },
     publisher: {
       '@type': 'Organization',

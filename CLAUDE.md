@@ -88,6 +88,7 @@ node n8n/tests/split-quantity.test.js
 node n8n/tests/trade-terms.test.js        # MOQ / lead-time ingestion parser
 node n8n/tests/trade-terms-digest.test.js
 node n8n/tests/instant-quote-intake.test.js   # Instant Quote intake payload rules
+node n8n/tests/unmatched-demand-digest.test.js # weekly buying brief from unmatched demand
 ```
 
 ## Layout
@@ -110,8 +111,10 @@ node n8n/tests/instant-quote-intake.test.js   # Instant Quote intake payload rul
   `trade-terms-normaliser/` — the one sub-workflow all four ingestion pipelines
   call to parse MOQ and lead time into typed fields at ingestion, and
   `instant-quote-intake/` — the webhook the Trade Desk API calls after pricing a
-  buyer's uploaded list: logs it to Airtable against the client and emails the
-  priced file to ak@akay.ie
+  buyer's uploaded list: logs it to Airtable against the client, emails the
+  priced file to ak@akay.ie, and turns every line it could NOT price into a
+  `Wanted` row, and `unmatched-demand-digest/` — the Monday buying brief built
+  from those rows (what buyers asked for that we could not supply)
 - `quote/` — the **Trade Desk** SPA published at quote.akay.ie: a pre-built
   React bundle deployed by its own Netlify project (`sellnin-trade-desk`), not
   by this build — `.github/workflows/deploy-quote.yml` publishes it whenever
