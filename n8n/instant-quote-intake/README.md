@@ -147,10 +147,48 @@ demand rows.
 | File | What it is |
 | --- | --- |
 | `validate-and-compose.js` | Mirror of the workflow's "Validate & Compose" Code node — the only place the payload is interpreted |
-| `extract-wanted-lines.js` | Mirror of "Extract Wanted Lines" — fans the unpriced lines out into one item per `Wanted` row. Sits after Create Enquiry; feeds an Airtable create node with fields mapped **explicitly**, never auto-mapped |
+| `extract-wanted-lines.js` | Mirror of "Extract Wanted Lines" — fans the unpriced lines out into one item per `Wanted` row. Sits after Create Enquiry; feeds an Airtable create node set to **Map Automatically** (see below) |
 | `../tests/instant-quote-intake.test.js` | Runs both files against real payload shapes (`npm test`) |
 
 Airtable ids the workflow writes to: base `appaDSdZkAE9PGkjT`, Enquiries
 `tblgZUj1JeGyHXmcx` (`Inquiry File` = `fld8MfwuuY7DDB4d0`, `Quoted File` =
 `flddhG2BquXE5wuEA`), Clients `tblcWMfGioSXtZZzl`, Wanted `tblWZnoQHC2E6tYPd`
 (schema read 2026-09-17).
+
+## Why the Wanted create node auto-maps
+
+Earlier revisions of this file said to map the Airtable fields explicitly and
+never auto-map. That advice predates the delete-empty-keys logic at the end of
+`extract-wanted-lines.js` and is now backwards for this node.
+
+**Map Automatically** writes the keys present on the input item and sends
+nothing for the ones that are absent. Manual mapping writes an empty value for
+a key the Code node deleted — and `''` into a single select, with typecast off,
+is rejected by Airtable for the **whole batch**, so one line with no Category
+would lose every `Wanted` row from that upload.
+
+Verified live on 2026-09-17: a test upload whose Heineken line resolved no
+Category, Currency or Target Price wrote a row with those three columns simply
+absent, alongside two complete rows. No empty values reached the base.
+
+The branch hangs off `Create Enquiry` in **parallel** with `Attach Inquiry
+File`, not in line with it. That matters: the node returns `[]` when every line
+priced, and an empty result in the main chain would stop the file attachments,
+the email and the webhook response. In parallel it just ends, and `Respond
+Success` still fires first (verified: execution index 14, ahead of the Wanted
+branch at 15–16).
+
+## One enquiry, one extractor
+
+`Wanted Intake — Akay (Enquiries → Wanted)` (`ZPLizgoZPiEPSOcv`) runs every 15
+minutes over pending Enquiries and would otherwise pick these up too — its
+filter matched on `Status: New` + a linked Client + `Requested Brands`, which
+every Instant Quote enquiry has. On 2026-09-17 that was observed writing a
+second set of rows off the same enquiry, including lines the Trade Desk had
+**successfully priced**, which the buying brief would then report as unsourced
+demand.
+
+Its filter formula now carries `{Channel}!='Instant Quote'`. This workflow owns
+Instant Quote enquiries because it alone knows which lines were priced; Claude
+re-reading the summary text cannot tell. Email, WhatsApp and every other
+channel are untouched.

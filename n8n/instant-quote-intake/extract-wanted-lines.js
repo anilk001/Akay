@@ -3,7 +3,11 @@
  * Workflow: Instant Quote Intake — quote.akay.ie (pXGfSBEn5ZdOT4nt)
  * Mode: Run Once for All Items
  * Sits after: Airtable → Create Enquiry
- * Feeds:      Airtable → Create Wanted (map fields explicitly, NOT auto-map)
+ * Feeds:      Airtable → Create Wanted, set to Map Automatically. The keys
+ *             below are real Wanted columns and the unresolved ones are
+ *             deleted, so auto-map sends exactly what resolved and nothing
+ *             else. Manual mapping would send '' for a deleted key and fail
+ *             the whole batch. See this folder's README.
  *
  * Fans the unmatched lines out into one item per `Wanted` row. It interprets
  * nothing — `validate-and-compose.js` already parsed every line — it only

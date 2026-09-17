@@ -11,7 +11,12 @@ same fact noticed a year later is four customers who stopped asking.
 
 | File | Node | Workflow |
 |---|---|---|
-| `build-demand-digest.js` | Build Demand Digest | Unmatched Demand Digest — Akay |
+| `build-demand-digest.js` | Build Demand Digest | Unmatched Demand Digest — Akay (`jnF4IiOtILF2xUK6`) |
+
+Live since 2026-09-17. Nodes: `Monday 07:30` → `Search Wanted` →
+`Build Demand Digest` → `Email Buying Brief`. Timezone `Europe/Dublin`, with
+the shared `ERROR HANDLER — Akay Alerts` (`OnCFbngmILTKsdkw`) attached, so a
+failed run mails ak@akay.ie instead of failing silently.
 
 ## Where the data comes from
 
@@ -49,8 +54,14 @@ Fields to return: `Brand`, `Product Name`, `Variant`, `Volume ML`, `Category`,
 `Qty`, `Qty Unit`, `Target Price`, `Currency`, `Bond/Customs Status`, `Client`,
 `Match Count`, `Status`, `Source`, `Trader Notes`, `Created Date`.
 
-Set Build Demand Digest to **Run once with all items**. Map the send node to
-`{{ $json.subject }}`, `{{ $json.html }}` and `{{ $json.text }}`.
+Set Build Demand Digest to **Run once with all items**.
+
+The Gmail node carries a single body, so it is mapped to `{{ $json.subject }}`
+and `{{ $json.html }}` with Email Type **HTML**. `$json.text` is still built and
+still asserted by the tests — it is there for a plain-text channel (WhatsApp,
+Slack) if one is ever added, not because Gmail sends both.
+
+Recipients: `ak@akay.ie, info@akay.ie`.
 
 It runs half an hour after the trade-terms digest on purpose: that one is about
 what we could not *read*, this one about what we could not *sell*, and they
@@ -114,6 +125,13 @@ Neither blocks the digest; both make it sharper.
    sources may not. A lookup column called `Client Name (Cache)` on Wanted would
    fix it for every source with no code change; the node already reads that name
    first.
+
+   Measured on the first live run (2026-09-17): five of seven products came back
+   as `(unattributed)` despite having a `Client` link, because the REST API
+   returns that link as record ids and the digest drops them rather than print
+   `recXXXXXXXXXXXXXX` in a Monday email. Only the quote-tool rows resolved a
+   buyer, from their stamped `Buyer:` line. Since the whole brief ranks by
+   *distinct buyers*, this is the single change that would most improve it.
 
 ## Tests
 
