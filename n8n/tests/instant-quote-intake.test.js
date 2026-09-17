@@ -105,4 +105,99 @@ ok(tooBig.notesBlock.includes('too large'), 'the record says the file was not st
 const bot = run({ file: B64, email: 'bot@example.com', company_website: 'http://spam.example' });
 eq(bot.ok, false, 'a filled honeypot is rejected');
 
+// --- unmatched lines become the buying brief --------------------------------
+// A line the API priced has `matched`. One without it is a customer telling us
+// what to stock, and it is the only record of that fact — so what the parser
+// gets right here is what the Wanted row and the Monday digest get right.
+const mixed = run({
+  file: B64,
+  email: 'jane@buyer.ie',
+  company: 'Buyer Wholesale Ltd',
+  lines: [
+    { description: 'Jameson 12 x 70cl 40%', matched: 'Jameson 6x70cl', qty: 50, price: '17.95 EUR/btl' },
+    { description: 'Johnnie Walker Black Label 12 x 70cl 40% T1', qty: 20, target: '22.50 EUR' },
+    { description: 'Heineken 24 x 330ml can pallets', qty: 4 },
+    { description: 'Hendricks Gin 6 x 0.7L', qty: 10, cost: 26 },
+  ],
+  summary: { lineCount: 4, matchedCount: 1, currency: 'EUR' },
+});
+
+eq(mixed.unmatchedCount, 3, 'only the lines with no match are carried forward');
+ok(mixed.notesBlock.includes('Lines we could not price: 3'), 'and the enquiry record says how many');
+
+const [jw, heineken, hendricks] = mixed.unmatchedLines;
+eq(jw.brand, 'Johnnie Walker Black Label', 'the brand is what was typed before the pack');
+eq(jw.volumeMl, 700, '70cl is 700ml');
+eq(jw.bond, 'T1', 'a bond marker in the line is kept — T1 and T2 are different products');
+eq(jw.targetPrice, 22.5, "the buyer's own target is the reason the row is actionable");
+eq(jw.currency, 'EUR', 'read from the line itself');
+eq(heineken.qtyUnit, 'Pallets', 'the unit comes from the words the buyer used');
+eq(hendricks.volumeMl, 700, '0.7L is the same 700ml, so it groups with 70cl');
+eq(hendricks.category, 'Spirits', 'category is inferred when a word gives it away');
+eq(hendricks.currency, 'EUR', "a bare cost falls back to the quote's currency");
+
+// Every select value must be a real option or empty — Airtable rejects the
+// WHOLE batch on one unknown value, and this repo writes with typecast off.
+const CATEGORIES = ['', 'Beer', 'Spirits', 'Champagne', 'Wine', 'Grocery', 'Confectionery', 'Toiletries', 'Soft Drinks', 'Other FMCG'];
+const UNITS = ['', 'Cases', 'Pallets', 'Containers', 'Bottles', 'Pieces'];
+const CURRENCIES = ['', 'EUR', 'USD', 'GBP', 'AED', 'SGD', 'Other'];
+const BONDS = ['', 'Either', 'T1', 'T2', 'Bonded', 'Duty Paid', 'On Floor', 'Other'];
+const wild = run({
+  file: B64,
+  lines: [
+    { description: 'Something nobody has a word for, 99 blorks', qty: 3, category: 'Fictional' },
+    { description: 'Mystery item', qty: 1 },
+  ],
+});
+for (const line of wild.unmatchedLines) {
+  ok(CATEGORIES.includes(line.category), `category "${line.category}" is a real option or empty`);
+  ok(UNITS.includes(line.qtyUnit), `qty unit "${line.qtyUnit}" is a real option or empty`);
+  ok(CURRENCIES.includes(line.currency), `currency "${line.currency}" is a real option or empty`);
+  ok(BONDS.includes(line.bond), `bond status "${line.bond}" is a real option or empty`);
+}
+
+// An all-matched upload is the good case, not an empty-list bug.
+const allMatched = run({
+  file: B64,
+  lines: [{ description: 'Jameson 70cl', matched: 'Jameson 6x70cl', qty: 10 }],
+});
+eq(allMatched.unmatchedCount, 0, 'nothing to source when every line priced');
+eq(allMatched.unmatchedLines.length, 0, 'and no empty rows are invented');
+
+// --- the fan-out into Wanted rows -------------------------------------------
+const EXTRACT = join(dirname(fileURLToPath(import.meta.url)), '..', 'instant-quote-intake', 'extract-wanted-lines.js');
+const extractFn = new Function('$input', '$', readFileSync(EXTRACT, 'utf8'));
+
+function extract(compose, enquiry) {
+  const $node = (name) => {
+    if (name !== 'Validate & Compose') throw new Error(`unexpected node reference: ${name}`);
+    return { first: () => ({ json: compose }) };
+  };
+  return extractFn({ first: () => ({ json: enquiry }) }, $node).map((i) => i.json);
+}
+
+const wanted = extract(mixed, { id: 'recENQUIRY1234567', fields: { Client: ['recCLIENT12345678'] } });
+eq(wanted.length, 3, 'one Wanted row per unpriced line');
+eq(wanted[0].Status, 'Open', 'open until the matcher or a human closes it');
+eq(wanted[0].Source, 'Enquiry', 'a real option on Wanted.Source — "Instant Quote" is not one yet');
+ok(wanted[0]['Trader Notes'].includes('Instant Quote'), 'so the origin is stamped where the digest can count it');
+eq(wanted[0]['Claude Review Status'], 'Pending Review', 'a guessed brand arrives visibly unreviewed');
+assert.deepEqual(wanted[0]['Source Enquiry'], ['recENQUIRY1234567'], 'linked back to the enquiry it came from');
+n += 1;
+assert.deepEqual(wanted[0].Client, ['recCLIENT12345678'], 'and to the buyer who asked');
+n += 1;
+ok(wanted[0]['Wanted ID'] !== wanted[1]['Wanted ID'], 'each row gets its own id');
+
+// The reason empties are dropped rather than sent: '' fails a single select.
+ok(!('Category' in wanted[0]), 'an unresolved select is omitted, never sent as an empty string');
+ok(!('Qty Unit' in wanted[0]), 'same for a unit nobody stated');
+ok('Category' in wanted[2], 'but a resolved one is written');
+
+// No client on the enquiry must not stop the demand being captured.
+const anonWanted = extract(mixed, { id: 'recENQUIRY1234567', fields: {} });
+eq(anonWanted.length, 3, 'an unattributed upload still produces rows');
+ok(!('Client' in anonWanted[0]), 'with no client link rather than an empty one');
+
+eq(extract(allMatched, { id: 'recENQUIRY1234567', fields: {} }).length, 0, 'a fully priced upload writes nothing');
+
 console.log(`instant-quote-intake: ${n} assertions passed`);

@@ -22,6 +22,9 @@ between 2026-07-29 and 2026-08-27. A draft in n8n is invisible until published.
 | `whatsapp-offer-broadcast/build-results.js` | `BeGfFpgxmI7hdCTI` | Build Results | full source, **published 2026-09-04** |
 | `trade-terms-normaliser/normalise-trade-terms.js` | `WQ6A8IVLSAd72fnk` | Normalise Trade Terms | full source, **published 2026-09-13** (v3: bare ex-stock) |
 | `trade-terms-digest/build-parse-digest.js` | *(not built in n8n yet)* | Build Parse Digest | full source, **not published** |
+| `instant-quote-intake/validate-and-compose.js` | `pXGfSBEn5ZdOT4nt` | Validate & Compose | full source, **not published** |
+| `instant-quote-intake/extract-wanted-lines.js` | `pXGfSBEn5ZdOT4nt` | Extract Wanted Lines | full source, **not published** |
+| `unmatched-demand-digest/build-demand-digest.js` | *(not built in n8n yet)* | Build Demand Digest | full source, **not published** |
 
 The four WhatsApp nodes and the trade-terms normaliser are live. **Excel Offer
 Ingestion** (`j1NAhQEKz9hzi1T2`) now calls the normaliser on every line — as a
@@ -33,6 +36,13 @@ WhatsApp are still to come, and going live needs the mapping node described in
 The exception digest is not built in n8n at all yet, because publishing it
 starts sending a weekly email. Its two inputs are ready: `Parse Status` and
 `Parse Notes` were added to the Offers table on 2026-09-13.
+
+The **unmatched demand digest** is in the same state, and its input is thinner
+than that: the `Wanted` table it reads is live and already fed from Enquiries,
+but the Instant Quote half of the feed cannot produce a row until the Trade Desk
+API starts calling the intake webhook (see `instant-quote-intake/README.md`).
+Until then the digest reports on the demand the other sources capture, which is
+real but is not the buying list from the quote tool.
 
 `classify-message` is a patch rather than full source
 because the node could not be exported verbatim at the time; replace it with the
