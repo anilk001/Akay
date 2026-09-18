@@ -108,9 +108,10 @@ Two things make a kill-and-re-run safe, and you want both:
   batches the earlier run formed, re-checks each sent batch still covers the
   same addresses, and prints what it is skipping and why.
 - **The idempotency key**, which stops Resend re-sending a batch it already
-  accepted. Note its window is finite (Resend caches these for about a day), so
-  it is the belt and `progress.json` is the braces — a resume days later is
-  covered by the progress file alone.
+  accepted. Resend expires these after a fixed window — check the current
+  figure in their docs before relying on it. The script does not: the key is
+  the belt and `progress.json` is the braces, so a resume long after the fact
+  is covered by the progress file alone.
 
 ### The degrade to 50
 
