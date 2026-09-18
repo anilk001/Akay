@@ -1,0 +1,26 @@
+<<<PASTE FINAL COPY>>>
+
+Paste the final body copy here, replacing this whole file including the marker
+line above. Do not paste the greeting or the opt-out footer - dispatch.mjs adds
+both, so they are identical on every email:
+
+  Hello,
+
+  <what you paste here>
+
+  --
+  Reply STOP to this email and we'll take you off our offer list.
+
+The dry run refuses to go any further while the marker is still in this file,
+and it prints the assembled text part so you can read exactly what goes out.
+
+It also checks, rather than changes, the constraints from the brief:
+
+  - every link resolves to quote.akay.ie (a link to akay.ie warns, a link to
+    anywhere else is an error)
+  - no unreplaced merge tokens, and no per-recipient name - the greeting is flat
+  - no tracking pixel in the HTML
+
+The HTML part is derived from this file: paragraphs on blank lines, bare URLs
+linked, nothing else. If you want to hand-write it instead, drop an email.html
+beside this file and dispatch.mjs will send that verbatim.

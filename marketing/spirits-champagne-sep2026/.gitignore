@@ -1,0 +1,8 @@
+# The recipient list is 1,322 buyers' personal data. It never enters git.
+recipients.csv
+*.csv
+
+# Run state and output: local to whoever ran the send.
+progress.json
+progress.json.tmp
+report.md
