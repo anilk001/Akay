@@ -547,8 +547,15 @@ function preflight(opts) {
   if (!rec.identityHolds) {
     fail(`the counts do not reconcile: ${counts.fetched} - ${counts.suppressedBlocked} - ${counts.excludedCountry} - ${counts.duplicates} - ${counts.internalDropped} = ${rec.expected}, but eligible is ${counts.eligible} (brief section 4).`);
   }
-  if (!rec.countHolds) {
-    fail(`eligible is ${counts.eligible}, and the hard gate is ${EXPECTED_ELIGIBLE} (brief section 4). Off by ${counts.eligible - EXPECTED_ELIGIBLE}. Do not send.`);
+  // The brief's 1,322 was a snapshot. The list legitimately shrinks as the n8n
+  // workflow suppresses bounces and unsubscribes, so --expect <n> allows a
+  // different number - but only when passed deliberately, and it says so.
+  const expected = opts.expect ?? EXPECTED_ELIGIBLE;
+  if (counts.eligible !== expected) {
+    fail(`eligible is ${counts.eligible}, and the gate is ${expected}${opts.expect ? ' (--expect)' : ' (brief section 4)'}. Off by ${counts.eligible - expected}. Do not send.`);
+  }
+  if (opts.expect && opts.expect !== EXPECTED_ELIGIBLE) {
+    warn(`gate overridden: --expect ${opts.expect}, the brief says ${EXPECTED_ELIGIBLE} (difference ${opts.expect - EXPECTED_ELIGIBLE}).`);
   }
 
   log(`Reconciled: ${counts.eligible} eligible, identity holds, matches the ${EXPECTED_ELIGIBLE} gate.`);
@@ -958,6 +965,7 @@ export function parseArgs(argv) {
     emitDir: path.join(DIR, 'batches'),
     recordKey: null,
     ids: null,
+    expect: null,
     yes: false,
     withStatus: false,
   };
@@ -970,6 +978,7 @@ export function parseArgs(argv) {
     else if (a === '--emit') opts.mode = 'emit';
     else if (a === '--record') { opts.mode = 'record'; i += 1; opts.recordKey = argv[i]; }
     else if (a === '--emit-dir') { i += 1; opts.emitDir = path.resolve(argv[i]); }
+    else if (a === '--expect') { i += 1; opts.expect = Number(argv[i]); }
     else if (a === '--ids') { i += 1; opts.ids = String(argv[i]).split(/[\s,]+/).filter(Boolean); }
     else if (a === '--csv') { i += 1; opts.csv = path.resolve(argv[i]); }
     else if (a === '--progress') { i += 1; opts.progress = path.resolve(argv[i]); }
@@ -998,6 +1007,7 @@ ${RUN} - offer dispatch
   --csv <path>       default: ./recipients.csv beside this script
   --progress <path>  default: ./progress.json beside this script
   --emit-dir <path>  default: ./batches beside this script
+  --expect <n>       override the eligible-count gate, deliberately
   --ids <a,b,c>      ids for --record, instead of stdin
   --yes              skip the interactive approval prompt on --send
 `;
