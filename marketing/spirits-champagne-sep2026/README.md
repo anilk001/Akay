@@ -14,28 +14,54 @@ and stamps `Suppression Reason`.
 | `email.txt` | The body copy. Ships holding the paste marker — see below. |
 | `recipients.csv` | **Not in git.** Anil provides it; it is 1,322 people's addresses. |
 | `progress.json` | **Not in git.** Written after every batch; this is what makes a re-run safe. |
+| `batches/` | **Not in git.** Emitted payloads for the connector transport. |
 
 ## Run order
 
 ```bash
-export RESEND_API_KEY=...            # never write it to a file
 cd marketing/spirits-champagne-sep2026
 cp ~/Downloads/recipients.csv .      # or pass --csv <path>
 
-node dispatch.test.js                # 27 checks, no network
+node dispatch.test.js                # 29 checks, no network
 node dispatch.mjs --dry-run          # 1. reconcile. Anil reviews.
-node dispatch.mjs --test             # 2. one email to ak@akay.ie. Anil reviews.
-node dispatch.mjs --send             # 3. the full run, resumable.
+                                     # 2. test send, then 3. the full run —
+                                     #    pick a transport below.
 node dispatch.mjs --report           # 4. the summary. --with-status polls Resend.
 ```
 
-`--send` refuses to start unless `progress.json` records a test send **and**
-the copy still hashes to what that test went out with. Changing `email.txt`
-after Anil approves the test invalidates the approval, so the script makes you
-re-run `--test`.
+### Two transports, one plan
 
-It must run somewhere with egress to `api.resend.com` — a Claude Code sandbox
-does not have it.
+Filtering, batching, idempotency keys and `progress.json` are identical either
+way. Only who makes the HTTP call changes.
+
+**Direct HTTPS** — on a machine with egress to `api.resend.com`:
+
+```bash
+export RESEND_API_KEY=...            # never write it to a file
+node dispatch.mjs --test             # one email to ak@akay.ie. Anil reviews.
+node dispatch.mjs --send             # the full run, resumable.
+```
+
+**The Resend connector** — needs no key here, and works where a sandbox's
+egress policy blocks `api.resend.com` outright (it does in Claude Code on the
+web; `curl` there gets a 403 on CONNECT):
+
+```bash
+node dispatch.mjs --emit             # writes batches/batch-NN.json
+# for each file in order: send its "emails" array with the connector's
+# send-batch-emails, passing its "idempotencyKey", pause ~2s, then:
+echo '["<id>", ...]' | node dispatch.mjs --record spirits-champagne-sep2026-batchNN
+```
+
+`--emit` emits **only the test batch** until a test send is recorded, so the
+§7 order holds on this path too. `--record` refuses an unknown key, and refuses
+an id count that does not match the batch — a partial batch never gets marked
+sent. Re-running `--emit` skips whatever is already recorded.
+
+Both `--send` and `--emit` refuse to touch the list unless `progress.json`
+records a test send **and** the copy still hashes to what that test went out
+with. Changing `email.txt` after Anil approves the test invalidates the
+approval, and the script makes you re-run the test.
 
 ## The copy
 
@@ -108,7 +134,9 @@ Two things make a kill-and-re-run safe, and you want both:
   batches the earlier run formed, re-checks each sent batch still covers the
   same addresses, and prints what it is skipping and why.
 - **The idempotency key**, which stops Resend re-sending a batch it already
-  accepted. Resend expires these after a fixed window — check the current
+  accepted. The connector takes the same key (`idempotencyKey`, max 256 chars,
+  sent as the `Idempotency-Key` header), so both transports dedupe against the
+  same thing. Resend expires these after a fixed window — check the current
   figure in their docs before relying on it. The script does not: the key is
   the belt and `progress.json` is the braces, so a resume long after the fact
   is covered by the progress file alone.
@@ -131,8 +159,12 @@ failures, elapsed, final batch size. Add `--with-status` to poll every accepted
 id for its `last_event` and tally real bounce and complaint counts — paced at
 2/s, so roughly 11 minutes for a full run.
 
+`--with-status` uses direct HTTPS, so on the connector transport read the
+events with the connector instead (`get-email` per id, or `list-emails`) and
+run a plain `--report` for everything else.
+
 **Bounce watch: under 2% is healthy. Over 5%, stop and tell Anil** — kill the
-run, and the next `--send` resumes from the last completed batch.
+run, and the next `--send` or `--emit` resumes from the last recorded batch.
 
 ## Tests
 
@@ -148,4 +180,4 @@ It covers the CSV parser (quotes, embedded commas, CRLF, BOM), every country
 variant and the near-misses that must survive, the four filters and their
 reconciliation, first-occurrence dedupe, sort stability, both hard gates, batch
 planning and key namespacing, the tail re-plan after a degrade losing nobody,
-one-message-per-recipient payloads, and the copy checks.
+one-message-per-recipient payloads on both transports, and the copy checks.

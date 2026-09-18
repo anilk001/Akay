@@ -386,6 +386,20 @@ export function buildPayload(emails, copy) {
   }));
 }
 
+// The same messages in the shape the Resend connector's send-batch-emails
+// takes (`replyTo` as an array, rather than the REST API's `reply_to`). Same
+// one-object-per-recipient rule.
+export function buildConnectorPayload(emails, copy) {
+  return emails.map((email) => ({
+    from: FROM,
+    to: [email],
+    replyTo: [REPLY_TO],
+    subject: copy.subject,
+    text: copy.text,
+    html: copy.html,
+  }));
+}
+
 // -- Resend ----------------------------------------------------------------
 class HttpError extends Error {
   constructor(status, body) {
@@ -576,49 +590,61 @@ async function doTest(opts) {
   log('\nSTOP HERE. Anil reviews the received email before --send (brief section 7.2).\n');
 }
 
-async function doSend(opts) {
-  const { copy, eligible, counts, inputHash } = preflight(opts);
-  const apiKey = requireKey();
-  const progress = readProgress(opts.progress);
-
-  // Section 7 - refuse to start without a recorded test send.
+// Section 7 - nothing may go to a real buyer until a test send is recorded AND
+// the copy still hashes to what that test went out with. Shared by every path
+// that can put mail in front of the list.
+function requireApprovedTest(progress, copy, inputHash, progressPath) {
   if (!progress?.test) {
-    fail(`no test send recorded in ${opts.progress}. Run --test first and have Anil review it (brief section 7).`);
+    fail(`no test send recorded in ${progressPath}. Run --test (or --emit, which emits the test batch first) and have Anil review it (brief section 7).`);
   }
   if (progress.test.copyHash !== copy.hash) {
-    fail(`the copy has changed since the test send (${progress.test.copyHash.slice(0, 16)} -> ${copy.hash.slice(0, 16)}). What Anil approved is not what would go out. Re-run --test.`);
+    fail(`the copy has changed since the test send (${progress.test.copyHash.slice(0, 16)} -> ${copy.hash.slice(0, 16)}). What Anil approved is not what would go out. Re-run the test.`);
   }
   if (progress.inputHash !== inputHash) {
     fail(`recipients.csv has changed since the run started (${progress.inputHash.slice(0, 16)} -> ${inputHash.slice(0, 16)}). Batch NN would no longer mean the same recipients - stop and ask Anil (brief section 6).`);
   }
+}
+
+// Rebuild the batches exactly as an earlier run formed them, then plan the
+// rest. Used by --send, --emit and --record so all three agree on what batch
+// NN means, whichever one actually made the call.
+function resolveBatches(eligible, progress) {
+  const done = (progress.batches ?? []).filter((b) => b.status === 'sent').sort((a, b) => a.n - b.n);
+  if (!done.length) return { batches: planBatches(eligible), done };
+
+  const rebuilt = [];
+  let offset = 0;
+  done.forEach((d, idx) => {
+    const slice = eligible.slice(offset, offset + d.size);
+    rebuilt.push({
+      n: idx + 1, key: d.key, size: slice.length, plannedSize: d.plannedSize ?? d.size,
+      emails: slice.map((r) => r.email), emailsSha: sha256(slice.map((r) => r.email).join('\n')),
+    });
+    offset += d.size;
+  });
+  for (const [idx, b] of rebuilt.entries()) {
+    if (done[idx].emailsSha && done[idx].emailsSha !== b.emailsSha) {
+      fail(`batch ${b.n} (${b.key}) no longer covers the same recipients as when it was sent. Do not continue - tell Anil.`);
+    }
+  }
+  const tailSize = done[done.length - 1].plannedSize ?? BATCH_SIZE;
+  return { batches: [...rebuilt, ...replanTail(eligible, rebuilt, tailSize)], done };
+}
+
+async function doSend(opts) {
+  const { copy, eligible, counts, inputHash } = preflight(opts);
+  const apiKey = requireKey();
+  const progress = readProgress(opts.progress);
+  requireApprovedTest(progress, copy, inputHash, opts.progress);
 
   progress.batches ??= [];
-  const done = progress.batches.filter((b) => b.status === 'sent').sort((a, b) => a.n - b.n);
-
-  // Rebuild the plan exactly as the earlier run formed it, then plan the rest.
-  let batches;
+  const resolved = resolveBatches(eligible, progress);
+  const done = resolved.done;
+  let batches = resolved.batches;
   if (done.length) {
-    const rebuilt = [];
-    let offset = 0;
-    done.forEach((d, idx) => {
-      const slice = eligible.slice(offset, offset + d.size);
-      rebuilt.push({
-        n: idx + 1, key: d.key, size: slice.length, plannedSize: d.plannedSize ?? d.size,
-        emails: slice.map((r) => r.email), emailsSha: sha256(slice.map((r) => r.email).join('\n')),
-      });
-      offset += d.size;
-    });
-    for (const [idx, b] of rebuilt.entries()) {
-      if (done[idx].emailsSha && done[idx].emailsSha !== b.emailsSha) {
-        fail(`batch ${b.n} (${b.key}) no longer covers the same recipients as when it was sent. Do not continue - tell Anil.`);
-      }
-    }
-    const tailSize = done[done.length - 1].plannedSize ?? BATCH_SIZE;
-    batches = [...rebuilt, ...replanTail(eligible, rebuilt, tailSize)];
     log(`\nResuming. Skipping ${done.length} batch(es) already marked sent:`);
     done.forEach((b) => log(`  batch ${b.n} (${b.key}) - ${b.count ?? b.size} recipients, sent ${b.at}`));
   } else {
-    batches = planBatches(eligible);
     log(`\nStarting fresh: ${batches.length} batches.`);
   }
 
@@ -700,6 +726,135 @@ async function doSend(opts) {
   writeProgress(opts.progress, progress);
   log(`\nDone. ${counts.eligible} recipients across ${progress.batches.filter((b) => b.status === 'sent').length} batches in ${elapsed}s.`);
   log('Next: --report (brief section 8), and watch the bounce rate - over 5% means stop.\n');
+}
+
+// -- emit / record: the same run driven over the Resend connector -----------
+// Direct HTTPS to api.resend.com is not always available (a Claude Code
+// sandbox's egress policy blocks it), but the Resend connector's
+// send-batch-emails takes the same 100 messages and the same Idempotency-Key.
+// --emit writes the exact payloads; --record files the returned ids back into
+// progress.json. Filtering, batching, keys and resumability stay in one place,
+// whichever transport makes the call.
+function emitPath(dir, batch) {
+  return path.join(dir, batch.isTest ? 'batch-test.json' : `batch-${String(batch.n).padStart(2, '0')}.json`);
+}
+
+function writeBatchFile(dir, batch, copy) {
+  const file = emitPath(dir, batch);
+  fs.writeFileSync(file, `${JSON.stringify({
+    run: RUN,
+    n: batch.n,
+    idempotencyKey: batch.key,
+    count: batch.size,
+    emailsSha: batch.emailsSha,
+    copyHash: copy.hash,
+    emails: buildConnectorPayload(batch.emails, copy),
+  }, null, 2)}\n`);
+  return file;
+}
+
+async function doEmit(opts) {
+  const { copy, eligible, counts, inputHash } = preflight(opts);
+  const progress = readProgress(opts.progress) ?? {
+    run: RUN, inputHash, eligible: counts.eligible, batchSize: BATCH_SIZE, batches: [],
+  };
+  if (progress.inputHash !== inputHash) {
+    fail(`recipients.csv has changed since the run started (${progress.inputHash.slice(0, 16)} -> ${inputHash.slice(0, 16)}). Batch NN would no longer mean the same recipients - stop and ask Anil (brief section 6).`);
+  }
+  progress.batches ??= [];
+  fs.mkdirSync(opts.emitDir, { recursive: true });
+
+  // Section 7 order holds here too: no test on file means the test batch is
+  // the only thing that gets emitted.
+  if (!progress.test) {
+    const batch = {
+      n: 0, key: `${RUN}-test`, size: 1, plannedSize: 1, isTest: true,
+      emails: [TEST_RECIPIENT], emailsSha: sha256(TEST_RECIPIENT),
+    };
+    const file = writeBatchFile(opts.emitDir, batch, copy);
+    writeProgress(opts.progress, progress);
+    log(`\nNo test send on file, so only the test batch was emitted:`);
+    log(`  ${file}  ->  1 email to ${TEST_RECIPIENT}, key ${batch.key}`);
+    log(`\nSend it with the Resend connector's send-batch-emails, passing`);
+    log(`idempotencyKey "${batch.key}", then file the returned id:`);
+    log(`  echo '["<id>"]' | node dispatch.mjs --record ${batch.key}`);
+    log(`\nSTOP HERE. Anil reviews the received email (brief section 7.2).\n`);
+    return;
+  }
+
+  requireApprovedTest(progress, copy, inputHash, opts.progress);
+  const { batches, done } = resolveBatches(eligible, progress);
+  const todo = batches.filter((b) => !progress.batches.some((p) => p.key === b.key && p.status === 'sent'));
+  if (!todo.length) { log('\nNothing left to emit - every batch is already marked sent.\n'); return; }
+
+  if (done.length) log(`\nSkipping ${done.length} batch(es) already marked sent.`);
+  log(`\nEmitting ${todo.length} batch(es), ${todo.reduce((a, b) => a + b.size, 0)} emails, to ${opts.emitDir}:`);
+  todo.forEach((b) => log(`  ${writeBatchFile(opts.emitDir, b, copy)}  ->  ${b.size} emails, key ${b.key}`));
+  writeProgress(opts.progress, progress);
+
+  log(`\nFor each file, in order: send its "emails" array with the Resend`);
+  log(`connector's send-batch-emails, passing its "idempotencyKey", pause ~${BATCH_PAUSE_MS / 1000}s,`);
+  log(`then file the returned ids before moving on:`);
+  log(`  echo '["<id>", ...]' | node dispatch.mjs --record ${todo[0].key}`);
+  log(`\nRe-running --emit after that skips whatever is already recorded.\n`);
+}
+
+function readStdin() {
+  return new Promise((resolve) => {
+    if (process.stdin.isTTY) { resolve(''); return; }
+    let buf = '';
+    process.stdin.setEncoding('utf8');
+    process.stdin.on('data', (d) => { buf += d; });
+    process.stdin.on('end', () => resolve(buf));
+  });
+}
+
+async function doRecord(opts) {
+  const { copy, eligible, inputHash } = preflight(opts);
+  const progress = readProgress(opts.progress);
+  if (!progress) fail(`no progress file at ${opts.progress}. Run --emit first.`);
+  if (progress.inputHash !== inputHash) {
+    fail(`recipients.csv has changed since the run started. Stop and ask Anil (brief section 6).`);
+  }
+
+  let ids = opts.ids;
+  if (!ids) {
+    const raw = (await readStdin()).trim();
+    if (!raw) fail('no Resend ids given. Pass --ids <a,b,c> or pipe a JSON array on stdin.');
+    try { ids = JSON.parse(raw); } catch { ids = raw.split(/[\s,]+/).filter(Boolean); }
+  }
+  if (!Array.isArray(ids) || ids.some((i) => typeof i !== 'string')) fail('ids must be a list of strings.');
+
+  if (opts.recordKey === `${RUN}-test`) {
+    if (ids.length !== 1) fail(`the test send is one email, but ${ids.length} id(s) were given.`);
+    progress.test = { to: TEST_RECIPIENT, key: opts.recordKey, resendId: ids[0], copyHash: copy.hash, at: new Date().toISOString() };
+    writeProgress(opts.progress, progress);
+    log(`\nTest send recorded: ${ids[0]}.`);
+    log('STOP HERE. Anil reviews the received email before anything goes to the list.\n');
+    return;
+  }
+
+  requireApprovedTest(progress, copy, inputHash, opts.progress);
+  const { batches } = resolveBatches(eligible, progress);
+  const batch = batches.find((b) => b.key === opts.recordKey);
+  if (!batch) {
+    fail(`no batch with key ${opts.recordKey} in the current plan. Run --emit to see what is outstanding.`);
+  }
+  if (ids.length !== batch.size) {
+    fail(`batch ${batch.n} (${batch.key}) covers ${batch.size} recipients but ${ids.length} id(s) were given. Do not record a partial batch - check what Resend actually accepted.`);
+  }
+  progress.batches = (progress.batches ?? []).filter((p) => p.key !== batch.key);
+  progress.batches.push({
+    n: batch.n, key: batch.key, count: batch.size, size: batch.size,
+    plannedSize: batch.plannedSize, emailsSha: batch.emailsSha,
+    status: 'sent', resendIds: ids, transport: 'connector', at: new Date().toISOString(),
+  });
+  writeProgress(opts.progress, progress);
+
+  const sent = progress.batches.filter((b) => b.status === 'sent');
+  const total = sent.reduce((a, b) => a + (b.count ?? b.size), 0);
+  log(`\nRecorded batch ${batch.n} (${batch.key}): ${ids.length} accepted.`);
+  log(`Progress: ${sent.length} batch(es), ${total}/${progress.eligible} recipients.\n`);
 }
 
 async function doReport(opts) {
@@ -800,6 +955,9 @@ export function parseArgs(argv) {
     mode: null,
     csv: path.join(DIR, 'recipients.csv'),
     progress: path.join(DIR, 'progress.json'),
+    emitDir: path.join(DIR, 'batches'),
+    recordKey: null,
+    ids: null,
     yes: false,
     withStatus: false,
   };
@@ -809,6 +967,10 @@ export function parseArgs(argv) {
     else if (a === '--test') opts.mode = 'test';
     else if (a === '--send') opts.mode = 'send';
     else if (a === '--report') opts.mode = 'report';
+    else if (a === '--emit') opts.mode = 'emit';
+    else if (a === '--record') { opts.mode = 'record'; i += 1; opts.recordKey = argv[i]; }
+    else if (a === '--emit-dir') { i += 1; opts.emitDir = path.resolve(argv[i]); }
+    else if (a === '--ids') { i += 1; opts.ids = String(argv[i]).split(/[\s,]+/).filter(Boolean); }
     else if (a === '--csv') { i += 1; opts.csv = path.resolve(argv[i]); }
     else if (a === '--progress') { i += 1; opts.progress = path.resolve(argv[i]); }
     else if (a === '--yes') opts.yes = true;
@@ -823,12 +985,20 @@ const USAGE = `
 ${RUN} - offer dispatch
 
   node dispatch.mjs --dry-run    parse, filter, reconcile, print. No send.
+  node dispatch.mjs --report     the send summary. Add --with-status to poll Resend.
+
+  Over direct HTTPS to api.resend.com (needs RESEND_API_KEY):
   node dispatch.mjs --test       one email to ${TEST_RECIPIENT}.
   node dispatch.mjs --send       the full run to the ${EXPECTED_ELIGIBLE}, resumable.
-  node dispatch.mjs --report     the send summary. Add --with-status to poll Resend.
+
+  Over the Resend connector (no key here, works where egress is blocked):
+  node dispatch.mjs --emit           write the outstanding batches as payloads
+  node dispatch.mjs --record <key>   file the returned ids back, ids on stdin
 
   --csv <path>       default: ./recipients.csv beside this script
   --progress <path>  default: ./progress.json beside this script
+  --emit-dir <path>  default: ./batches beside this script
+  --ids <a,b,c>      ids for --record, instead of stdin
   --yes              skip the interactive approval prompt on --send
 `;
 
@@ -838,6 +1008,11 @@ async function main() {
   if (opts.mode === 'dry-run') return doDryRun(opts);
   if (opts.mode === 'test') return doTest(opts);
   if (opts.mode === 'send') return doSend(opts);
+  if (opts.mode === 'emit') return doEmit(opts);
+  if (opts.mode === 'record') {
+    if (!opts.recordKey) fail('--record needs the batch key, e.g. --record ' + `${RUN}-batch01`);
+    return doRecord(opts);
+  }
   if (opts.mode === 'report') return doReport(opts);
 }
 

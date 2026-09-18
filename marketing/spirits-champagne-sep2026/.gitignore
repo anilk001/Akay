@@ -6,3 +6,6 @@ recipients.csv
 progress.json
 progress.json.tmp
 report.md
+
+# Emitted batch payloads carry every recipient address.
+batches/

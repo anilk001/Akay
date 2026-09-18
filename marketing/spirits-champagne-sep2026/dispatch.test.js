@@ -13,7 +13,7 @@ import path from 'node:path';
 
 import {
   parseCsv, normCountry, isExcludedCountry, applyFilters, reconcile,
-  planBatches, replanTail, batchKey, buildPayload, loadCopy, verifyCopy,
+  planBatches, replanTail, batchKey, buildPayload, buildConnectorPayload, loadCopy, verifyCopy,
   textToHtml, BATCH_SIZE, DEGRADED_BATCH_SIZE, RUN, FROM, REPLY_TO, SUBJECT,
   GREETING, FOOTER, PLACEHOLDER,
 } from './dispatch.mjs';
@@ -219,6 +219,29 @@ test('builds one message per recipient - never a shared to array', () => {
   });
   assert.deepEqual(payload.map((m) => m.to[0]), ['a@b.com', 'c@d.com']);
   assert.equal(JSON.stringify(payload).includes('bcc'), false);
+});
+
+test('the connector payload carries the same one-per-recipient rule', () => {
+  const copy = { subject: SUBJECT, text: 'x', html: '<p>x</p>' };
+  const payload = buildConnectorPayload(['a@b.com', 'c@d.com'], copy);
+  assert.equal(payload.length, 2);
+  payload.forEach((m) => {
+    assert.equal(m.to.length, 1, 'each message addresses exactly one recipient');
+    assert.deepEqual(m.replyTo, [REPLY_TO], 'the connector spells it replyTo, not reply_to');
+    assert.equal(m.from, FROM);
+  });
+  assert.equal(/"bcc"|"cc"/i.test(JSON.stringify(payload)), false);
+});
+
+test('both transports send byte-identical content, only the envelope differs', () => {
+  const copy = { subject: SUBJECT, text: 'body', html: '<p>body</p>' };
+  const rest = buildPayload(['a@b.com'], copy)[0];
+  const conn = buildConnectorPayload(['a@b.com'], copy)[0];
+  assert.equal(rest.subject, conn.subject);
+  assert.equal(rest.text, conn.text);
+  assert.equal(rest.html, conn.html);
+  assert.deepEqual(rest.to, conn.to);
+  assert.equal(rest.reply_to, conn.replyTo[0]);
 });
 
 // -- copy ------------------------------------------------------------------
