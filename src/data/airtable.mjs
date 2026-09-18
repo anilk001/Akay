@@ -27,6 +27,10 @@ const FIELDS = [
   'Volume ML', 'Unit Type',
   'Stock Display', 'Stock Cases', 'Public Terms', 'Warehouse', 'Incoterm',
   'Bond/Customs Status', 'Origin Country', 'Public Listing', 'Featured',
+  // Barcodes. Public by definition — they are printed on the product — and
+  // they are how a buyer's uploaded list is matched when it identifies goods
+  // by barcode rather than by name (the Trade Desk reads /search-index.json).
+  'EAN Unit', 'EAN Case',
   'MOQ', 'Lead Time', 'BBD', 'Public Note', 'Offer Date', 'Auto Expiry Date',
   // Structured trade terms, parsed at ingestion by the n8n normaliser. The two
   // free-text columns above stay in the list as the fallback for rows the
@@ -233,6 +237,9 @@ function normalize(fields, recordId = null) {
     volumeMl: typeof fields['Volume ML'] === 'number' ? fields['Volume ML'] : null,
     pack: typeof fields['PCS/Case'] === 'number' ? fields['PCS/Case'] : null,
     unitType: fields['Unit Type'] || '',
+    // Unit and case barcodes, for matching an uploaded buying list.
+    ean: fields['EAN Unit'] || '',
+    eanCase: fields['EAN Case'] || '',
     warehouse: fields['Warehouse'] && fields['Warehouse'] !== 'Other' ? fields['Warehouse'] : '',
     incoterm: fields['Incoterm'] && fields['Incoterm'] !== 'Other' ? fields['Incoterm'] : '',
     moq: fields['MOQ'] || '',
