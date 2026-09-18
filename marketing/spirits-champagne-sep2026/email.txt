@@ -1,26 +1,17 @@
-<<<PASTE FINAL COPY>>>
+New this week, all T2:
 
-Paste the final body copy here, replacing this whole file including the marker
-line above. Do not paste the greeting or the opt-out footer - dispatch.mjs adds
-both, so they are identical on every email:
+• Absolut Vodka 1L, 12/case — EUR 74.00/case (EUR 6.17/btl), 600 cases
+• Aperol (New Design) 70cl — EUR 7.51/btl, 1,000 cases, EXW Loendersloot, on the floor
+• Moët & Chandon Brut Impérial 75cl — EUR 30.29/btl, 3,570 btl (gift box EUR 30.98, 1,152 btl)
+• Moët & Chandon Rosé 75cl — EUR 38.17/btl, 3,060 btl
+• Veuve Clicquot Brut 75cl — EUR 35.60/btl, 2,700 btl (gift box EUR 36.49, 768 btl)
+• Veuve Clicquot Rosé 75cl — EUR 41.21/btl, 540 btl
 
-  Hello,
+Champagne DAP Loendersloot, 2–3 weeks. Prices re-confirmed on enquiry.
 
-  <what you paste here>
+Have a full buying list? Upload it at akay.ie and get an instant quote on every line — no need to ask item by item.
 
-  --
-  Reply STOP to this email and we'll take you off our offer list.
+Reply with the lines and quantities you need.
 
-The dry run refuses to go any further while the marker is still in this file,
-and it prints the assembled text part so you can read exactly what goes out.
-
-It also checks, rather than changes, the constraints from the brief:
-
-  - every link resolves to quote.akay.ie (a link to akay.ie warns, a link to
-    anywhere else is an error)
-  - no unreplaced merge tokens, and no per-recipient name - the greeting is flat
-  - no tracking pixel in the HTML
-
-The HTML part is derived from this file: paragraphs on blank lines, bare URLs
-linked, nothing else. If you want to hand-write it instead, drop an email.html
-beside this file and dispatch.mjs will send that verbatim.
+Anil Khetan
+Akay Ireland Ltd
