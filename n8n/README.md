@@ -26,6 +26,8 @@ between 2026-07-29 and 2026-08-27. A draft in n8n is invisible until published.
 | `instant-quote-intake/extract-wanted-lines.js` | `pXGfSBEn5ZdOT4nt` | Extract Wanted Lines | full source, **not published** |
 | `instant-quote-intake/trade-desk-api/post-to-intake.js` | *(not an n8n node — belongs in `trade-desk-api`)* | — | full source, **not installed** |
 | `unmatched-demand-digest/build-demand-digest.js` | *(not built in n8n yet)* | Build Demand Digest | full source, **not published** |
+| `purge-offers-sent-log/backup-gate.js` | `hbZKmATpQ8tNTMh1` | Backup Gate | full source, **built, INACTIVE** |
+| `purge-offers-sent-log/recheck-and-cap-batch.js` | `hbZKmATpQ8tNTMh1` | Re-check And Cap Batch | full source, **built, INACTIVE** |
 
 The four WhatsApp nodes and the trade-terms normaliser are live. **Excel Offer
 Ingestion** (`j1NAhQEKz9hzi1T2`) now calls the normaliser on every line — as a
