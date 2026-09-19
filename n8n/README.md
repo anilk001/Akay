@@ -26,6 +26,12 @@ between 2026-07-29 and 2026-08-27. A draft in n8n is invisible until published.
 | `instant-quote-intake/extract-wanted-lines.js` | `pXGfSBEn5ZdOT4nt` | Extract Wanted Lines | full source, **not published** |
 | `instant-quote-intake/trade-desk-api/post-to-intake.js` | *(not an n8n node — belongs in `trade-desk-api`)* | — | full source, **not installed** |
 | `unmatched-demand-digest/build-demand-digest.js` | *(not built in n8n yet)* | Build Demand Digest | full source, **not published** |
+| `offer-dispatch/gate-check.js` | `dAYMAj6mZD3hTV4T` | Gate Check | full source, **published 2026-09-19** |
+| `offer-dispatch/build-recipients.js` | `dAYMAj6mZD3hTV4T` | Build Recipients | full source, **published 2026-09-19** |
+| `offer-dispatch/compose-from-fields.js` | `dAYMAj6mZD3hTV4T` | Compose From Fields | full source, **published 2026-09-19** |
+| `offer-dispatch/build-approval-email.js` | `dAYMAj6mZD3hTV4T` | Build Approval Email | full source, **published 2026-09-19** |
+| `offer-dispatch/build-sends.js` | `dAYMAj6mZD3hTV4T` | Build Sends | full source, **published 2026-09-19** |
+| `offer-dispatch/reconcile.js` | `dAYMAj6mZD3hTV4T` | Reconcile | full source, **published 2026-09-19** |
 
 The four WhatsApp nodes and the trade-terms normaliser are live. **Excel Offer
 Ingestion** (`j1NAhQEKz9hzi1T2`) now calls the normaliser on every line — as a
@@ -68,6 +74,28 @@ characters is unreadable, and some editors strip them silently, which would
 break the pattern without any visible change to the source.
 
 ## Changes in this commit
+
+**Offer Dispatch sends through Resend's batch endpoint** (`offer-dispatch/`)
+
+`Send via Resend` was posting one request per recipient, paced 2 per 1,100 ms.
+At 2,412 recipients that is 22 minutes of pure pacing against a 1800 s
+`executionTimeout`, and on 2026-09-14 execution 50042 was killed at 34m13s in
+`Write Sent Log` — *after* Resend had accepted all 2,412 emails
+(`"_sent":2412, "_failed":0`). Because the run died before
+`Dispatch Complete?`, the offer was never marked Broadcasted and never had its
+queue flag cleared, so it looked unsent while every client had it.
+
+`/emails/batch` takes 100 emails per request, turning that send into 25
+requests. `build-sends.js` chunks, `reconcile.js` unpacks using the documented
+`data[i]` ordering, and the timeout class of failure is gone rather than
+deferred.
+
+Alongside it, the things that made each failure cost a whole fix-and-retry
+cycle: `Gate Check` now partitions instead of throwing on the first bad offer,
+and `Compose From Fields` and `Build Recipients` report every problem in one
+halt. `offer-dispatch/README.md` has the detail.
+
+## Earlier changes in this commit
 
 **Trade terms are parsed at ingestion instead of being backfilled later**
 (`trade-terms-normaliser/`, `trade-terms-digest/`)
@@ -143,6 +171,7 @@ Plain node, no framework. `npm test` runs all of them:
     node n8n/tests/buy-side-guard.test.js
     node n8n/tests/trade-terms.test.js
     node n8n/tests/trade-terms-digest.test.js
+    node n8n/tests/offer-dispatch.test.js
 
 The two trade-terms tests **load and execute the node source** rather than
 re-typing it — `new Function('$input', src)`, since a Code node is a function
