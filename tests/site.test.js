@@ -2,26 +2,25 @@
 // ever be built for a real Airtable record id.
 
 import assert from 'node:assert/strict';
-import { reconfirmUrl, absoluteUrl, quoteUrl, SITE_URL, QUOTE_URL } from '../src/lib/site.mjs';
+import { reconfirmOfferId, absoluteUrl, quoteUrl, SITE_URL, QUOTE_URL } from '../src/lib/site.mjs';
 
 let n = 0;
 const eq = (a, b) => { assert.equal(a, b); n += 1; };
 
-eq(reconfirmUrl('rec002EcNLmBaYVzr'),
-  'https://akay-team.app.n8n.cloud/webhook/reconfirm?o=rec002EcNLmBaYVzr');
+eq(reconfirmOfferId('rec002EcNLmBaYVzr'), 'rec002EcNLmBaYVzr');
 
 // A snapshot-built offer has a placeholder id, not an Airtable one. Linking it
 // would send the buyer to the workflow's "link not valid" page for nothing.
-eq(reconfirmUrl('snapshot-12'), '');
-eq(reconfirmUrl(''), '');
-eq(reconfirmUrl(null), '');
-eq(reconfirmUrl(undefined), '');
+eq(reconfirmOfferId('snapshot-12'), '');
+eq(reconfirmOfferId(''), '');
+eq(reconfirmOfferId(null), '');
+eq(reconfirmOfferId(undefined), '');
 // Right prefix, wrong length — the workflow's own guard would reject it too.
-eq(reconfirmUrl('recTOOSHORT'), '');
-eq(reconfirmUrl('rec002EcNLmBaYVzrEXTRA'), '');
+eq(reconfirmOfferId('recTOOSHORT'), '');
+eq(reconfirmOfferId('rec002EcNLmBaYVzrEXTRA'), '');
 // Nothing that could carry a quote or a second parameter into the endpoint.
-eq(reconfirmUrl("rec002EcNLmBaYVz'"), '');
-eq(reconfirmUrl('rec002EcNLmBaYV&c'), '');
+eq(reconfirmOfferId("rec002EcNLmBaYVz'"), '');
+eq(reconfirmOfferId('rec002EcNLmBaYV&c'), '');
 
 // The Trade Desk lives on its own origin and routes on the hash, so every
 // link into it has to carry a tab the app actually knows about — the ids come

@@ -6,7 +6,7 @@ import { productOfferSchema, breadcrumbSchema, organizationSchema } from '../../
 import Seo from '../../components/Seo.astro';
 import { priceLabel } from '../../lib/price.mjs';
 import { enquiryLink, WA_LINK, WA_DISPLAY } from '../../lib/whatsapp.mjs';
-import { reconfirmUrl } from '../../lib/site.mjs';
+import { reconfirmOfferId, RECONFIRM_ENDPOINT } from '../../lib/site.mjs';
 
 // Get all valid slugs for static generation. Sold-out (delisted) offers keep
 // their pages — live offers are slugged FIRST so a re-listed line always owns
@@ -295,6 +295,7 @@ if (!isDelisted && offer.stock === 'in' && offer.qty) {
       line-height: 1.5;
     }
     .reconfirm a { color: inherit; text-decoration: underline; }
+    .reconfirm-button { background: none; border: 0; padding: 0; margin: 0; font: inherit; color: inherit; text-decoration: underline; cursor: pointer; }
 
     .spec-hedge {
       display: inline-block;
@@ -461,13 +462,23 @@ if (!isDelisted && offer.stock === 'in' && offer.qty) {
         <a href={`mailto:offers@akay.ie?subject=Interest in ${offer.name}`} class="cta-button cta-secondary">Email</a>
       </div>
 
-      {!isDelisted && reconfirmUrl(offer.id) && (
-        <p class="reconfirm">
+      {!isDelisted && reconfirmOfferId(offer.id) && (
+        <form class="reconfirm" method="post" action={RECONFIRM_ENDPOINT} target="_blank">
+          <input type="hidden" name="o" value={reconfirmOfferId(offer.id)} />
+          <input type="hidden" name="c" value="" data-reconfirm-client />
+          <input type="hidden" name="confirm" value="yes" />
           Price listed{offer.offerDate ? ` ${offer.offerDate}` : ''}.
-          {' '}<a href={reconfirmUrl(offer.id)} rel="nofollow noopener" target="_blank">Ask us to re-confirm it</a>
+          {' '}<button type="submit" class="reconfirm-button">Ask us to re-confirm it</button>
           {' '}and we will come back with the current price and availability.
-        </p>
+        </form>
       )}
+      <script is:inline>
+        (function () {
+          var c = new URLSearchParams(location.search).get('c') || '';
+          if (!/^rec[A-Za-z0-9]{14}$/.test(c)) return;
+          document.querySelectorAll('[data-reconfirm-client]').forEach(function (el) { el.value = c; });
+        })();
+      </script>
 
       <p style="font-size: 0.85em; color: var(--muted); margin-top: 1.5em; margin-bottom: 0;">
         {isDelisted

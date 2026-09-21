@@ -42,18 +42,22 @@ export function quoteUrl(tab = 'chat') {
 // GHZu605lfGOlf2eW). Written down once here for the same reason SITE_URL is:
 // if the automation moves, it is one edit rather than a grep.
 //
+// POST ONLY since 2026-09-21: the offer page posts a form, there is no GET link.
+// A browser-disguised crawler walked the old GET link every ~30s and burned
+// n8n executions; the webhook now accepts POST only, so stray GETs cost nothing.
+//
 // The link is a GET that logs an enquiry, so it carries rel="nofollow" at every
 // call site to keep crawlers out of it. Repeat hits are harmless — the workflow
 // is idempotent per offer per day — but there is no reason to invite them.
-const RECONFIRM_ENDPOINT = 'https://akay-team.app.n8n.cloud/webhook/reconfirm';
+export const RECONFIRM_ENDPOINT = 'https://akay-team.app.n8n.cloud/webhook/reconfirm';
 
-/** Re-confirm link for one offer. Returns '' when the record id is unknown. */
-export function reconfirmUrl(offerId = '') {
+/** Offer id for the re-confirm form. Returns '' when the record id is unknown. */
+export function reconfirmOfferId(offerId = '') {
   const id = String(offerId || '').trim();
   // Only a real Airtable record id — a snapshot placeholder like
   // "snapshot-12" would just produce the workflow's "link not valid" page.
   if (!/^rec[A-Za-z0-9]{14}$/.test(id)) return '';
-  return `${RECONFIRM_ENDPOINT}?o=${encodeURIComponent(id)}`;
+  return id;
 }
 
 // Absolute URL for an internal path. Accepts '/', '/about/', 'about/'.
