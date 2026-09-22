@@ -143,12 +143,13 @@ Plain node, no framework. `npm test` runs all of them:
     node n8n/tests/buy-side-guard.test.js
     node n8n/tests/trade-terms.test.js
     node n8n/tests/trade-terms-digest.test.js
+    node n8n/tests/wa-offer-heading.test.js
 
-The two trade-terms tests **load and execute the node source** rather than
-re-typing it — `new Function('$input', src)`, since a Code node is a function
-body — so the test and the text pasted into n8n cannot drift. The two older
-tests predate that harness and still hold their own copy of the logic; worth
-converting when either is next touched.
+The trade-terms and wa-offer-heading tests **load and execute the node source**
+rather than re-typing it — `new Function('$input', src)`, since a Code node is a
+function body — so the test and the text pasted into n8n cannot drift. The two
+older tests predate that harness and still hold their own copy of the logic;
+worth converting when either is next touched.
 
 Cases are real messages from the WhatsApp Log. The buy-side test asserts both
 directions: sell-side messages must stay `Supplier Offer`, buy-side must become
