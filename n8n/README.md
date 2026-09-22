@@ -26,6 +26,7 @@ between 2026-07-29 and 2026-08-27. A draft in n8n is invisible until published.
 | `instant-quote-intake/extract-wanted-lines.js` | `pXGfSBEn5ZdOT4nt` | Extract Wanted Lines | full source, **not published** |
 | `instant-quote-intake/trade-desk-api/post-to-intake.js` | *(not an n8n node — belongs in `trade-desk-api`)* | — | full source, **not installed** |
 | `unmatched-demand-digest/build-demand-digest.js` | *(not built in n8n yet)* | Build Demand Digest | full source, **not published** |
+| `offer-name/build-offer-name.js` | `j1NAhQEKz9hzi1T2`, `8oPUD8d9NPVBEime`, `aZvwBunq4W07XqL3`, `Bn6Irz2Yx7MTRnKu` | Build Airtable Payload (`buildOfferName`) | fragment only, **not published** |
 
 The four WhatsApp nodes and the trade-terms normaliser are live. **Excel Offer
 Ingestion** (`j1NAhQEKz9hzi1T2`) now calls the normaliser on every line — as a
@@ -158,3 +159,23 @@ Note `node --check` fails on `extract-wa-offers.js` with "Illegal return
 statement". That is expected — an n8n Code node is a function *body*, so
 top-level `return` is legal there. To syntax-check it, wrap it in a function
 first.
+
+## The Offer Name fragment covers four nodes at once
+
+`offer-name/build-offer-name.js` is the only mirror here that is not a whole
+node. `buildOfferName` is copied verbatim into the **Build Airtable Payload**
+node of all four ingestion workflows, and all four carried the same bug: the
+brand was concatenated in front of the product name without checking whether the
+product name already said it, so the base filled up with `Jameson Jameson 700ml`
+and `Monkey Shoulder Monkey Shoulder Blended Malt Blended Malt 700ml`. Replaying
+the fix over the first 8,000 Offers rows on 2026-09-22 changed 6,550 names
+(82%) and took rows with an adjacent repeated word from 4,271 to 83.
+
+Paste it into each of the four nodes. The call sites differ — Excel and
+PDF/Image pass `run.supplierName` / `resolved.supplierName`, Email Body and
+WhatsApp pass `ctx.supplierName` — so change the function and leave each node's
+own call alone. A node is not fixed until its workflow is **published**.
+
+Offer Name is internal: it is the primary field of the Offers table, so it is
+what every Airtable view, digest and Offers Sent Log row shows, but it is not in
+`FIELDS` and never reaches the snapshot or akay.ie.
