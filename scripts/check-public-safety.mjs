@@ -33,6 +33,11 @@ const FORBIDDEN_REGEX = [
   /AIRTABLE_TOKEN/,
   /Airtable_Pat/,
   /Authorization:\s*Bearer/i,
+  // Phase 3 introduces a SECOND secret, and a more dangerous one than a
+  // read-only Airtable PAT: a database credential. Golden rule 4 says the
+  // build asserts public safety, so it has to assert this too.
+  /postgres(?:ql)?:\/\/[^\s"'<>]*@/i,
+  /DATABASE_URL/,
 ];
 const SCAN_EXT = new Set(['.html', '.js', '.mjs', '.json', '.txt', '.xml']);
 

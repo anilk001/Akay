@@ -20,7 +20,23 @@ const TABLE = process.env.AIRTABLE_OFFERS_TABLE || 'Offers';
 // a rename in Airtable cannot silently point the build at nothing.
 const STATS_TABLE = process.env.AIRTABLE_STATS_TABLE || 'tblC0Bnld4aZTv7dd';
 
+// Phase 3 of the Airtable migration. OFFERS_SOURCE=postgres makes getOffers()
+// read the akay.offers replica instead of Airtable. Unset (or anything else)
+// keeps the Airtable path, so this ships inert and the rollback is one env var.
+// DATABASE_URL must be a READ-ONLY role: readonly_site, never n8n_app.
+const OFFERS_SOURCE = (process.env.OFFERS_SOURCE || 'airtable').toLowerCase();
+const PG_URL = process.env.DATABASE_URL || '';
+// Optional PEM for providers that use their own CA (Supabase does). Supplying
+// it keeps verification ON; the alternative people reach for - disabling
+// rejectUnauthorized - is what the 2026-09-23 review flagged as a leak vector.
+const PG_CA = process.env.DATABASE_CA_CERT || '';
+
 // Public-safe fields only. Anything not listed here is never pulled.
+// Exported ONLY so tests/offers-pg-allowlist.test.js can assert that the
+// Airtable and Postgres allowlists describe the same catalogue. Nothing at
+// runtime should import this - use FIELDS.
+export const FIELDS_FOR_TEST = [];
+
 const FIELDS = [
   'Public Product Description', 'Variant', 'Brand', 'Category', 'Public Spec',
   'Price Display', 'Currency', 'Price Type', 'Price Per Unit & Case', 'PCS/Case',
@@ -59,7 +75,13 @@ export const FORBIDDEN_FIELDS = [
   // Site Stats table — everything but the display string is internal.
   'Numeric Value', 'Detail', 'Lines Counted', 'Lines Skipped No Qty', 'Rate Date', 'Updated At',
 ];
-export const FORBIDDEN_PATTERN = /supplier|buy|cost|markup|margin|trader|vendor|contact|internal|source|bundle|target|excluded|trust|\bnotes?\b|comparable|feedback|broadcast/i;
+// Widened 2026-09-23 for the Postgres source. The Airtable half of the guard
+// was closed by construction - an unlisted field is never requested, and the
+// name space is the curated Airtable schema. A replica's column names are not
+// curated, so the pattern has to anticipate the shapes a buy price or a
+// customer identifier could plausibly arrive under: purchase_price,
+// landed_price, remarks, raw_message, email, phone, payment_terms, created_by.
+export const FORBIDDEN_PATTERN = /supplier|buy|cost|markup|margin|trader|vendor|contact|internal|source|bundle|target|excluded|trust|\bnotes?\b|comparable|feedback|broadcast|purchase|landed|comment|remark|message|whatsapp|\bwa\b|email|phone|payment.?terms|created.?by/i;
 // Public-by-design names the pattern would otherwise trip on: the Airtable
 // field "Public Note" and the `note` key it becomes in the search index, plus
 // "MOQ Source" — which records which tier of the cascade supplied a minimum
@@ -77,9 +99,236 @@ export function isForbiddenField(name) {
 
 for (const f of FIELDS) {
   if (isForbiddenField(f)) throw new Error(`[airtable] FIELDS contains a non-public field: "${f}"`);
+  FIELDS_FOR_TEST.push(f);
 }
 for (const f of STATS_FIELDS) {
   if (isForbiddenField(f)) throw new Error(`[airtable] STATS_FIELDS contains a non-public field: "${f}"`);
+}
+
+// ---------------------------------------------------------------------------
+// Postgres source (Phase 3 of the Airtable migration).
+//
+// akay.offers is a replica of the Airtable Offers table, synced hourly. This
+// path reads it INSTEAD of Airtable when OFFERS_SOURCE=postgres - through
+// akay.offers_public (migration 008), which is the only object the site's role
+// can see. Everything
+// downstream is untouched: the query aliases every column back to its exact
+// Airtable field name, so normalize() and deriveExtras() cannot tell the
+// difference, and the snapshot shape does not change.
+//
+// THE SAFETY PROBLEM THIS SOLVES, stated plainly. Today the guard is that a
+// field never REQUESTED from Airtable cannot leak. akay.offers holds more than
+// that fetch ever pulled - buy_price, margin_pct, supplier_name, supplier_email,
+// supplier_payment_terms, trader_comment, notes. A `select *` here would put
+// buy prices and supplier identity straight into the snapshot, and the snapshot
+// is committed to a PUBLIC repo.
+//
+// So PG_FIELDS below is the same kind of allowlist as FIELDS, built from the
+// same names, and checked by the same isForbiddenField() at module load. A
+// column that is not in this list is never selected.
+export const PG_FIELDS = [
+  ['Public Product Description', 'o.public_product_description', 'text'],
+  ['Variant',                    'o.variant',                    'text'],
+  ['Brand',                      'o.brand',                      'text'],
+  ['Category',                   'o.category',                   'text'],
+  ['Public Spec',                'o.public_spec',                'text'],
+  ['Price Display',              'o.price_display',              'text'],
+  ['Currency',                   'o.currency',                   'text'],
+  ['Price Type',                 'o.price_type',                 'text'],
+  ['Price Per Unit & Case',      'o.price_per_unit_and_case',    'text'],
+  ['PCS/Case',                   'o.pcs_case',                   'num'],
+  ['Volume ML',                  'o.volume_ml',                  'num'],
+  ['Unit Type',                  'o.unit_type',                  'text'],
+  ['Stock Display',              'o.stock_display',              'text'],
+  ['Stock Cases',                'o.stock_cases',                'num'],
+  ['Public Terms',               'o.public_terms',               'text'],
+  ['Warehouse',                  'o.warehouse',                  'text'],
+  ['Incoterm',                   'o.incoterm',                   'text'],
+  ['Bond/Customs Status',        'o.bond_customs_status',        'text'],
+  ['Origin Country',             'o.origin_country',             'text'],
+  // The only one that comes from the view rather than the table: it reads
+  // dublin_today(), so it cannot be a generated column.
+  ['Public Listing',             'c.public_listing',             'text'],
+  ['Featured',                   'o.featured',                   'bool'],
+  ['EAN Unit',                   'o.ean_unit',                   'text'],
+  ['EAN Case',                   'o.ean_case',                   'text'],
+  ['MOQ',                        'o.moq',                        'text'],
+  ['Lead Time',                  'o.lead_time',                  'text'],
+  ['BBD',                        'o.bbd',                        'date'],
+  ['Public Note',                'o.public_note',                'text'],
+  ['Offer Date',                 'o.offer_date',                 'date'],
+  ['Auto Expiry Date',           'o.auto_expiry_date',           'date'],
+  ['MOQ Type',                   'o.moq_type',                   'text'],
+  ['MOQ Qty',                    'o.moq_qty',                    'num'],
+  ['MOQ Currency',               'o.moq_currency',               'text'],
+  ['MOQ Source',                 'o.moq_source',                 'text'],
+  ['Mixed Load Allowed',         'o.mixed_load_allowed',         'bool'],
+  ['Lead Time Days',             'o.lead_time_days',             'num'],
+];
+
+// Same guard as FIELDS, and one more: the two lists must agree. If someone adds
+// a field to FIELDS and forgets the Postgres column, the two sources would bake
+// different snapshots depending on which one ran - the worst kind of drift,
+// because both builds go green.
+// The column is checked as well as the field name, because the dangerous
+// mistake here is not a bad field name - it is an allowed field name pointed at
+// the wrong column, e.g. ['Price Display', 'o.buy_price']. That would pass a
+// name-only check and put cost into a public snapshot.
+//
+// FORBIDDEN_PATTERN is written for Airtable field names, so the column is
+// turned back into that shape first ('o.moq_source' -> 'moq source'). The same
+// PATTERN_EXCEPTIONS apply, keyed on the field name: "MOQ Source" records which
+// tier of the cascade supplied a minimum, not who the supplier is.
+// FORBIDDEN_FIELDS as column names, so the list half of the guard works on
+// snake_case too. This is not redundant with the pattern: "Price Delta %" ->
+// price_delta_pct contains none of the pattern's words, so the pattern alone
+// waves it through. The test caught exactly that.
+const FORBIDDEN_COLUMNS = new Set(FORBIDDEN_FIELDS.map((f) => f
+  .replace(/&/g, 'and').replace(/%/g, 'pct').replace(/\//g, '_')
+  .replace(/[^0-9A-Za-z]+/g, '_').replace(/^_+|_+$/g, '').replace(/_+/g, '_')
+  .toLowerCase()));
+
+// Airtable field name -> the snake_case column it is allowed to map to.
+const snakeColumn = (f) => f
+  .replace(/&/g, 'and').replace(/%/g, 'pct').replace(/\//g, '_')
+  .replace(/[^0-9A-Za-z]+/g, '_').replace(/^_+|_+$/g, '').replace(/_+/g, '_')
+  .toLowerCase();
+
+export function isForbiddenColumn(column, fieldName) {
+  const bare = column.replace(/^[a-z]+\./, '');
+  // The exact-list check runs FIRST and is never skipped. An earlier version
+  // returned false for a PATTERN_EXCEPTIONS field before checking anything,
+  // which meant ['Public Note', 'o.buy_price'] passed every guard and would
+  // have published buy prices into the search index and the public snapshot.
+  // isForbiddenField has always had this ordering right; the column version
+  // inverted it.
+  if (FORBIDDEN_COLUMNS.has(bare)) return true;
+  // An exception excuses a field from the PATTERN only, and only for its own
+  // column. "MOQ Source" may map to moq_source and to nothing else.
+  if (PATTERN_EXCEPTIONS.has(fieldName)) return bare !== snakeColumn(fieldName);
+  return FORBIDDEN_PATTERN.test(bare.replace(/_/g, ' '));
+}
+
+for (const [name, column] of PG_FIELDS) {
+  // Only the two aliases in the FROM clause. isForbiddenColumn strips the
+  // alias before testing, so a column from some future joined table - say
+  // ['Brand', 's.name'] off a suppliers join - would reduce to "name" and
+  // sail through. The guard is only ever as strong as a fixed FROM clause.
+  if (!/^[oc]\.[a-z_]+$/.test(column)) throw new Error(`[pg] PG_FIELDS column must be o.<col> or c.<col>: "${column}"`);
+  if (isForbiddenField(name)) throw new Error(`[pg] PG_FIELDS contains a non-public field: "${name}"`);
+  if (isForbiddenColumn(column, name)) throw new Error(`[pg] PG_FIELDS maps to a non-public column: "${column}" (for "${name}")`);
+}
+{
+  const a = new Set(FIELDS);
+  const b = new Set(PG_FIELDS.map(([n]) => n));
+  const missing = [...a].filter((n) => !b.has(n));
+  const extra = [...b].filter((n) => !a.has(n));
+  if (missing.length) throw new Error(`[pg] PG_FIELDS is missing: ${missing.join(', ')}`);
+  if (extra.length) throw new Error(`[pg] PG_FIELDS has fields FIELDS does not: ${extra.join(', ')}`);
+}
+
+// PG_FIELDS records where each value really LIVES (o.* on the table, c.* in
+// the computed view) because that is what generates migration 008. The query
+// reads the view, where every column is already flattened to its bare name, so
+// the alias is stripped here. One list, two consumers, no hand-maintained copy.
+const bareColumn = (col) => col.replace(/^[a-z]+\./, '');
+const PG_SELECT = PG_FIELDS.map(([name, col]) => `${bareColumn(col)} as ${JSON.stringify(name)}`).join(',\n       ');
+
+// pg returns numeric as a STRING and date as a JS Date; Airtable returns a
+// number and a 'YYYY-MM-DD' string. Coerce, or the two sources bake different
+// snapshots from identical data. Airtable also OMITS an empty field and an
+// unticked checkbox rather than sending null/false, so this drops them too -
+// normalize() is written against that shape.
+function pgFields(row) {
+  const out = {};
+  for (const [name, , type] of PG_FIELDS) {
+    const v = row[name];
+    if (v === null || v === undefined || v === '') continue;
+    if (type === 'num') {
+      const n = Number(v);
+      if (Number.isFinite(n)) out[name] = n;
+    } else if (type === 'date') {
+      out[name] = v instanceof Date ? v.toISOString().slice(0, 10) : String(v).slice(0, 10);
+    } else if (type === 'bool') {
+      if (v === true) out[name] = true;          // Airtable omits an unticked box
+    } else {
+      out[name] = String(v);
+    }
+  }
+  return out;
+}
+
+// The two WHERE clauses, frozen at module scope. pgQuery takes a KEY, not a
+// string, so no caller can ever thread a filter into the SQL: client.query()
+// without a values array issues a simple query, which permits multiple
+// statements separated by ';'. There is no injection surface today and this
+// keeps it that way by construction rather than by convention.
+const PG_WHERE = {
+  live: { where: `public_listing = 'Yes'` },
+  delisted: {
+    where: `status in ('Sold', 'Expired') and offer_approval_status = 'Approved' and listing_approved`,
+    order: 'offer_date desc nulls last, airtable_id collate "C"',
+  },
+};
+
+async function pgQuery(key, { limit = null } = {}) {
+  const spec = PG_WHERE[key];
+  if (!spec) throw new Error(`[pg] unknown query "${key}"`);
+  const { where, order = '' } = spec;
+  const { default: pg } = await import('pg');
+  // pg parses a DATE column into a JS Date at LOCAL midnight, so in Dublin
+  // (UTC+1 in summer) 2026-09-23 becomes 2026-09-22T23:00:00Z and
+  // toISOString().slice(0,10) yields the day BEFORE. Every BBD, Offer Date and
+  // Auto Expiry Date would shift back one day - invisible on a UTC GitHub
+  // runner, wrong on a laptop. Keep the wire format, which is already exactly
+  // Airtable's 'YYYY-MM-DD'.
+  pg.types.setTypeParser(1082, (v) => v);
+  const client = new pg.Client({
+    connectionString: PG_URL,
+    // Verify the server. With this off, anyone on the runner->DB path can both
+    // harvest the role credentials from the startup packet and serve arbitrary
+    // rows, which this code bakes straight into a public snapshot.
+    //
+    // DATABASE_CA_CERT is optional and exists because Supabase serves its
+    // database endpoints from its OWN certificate authority, which is not in
+    // Node's built-in CA list. Without the CA, verification fails outright
+    // (SELF_SIGNED_CERT_IN_CHAIN / UNABLE_TO_VERIFY_LEAF_SIGNATURE). The fix
+    // is to supply the CA, never to turn verification off - Supabase publishes
+    // it as "Download certificate" on the Database Settings page.
+    ssl: PG_CA
+      ? { rejectUnauthorized: true, ca: PG_CA }
+      : { rejectUnauthorized: true },
+    statement_timeout: 60000,
+  });
+  await client.connect();
+  try {
+    // akay.offers_public, NEVER akay.offers. Migration 008 revoked this role's
+    // SELECT on the base table, so a `select *` here could not reach a buy
+    // price even if the allowlist above were wrong - which, on 2026-09-23, it
+    // twice was. The view is the guard; the allowlist is now the second layer.
+    const sql = `select airtable_id as "__id",\n       ${PG_SELECT}\nfrom akay.offers_public\nwhere ${where}${order ? `\norder by ${order}` : ''}${limit ? `\nlimit ${Number(limit)}` : ''}`;
+    const { rows } = await client.query(sql);
+    const out = [];
+    for (const r of rows) {
+      const o = deriveExtras(normalize(pgFields(r), r.__id));
+      if (o.name && !isTestRow(o.name)) out.push(o);
+    }
+    return out;
+  } finally {
+    await client.end();
+  }
+}
+
+// The two fetches, mirroring fetchLive() and fetchDelisted() exactly.
+// The join to akay.offers_computed also inherits its soft-delete filter
+// (migration 005), so an offer deleted in Airtable drops off the site.
+function fetchLivePg() {
+  return pgQuery('live');
+}
+
+function fetchDelistedPg() {
+  return pgQuery('delisted', { limit: DELISTED_CAP })
+    .then((rows) => rows.map((o) => ({ ...o, delisted: true })));
 }
 
 const INCOTERMS = ['EXW', 'FCA', 'FOB', 'CFR', 'CIF', 'DAP', 'DDP', 'DPU', 'CPT', 'CIP', 'FAS'];
@@ -388,6 +637,42 @@ function snapshotDelisted() {
 }
 
 export async function getOffers() {
+  // Phase 3: read the Postgres replica instead of Airtable. Deliberately the
+  // FIRST branch and deliberately not silent-on-failure in the same way the
+  // Airtable path is: if the site is meant to be reading Postgres and cannot,
+  // falling through to Airtable would hide the outage behind a working build.
+  // It falls back to the SNAPSHOT, which is the same last-known-good the
+  // Airtable path uses, and says so loudly.
+  if (OFFERS_SOURCE === 'postgres') {
+    if (!PG_URL) {
+      console.warn('[pg] OFFERS_SOURCE=postgres but DATABASE_URL is not set — using snapshot');
+    } else {
+      try {
+        const offers = await fetchLivePg();
+        if (offers.length) {
+          console.log(`[pg] fetched ${offers.length} live public offers from akay.offers`);
+          let delisted;
+          try {
+            delisted = await fetchDelistedPg();
+            console.log(`[pg] fetched ${delisted.length} delisted (sold-out) offers`);
+          } catch (err) {
+            console.warn(`[pg] delisted fetch failed (${err.message.slice(0, 120)}) — using snapshot archive`);
+            delisted = snapshotDelisted();
+          }
+          return { offers, delisted, source: 'postgres' };
+        }
+        console.warn('[pg] live fetch returned 0 rows — using snapshot');
+      } catch (err) {
+        console.warn(`[pg] live fetch failed (${err.message.slice(0, 120)}) — using snapshot`);
+      }
+    }
+    return {
+      offers: snapshot.offers.map((o, i) => renormalizeSnapshotOffer(o, i)),
+      delisted: snapshotDelisted(),
+      source: 'snapshot',
+    };
+  }
+
   if (TOKEN) {
     try {
       const offers = await fetchLive();

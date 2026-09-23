@@ -33,7 +33,9 @@ name: Scheduled catalogue refresh
 #      the run. It is still best-effort — never rely on it for a launch.
 #   2. repository_dispatch — the path that actually has a predictable latency.
 #      The n8n workflow "Catalogue Refresh Poke — akay.ie" (2gOrnHPuBNo13eLN)
-#      fires it every 5 minutes; n8n honours schedules where GitHub does not.
+#      fires it every 15 minutes in business hours and hourly otherwise
+#      (verified 2026-09-23 against the workflow's crons, not its name);
+#      n8n honours schedules where GitHub does not.
 #      A poke with no catalogue change costs nothing: the job exits at the
 #      git diff below without installing or building anything.
 #      Anything else can poke it too — an Airtable automation, a script:
@@ -203,10 +205,21 @@ jobs:
 
           tail=""
           if [ -n "${LOG:-}" ] && [ -f "$LOG" ]; then
-            # Strip colour codes, and redact anything shaped like an Airtable
-            # PAT: GitHub masks secrets on the step's stdout, not in a file we
+            # Strip colour codes, and redact anything shaped like a secret:
+            # GitHub masks secrets on the step's stdout, not in a file we
             # tee'd, and this body goes into a public issue.
-            tail=$(tail -n 60 "$LOG" | sed -E 's/\x1b\[[0-9;]*m//g; s/pat[A-Za-z0-9]{14}\.[a-f0-9]{64}/[redacted]/g')
+            #
+            # The postgres:// rule is for Phase 3 and MUST be here before
+            # DATABASE_URL is ever added to this job. pg errors routinely carry
+            # the host and role ("password authentication failed for user
+            # ...", "getaddrinfo ENOTFOUND db-xxx"), and the data layer logs
+            # err.message.slice(0, 120) - truncation, not redaction - into this
+            # same file.
+            tail=$(tail -n 60 "$LOG" | sed -E '
+              s/\x1b\[[0-9;]*m//g;
+              s/pat[A-Za-z0-9]{14}\.[a-f0-9]{64}/[redacted]/g;
+              s#(postgres(ql)?://[^:@/]+:)[^@]*@#\1[redacted]@#g;
+              s#(postgres(ql)?://)[^[:space:]\"]*#\1[redacted]#g')
           fi
 
           {
