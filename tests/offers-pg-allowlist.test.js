@@ -45,6 +45,28 @@ for (const col of [
 assert.equal(isForbiddenColumn('o.moq_source', 'MOQ Source'), false, 'MOQ Source must stay allowed');
 assert.equal(isForbiddenColumn('o.moq_source', 'Price Display'), true, 'moq_source must be forbidden for any other field');
 
+// 4b. THE EXCEPTION MUST NOT BE A SKELETON KEY. This is the regression test
+//     for a real hole: isForbiddenColumn once returned false for an exception
+//     field BEFORE checking anything, so ['Public Note', 'o.buy_price'] passed
+//     every guard. `note` is in PUBLIC_KEYS, so that would have published buy
+//     prices in dist/search-index.json, on every offer page, and in the
+//     committed public snapshot - with the build green.
+for (const field of ['Public Note', 'MOQ Source', 'note']) {
+  for (const col of ['o.buy_price', 'o.margin_pct', 'o.supplier_name', 'o.supplier_email', 'o.trader_comment']) {
+    assert.equal(
+      isForbiddenColumn(col, field), true,
+      `an exception field must not excuse "${col}" — "${field}" would become a skeleton key`,
+    );
+  }
+}
+// An exception excuses a field for its OWN column and nothing else.
+assert.equal(isForbiddenColumn('o.public_note', 'Public Note'), false, 'Public Note must map to public_note');
+
+// 4c. The guard only sees through the aliases in the FROM clause, so the
+//     module-load loop pins them. A joined table would defeat it:
+//     ['Brand', 's.name'] strips to "name" and passes every check.
+assert.equal(isForbiddenColumn('s.name', 'Brand'), false, 'documents the known limit: an unpinned alias is invisible to the guard');
+
 // 5. No duplicates, and no column selected twice under two names.
 const names = PG_FIELDS.map(([n]) => n);
 const cols = PG_FIELDS.map(([, c]) => c);

@@ -71,7 +71,13 @@ export const FORBIDDEN_FIELDS = [
   // Site Stats table — everything but the display string is internal.
   'Numeric Value', 'Detail', 'Lines Counted', 'Lines Skipped No Qty', 'Rate Date', 'Updated At',
 ];
-export const FORBIDDEN_PATTERN = /supplier|buy|cost|markup|margin|trader|vendor|contact|internal|source|bundle|target|excluded|trust|\bnotes?\b|comparable|feedback|broadcast/i;
+// Widened 2026-09-23 for the Postgres source. The Airtable half of the guard
+// was closed by construction - an unlisted field is never requested, and the
+// name space is the curated Airtable schema. A replica's column names are not
+// curated, so the pattern has to anticipate the shapes a buy price or a
+// customer identifier could plausibly arrive under: purchase_price,
+// landed_price, remarks, raw_message, email, phone, payment_terms, created_by.
+export const FORBIDDEN_PATTERN = /supplier|buy|cost|markup|margin|trader|vendor|contact|internal|source|bundle|target|excluded|trust|\bnotes?\b|comparable|feedback|broadcast|purchase|landed|comment|remark|message|whatsapp|\bwa\b|email|phone|payment.?terms|created.?by/i;
 // Public-by-design names the pattern would otherwise trip on: the Airtable
 // field "Public Note" and the `note` key it becomes in the search index, plus
 // "MOQ Source" — which records which tier of the cascade supplied a minimum
@@ -176,14 +182,33 @@ const FORBIDDEN_COLUMNS = new Set(FORBIDDEN_FIELDS.map((f) => f
   .replace(/[^0-9A-Za-z]+/g, '_').replace(/^_+|_+$/g, '').replace(/_+/g, '_')
   .toLowerCase()));
 
+// Airtable field name -> the snake_case column it is allowed to map to.
+const snakeColumn = (f) => f
+  .replace(/&/g, 'and').replace(/%/g, 'pct').replace(/\//g, '_')
+  .replace(/[^0-9A-Za-z]+/g, '_').replace(/^_+|_+$/g, '').replace(/_+/g, '_')
+  .toLowerCase();
+
 export function isForbiddenColumn(column, fieldName) {
-  if (PATTERN_EXCEPTIONS.has(fieldName)) return false;
   const bare = column.replace(/^[a-z]+\./, '');
+  // The exact-list check runs FIRST and is never skipped. An earlier version
+  // returned false for a PATTERN_EXCEPTIONS field before checking anything,
+  // which meant ['Public Note', 'o.buy_price'] passed every guard and would
+  // have published buy prices into the search index and the public snapshot.
+  // isForbiddenField has always had this ordering right; the column version
+  // inverted it.
   if (FORBIDDEN_COLUMNS.has(bare)) return true;
+  // An exception excuses a field from the PATTERN only, and only for its own
+  // column. "MOQ Source" may map to moq_source and to nothing else.
+  if (PATTERN_EXCEPTIONS.has(fieldName)) return bare !== snakeColumn(fieldName);
   return FORBIDDEN_PATTERN.test(bare.replace(/_/g, ' '));
 }
 
 for (const [name, column] of PG_FIELDS) {
+  // Only the two aliases in the FROM clause. isForbiddenColumn strips the
+  // alias before testing, so a column from some future joined table - say
+  // ['Brand', 's.name'] off a suppliers join - would reduce to "name" and
+  // sail through. The guard is only ever as strong as a fixed FROM clause.
+  if (!/^[oc]\.[a-z_]+$/.test(column)) throw new Error(`[pg] PG_FIELDS column must be o.<col> or c.<col>: "${column}"`);
   if (isForbiddenField(name)) throw new Error(`[pg] PG_FIELDS contains a non-public field: "${name}"`);
   if (isForbiddenColumn(column, name)) throw new Error(`[pg] PG_FIELDS maps to a non-public column: "${column}" (for "${name}")`);
 }
@@ -222,11 +247,38 @@ function pgFields(row) {
   return out;
 }
 
-async function pgQuery(where, { order = '', limit = null } = {}) {
+// The two WHERE clauses, frozen at module scope. pgQuery takes a KEY, not a
+// string, so no caller can ever thread a filter into the SQL: client.query()
+// without a values array issues a simple query, which permits multiple
+// statements separated by ';'. There is no injection surface today and this
+// keeps it that way by construction rather than by convention.
+const PG_WHERE = {
+  live: { where: `c.public_listing = 'Yes'` },
+  delisted: {
+    where: `o.status in ('Sold', 'Expired') and o.offer_approval_status = 'Approved' and o.listing_approved`,
+    order: 'o.offer_date desc nulls last, o.airtable_id collate "C"',
+  },
+};
+
+async function pgQuery(key, { limit = null } = {}) {
+  const spec = PG_WHERE[key];
+  if (!spec) throw new Error(`[pg] unknown query "${key}"`);
+  const { where, order = '' } = spec;
   const { default: pg } = await import('pg');
+  // pg parses a DATE column into a JS Date at LOCAL midnight, so in Dublin
+  // (UTC+1 in summer) 2026-09-23 becomes 2026-09-22T23:00:00Z and
+  // toISOString().slice(0,10) yields the day BEFORE. Every BBD, Offer Date and
+  // Auto Expiry Date would shift back one day - invisible on a UTC GitHub
+  // runner, wrong on a laptop. Keep the wire format, which is already exactly
+  // Airtable's 'YYYY-MM-DD'.
+  pg.types.setTypeParser(1082, (v) => v);
   const client = new pg.Client({
     connectionString: PG_URL,
-    ssl: { rejectUnauthorized: false },
+    // Verify the server. With this off, anyone on the runner->DB path can both
+    // harvest the role credentials from the startup packet and serve arbitrary
+    // rows, which this code bakes straight into a public snapshot. Put
+    // sslmode=verify-full in DATABASE_URL if the provider needs an explicit CA.
+    ssl: { rejectUnauthorized: true },
     statement_timeout: 60000,
   });
   await client.connect();
@@ -248,14 +300,12 @@ async function pgQuery(where, { order = '', limit = null } = {}) {
 // The join to akay.offers_computed also inherits its soft-delete filter
 // (migration 005), so an offer deleted in Airtable drops off the site.
 function fetchLivePg() {
-  return pgQuery(`c.public_listing = 'Yes'`);
+  return pgQuery('live');
 }
 
 function fetchDelistedPg() {
-  return pgQuery(
-    `o.status in ('Sold', 'Expired') and o.offer_approval_status = 'Approved' and o.listing_approved`,
-    { order: 'o.offer_date desc nulls last, o.airtable_id collate "C"', limit: DELISTED_CAP },
-  ).then((rows) => rows.map((o) => ({ ...o, delisted: true })));
+  return pgQuery('delisted', { limit: DELISTED_CAP })
+    .then((rows) => rows.map((o) => ({ ...o, delisted: true })));
 }
 
 const INCOTERMS = ['EXW', 'FCA', 'FOB', 'CFR', 'CIF', 'DAP', 'DDP', 'DPU', 'CPT', 'CIP', 'FAS'];
