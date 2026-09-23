@@ -76,9 +76,32 @@ function compare(label, listA, listB) {
   return onlyA.length + onlyB.length + perField.size;
 }
 
+// THE DELISTED CAP IS AN EXPECTED DIFFERENCE, NOT A FAULT.
+// Both sources take the newest DELISTED_CAP=800 by Offer Date, but Airtable
+// sorts by date alone and Postgres adds `airtable_id collate "C"` as a
+// tiebreak. Wherever dates tie across the 800th row, the two pick a different
+// subset of that day - forever. A gate that can never go green trains whoever
+// runs it to ignore it, so the boundary day is separated out and reported,
+// not counted as a fault.
+function trimCapBoundary(listA, listB) {
+  const oldest = (rows) => rows.reduce((m, o) => (o.offerDate && (!m || o.offerDate < m) ? o.offerDate : m), null);
+  const cut = [oldest(listA), oldest(listB)].filter(Boolean).sort().pop() || null;
+  if (!cut) return [listA, listB, 0, null];
+  const keep = (rows) => rows.filter((o) => !o.offerDate || o.offerDate > cut);
+  const dropped = (listA.length - keep(listA).length) + (listB.length - keep(listB).length);
+  return [keep(listA), keep(listB), dropped, cut];
+}
+
 let problems = 0;
 problems += compare('live offers', a.offers, b.offers);
-problems += compare('delisted archive', a.delisted, b.delisted);
+
+const [dA, dB, dropped, cut] = trimCapBoundary(a.delisted, b.delisted);
+if (dropped) {
+  console.log(`\nnote: ${dropped} delisted row(s) on the cap-boundary date ${cut} are excluded from the`);
+  console.log('      comparison. The two sources break Offer Date ties differently, so which rows land');
+  console.log('      in the newest 800 differs on that day only. Expected, and not a reason to hold the switch.');
+}
+problems += compare('delisted archive (excluding the cap-boundary day)', dA, dB);
 
 console.log(`\n${problems === 0 ? 'IDENTICAL — safe to switch.' : `${problems} difference class(es) — do NOT switch until each is explained.`}`);
 process.exit(problems === 0 ? 0 : 2);
