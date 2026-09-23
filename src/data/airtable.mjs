@@ -290,7 +290,23 @@ function pgFields(row) {
 // statements separated by ';'. There is no injection surface today and this
 // keeps it that way by construction rather than by convention.
 const PG_WHERE = {
-  live: { where: `public_listing = 'Yes'` },
+  // ORDER BY IS NOT COSMETIC HERE. Two things depend on it:
+  //
+  // 1. withSlugs() assigns the -2/-3 suffixes for duplicate slugs in ARRAY
+  //    ORDER. Reorder the array and two offers swap URLs - a page that was
+  //    offer A becomes offer B, with every inbound link and indexed result
+  //    now pointing at the wrong product.
+  // 2. Without an ORDER BY, Postgres returns heap order, which changes as rows
+  //    are updated. The snapshot would churn on every refresh with no data
+  //    change at all, committing and redeploying the site for nothing - the
+  //    exact opposite of the "byte-identical when unchanged" design.
+  //
+  // `airtable_id collate "C"` reproduces what Airtable returned: byte-sorted
+  // record id. Proven, not assumed - the first Postgres-baked snapshot came out
+  // with identical data in a different order, and the previous Airtable-baked
+  // one was exactly sorted(ids). Plain ORDER BY would use the database
+  // collation and sort rec4p before rec4V.
+  live: { where: `public_listing = 'Yes'`, order: 'airtable_id collate "C"' },
   delisted: {
     where: `status in ('Sold', 'Expired') and offer_approval_status = 'Approved' and listing_approved`,
     order: 'offer_date desc nulls last, airtable_id collate "C"',
