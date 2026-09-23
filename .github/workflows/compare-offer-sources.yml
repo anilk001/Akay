@@ -1,0 +1,57 @@
+name: Compare offer sources (Airtable vs Postgres)
+
+# Runbook Phase 3, step 9. Run BOTH sources and diff the normalised output,
+# before switching akay.ie onto Postgres.
+#
+# MANUAL ONLY. No schedule, no push trigger. It writes nothing, commits
+# nothing and deploys nothing - it reads both sources and reports.
+#
+# WHY IT LIVES HERE AND NOT ON A LAPTOP. It needs egress to Airtable AND to
+# Postgres at once. It also needs to run in UTC: node-postgres parses a DATE
+# column at LOCAL midnight, and although src/data/airtable.mjs now pins the
+# type parser to keep the raw 'YYYY-MM-DD', a runner is the environment the
+# real refresh uses, so this is the environment the gate should judge.
+#
+# REQUIRED SECRET: DATABASE_URL, a READ-ONLY connection string.
+#   Use the readonly_site role, never n8n_app. After migration 008 that role
+#   can see exactly one object, akay.offers_public, so even a mistake here
+#   cannot read a buy price.
+#   Settings -> Secrets and variables -> Actions -> New repository secret.
+#
+# Exit 0 means the two sources are identical and the switch is safe.
+# Exit 2 means they differ; the log names every differing field and an example.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - run: npm ci
+
+      - name: Diff Airtable against Postgres
+        env:
+          AIRTABLE_TOKEN: ${{ secrets.AIRTABLE_TOKEN }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          set -o pipefail
+          # Redact anything shaped like a connection string or a PAT before it
+          # reaches the log. GitHub masks registered secrets on stdout, but pg
+          # errors can carry a host and role that were never registered as a
+          # secret in their own right.
+          node scripts/compare-offer-sources.mjs 2>&1 | sed -E '
+            s/pat[A-Za-z0-9]{14}\.[a-f0-9]{64}/[redacted]/g;
+            s#(postgres(ql)?://[^:@/]+:)[^@]*@#\1[redacted]@#g;
+            s#(postgres(ql)?://)[^[:space:]"]*#\1[redacted]#g'
