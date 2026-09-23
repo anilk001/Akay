@@ -45,6 +45,12 @@ jobs:
         env:
           AIRTABLE_TOKEN: ${{ secrets.AIRTABLE_TOKEN }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          # Optional. Only needed if the provider uses its own CA, which
+          # Supabase does. Paste the PEM from Database Settings ->
+          # "Download certificate" as a second repository secret. Without it,
+          # certificate verification fails rather than falling back to an
+          # unverified connection - which is the correct way round.
+          DATABASE_CA_CERT: ${{ secrets.DATABASE_CA_CERT }}
         run: |
           set -o pipefail
           # Redact anything shaped like a connection string or a PAT before it

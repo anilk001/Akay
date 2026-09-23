@@ -26,6 +26,10 @@ const STATS_TABLE = process.env.AIRTABLE_STATS_TABLE || 'tblC0Bnld4aZTv7dd';
 // DATABASE_URL must be a READ-ONLY role: readonly_site, never n8n_app.
 const OFFERS_SOURCE = (process.env.OFFERS_SOURCE || 'airtable').toLowerCase();
 const PG_URL = process.env.DATABASE_URL || '';
+// Optional PEM for providers that use their own CA (Supabase does). Supplying
+// it keeps verification ON; the alternative people reach for - disabling
+// rejectUnauthorized - is what the 2026-09-23 review flagged as a leak vector.
+const PG_CA = process.env.DATABASE_CA_CERT || '';
 
 // Public-safe fields only. Anything not listed here is never pulled.
 // Exported ONLY so tests/offers-pg-allowlist.test.js can assert that the
@@ -283,9 +287,17 @@ async function pgQuery(key, { limit = null } = {}) {
     connectionString: PG_URL,
     // Verify the server. With this off, anyone on the runner->DB path can both
     // harvest the role credentials from the startup packet and serve arbitrary
-    // rows, which this code bakes straight into a public snapshot. Put
-    // sslmode=verify-full in DATABASE_URL if the provider needs an explicit CA.
-    ssl: { rejectUnauthorized: true },
+    // rows, which this code bakes straight into a public snapshot.
+    //
+    // DATABASE_CA_CERT is optional and exists because Supabase serves its
+    // database endpoints from its OWN certificate authority, which is not in
+    // Node's built-in CA list. Without the CA, verification fails outright
+    // (SELF_SIGNED_CERT_IN_CHAIN / UNABLE_TO_VERIFY_LEAF_SIGNATURE). The fix
+    // is to supply the CA, never to turn verification off - Supabase publishes
+    // it as "Download certificate" on the Database Settings page.
+    ssl: PG_CA
+      ? { rejectUnauthorized: true, ca: PG_CA }
+      : { rejectUnauthorized: true },
     statement_timeout: 60000,
   });
   await client.connect();
