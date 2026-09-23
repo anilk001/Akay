@@ -5,9 +5,14 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { getOffers, getSiteStats, statsForSnapshot } from '../data/airtable.mjs';
 
+// 'live' is Airtable, 'postgres' is the akay.offers replica (OFFERS_SOURCE).
+// Both are real fetches and both may write. 'snapshot' means neither ran, and
+// rewriting the snapshot from the snapshot would quietly freeze the catalogue
+// while every run stayed green - so that one still refuses.
+const LIVE_SOURCES = new Set(['live', 'postgres']);
 const { offers, delisted, source } = await getOffers();
-if (source !== 'live') {
-  console.error('Refusing to overwrite snapshot — live fetch did not run (no token / no network).');
+if (!LIVE_SOURCES.has(source)) {
+  console.error('Refusing to overwrite snapshot — no live fetch ran (no token / no DATABASE_URL / no network).');
   process.exit(1);
 }
 // Headline figures for the homepage ticker (see getSiteStats). Netlify's own
@@ -33,4 +38,4 @@ try {
   // No readable previous snapshot: today's date it is.
 }
 writeFileSync(out, JSON.stringify({ ...next, generated }, null, 1));
-console.log(`Wrote ${offers.length} offers + ${delisted.length} delisted + ${Object.keys(stats).length} site stat(s) to ${out} (generated ${generated})`);
+console.log(`[${source}] Wrote ${offers.length} offers + ${delisted.length} delisted + ${Object.keys(stats).length} site stat(s) to ${out} (generated ${generated})`);
