@@ -77,7 +77,21 @@ assert.equal(new Set(cols).size, cols.length, 'PG_FIELDS selects the same column
 //    numeric as a string and date as a Date; an unhandled type would ship a
 //    different snapshot from the Airtable path on identical data.
 for (const [name, , type] of PG_FIELDS) {
-  assert.ok(['text', 'num', 'date', 'bool'].includes(type), `PG_FIELDS has an unknown type "${type}" for "${name}"`);
+  assert.ok(['text', 'num', 'date', 'dateiso', 'bool'].includes(type), `PG_FIELDS has an unknown type "${type}" for "${name}"`);
+}
+
+// 6b. Airtable returns a FORMULA field's date as a full ISO datetime and a
+//     plain date field as YYYY-MM-DD. Compare run 35849520278 found this the
+//     hard way: expiryDate differed on all 11,325 live offers and all 467
+//     delisted, and nothing else differed at all. Any Airtable formula date in
+//     this list must be 'dateiso', or the two sources bake different snapshots.
+const FORMULA_DATES = new Set(['Auto Expiry Date']);
+for (const [name, , type] of PG_FIELDS) {
+  if (FORMULA_DATES.has(name)) {
+    assert.equal(type, 'dateiso', `"${name}" is an Airtable formula date and must be 'dateiso', not '${type}'`);
+  } else if (type === 'dateiso') {
+    assert.fail(`"${name}" is marked 'dateiso' but is not a known Airtable formula date`);
+  }
 }
 
 // 7. The two allowlists must describe the same catalogue. If they drift, the
