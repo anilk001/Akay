@@ -8,6 +8,7 @@
 // If no token is present, or the network is unavailable (e.g. a restricted CI
 // sandbox), it falls back to the committed snapshot so the build still succeeds.
 
+import { readFileSync } from 'node:fs';
 import snapshot from './offers-snapshot.json' with { type: 'json' };
 import { parseVolumeMl } from '../lib/normalise.mjs';
 import { tradeTermsView } from '../lib/trade-terms.mjs';
@@ -26,10 +27,23 @@ const STATS_TABLE = process.env.AIRTABLE_STATS_TABLE || 'tblC0Bnld4aZTv7dd';
 // DATABASE_URL must be a READ-ONLY role: readonly_site, never n8n_app.
 const OFFERS_SOURCE = (process.env.OFFERS_SOURCE || 'airtable').toLowerCase();
 const PG_URL = process.env.DATABASE_URL || '';
-// Optional PEM for providers that use their own CA (Supabase does). Supplying
-// it keeps verification ON; the alternative people reach for - disabling
-// rejectUnauthorized - is what the 2026-09-23 review flagged as a leak vector.
-const PG_CA = process.env.DATABASE_CA_CERT || '';
+// The CA that signs the database endpoint. Supabase uses its own root rather
+// than a publicly-trusted one, so without this Node rejects the connection with
+// "self-signed certificate in certificate chain" - which is exactly how run
+// 35848253308 failed.
+//
+// The bundled copy is Supabase's PUBLIC root CA, published for download and
+// committed in certs/. It is not a credential, so there is no secret to manage
+// and no rotation burden, and it works identically in CI, locally and for
+// anyone cloning the repo. DATABASE_CA_CERT still overrides it.
+//
+// What this exists to prevent is the reflex fix for that error:
+// rejectUnauthorized: false. The 2026-09-23 review flagged that as both a
+// credential-disclosure and a wrong-data vector, because this build bakes what
+// the database returns into a snapshot committed to a public repo.
+const BUNDLED_CA = new URL('../../certs/supabase-prod-ca-2021.crt', import.meta.url);
+const PG_CA = process.env.DATABASE_CA_CERT
+  || (() => { try { return readFileSync(BUNDLED_CA, 'utf8'); } catch { return ''; } })();
 
 // Public-safe fields only. Anything not listed here is never pulled.
 // Exported ONLY so tests/offers-pg-allowlist.test.js can assert that the
