@@ -105,7 +105,9 @@ for (const f of STATS_FIELDS) {
 // Postgres source (Phase 3 of the Airtable migration).
 //
 // akay.offers is a replica of the Airtable Offers table, synced hourly. This
-// path reads it INSTEAD of Airtable when OFFERS_SOURCE=postgres. Everything
+// path reads it INSTEAD of Airtable when OFFERS_SOURCE=postgres - through
+// akay.offers_public (migration 008), which is the only object the site's role
+// can see. Everything
 // downstream is untouched: the query aliases every column back to its exact
 // Airtable field name, so normalize() and deriveExtras() cannot tell the
 // difference, and the snapshot shape does not change.
@@ -221,7 +223,12 @@ for (const [name, column] of PG_FIELDS) {
   if (extra.length) throw new Error(`[pg] PG_FIELDS has fields FIELDS does not: ${extra.join(', ')}`);
 }
 
-const PG_SELECT = PG_FIELDS.map(([name, col]) => `${col} as ${JSON.stringify(name)}`).join(',\n       ');
+// PG_FIELDS records where each value really LIVES (o.* on the table, c.* in
+// the computed view) because that is what generates migration 008. The query
+// reads the view, where every column is already flattened to its bare name, so
+// the alias is stripped here. One list, two consumers, no hand-maintained copy.
+const bareColumn = (col) => col.replace(/^[a-z]+\./, '');
+const PG_SELECT = PG_FIELDS.map(([name, col]) => `${bareColumn(col)} as ${JSON.stringify(name)}`).join(',\n       ');
 
 // pg returns numeric as a STRING and date as a JS Date; Airtable returns a
 // number and a 'YYYY-MM-DD' string. Coerce, or the two sources bake different
@@ -253,10 +260,10 @@ function pgFields(row) {
 // statements separated by ';'. There is no injection surface today and this
 // keeps it that way by construction rather than by convention.
 const PG_WHERE = {
-  live: { where: `c.public_listing = 'Yes'` },
+  live: { where: `public_listing = 'Yes'` },
   delisted: {
-    where: `o.status in ('Sold', 'Expired') and o.offer_approval_status = 'Approved' and o.listing_approved`,
-    order: 'o.offer_date desc nulls last, o.airtable_id collate "C"',
+    where: `status in ('Sold', 'Expired') and offer_approval_status = 'Approved' and listing_approved`,
+    order: 'offer_date desc nulls last, airtable_id collate "C"',
   },
 };
 
@@ -283,7 +290,11 @@ async function pgQuery(key, { limit = null } = {}) {
   });
   await client.connect();
   try {
-    const sql = `select o.airtable_id as "__id",\n       ${PG_SELECT}\nfrom akay.offers o\njoin akay.offers_computed c on c.id = o.id\nwhere ${where}${order ? `\norder by ${order}` : ''}${limit ? `\nlimit ${Number(limit)}` : ''}`;
+    // akay.offers_public, NEVER akay.offers. Migration 008 revoked this role's
+    // SELECT on the base table, so a `select *` here could not reach a buy
+    // price even if the allowlist above were wrong - which, on 2026-09-23, it
+    // twice was. The view is the guard; the allowlist is now the second layer.
+    const sql = `select airtable_id as "__id",\n       ${PG_SELECT}\nfrom akay.offers_public\nwhere ${where}${order ? `\norder by ${order}` : ''}${limit ? `\nlimit ${Number(limit)}` : ''}`;
     const { rows } = await client.query(sql);
     const out = [];
     for (const r of rows) {
