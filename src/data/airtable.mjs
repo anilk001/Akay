@@ -285,6 +285,14 @@ async function pgQuery(key, { limit = null } = {}) {
   pg.types.setTypeParser(1082, (v) => v);
   const client = new pg.Client({
     connectionString: PG_URL,
+    // pg defaults BOTH of these to 0, meaning "wait forever". A pooler that
+    // accepts the TCP connection and then stalls - a wrong SSL mode, a
+    // tenant-qualified username the pooler will not route, a paused project -
+    // leaves connect() hanging with no error until the CI job's own timeout
+    // kills it 20 minutes later, and the log says nothing about why. Fail fast
+    // and say so instead.
+    connectionTimeoutMillis: 15000,
+    query_timeout: 120000,
     // Verify the server. With this off, anyone on the runner->DB path can both
     // harvest the role credentials from the startup packet and serve arbitrary
     // rows, which this code bakes straight into a public snapshot.
@@ -300,7 +308,20 @@ async function pgQuery(key, { limit = null } = {}) {
       : { rejectUnauthorized: true },
     statement_timeout: 60000,
   });
-  await client.connect();
+  try {
+    await client.connect();
+  } catch (err) {
+    // Name the likely cause rather than surfacing a bare ETIMEDOUT. These are
+    // the three that actually happen with Supabase's shared pooler.
+    const hint = /timeout/i.test(err.message)
+      ? ' — connect timed out. Check the host is the SESSION pooler (port 5432, not 6543) and the username is role.projectref, not just the role.'
+      : /self.signed|unable to verify|certificate/i.test(err.message)
+        ? ' — certificate could not be verified. Supply the provider CA as DATABASE_CA_CERT; do NOT disable verification.'
+        : /password|authentication|role .* does not exist/i.test(err.message)
+          ? ' — the pooler rejected the credentials. On Supabase the username must be role.projectref.'
+          : '';
+    throw new Error(`[pg] connect failed: ${err.message}${hint}`);
+  }
   try {
     // akay.offers_public, NEVER akay.offers. Migration 008 revoked this role's
     // SELECT on the base table, so a `select *` here could not reach a buy
