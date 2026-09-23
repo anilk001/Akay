@@ -25,7 +25,11 @@ build time → static HTML → Netlify.
     is now staggered off the contended minutes, but it is still best-effort.
   - The reliable path is `repository_dispatch` (`catalogue-changed`). The n8n
     workflow **"Catalogue Refresh Poke — akay.ie"** (`2gOrnHPuBNo13eLN`) fires
-    it every 5 minutes; n8n honours schedules where GitHub does not. A poke
+    it every 15 minutes in business hours and hourly otherwise (Dublin) —
+    verified 2026-09-23 against the workflow's own crons, which are
+    `*/15 7-19 * * 1-5`, `0 0-6,20-23 * * 1-5` and `0 * * * 0,6`. This file
+    and the cutover runbook both said "every 5 minutes"; neither was right.
+    n8n honours schedules where GitHub does not. A poke
     with no catalogue change costs nothing — the job exits at the `git diff`.
   - Before committing, the job runs `npm ci && npm test && npm run build` on
     the freshly-baked snapshot. It commits with `GITHUB_TOKEN`, and GitHub
@@ -33,7 +37,7 @@ build time → static HTML → Netlify.
     refresh commit — this in-job gate is that missing CI run. A failure means
     no commit: the site keeps the last good catalogue and the run goes red.
   - **A red refresh is a stale site, and it opens an issue.** The poke retries
-    every 5 minutes, so one persistent failure is hundreds of identical red
+    every 15 minutes, so one persistent failure is dozens of identical red
     runs (56 in five hours on 2026-09-17, over a test that named a SKU which
     expired at midnight). The first failure now opens one issue labelled
     `refresh-failing` with the log tail; the next green run closes it. When

@@ -33,7 +33,9 @@ name: Scheduled catalogue refresh
 #      the run. It is still best-effort — never rely on it for a launch.
 #   2. repository_dispatch — the path that actually has a predictable latency.
 #      The n8n workflow "Catalogue Refresh Poke — akay.ie" (2gOrnHPuBNo13eLN)
-#      fires it every 5 minutes; n8n honours schedules where GitHub does not.
+#      fires it every 15 minutes in business hours and hourly otherwise
+#      (verified 2026-09-23 against the workflow's crons, not its name);
+#      n8n honours schedules where GitHub does not.
 #      A poke with no catalogue change costs nothing: the job exits at the
 #      git diff below without installing or building anything.
 #      Anything else can poke it too — an Airtable automation, a script:
