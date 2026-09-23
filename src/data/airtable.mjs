@@ -171,7 +171,14 @@ export const PG_FIELDS = [
   ['BBD',                        'o.bbd',                        'date'],
   ['Public Note',                'o.public_note',                'text'],
   ['Offer Date',                 'o.offer_date',                 'date'],
-  ['Auto Expiry Date',           'o.auto_expiry_date',           'date'],
+  // 'dateiso', not 'date'. Auto Expiry Date is a FORMULA field in Airtable, and
+  // Airtable returns a formula's date result as a full ISO datetime
+  // ("2026-09-24T00:00:00.000Z") where a plain date field returns "2026-09-24".
+  // normalize() passes expiryDate through untouched and it is in PUBLIC_KEYS,
+  // so the difference reaches dist/search-index.json and the committed
+  // snapshot. Offer Date and BBD are plain date fields and need no such
+  // treatment - which is exactly why they matched and this one did not.
+  ['Auto Expiry Date',           'o.auto_expiry_date',           'dateiso'],
   ['MOQ Type',                   'o.moq_type',                   'text'],
   ['MOQ Qty',                    'o.moq_qty',                    'num'],
   ['MOQ Currency',               'o.moq_currency',               'text'],
@@ -263,6 +270,11 @@ function pgFields(row) {
       if (Number.isFinite(n)) out[name] = n;
     } else if (type === 'date') {
       out[name] = v instanceof Date ? v.toISOString().slice(0, 10) : String(v).slice(0, 10);
+    } else if (type === 'dateiso') {
+      // Reproduce Airtable's formula-date shape exactly, so the snapshot is
+      // byte-identical whichever source baked it.
+      const d = v instanceof Date ? v.toISOString().slice(0, 10) : String(v).slice(0, 10);
+      out[name] = `${d}T00:00:00.000Z`;
     } else if (type === 'bool') {
       if (v === true) out[name] = true;          // Airtable omits an unticked box
     } else {
