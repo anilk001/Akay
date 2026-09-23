@@ -42,8 +42,10 @@ name: Scheduled catalogue refresh
 #      fires it every 15 minutes in business hours and hourly otherwise
 #      (verified 2026-09-23 against the workflow's crons, not its name);
 #      n8n honours schedules where GitHub does not.
-#      A poke with no catalogue change costs nothing: the job exits at the
-#      git diff below without installing or building anything.
+#      A poke with no catalogue change is cheap: the job installs (cached,
+#      a few seconds) and exits at the git diff below without building.
+#      It used to install nothing at all - that changed on 2026-09-23 when
+#      the fetch moved to Postgres and began needing the `pg` package.
 #      Anything else can poke it too — an Airtable automation, a script:
 #        curl -X POST -H "Accept: application/vnd.github+json" \
 #             -H "Authorization: Bearer <PAT with repo scope>" \
@@ -107,7 +109,8 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version: '20'
-          # The verify step below runs npm ci; cache the download so a refresh
+          # The refresh step below runs npm ci before the fetch; cache the
+          # download so a refresh
           # that finds a changed catalogue still finishes in well under a minute.
           cache: npm
 
@@ -154,11 +157,27 @@ jobs:
           LOG="$RUNNER_TEMP/refresh.log"
           echo "log=$LOG" >> "$GITHUB_OUTPUT"
 
+          # DEPENDENCIES BEFORE THE FETCH. This install used to live further
+          # down, in the verify gate, because the fetch needed nothing but
+          # built-in fetch() and a poke with no catalogue change could exit at
+          # the git diff without installing anything.
+          #
+          # Reading Postgres changed that: src/data/airtable.mjs imports `pg`.
+          # On 2026-09-23 the first Postgres-backed refresh failed with
+          # "Cannot find package 'pg'", sync-offers correctly refused to
+          # overwrite, and the run opened issue #36. The guards behaved
+          # perfectly - the site kept serving the last good snapshot - but the
+          # install has to happen first now.
+          #
+          # It costs a few seconds per poke, with the npm cache from setup-node
+          # doing the work. That is the price of the fetch having a dependency.
+          npm ci 2>&1 | tee "$LOG"
+
           # sync-offers refuses to overwrite unless the live fetch succeeds,
-          # so a transient Airtable/network error can never blank the catalogue.
-          # It also keeps the previous `generated` stamp when nothing changed,
-          # so an unchanged catalogue is a byte-identical file here.
-          npm run sync-offers 2>&1 | tee "$LOG"
+          # so a transient Airtable/Postgres/network error can never blank the
+          # catalogue. It also keeps the previous `generated` stamp when nothing
+          # changed, so an unchanged catalogue is a byte-identical file here.
+          npm run sync-offers 2>&1 | tee -a "$LOG"
 
           git config user.name "akay-refresh-bot"
           git config user.email "actions@users.noreply.github.com"
@@ -192,7 +211,7 @@ jobs:
           # file about to be committed. Without it the build reads the baked
           # snapshot — exactly what Netlify's build, which holds no token, will
           # do with this commit.
-          npm ci 2>&1 | tee -a "$LOG"
+          # (npm ci already ran above, before the fetch.)
           # OFFERS_SOURCE and DATABASE_URL are unset here as well as
           # AIRTABLE_TOKEN. The point of this gate is to verify the snapshot
           # that was just baked; leaving any live source set would make the
