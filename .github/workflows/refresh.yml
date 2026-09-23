@@ -12,6 +12,12 @@ name: Scheduled catalogue refresh
 # what triggers Netlify to redeploy — so every Airtable edit reaches the site
 # automatically, within one refresh cycle.
 #
+# SINCE 2026-09-23 this job bakes the snapshot from POSTGRES (akay.offers),
+# not Airtable - see OFFERS_SOURCE below. It needs a DATABASE_URL secret using
+# the readonly_site role, which can see exactly one object, akay.offers_public.
+# AIRTABLE_TOKEN is still required: the Site Stats ticker reads Airtable, and
+# it is the fallback the moment OFFERS_SOURCE is removed.
+#
 # REQUIRED: add a repository secret named AIRTABLE_TOKEN
 #   (Settings -> Secrets and variables -> Actions -> New repository secret).
 #   Use a read-only Airtable Personal Access Token
@@ -108,6 +114,20 @@ jobs:
       - name: Re-bake snapshot from live Airtable, commit if changed
         id: refresh
         env:
+          # PHASE 3 CUTOVER, 2026-09-23. The snapshot is now baked from the
+          # akay.offers replica, not Airtable. Rollback is deleting these two
+          # lines: the data layer falls back to Airtable when OFFERS_SOURCE is
+          # anything else, and nothing else in this job changes.
+          #
+          # Gate that authorised it - compare run 35849824932:
+          #   live offers      airtable 11325  postgres 11325  in both 11325
+          #   delisted archive airtable   467  postgres   467  in both   467
+          #   field differences: NONE - the two sources normalise identically.
+          OFFERS_SOURCE: postgres
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          # Kept: the Site Stats ticker still reads Airtable (getSiteStats),
+          # and removing OFFERS_SOURCE must fall straight back to a working
+          # Airtable fetch without touching this file again.
           AIRTABLE_TOKEN: ${{ secrets.AIRTABLE_TOKEN }}
         run: |
           # An unspecified shell is `bash -e` WITHOUT pipefail, so the
@@ -115,7 +135,17 @@ jobs:
           # failing suite would be committed as if it had passed.
           set -euo pipefail
 
-          if [ -z "$AIRTABLE_TOKEN" ]; then
+          # Check the secret the ACTIVE source needs. Checking AIRTABLE_TOKEN
+          # while reading Postgres would let a missing DATABASE_URL through to
+          # a fetch that silently falls back to the snapshot - and sync-offers
+          # would then refuse to write, every run, with nothing saying why.
+          if [ "${OFFERS_SOURCE:-airtable}" = "postgres" ]; then
+            if [ -z "${DATABASE_URL:-}" ]; then
+              echo "::warning::OFFERS_SOURCE=postgres but the DATABASE_URL secret is not set — cannot refresh."
+              echo "::warning::Add it in Settings -> Secrets and variables -> Actions. Skipping this run."
+              exit 0
+            fi
+          elif [ -z "$AIRTABLE_TOKEN" ]; then
             echo "::warning::AIRTABLE_TOKEN secret is not set — cannot refresh from Airtable."
             echo "::warning::Add it in Settings -> Secrets and variables -> Actions. Skipping this run."
             exit 0
@@ -163,8 +193,13 @@ jobs:
           # snapshot — exactly what Netlify's build, which holds no token, will
           # do with this commit.
           npm ci 2>&1 | tee -a "$LOG"
-          env -u AIRTABLE_TOKEN npm test 2>&1 | tee -a "$LOG"
-          env -u AIRTABLE_TOKEN npm run build 2>&1 | tee -a "$LOG"   # ends in scripts/check-public-safety.mjs
+          # OFFERS_SOURCE and DATABASE_URL are unset here as well as
+          # AIRTABLE_TOKEN. The point of this gate is to verify the snapshot
+          # that was just baked; leaving any live source set would make the
+          # build fetch again and test something other than the artefact about
+          # to be committed.
+          env -u AIRTABLE_TOKEN -u OFFERS_SOURCE -u DATABASE_URL npm test 2>&1 | tee -a "$LOG"
+          env -u AIRTABLE_TOKEN -u OFFERS_SOURCE -u DATABASE_URL npm run build 2>&1 | tee -a "$LOG"   # ends in scripts/check-public-safety.mjs
 
           git add src/data/offers-snapshot.json
           git commit -m "chore: refresh catalogue snapshot from Airtable"
