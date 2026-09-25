@@ -1,6 +1,6 @@
 # Sent Mail → Client Capture — Akay
 
-n8n workflow `EILYbFqzEXVUsM8Z` · every 15 minutes (Europe/Dublin) · **ships in DRY_RUN**
+n8n workflow `EILYbFqzEXVUsM8Z` · every 15 minutes (Europe/Dublin) · **live since 2026-09-25**
 
 When Anil emails someone new from **ak@akay.ie**, that person should be in
 **Clients**, filed under what they buy, without anyone typing them in. Before
@@ -18,7 +18,11 @@ enquiry, so offers to their category never went to them.
 3. **Pick New Recipients** (`pick-new-recipients.js`) — keeps each To/Cc/Bcc
    recipient who is not:
    - already a Client, or a Contact linked to one (case-insensitive)
-   - on a Supplier's domain (free-mail domains excepted)
+   - on a Supplier's domain (free-mail domains excepted). A domain that is
+     also on a Client is a company that both buys and sells, as much of the
+     spirits trade does, so there only the exact supplier addresses are skipped
+   - on `IGNORE_EMAILS` / `IGNORE_DOMAINS` — people Anil emails who are not
+     buyers (developer, accountant …)
    - `@akay.ie`, a no-reply mailbox, or a service domain (Airtable, GitHub …)
    - one of more than 10 recipients on the message — that is a broadcast
 
@@ -74,14 +78,18 @@ after it.
 only Inactive and Blacklisted), so a new client starts getting their category's
 offers straight away. Set them Inactive to stop that.
 
-## Going live
+## Removing a wrong one
 
-1. Read the dry-run output of **Build Client Creates**. `wouldCreate` is exactly
-   what would be posted. Check the categories and that no supplier slipped
-   through. If a supplier did, add their email to Suppliers; their whole domain
-   is excluded from then on.
-2. Set `DRY_RUN = false` in **Build Client Creates**, here and in the node.
-3. **Publish** the workflow. A draft in n8n does nothing (see `../README.md`).
+Set it **Inactive**, or add the address to `IGNORE_EMAILS`. Do **not** delete
+it: the next run re-reads the last two days of sent mail and adds it back.
+An Inactive row still blocks re-adding, and the offer sends skip Inactive.
+
+## History
+
+- 2026-09-25 dry run over 62 real sent mails: 6 would-be clients. One was
+  the developer, which led to the ignore list. Went live the same day with
+  `DRY_RUN = false`, and supplier domains that are also client domains no
+  longer blocked.
 
 ## Tuning
 

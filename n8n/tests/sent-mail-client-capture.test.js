@@ -16,8 +16,8 @@ import { dirname, join } from 'node:path';
 const DIR = join(dirname(fileURLToPath(import.meta.url)), '..', 'sent-mail-client-capture');
 const pickFn = new Function('$', readFileSync(join(DIR, 'pick-new-recipients.js'), 'utf8'));
 const buildSrc = readFileSync(join(DIR, 'build-client-creates.js'), 'utf8');
-const buildDry = new Function('$', buildSrc);
-const buildLive = new Function('$', buildSrc.replace('const DRY_RUN = true;', 'const DRY_RUN = false;'));
+const buildLive = new Function('$', buildSrc);
+const buildDry = new Function('$', buildSrc.replace('const DRY_RUN = false;', 'const DRY_RUN = true;'));
 const stampFn = new Function('$input', '$', readFileSync(join(DIR, 'build-archive-stamps.js'), 'utf8'));
 
 const quiet = console.log;
@@ -102,6 +102,14 @@ check('supplier address', pick([mail({ to: addr('sales@supplier.nl') })]).candid
 check('anyone else on a supplier domain', pick([mail({ to: addr('ops@supplier.nl') })]).candidates.length, 0);
 check('supplier on gmail does not block every gmail address',
   pick([mail({ to: addr('newbuyer@gmail.com') })]).candidates.map((c) => c.email), ['newbuyer@gmail.com']);
+check('ignore list: address', pick([mail({ to: addr('DeveloperRasikul@gmail.com') })]).candidates.length, 0);
+{
+  const extra = { 'Clients Keys': [...BASE['Clients Keys'], { id: 'recC2', 'Client Name': 'Dual Role', Email: 'buyer@supplier.nl' }] };
+  check('buys AND sells: a new colleague on a supplier domain that is also a client domain is added',
+    pick([mail({ to: addr('newperson@supplier.nl') })], extra).candidates.map((c) => c.email), ['newperson@supplier.nl']);
+  check('buys AND sells: the exact supplier address is still skipped',
+    pick([mail({ to: addr('sales@supplier.nl') })], extra).candidates.length, 0);
+}
 check('internal akay.ie', pick([mail({ to: addr('kai@akay.ie') })]).candidates.length, 0);
 check('no-reply mailbox', pick([mail({ to: addr('noreply@shop.com') })]).candidates.length, 0);
 check('service domain', pick([mail({ to: addr('support@airtable.com') })]).candidates.length, 0);

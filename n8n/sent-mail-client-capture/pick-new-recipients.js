@@ -9,7 +9,11 @@
  *
  *   - already a Client, or a Contact linked to one (case-insensitive email)
  *   - on a Supplier's email domain (free-mail domains excepted — a supplier on
- *     gmail.com says nothing about the next gmail.com address)
+ *     gmail.com says nothing about the next gmail.com address). A domain that
+ *     is on a Client as well is a company that both buys and sells, common in
+ *     the spirits trade, so there only the exact supplier addresses are
+ *     skipped and a new colleague there still becomes a Client
+ *   - on the IGNORE lists below
  *   - internal (@akay.ie) or a service/no-reply mailbox
  *   - one of more than MAX_RECIPIENTS on a single message — that is a
  *     broadcast, not a conversation with a client
@@ -28,6 +32,14 @@
  * nobody new — the scheduler simply fires again in 15 minutes.
  */
 const MAX_RECIPIENTS = 10;
+
+// People Anil emails who are not buyers (developer, accountant, lawyer …).
+// Whole domains go in IGNORE_DOMAINS. Setting a wrongly added client to
+// Inactive works too — any existing Clients row blocks re-adding — but
+// DELETING one does not: the next run re-reads the same sent mail and
+// adds them back.
+const IGNORE_EMAILS = ['developerrasikul@gmail.com'];
+const IGNORE_DOMAINS = [];
 const INTERNAL_DOMAINS = ['akay.ie'];
 const FREE_MAIL = ['gmail.com', 'googlemail.com', 'hotmail.com', 'hotmail.co.uk', 'outlook.com', 'live.com', 'yahoo.com', 'yahoo.co.uk', 'icloud.com', 'me.com', 'aol.com', 'gmx.de', 'gmx.net', 'mail.ru', 'yandex.ru', 'proton.me', 'protonmail.com', 'eircom.net', 'web.de', 'qq.com', '163.com'];
 const SERVICE_DOMAINS = ['google.com', 'airtable.com', 'n8n.io', 'n8n.cloud', 'netlify.com', 'github.com', 'resend.com', 'resend.dev', 'stripe.com', 'paypal.com', 'docusign.net', 'dropbox.com', 'revenue.ie', 'linkedin.com', 'facebookmail.com', 'whatsapp.com', 'anthropic.com'];
@@ -149,7 +161,7 @@ items('Supplier Emails').map(flat).forEach(function (s) {
 
 // ---- walk the sent mail ----
 const byEmail = {};
-const counts = { messages: 0, broadcasts: 0, known: 0, internal: 0, service: 0, supplier: 0, candidates: 0 };
+const counts = { messages: 0, broadcasts: 0, known: 0, internal: 0, service: 0, supplier: 0, ignored: 0, candidates: 0 };
 for (const it of items('Sent Mail')) {
   const m = it.json || {};
   counts.messages++;
@@ -169,7 +181,8 @@ for (const it of items('Sent Mail')) {
     if (known[e]) { counts[known[e] === 'supplier' ? 'supplier' : 'known']++; return; }
     if (INTERNAL_DOMAINS.indexOf(d) >= 0) { counts.internal++; return; }
     if (SERVICE_LOCAL.test(e.split('@')[0]) || SERVICE_DOMAINS.some(function (s) { return d === s || d.endsWith('.' + s); })) { counts.service++; return; }
-    if (supplierDomains[d]) { counts.supplier++; return; }
+    if (IGNORE_EMAILS.indexOf(e) >= 0 || IGNORE_DOMAINS.indexOf(d) >= 0) { counts.ignored++; return; }
+    if (supplierDomains[d] && !clientDomains[d]) { counts.supplier++; return; }
 
     const c = byEmail[e] || (byEmail[e] = { email: e, name: '', firstDate: date, lastDate: date, subjects: [], parts: [], messageIds: [] });
     const name = String(r.name || '').replace(/^["']|["']$/g, '').trim();

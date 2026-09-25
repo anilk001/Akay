@@ -21,9 +21,9 @@
  * Every select value written here is a real option on Clients; the POST runs
  * with typecast OFF so a typo fails loudly instead of inventing an option.
  *
- * DRY_RUN = true writes nothing: one summary item shows what WOULD be created.
+ * DRY_RUN = true writes nothing (live since 2026-09-25): one summary item shows what WOULD be created.
  */
-const DRY_RUN = true;
+const DRY_RUN = false;
 const RUN_TAG = 'sent-mail capture ' + new Date().toISOString().slice(0, 10);
 
 const INTEREST_OPTIONS = ['Beer', 'Spirits', 'Wine', 'Grocery', 'Confectionery', 'Toiletries', 'Soft Drinks', 'Other FMCG', 'Indv Spirits', 'Indv groceries'];
