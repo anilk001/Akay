@@ -26,6 +26,9 @@ between 2026-07-29 and 2026-08-27. A draft in n8n is invisible until published.
 | `instant-quote-intake/extract-wanted-lines.js` | `pXGfSBEn5ZdOT4nt` | Extract Wanted Lines | full source, **not published** |
 | `instant-quote-intake/trade-desk-api/post-to-intake.js` | *(not an n8n node — belongs in `trade-desk-api`)* | — | full source, **not installed** |
 | `unmatched-demand-digest/build-demand-digest.js` | *(not built in n8n yet)* | Build Demand Digest | full source, **not published** |
+| `sent-mail-client-capture/pick-new-recipients.js` | `EILYbFqzEXVUsM8Z` | Pick New Recipients | full source, **DRY_RUN, not published** |
+| `sent-mail-client-capture/build-client-creates.js` | `EILYbFqzEXVUsM8Z` | Build Client Creates | full source, **DRY_RUN, not published** |
+| `sent-mail-client-capture/build-archive-stamps.js` | `EILYbFqzEXVUsM8Z` | Build Archive Stamps | full source, **DRY_RUN, not published** |
 
 The four WhatsApp nodes and the trade-terms normaliser are live. **Excel Offer
 Ingestion** (`j1NAhQEKz9hzi1T2`) now calls the normaliser on every line — as a
@@ -143,6 +146,7 @@ Plain node, no framework. `npm test` runs all of them:
     node n8n/tests/buy-side-guard.test.js
     node n8n/tests/trade-terms.test.js
     node n8n/tests/trade-terms-digest.test.js
+    node n8n/tests/sent-mail-client-capture.test.js
 
 The two trade-terms tests **load and execute the node source** rather than
 re-typing it — `new Function('$input', src)`, since a Code node is a function

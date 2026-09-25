@@ -93,6 +93,7 @@ node n8n/tests/trade-terms.test.js        # MOQ / lead-time ingestion parser
 node n8n/tests/trade-terms-digest.test.js
 node n8n/tests/instant-quote-intake.test.js   # Instant Quote intake payload rules
 node n8n/tests/unmatched-demand-digest.test.js # weekly buying brief from unmatched demand
+node n8n/tests/sent-mail-client-capture.test.js # new recipients of ak@akay.ie mail → Clients
 ```
 
 ## Layout
@@ -118,7 +119,10 @@ node n8n/tests/unmatched-demand-digest.test.js # weekly buying brief from unmatc
   buyer's uploaded list: logs it to Airtable against the client, emails the
   priced file to ak@akay.ie, and turns every line it could NOT price into a
   `Wanted` row, and `unmatched-demand-digest/` — the Monday buying brief built
-  from those rows (what buyers asked for that we could not supply)
+  from those rows (what buyers asked for that we could not supply), and
+  `sent-mail-client-capture/` — adds each new recipient of mail sent from
+  ak@akay.ie to Clients as Pending Review, with Interest Categories and the
+  matching `Indv …` Capsule Tag the offer sends select on
 - `quote/` — the **Trade Desk** SPA published at quote.akay.ie: a pre-built
   React bundle deployed by its own Netlify project (`sellnin-trade-desk`), not
   by this build — `.github/workflows/deploy-quote.yml` publishes it whenever
