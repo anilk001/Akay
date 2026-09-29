@@ -168,7 +168,22 @@ export function listingTermsLine(offer = {}) {
     parts.push(SAYS_MINIMUM.test(moq.text) && !hedge ? moq.text : `MOQ ${hedge}${moq.text}`);
   }
   if (lead) parts.push(SAYS_LEAD.test(lead) ? lead : `Lead ${lead}`);
+  const pallet = palletLabel(offer);
+  if (pallet) parts.push(pallet);
   return parts.join(' \u00b7 ');
+}
+
+/**
+ * "60 cases/pallet", or "1,440 pcs/pallet" when only the piece count is
+ * known. Empty when neither has been measured — most lines, for now — so a
+ * card never states a pallet it has not got.
+ */
+export function palletLabel(offer = {}) {
+  const cases = offer.palletCases;
+  if (Number.isFinite(cases) && cases > 0) return `${formatNumber(cases)} cases/pallet`;
+  const pcs = offer.palletPieces;
+  if (Number.isFinite(pcs) && pcs > 0) return `${formatNumber(pcs)} pcs/pallet`;
+  return '';
 }
 
 function formatNumber(n) {

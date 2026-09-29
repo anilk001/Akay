@@ -7,7 +7,7 @@
 import assert from 'node:assert/strict';
 import {
   moqLabel, leadTimeLabel, isEstimated, moqBucket, leadTimeBucket, tradeTermsView,
-  listingTermsLine,
+  listingTermsLine, palletLabel,
 } from '../src/lib/trade-terms.mjs';
 
 let n = 0;
@@ -130,5 +130,18 @@ eq(leadTimeLabel({ leadTime: 'Immediate' }), 'Ex-stock');
 eq(leadTimeLabel({ leadTime: '5-7 days' }), '5-7 days');
 eq(leadTimeLabel({ leadTime: '2 weeks from stock' }), '2 weeks from stock');
 eq(leadTimeLabel({ leadTime: 'Approx. 2-3 weeks' }), 'Approx. 2-3 weeks');
+
+// ── Pallet configuration ───────────────────────────────────────────────────
+// Unmeasured is the common case, and it must print nothing at all.
+eq(palletLabel({}), '');
+eq(palletLabel({ palletCases: null, palletPieces: null }), '');
+eq(palletLabel({ palletCases: 60 }), '60 cases/pallet');
+eq(palletLabel({ palletCases: 1200 }), '1,200 cases/pallet');
+// Cases win when both are known; pieces are the fallback, labelled as pieces.
+eq(palletLabel({ palletCases: 60, palletPieces: 720 }), '60 cases/pallet');
+eq(palletLabel({ palletPieces: 1440 }), '1,440 pcs/pallet');
+eq(palletLabel({ palletCases: 0 }), '');
+eq(listingTermsLine({ leadTime: '2 weeks', palletCases: 60 }), 'Lead 2 weeks \u00b7 60 cases/pallet');
+eq(listingTermsLine({ palletCases: 60 }), '60 cases/pallet');
 
 console.log(`trade-terms-display: ${n} assertions passed`);

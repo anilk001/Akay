@@ -59,14 +59,22 @@ process.stdout.write(`-- 009_offers_public_direct.sql
 -- table, and the base table is exactly what we are hiding. This view therefore
 -- runs as its owner (postgres). That is the whole mechanism; do not "fix" it.
 --
--- THE THREE FLAGS AT THE BOTTOM are filter columns, not display columns. The
+-- THE FOUR COLUMNS AT THE BOTTOM are filter columns, not display columns. The
 -- delisted archive query needs them in its WHERE. They are operational state,
 -- not commercial data, and none of them is in FORBIDDEN_FIELDS - but they are
 -- deliberately NOT in PG_FIELDS, so they are never selected into the snapshot.
 
 begin;
 
-create or replace view akay.offers_public as
+-- DROP + CREATE, not CREATE OR REPLACE. Postgres only lets OR REPLACE append
+-- columns at the END of a view, and a new PG_FIELDS entry lands before the
+-- four filter columns below - so OR REPLACE fails with "cannot change name of
+-- view column". Nothing depends on this view (checked 2026-09-29), and the
+-- grant is re-issued below inside the same transaction, so readonly_site is
+-- never left without access and never sees a half-built view.
+drop view if exists akay.offers_public;
+
+create view akay.offers_public as
 select
   o.airtable_id                    as airtable_id,
 ${cols}
@@ -87,6 +95,10 @@ where o.deleted_at is null;
 
 comment on view akay.offers_public is
   'The ONLY object akay.ie may read. Generated from PG_FIELDS in src/data/airtable.mjs. Runs as owner on purpose, so readonly_site never needs SELECT on akay.offers.';
+
+-- DROP + CREATE makes whoever runs this the owner. The view's privileges ARE
+-- its owner's (security_invoker is off), so pin it to postgres explicitly.
+alter view akay.offers_public owner to postgres;
 
 -- The grant moves to the view, and only the view.
 grant select on akay.offers_public to readonly_site;

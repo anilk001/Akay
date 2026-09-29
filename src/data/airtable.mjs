@@ -68,6 +68,9 @@ const FIELDS = [
   // parser has not reached yet.
   'MOQ Type', 'MOQ Qty', 'MOQ Currency', 'MOQ Source', 'Mixed Load Allowed',
   'Lead Time Days',
+  // Pallet configuration. Measured for about a fifth of the catalogue so far;
+  // the rest render nothing rather than a guess.
+  'Cases per Pallet', 'Pieces per Pallet',
 ];
 
 // Site Stats columns the build may read. The rest of that table — the numeric
@@ -186,6 +189,8 @@ export const PG_FIELDS = [
   ['MOQ Source',                 'o.moq_source',                 'text'],
   ['Mixed Load Allowed',         'o.mixed_load_allowed',         'bool'],
   ['Lead Time Days',             'o.lead_time_days',             'num'],
+  ['Cases per Pallet',           'o.cases_per_pallet',           'num'],
+  ['Pieces per Pallet',          'o.pieces_per_pallet',          'num'],
 ];
 
 // Same guard as FIELDS, and one more: the two lists must agree. If someone adds
@@ -503,6 +508,10 @@ function isTestRow(name = '') {
   return /^testbrand|^testproduct/i.test(name.trim());
 }
 
+// A count that can only be a whole, positive number of things; anything else
+// (empty, 0, negative) is "not known", never printed.
+const countOrNull = (v) => (typeof v === 'number' && v > 0 ? Math.round(v) : null);
+
 function normalize(fields, recordId = null) {
   const detail = fields['Price Per Unit & Case'] || fields['Price Display'] || '';
   const parts = parsePriceParts(detail);
@@ -549,6 +558,8 @@ function normalize(fields, recordId = null) {
     featured: fields['Featured'] === true,
     volumeMl: typeof fields['Volume ML'] === 'number' ? fields['Volume ML'] : null,
     pack: typeof fields['PCS/Case'] === 'number' ? fields['PCS/Case'] : null,
+    palletCases: countOrNull(fields['Cases per Pallet']),
+    palletPieces: countOrNull(fields['Pieces per Pallet']),
     unitType: fields['Unit Type'] || '',
     // Unit and case barcodes, for matching an uploaded buying list.
     ean: fields['EAN Unit'] || '',
@@ -676,7 +687,7 @@ function renormalizeSnapshotOffer(o, index, idPrefix = 'snapshot') {
     moq: '', leadTime: '', bbd: '', note: '', offerDate: '', expiryDate: '',
     volumeMl: null, pack: null, unitType: '', warehouse: '', incoterm: '',
     moqType: '', moqQty: null, moqCurrency: '', moqSource: '', mixedLoad: false,
-    leadTimeDays: null,
+    leadTimeDays: null, palletCases: null, palletPieces: null,
     ...o,
     id: o.id || `${idPrefix}-${index}`,
     name,
