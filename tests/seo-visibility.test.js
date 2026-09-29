@@ -83,7 +83,7 @@ eq(dutyClass('Bonded'), 'under-bond');
 eq(dutyClass('T2'), 'duty-paid');
 eq(dutyClass('On Floor'), '');
 eq(houseMinimum('Spirits').short, 'EUR 5,000 minimum order');
-eq(houseMinimum('Toiletries').short, 'Full container');
+eq(houseMinimum('Toiletries').short, 'EUR 10,000 minimum order');
 eq(houseMinimum('Wine'), null);
 
 const jd = brandAnswers("Jack Daniel's", [row(1, "Jack Daniel's"), row(2, "Jack Daniel's", { tier: 'T1', amount: 90, warehouse: 'Riga' })]);
@@ -107,7 +107,7 @@ ok(offerAnswers(row(1, 'X')).some((t) => /EUR 5,000/.test(t)), 'house minimum wh
 
 // --- Company facts agree everywhere ---------------------------------------
 eq(LEGAL_NAME, 'Akay Ireland Ltd');
-eq(companyAddressLine(), '36 Glean an Oir, Shannon, Co. Clare, V14 V006, Ireland');
+eq(companyAddressLine(), '36 Gleann An Oir, Shannon, Co. Clare, V14 V006, Ireland');
 const org = organizationSchema();
 eq(org.legalName, 'Akay Ireland Ltd');
 eq(org.vatID, 'IE8250418E');

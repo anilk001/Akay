@@ -22,7 +22,7 @@ const MINIMUM_BY_CATEGORY = {
 };
 const MINIMUM_TEXT = {
   spirits: { short: 'EUR 5,000 minimum order', long: TRADING_TERMS.spiritsMinimum },
-  fmcg: { short: 'Full container', long: TRADING_TERMS.fmcgMinimum },
+  fmcg: { short: 'EUR 10,000 minimum order', long: TRADING_TERMS.fmcgMinimum },
 };
 
 export function houseMinimum(category) {
@@ -166,9 +166,7 @@ export function offerAnswers(offer) {
   if (duty) notes.push(duty);
   if (!offer.moqLabel) {
     const house = houseMinimum(offer.category);
-    if (house) notes.push(house === MINIMUM_TEXT.spirits
-      ? `${house.long}. The minimum is per order, so this line can be combined with others to reach it.`
-      : `${house.long}.`);
+    if (house) notes.push(`${house.long}. The minimum is per order, so this line can be combined with others to reach it.`);
   }
   notes.push(`To buy, send the quantity on WhatsApp or email, or add this line to a buying list and upload it at ${QUOTE_URL.replace('https://', '')} to get it priced with the rest.`);
   return notes;

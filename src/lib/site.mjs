@@ -14,7 +14,7 @@ export const LEGAL_NAME = 'Akay Ireland Ltd';
 export const COMPANY = {
   legalName: LEGAL_NAME,
   tradingName: SITE_NAME,
-  streetAddress: '36 Glean an Oir',
+  streetAddress: '36 Gleann An Oir',
   locality: 'Shannon',
   region: 'Co. Clare',
   postalCode: 'V14 V006',
@@ -38,7 +38,7 @@ export function companyAddressLine() {
 // the defaults the whole catalogue trades on.
 export const TRADING_TERMS = {
   spiritsMinimum: 'Spirits: minimum order EUR 5,000',
-  fmcgMinimum: 'FMCG: full containers only',
+  fmcgMinimum: 'FMCG: minimum order EUR 10,000',
   payment: 'Back-to-back on confirmed orders; no credit terms',
 };
 // 1200x630 share card (public/og-akay.png). The bird logo alone is 320x279,

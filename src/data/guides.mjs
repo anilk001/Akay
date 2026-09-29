@@ -128,7 +128,7 @@ Always confirm Incoterm on your purchase order. Disputes about who pays what are
 AKAY's standard minimums:
 
 - **Spirits:** minimum order EUR 5,000 per order, across as many lines as you like.
-- **FMCG** (grocery, confectionery, toiletries, household): full containers only.
+- **FMCG** (grocery, confectionery, toiletries, household): minimum order EUR 10,000 per order.
 - **Offer-specific minimums:** where an offer page states its own MOQ, that figure applies.
 
 For scale: a pallet holds roughly 40–60 cases; a 20ft container 400–500 cases and a 40ft container 800–1,000, depending on the product.
@@ -212,7 +212,7 @@ For regular buyers: NET 30 (invoice terms).
 ## Common Questions
 
 **Can I order just 1 case?**
-No. Spirits orders start at EUR 5,000 and FMCG moves in full containers. The spirits minimum is per order, so several lines can be combined to reach it.
+No. Spirits orders start at EUR 5,000 and FMCG orders at EUR 10,000. The minimum is per order, so several lines can be combined to reach it.
 
 **Do you ship to [my country]?**
 Yes, AKAY ships worldwide. We have experience with Europe, Middle East, Africa, and Asia. Ask about your destination.
@@ -459,14 +459,14 @@ Shannon, Loendersloot (Netherlands), Riga (Latvia), and other EU licensed wareho
 5. **Arrange payment** (typically 50% upfront, 50% on shipment — escrow is available on a first deal: https://akay.ie/guides/escrow-payment-wholesale-spirits/)
 6. **Receive goods** and clear customs (if required)
 
-Minimum order: EUR 5,000 for spirits; full containers for FMCG. Where an offer states its own minimum, that minimum applies.
+Minimum order: EUR 5,000 for spirits; EUR 10,000 for FMCG. Where an offer states its own minimum, that minimum applies.
 
 ## Contact
 
 **Enquiries:** offers@akay.ie
 **WhatsApp:** +353 87 238 2368
 **Office:** +353 61 363305
-**Registered office:** Akay Ireland Ltd, 36 Glean an Oir, Shannon, Co. Clare, V14 V006, Ireland
+**Registered office:** Akay Ireland Ltd, 36 Gleann An Oir, Shannon, Co. Clare, V14 V006, Ireland
 **VAT:** IE8250418E · **CRO:** 250418
 **Business hours:** Monday–Friday, 9am–5pm Irish time
 
