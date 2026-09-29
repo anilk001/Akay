@@ -1,8 +1,9 @@
 ---
-import HeaderTools from '../../components/HeaderTools.astro';
 import { getOffers } from '../../data/airtable.mjs';
 import { withSlugs } from '../../lib/slug.mjs';
 import { categoryItemListSchema, organizationSchema, crumbs } from '../../lib/schema.mjs';
+import SiteHeader from '../../components/SiteHeader.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
 import Seo from '../../components/Seo.astro';
 import { priceLabel } from '../../lib/price.mjs';
 import { listingTermsLine } from '../../lib/trade-terms.mjs';
@@ -90,49 +91,10 @@ const breadcrumbData = crumbs([
   />
 
   <style>
-    :root {
-      --paper: #F7F5F0;
-      --paper-2: #EFEDE4;
-      --card: #FFFFFF;
-      --ink: #17140F;
-      --ink-soft: #41473F;
-      --muted: #767E72;
-      --line: #E4E0D4;
-      --brass: #B4231F;
-      --ok: #0E7A3B;
-      --ok-bg: #E2F0E5;
-      --warn: #9A6A12;
-      --warn-bg: #F5E9CE;
-      --neu: #5C6A78;
-      --neu-bg: #E9ECEF;
-      --shadow: 0 1px 2px rgba(20, 33, 26, 0.06), 0 6px 20px -8px rgba(20, 33, 26, 0.14);
-      --radius: 14px;
-      --serif: "Hoefler Text", "Iowan Old Style", Palatino, Georgia, "Times New Roman", serif;
-      --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --paper: #0C140F;
-        --paper-2: #081009;
-        --card: #13201A;
-        --ink: #F1EFE7;
-        --ink-soft: #C6CEC4;
-        --muted: #8A968A;
-        --line: #243029;
-        --brass: #EC5A52;
-        --ok: #5FC97E;
-        --ok-bg: #123021;
-        --warn: #E0B65C;
-        --warn-bg: #31280F;
-        --neu: #9AA7B4;
-        --neu-bg: #1B2530;
-        --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 28px -12px rgba(0, 0, 0, 0.6);
-      }
-    }
 
     body {
       margin: 0;
-      padding: 20px;
+      padding: 0;
       background: var(--paper);
       color: var(--ink);
       font: 16px / 1.5 var(--sans);
@@ -157,6 +119,7 @@ const breadcrumbData = crumbs([
     .container {
       max-width: 1000px;
       margin: 0 auto;
+      padding: 24px 20px 48px;
     }
 
     .breadcrumb {
@@ -176,6 +139,25 @@ const breadcrumbData = crumbs([
       color: var(--muted);
       font-size: 1em;
       margin: 0.5em 0 0;
+    }
+
+    .header .filter-jump {
+      margin-top: 1em;
+    }
+
+    .header .filter-jump a {
+      display: inline-block;
+      font-weight: 600;
+      color: var(--forest);
+      text-decoration: none;
+      border: 1px solid color-mix(in srgb, var(--forest) 35%, var(--line));
+      border-radius: 10px;
+      padding: 0.5em 0.9em;
+      background: var(--card);
+    }
+
+    .header .filter-jump a:hover {
+      border-color: var(--forest);
     }
 
     .offer-grid {
@@ -297,8 +279,8 @@ const breadcrumbData = crumbs([
   </style>
 </head>
 <body>
+  <SiteHeader current="offers" />
   <div class="container">
-    <HeaderTools />
     <div class="breadcrumb">
       <a href="/">Home</a> / {category}
     </div>
@@ -312,6 +294,9 @@ const breadcrumbData = crumbs([
         back priced on the spot — see
         <a href="/guides/requirement-list-format/">how to send a requirement list</a>.
         {tiers.length > 0 && <> Duty status on this page: {listPhrase(tiers, 5)} — see <a href="/guides/t1-vs-t2-duty-status/">T1 vs T2 explained</a>.</>}
+      </p>
+      <p class="filter-jump">
+        <a href={`/search/?cat=${encodeURIComponent(category)}`}>Filter these {category.toLowerCase()} offers by duty status, Incoterm, size and price →</a>
       </p>
     </div>
 
@@ -339,7 +324,7 @@ const breadcrumbData = crumbs([
     </div>
 
     <div class="nav">
-      <a href="/">← Back to catalogue</a>
+      <a href="/">← Home</a>
       |
       <a href="/#categories">Browse all categories</a>
       |
@@ -357,5 +342,6 @@ const breadcrumbData = crumbs([
       </ul>
     </nav>
   </div>
+  <SiteFooter />
 </body>
 </html>

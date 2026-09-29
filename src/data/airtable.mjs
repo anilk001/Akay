@@ -711,17 +711,54 @@ function snapshotDelisted() {
   }));
 }
 
-// Every source (Postgres, Airtable, snapshot) goes through one brand pass, so
-// "Nivea" and "NIVEA" are one brand on every page and in the snapshot. The
-// spelling is chosen over live AND delisted rows together, so a sold-out
-// page keeps the same brand slug as the live one. See src/lib/brand.mjs.
-export async function getOffers() {
-  const res = await loadOffers();
-  const canon = brandSpellings(res.offers, res.delisted);
-  return { ...res, offers: withCanonicalBrands(res.offers, canon), delisted: withCanonicalBrands(res.delisted, canon) };
+// Public names for warehouse / location values. Keys match case- and
+// space-insensitively against both the Warehouse field and the place part of
+// Public Terms ("EXW NTG" -> "EXW Netherlands"). Confirmed by Anil on
+// 2026-09-29: New Corp, NTG, Reftrans, Revera and the Surabaya address are all
+// warehouses, not suppliers; NTG is published as "Netherlands", and the three
+// New Corp spellings are shown one way.
+export const LOCATION_ALIASES = {
+  NTG: 'Netherlands',
+  'New Corp warehouse': 'New Corp',
+  NewCorp: 'New Corp',
+};
+const locKey = (v) => String(v || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+const ALIAS_BY_KEY = new Map(Object.entries(LOCATION_ALIASES).map(([k, v]) => [locKey(k), v]));
+
+export function normaliseLocation(offer) {
+  const warehouseAlias = ALIAS_BY_KEY.get(locKey(offer.warehouse));
+  const terms = String(offer.terms || '').trim();
+  const hit = terms.match(/^([A-Z]{3})\b\s*(.*)$/);
+  const m = hit && INCOTERMS.includes(hit[1]) ? hit : null;
+  const place = m ? m[2] : terms;
+  const termsAlias = place ? ALIAS_BY_KEY.get(locKey(place)) : undefined;
+  if (!warehouseAlias && !termsAlias) return offer;
+  return {
+    ...offer,
+    warehouse: warehouseAlias || offer.warehouse,
+    terms: termsAlias ? (m ? `${m[1]} ${termsAlias}` : termsAlias) : offer.terms,
+  };
 }
 
-async function loadOffers() {
+// Every source (Postgres, Airtable, snapshot) goes through the same two
+// passes: public warehouse names above, then one spelling per brand, so
+// "Nivea" and "NIVEA" are one brand on every page and in the snapshot. The
+// brand spelling is chosen over live AND delisted rows together, so a
+// sold-out page keeps the same brand slug as the live one. See
+// src/lib/brand.mjs.
+export async function getOffers() {
+  const result = await getOffersUnredacted();
+  const offers = result.offers.map(normaliseLocation);
+  const delisted = (result.delisted || []).map(normaliseLocation);
+  const canon = brandSpellings(offers, delisted);
+  return {
+    ...result,
+    offers: withCanonicalBrands(offers, canon),
+    delisted: withCanonicalBrands(delisted, canon),
+  };
+}
+
+async function getOffersUnredacted() {
   // Phase 3: read the Postgres replica instead of Airtable. Deliberately the
   // FIRST branch and deliberately not silent-on-failure in the same way the
   // Airtable path is: if the site is meant to be reading Postgres and cannot,

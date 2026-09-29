@@ -99,7 +99,18 @@ node n8n/tests/unmatched-demand-digest.test.js # weekly buying brief from unmatc
 
 - `src/data/airtable.mjs` — live fetch + normalize (public-safe fields only),
   plus `getSiteStats()` for the ticker's Airtable-maintained figures
-- `src/lib/site.mjs` — origin + site-wide SEO constants (`SITE_URL`)
+- `src/lib/site.mjs` — origin + site-wide SEO constants (`SITE_URL`), and
+  `COMPANY` / `TRADING_TERMS`: the legal name, registered address, VAT, CRO,
+  hours and house minimums that llms.txt, the About page and the
+  Organization JSON-LD all read. Change a company fact there, nowhere else
+- `src/lib/buying-answers.mjs` — the "Buying X wholesale" summary + FAQ on
+  brand pages and the "Buying this line" notes on offer pages, computed from
+  public fields only; every sentence must hold for every line it describes
+- `src/lib/redirects.mjs` — 301s for URLs retired by the 2026-09-29 slug
+  change (accents folded, brand spellings merged); `astro.config.mjs` writes
+  them to `dist/_redirects` at the end of the build
+- `LOCATION_ALIASES` in `src/data/airtable.mjs` — public names for warehouse
+  values (NTG is shown as "Netherlands"), applied on every getOffers() path
 - `src/components/Seo.astro` — the `<head>` for every page: title, canonical,
   robots, Open Graph, Twitter, GA4 and JSON-LD. Pages pass props, never
   hand-roll meta tags
@@ -107,6 +118,10 @@ node n8n/tests/unmatched-demand-digest.test.js # weekly buying brief from unmatc
 - `src/pages/` — index, category/offer/guide pages, sitemap, robots, llms.txt
 - `src/lib/` — fetch script, schema, slugs, WhatsApp link helpers,
   `normalise.mjs` + `search-engine.mjs` (shared by build, browser and tests)
+- `src/components/SiteHeader.astro` + `SiteFooter.astro` — the header (wordmark,
+  nav, search, theme toggle) and footer (company CRO/VAT, contact) on every
+  page. SiteHeader imports `src/styles/tokens.css`, the one copy of the design
+  tokens — pages must not define their own `:root` palette
 - `src/components/SiteSearch.astro` — header search form on every page
 - `src/pages/search.astro` + `search-index.json.ts` — client-side search over
   the public-safe index (see `tests/` for the acceptance cases)

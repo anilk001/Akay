@@ -4,11 +4,11 @@ import { organizationSchema, websiteSchema } from '../lib/schema.mjs';
 import Seo from '../components/Seo.astro';
 import { withSlugs, categorySlug, brandPages } from '../lib/slug.mjs';
 import { guides } from '../data/guides.mjs';
-import { enquiryLink, WA_LINK, SELL_STOCK_LINK, WA_DISPLAY } from '../lib/whatsapp.mjs';
+import { enquiryLink, WA_LINK, WA_DISPLAY, SELL_STOCK_LINK } from '../lib/whatsapp.mjs';
 import { listingTermsLine } from '../lib/trade-terms.mjs';
-import SiteSearch from '../components/SiteSearch.astro';
-import QuoteLink from '../components/QuoteLink.astro';
-import { quoteUrl, LEGAL_NAME, COMPANY_NUMBER, VAT_ID, TRADING_YEARS, DESK_CONTACT, DESK_PHONE, DESK_PHONE_DISPLAY, BUYING_EMAIL } from '../lib/site.mjs';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import { quoteUrl, CRO_NUMBER, VAT_NUMBER, BUYING_EMAIL } from '../lib/site.mjs';
 // The Instant Quote explainer (the .iq section below) and the /instant-quote/
 // landing page show the same walkthrough, so the asset is named in one place.
 import { QUOTE_VIDEO, QUOTE_VIDEO_POSTER, QUOTE_LANDING_PATH } from '../lib/quote-video.mjs';
@@ -39,13 +39,25 @@ const STOCK = { in: ['ok', 'In stock'], warn: ['warn', 'Limited'], enq: ['neu', 
 
 function toView(o) {
   const { basis, other, msg } = priceParts(o.priceDetail);
-  // tradeTerms: the shared "MOQ … · Lead …" wording the category and brand grids use.
+  // tradeTerms: the shared "MOQ … · Lead … · N cases/pallet" wording the
+  // category and brand grids use.
   return { ...o, basis, other, wa: enquiryLink(o, msg), st: STOCK[o.stock] || STOCK.enq, tradeTerms: listingTermsLine(o) };
 }
 const view = offers.map(toView);
-// Pin Featured offers to the front of the catalogue; stable sort keeps original order otherwise.
-const gridItems = [...view].sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
-const featuredCount = view.filter((o) => o.featured).length;
+// The homepage shows a short list, not the catalogue. It used to render every
+// live offer — 10,000+ cards and a 16 MB HTML file, which a phone on mobile
+// data had to download before the page settled. The full list lives at
+// /search/ (loaded on demand, with filters) and on the category pages; this
+// grid is the shop window: Featured lines first, then in-stock lines with the
+// most cases, then the rest, in catalogue order within each group.
+const HOME_LIMIT = 48;
+const rank = (o) => (o.featured ? 0 : o.stock === 'in' ? 1 : o.stock === 'warn' ? 2 : 3);
+const gridItems = view
+  .map((o, i) => [o, i])
+  .sort(([a, ia], [b, ib]) => rank(a) - rank(b) || (rank(a) === 1 ? (b.qty || 0) - (a.qty || 0) : 0) || ia - ib)
+  .slice(0, HOME_LIMIT)
+  .map(([o]) => o);
+const inStockCount = view.filter((o) => o.stock === 'in').length;
 
 const categories = ['All', ...Array.from(new Set(view.map((o) => o.category))).sort()];
 // Real <a> links to the category pages. The filter chips above are buttons
@@ -60,18 +72,17 @@ const brandCount = new Set(view.map((o) => o.brand)).size;
 // a crawlable path from here.
 const allBrandPages = brandPages(offers);
 const topBrands = [...allBrandPages].sort((a, b) => b.offers.length - a.offers.length).slice(0, 24);
-const currencies = Array.from(new Set(view.map((o) => o.currency).filter(Boolean))).sort();
 
+const fmt = (n) => n.toLocaleString('en-IE');
 const stats = [
-  [view.length.toLocaleString('en-IE'), 'live offers'],
+  [fmt(view.length), 'live offers'],
   // Value of listed stock, e.g. "Over €60 million" — a banded floor, so the
   // wording is printed exactly as stored, with no timestamp beside it. When
   // the stat is absent the row simply has one fewer figure: never €0, never
   // a placeholder slot.
   ...(siteStats.stock_value_eur ? [[siteStats.stock_value_eur, 'stock listed']] : []),
-  [categories.length - 1, 'categories'],
-  [currencies.join(' / ') || '—', 'currencies'],
-  [brandCount.toLocaleString('en-IE'), 'brands'],
+  [fmt(brandCount), 'brands'],
+  [fmt(inStockCount), 'lines in stock now'],
 ];
 ---
 
@@ -80,103 +91,30 @@ const stats = [
 <head>
   <Seo
     title="Wholesale Spirits, Beer &amp; FMCG Offers — Live Trade Pricing | AKAY Trade"
-    description="Live wholesale spirits, beer, HPC, grocery and confectionery offers from AKAY Trade, an Irish principal trader. By the case and pallet — trade pricing, pack specs and T1/T2 duty status on every line, no login."
-    ogTitle="AKAY Trade — Live Wholesale FMCG &amp; Spirits Offers"
+    description="Live wholesale beverage and FMCG offers from AKAY Trade, Ireland. Spirits, beer, soft drinks and grocery by the case and pallet — current trade pricing, pack specs and T1/T2 duty status on every line."
+    ogTitle="AKAY Trade — Live Wholesale Beverage Offers"
     path="/"
     schemas={[organizationSchema(), websiteSchema()]}
   />
   {/* is:global — scoped styles would stamp a data-astro-cid attribute on
-      every element of all 6,098 cards, adding megabytes to the HTML. This
-      page renders a whole document, so nothing else can collide. */}
+      every element of every card. The shared header and footer use prefixed
+      class names (sh-, sf-) so nothing here collides with them. Design
+      tokens come from src/styles/tokens.css via SiteHeader. */}
   <style is:global>
-    :root{
-      --paper:#F7F5F0; --paper-2:#EFEDE4; --card:#FFFFFF; --ink:#17140F; --ink-soft:#41473F;
-      --muted:#767E72; --line:#E4E0D4; --line-soft:#ECE8DD;
-      --brass:#B4231F; --brass-2:#D0362E; --forest:#0E7A3B; --lime:#6FA82E;
-      --ok:#0E7A3B; --ok-bg:#E2F0E5; --warn:#9A6A12; --warn-bg:#F5E9CE; --neu:#5C6A78; --neu-bg:#E9ECEF;
-      --shadow:0 1px 2px rgba(20,33,26,.06),0 6px 20px -8px rgba(20,33,26,.14);
-      --radius:14px;
-      --serif:"Hoefler Text","Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
-      --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-      --mono:ui-monospace,"SF Mono","SFMono-Regular",Menlo,Consolas,monospace;
-    }
-    @media (prefers-color-scheme:dark){
-      :root{
-        --paper:#0C140F; --paper-2:#081009; --card:#13201A; --ink:#F1EFE7; --ink-soft:#C6CEC4;
-        --muted:#8A968A; --line:#243029; --line-soft:#1B2620;
-        --brass:#EC5A52; --brass-2:#F26E66; --forest:#37B866; --lime:#9BD84F;
-        --ok:#5FC97E; --ok-bg:#123021; --warn:#E0B65C; --warn-bg:#31280F; --neu:#9AA7B4; --neu-bg:#1B2530;
-        --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px -12px rgba(0,0,0,.6);
-      }
-    }
-    :root[data-theme="light"]{
-      --paper:#F7F5F0; --paper-2:#EFEDE4; --card:#FFFFFF; --ink:#17140F; --ink-soft:#41473F;
-      --muted:#767E72; --line:#E4E0D4; --line-soft:#ECE8DD; --brass:#B4231F; --brass-2:#D0362E; --forest:#0E7A3B; --lime:#6FA82E;
-      --ok:#0E7A3B; --ok-bg:#E2F0E5; --warn:#9A6A12; --warn-bg:#F5E9CE; --neu:#5C6A78; --neu-bg:#E9ECEF;
-    }
-    :root[data-theme="dark"]{
-      --paper:#0C140F; --paper-2:#081009; --card:#13201A; --ink:#F1EFE7; --ink-soft:#C6CEC4;
-      --muted:#8A968A; --line:#243029; --line-soft:#1B2620; --brass:#EC5A52; --brass-2:#F26E66; --forest:#37B866; --lime:#9BD84F;
-      --ok:#5FC97E; --ok-bg:#123021; --warn:#E0B65C; --warn-bg:#31280F; --neu:#9AA7B4; --neu-bg:#1B2530;
-    }
     *{box-sizing:border-box}
     html,body{margin:0}
     body{background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.5;-webkit-font-smoothing:antialiased}
     .wrap{max-width:1200px;margin:0 auto;padding:0 20px}
 
-    header.bar{position:sticky;top:0;z-index:40;background:color-mix(in srgb,var(--paper) 86%,transparent);
-      backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
-    .bar-in{display:flex;align-items:center;gap:16px;height:60px}
-    .mark{display:inline-flex;align-items:center;gap:9px;font-family:var(--serif);font-weight:600;font-size:26px;letter-spacing:.02em;color:var(--ink);text-decoration:none;line-height:1}
-    .logo-slot{flex-shrink:0;height:34px;width:auto;filter:drop-shadow(0 1px 2px rgba(0,0,0,.18))}
-    .mark b{color:var(--brass)}
-    .dot{width:6px;height:6px;border-radius:50%;background:var(--brass-2);display:inline-block;margin:0 2px 2px 2px}
-    .bar-sub{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.04em}
-    /* Between the phone breakpoint and a wide desktop the bar holds the
-       wordmark, search, the Trade Desk link and the toggle: search yields its
-       width first (its min-content floor is lifted), but never below a box a
-       query is still readable in — under that the phone layout takes over. */
-    .bar-in > .site-search{min-width:200px}
-    /* The bar carries the wordmark, search, the Trade Desk link and the theme
-       toggle. Below 760px that is more than one row can hold: the wordmark and
-       the toggle shrink, and search moves to a second row rather than being
-       squeezed into what is left. (Without this the bar overflowed the
-       viewport and the whole page scrolled sideways.) */
-    /* "akay.ie" is the first thing the bar can afford to lose. */
-    @media (max-width:900px){.bar-sub{display:none}}
-    @media (max-width:760px){
-      .bar-in{gap:10px;height:auto;flex-wrap:wrap;padding:9px 0}
-      .mark{font-size:20px;gap:7px}
-      .logo-slot{height:26px}
-      #themeLbl{display:none}
-      .theme-btn{padding:0 9px}
-      /* Search drops to its own full-width row rather than being squeezed to a
-         box too narrow to read a query in. */
-      .bar-in > .site-search{order:5;flex:1 0 100%;max-width:none}
-    }
-    .bar-spacer{flex:1}
-    .theme-btn{border:1px solid var(--line);background:var(--card);color:var(--ink-soft);border-radius:9px;
-      height:34px;padding:0 12px;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
-    .theme-btn:hover{border-color:var(--brass-2);color:var(--ink)}
-
     .hero{border-bottom:1px solid var(--line);background:
       radial-gradient(120% 140% at 100% 0,color-mix(in srgb,var(--forest) 12%,transparent),transparent 55%),
       radial-gradient(90% 120% at 0 100%,color-mix(in srgb,var(--brass) 7%,transparent),transparent 60%)}
-    .hero-in{padding-top:34px;padding-bottom:26px}
+    .hero-in{padding-top:40px;padding-bottom:32px;display:grid;gap:28px 48px;
+      grid-template-columns:minmax(0,1.1fr) minmax(300px,.9fr);align-items:center}
+    @media (max-width:900px){.hero-in{grid-template-columns:1fr}}
     .eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--brass);margin:0 0 12px}
-    h1{font-family:var(--serif);font-weight:600;font-size:clamp(30px,5vw,46px);line-height:1.04;margin:0;max-width:16ch;text-wrap:balance;letter-spacing:-.01em}
+    h1{font-family:var(--serif);font-weight:600;font-size:clamp(30px,4.6vw,50px);line-height:1.04;margin:0;max-width:16ch;text-wrap:balance;letter-spacing:-.01em}
     .lede{margin:14px 0 0;max-width:56ch;color:var(--ink-soft);font-size:16px}
-    /* The hero now carries the primary button itself (the audit's first fix:
-       no primary action above the fold). The Instant Quote section below keeps
-       its own button, since that is where the explanation sits. */
-    /* inline, not inline-flex: the link is mid-sentence and has to be able to
-       wrap with the text around it rather than jumping to its own line. */
-    .cta-jump{color:var(--brass);font-weight:600;text-decoration:none;
-      border-bottom:1px solid color-mix(in srgb,var(--brass) 40%,transparent)}
-    .cta-jump:hover{color:var(--forest);border-bottom-color:color-mix(in srgb,var(--forest) 45%,transparent)}
-    .cta-jump svg{width:13px;height:13px;margin-left:5px;vertical-align:-1px}
-    /* Keeps the arrow tied to the last word so it can't orphan onto its own line. */
-    .cta-jump .nb{white-space:nowrap}
     /* The Instant Quote button. Brass rather than forest so it reads as the
        primary action on the page. */
     .cta-quote{display:inline-flex;align-items:center;gap:10px;height:50px;padding:0 22px;border-radius:12px;
@@ -191,19 +129,15 @@ const stats = [
     :root[data-theme="light"] .cta-quote{color:#fff}
     @media (prefers-reduced-motion:reduce){.cta-quote{transition:none}.cta-quote:hover{transform:none}}
     @media (max-width:520px){.cta-quote{width:100%;justify-content:center;padding:0 16px}}
-    .hero-cta{display:flex;flex-wrap:wrap;align-items:center;gap:12px 18px;margin-top:20px}
-    .cta-2{display:inline-flex;align-items:center;height:50px;padding:0 20px;border-radius:12px;border:1px solid var(--line);
-      background:var(--card);color:var(--ink);font-weight:600;font-size:15px;text-decoration:none;transition:border-color .14s}
-    .cta-2:hover{border-color:var(--forest);color:var(--forest)}
-    .cta-2:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
-    @media (max-width:520px){.cta-2{width:100%;justify-content:center}}
-    .trust{border-bottom:1px solid var(--line);background:var(--paper-2)}
-    .trust-in{list-style:none;margin:0 auto;padding-top:14px;padding-bottom:14px;display:grid;gap:10px 22px;
-      grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
-    .trust-in li{display:flex;flex-direction:column;gap:2px;font-size:12.5px;color:var(--muted);line-height:1.4}
-    .trust-in b{color:var(--ink);font-size:13.5px;font-weight:600}
-    .trust-in a{color:var(--brass);text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--brass) 40%,transparent)}
-    .trust-in a:hover{color:var(--forest)}
+    .hero-cta{display:flex;flex-wrap:wrap;gap:10px 12px;margin-top:22px}
+    /* Secondary action: outline, so the upload button stays the one to press. */
+    .cta-ghost{display:inline-flex;align-items:center;justify-content:center;height:50px;padding:0 20px;border-radius:12px;
+      border:1px solid var(--ink);color:var(--ink);background:transparent;font-weight:600;font-size:15px;text-decoration:none;transition:.14s}
+    .cta-ghost:hover{background:var(--ink);color:var(--paper)}
+    .cta-ghost:focus-visible{outline:2px solid var(--brass-2);outline-offset:3px}
+    @media (max-width:520px){.cta-ghost{width:100%}}
+    .ticker{display:flex;flex-wrap:wrap;gap:14px 28px;margin-top:26px;padding-top:20px;border-top:1px solid var(--line-soft)}
+
     .sell{border-bottom:1px solid var(--line);background:var(--paper-2);scroll-margin-top:76px}
     .sell-in{padding-top:24px;padding-bottom:24px;display:grid;gap:18px 36px;grid-template-columns:minmax(0,1.4fr) auto;align-items:center}
     @media (max-width:820px){.sell-in{grid-template-columns:1fr}}
@@ -213,7 +147,6 @@ const stats = [
     .sell-list{margin:10px 0 0;max-width:62ch;color:var(--muted);font-size:13px}
     .sell-list b{color:var(--ink-soft)}
     .sell-cta{display:flex;flex-direction:column;gap:10px;min-width:250px}
-    .sell-cta .cta-2{justify-content:center}
     .sell-wa{display:inline-flex;align-items:center;justify-content:center;gap:9px;height:50px;padding:0 20px;border-radius:12px;
       background:var(--forest);color:var(--paper);font-weight:600;font-size:15px;text-decoration:none;transition:background .14s}
     :root[data-theme="dark"] .sell-wa{color:#0A140F}
@@ -221,23 +154,33 @@ const stats = [
     .sell-wa:hover{background:var(--brass);color:#fff}
     .sell-wa:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
     @media (max-width:520px){.sell-cta{min-width:0}}
-    .ticker{display:flex;flex-wrap:wrap;gap:26px;margin-top:24px;padding-top:20px;border-top:1px solid var(--line-soft)}
+    .tline{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:10px;font-family:var(--mono);font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+    .tline span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+    /* Trust strip: registration facts and what every line carries. */
+    .trust{border-bottom:1px solid var(--line);background:var(--card)}
+    .trust-in{list-style:none;margin:0 auto;padding-top:16px;padding-bottom:16px;display:grid;gap:12px 20px;
+      grid-template-columns:repeat(4,minmax(0,1fr));font-size:13px;line-height:1.4}
+    @media (max-width:960px){.trust-in{grid-template-columns:repeat(3,minmax(0,1fr))}}
+    @media (max-width:560px){.trust-in{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    .trust-in b{display:block;color:var(--ink);font-weight:600}
+    .trust-in span{color:var(--muted);font-family:var(--mono);font-size:12px}
+    .trust-in a{color:var(--brass);text-decoration:none;font-weight:600}
+    .trust-in a:hover{text-decoration:underline}
     .stat .n{font-family:var(--mono);font-size:22px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
     .stat .l{font-size:12px;color:var(--muted);letter-spacing:.03em}
 
     /* ── Instant Quote ─────────────────────────────────────────────────
-       The site's USP, in the slot the category-email form used to hold.
-       Copy on the left, an explainer banner on the right. The banner is
-       plain HTML/CSS rather than a video: nothing to host, nothing to
-       download, and it renders with JS off. Set QUOTE_VIDEO in the
-       frontmatter to swap in a real screen recording instead. */
+       The site's USP. Its explainer banner sits in the hero, so this band
+       carries the three steps side by side and the call to action. The
+       banner is plain HTML/CSS rather than a video: nothing to host, nothing
+       to download, and it renders with JS off. Set QUOTE_VIDEO in
+       src/lib/quote-video.mjs to swap in a real screen recording. */
     /* scroll-margin-top clears the sticky header when the hero link jumps here. */
     .iq{border-bottom:1px solid var(--line);scroll-margin-top:76px;background:
       radial-gradient(90% 140% at 0 0,color-mix(in srgb,var(--brass) 8%,transparent),transparent 58%),
       color-mix(in srgb,var(--forest) 5%,transparent)}
-    .iq-in{padding-top:26px;padding-bottom:28px;display:grid;gap:24px 36px;
-      grid-template-columns:minmax(320px,1.05fr) minmax(290px,.95fr);align-items:center}
-    @media (max-width:900px){.iq-in{grid-template-columns:1fr}}
+    .iq-in{padding-top:30px;padding-bottom:30px}
     .iq-eyebrow{display:flex;align-items:center;gap:9px;margin:0 0 9px;font-family:var(--mono);font-size:11.5px;
       letter-spacing:.16em;text-transform:uppercase;color:var(--brass);font-weight:bold}
     .iq-eyebrow .new{background:var(--brass);color:#fff;border-radius:5px;padding:2px 7px;font-size:10px;letter-spacing:.1em}
@@ -247,8 +190,11 @@ const stats = [
     :root[data-theme="light"] .iq-eyebrow .new{color:#fff}
     .iq-copy h2{font-family:var(--serif);font-size:clamp(21px,2.7vw,28px);font-weight:600;margin:0;
       color:var(--ink);text-wrap:balance;letter-spacing:-.01em}
-    .iq-lede{margin:9px 0 0;color:var(--ink-soft);font-size:14.5px;max-width:58ch}
-    .iq-steps{list-style:none;margin:17px 0 0;padding:0;display:grid;gap:11px}
+    .iq-lede{margin:9px 0 0;color:var(--ink-soft);font-size:14.5px;max-width:70ch}
+    .iq-lede a{color:var(--brass);font-weight:600;text-decoration:none}
+    .iq-lede a:hover{text-decoration:underline}
+    .iq-steps{list-style:none;margin:20px 0 0;padding:0;display:grid;gap:14px 24px;grid-template-columns:repeat(3,minmax(0,1fr))}
+    @media (max-width:820px){.iq-steps{grid-template-columns:1fr}}
     .iq-steps li{display:flex;gap:11px;align-items:flex-start}
     .iq-n{flex-shrink:0;width:23px;height:23px;margin-top:1px;border-radius:50%;background:var(--forest);color:var(--paper);
       font-family:var(--mono);font-size:12px;font-weight:600;display:inline-flex;align-items:center;justify-content:center}
@@ -258,8 +204,8 @@ const stats = [
     .iq-steps b{display:block;color:var(--ink);font-size:14px;font-weight:600}
     .iq-steps .t{display:block;color:var(--ink-soft);font-size:13.5px;line-height:1.5;max-width:54ch}
     .iq-steps .t strong{color:var(--ink);font-weight:600}
-    .iq-cta{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;margin-top:19px}
-    .iq-alt{font-size:13px;color:var(--ink-soft);max-width:40ch}
+    .iq-cta{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;margin-top:22px}
+    .iq-alt{font-size:13px;color:var(--ink-soft);max-width:52ch}
     .iq-alt a{color:var(--brass);font-weight:600;text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--brass) 40%,transparent)}
     .iq-alt a:hover{color:var(--forest)}
 
@@ -267,7 +213,7 @@ const stats = [
        it. What they uploaded (product, their cost) sits static; what we add
        (our price, the saving) animates in beside it, which is the whole story
        in one picture. Figures are illustrative and captioned as such. */
-    .iq-demo{margin:0;width:100%;max-width:460px;justify-self:end}
+    .iq-demo{margin:0;width:100%;max-width:480px;justify-self:end}
     @media (max-width:900px){.iq-demo{justify-self:stretch;max-width:none}}
     .iq-win{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
       box-shadow:var(--shadow);overflow:hidden}
@@ -312,51 +258,33 @@ const stats = [
     /* Real recording, when one is dropped in */
     .iq-video{width:100%;display:block;border-radius:var(--radius);border:1px solid var(--line);box-shadow:var(--shadow);background:var(--card)}
 
-    /* Featured section */
-    .feat{background:color-mix(in srgb,var(--forest) 6%,var(--paper));border-bottom:1px solid var(--line)}
-    .feat-in{padding-top:26px;padding-bottom:30px}
-    .feat-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:12px;margin:0 0 16px}
-    .feat-eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--brass);font-weight:bold}
-    .feat-head h2{font-family:var(--serif);font-size:22px;font-weight:600;margin:0;color:var(--ink)}
-    .feat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
-    .feat .card{border-color:color-mix(in srgb,var(--brass-2) 40%,var(--line))}
     .feat-badge{align-self:flex-start;font-family:var(--mono);font-size:10px;font-weight:bold;letter-spacing:.08em;
       text-transform:uppercase;color:#fff;background:#B4231F;padding:3px 8px;border-radius:6px;margin-bottom:12px}
     .card.feat-on{border-color:color-mix(in srgb,var(--brass-2) 50%,var(--line))}
 
-    /* --bar-h is the header's real height, set from the DOM (see the script at
-       the end of the page): the bar wraps to a second row on narrow screens,
-       so this cannot be the flat 60px it used to be or the filter bar sticks
-       underneath the header and disappears behind it. */
-    .controls{position:sticky;top:var(--bar-h,60px);z-index:30;background:color-mix(in srgb,var(--paper) 90%,transparent);
-      backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:14px 0}
-    .controls-in{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
-    .search{position:relative;flex:1;min-width:220px;margin:0}
+    main.wrap{scroll-margin-top:76px}
+    .grid-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px;margin:0 0 14px}
+    .grid-head h2{font-family:var(--serif);font-size:clamp(22px,2.6vw,28px);font-weight:600;margin:0 0 4px;color:var(--ink)}
+    .grid-head .count{margin:0}
+    .count a{color:var(--brass);text-decoration:none;font-weight:600}
+    .count a:hover{text-decoration:underline}
+    .search{position:relative;flex:0 1 380px;min-width:240px;margin:0}
     .search input{width:100%;height:42px;border:1px solid var(--line);background:var(--card);color:var(--ink);
       border-radius:11px;padding:0 14px 0 40px;font-size:15px;font-family:var(--sans)}
     .search input:focus{outline:2px solid var(--brass-2);outline-offset:1px;border-color:transparent}
     .search svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted)}
-    .chips{display:flex;flex-wrap:wrap;gap:7px}
-    .chip{border:1px solid var(--line);background:var(--card);color:var(--ink-soft);border-radius:999px;
-      height:36px;padding:0 15px;font-size:13.5px;cursor:pointer;transition:.14s;white-space:nowrap}
-    .chip:hover{border-color:var(--brass-2)}
-    .chip[aria-pressed="true"]{background:var(--forest);color:var(--paper);border-color:var(--forest)}
-    select.sort{height:36px;border:1px solid var(--line);background:var(--card);color:var(--ink-soft);
-      border-radius:999px;padding:0 14px;font-size:13.5px;cursor:pointer;font-family:var(--sans)}
+    .chips{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 18px}
+    .chip{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--card);color:var(--ink-soft);border-radius:999px;
+      height:34px;padding:0 14px;font-size:13.5px;transition:.14s;white-space:nowrap;text-decoration:none}
+    .chip:hover{border-color:var(--brass-2);color:var(--ink)}
+    .chip-n{font-family:var(--mono);font-size:11px;color:var(--muted)}
+    .see-all{text-align:center;margin:28px 0 0}
 
-    main.wrap{padding:26px 20px 40px}
-    .count-row{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 16px;margin:0 0 16px}
-    .count{font-family:var(--mono);font-size:12.5px;color:var(--muted);margin:0;letter-spacing:.03em}
-    .filters-link{font-size:13px;font-weight:600;color:var(--brass);text-decoration:none}
-    .filters-link:hover{text-decoration:underline}
-    #grid{scroll-margin-top:calc(var(--bar-h,60px) + 84px)}
+    main.wrap{padding:32px 20px 44px}
+    .count{font-family:var(--mono);font-size:12.5px;color:var(--muted);margin:0 0 16px;letter-spacing:.03em}
     .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
     .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px;
-      display:flex;flex-direction:column;gap:0;box-shadow:var(--shadow);transition:.16s;position:relative;overflow:hidden;
-      /* Off-screen cards cost nothing to render — keeps the single-page catalogue
-         fast on phones even if the base grows back past 1,000 offers. */
-      content-visibility:auto;contain-intrinsic-size:auto 320px}
-    .card[hidden]{display:none}  /* let search/filter actually hide cards (overrides display:flex) */
+      display:flex;flex-direction:column;gap:0;box-shadow:var(--shadow);transition:.16s;position:relative;overflow:hidden}
     .card:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--brass-2) 55%,var(--line))}
     .card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--brass-2);opacity:0;transition:.16s}
     .card:hover::before{opacity:1}
@@ -374,8 +302,6 @@ const stats = [
     .tag{font-size:11px;padding:3px 8px;border-radius:6px;font-family:var(--mono);letter-spacing:.03em;
       border:1px solid var(--line);color:var(--muted)}
     .tag.tier{border-color:color-mix(in srgb,var(--brass-2) 45%,var(--line));color:var(--brass)}
-    .tline{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:10px;font-family:var(--mono);font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
-    .tline span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
     .price-row{margin-top:16px;padding-top:14px;border-top:1px solid var(--line-soft);display:flex;align-items:flex-end;justify-content:space-between;gap:8px}
     .price .amt{font-family:var(--mono);font-size:22px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums;line-height:1}
     .price .cur{font-size:12px;color:var(--muted);font-family:var(--mono)}
@@ -410,11 +336,18 @@ const stats = [
     :root[data-theme="dark"] .enquire{color:#0A140F}
     @media (prefers-color-scheme:dark){.enquire{color:#0A140F}}
     .enquire:hover{background:var(--brass);color:#fff}
-    .empty{text-align:center;padding:60px 20px;color:var(--muted);font-family:var(--mono);font-size:14px}
-
-    footer{border-top:1px solid var(--line);padding:26px 0 44px;color:var(--muted);font-size:12.5px}
-    footer .wrap{display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between}
-    footer .note{max-width:64ch;line-height:1.6}
+    
+    .guides{border-top:1px solid var(--line);padding:40px 0;background:var(--paper-2);scroll-margin-top:76px}
+    .guides h2{font-family:var(--serif);font-size:24px;margin:0 0 8px}
+    .guides h2 a{color:var(--ink);text-decoration:none}
+    .guides .catnav-lede a{color:var(--brass);text-decoration:none}
+    .guide-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+    .guide-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px;text-decoration:none;
+      transition:.16s;display:flex;flex-direction:column}
+    .guide-card:hover{border-color:color-mix(in srgb,var(--brass-2) 55%,var(--line))}
+    .guide-card h3{margin:0 0 8px;font-size:16px;font-family:var(--serif);font-weight:600;color:var(--ink);line-height:1.3}
+    .guide-card p{margin:0;color:var(--muted);font-size:14px;flex-grow:1}
+    .guide-card span{color:var(--brass);font-size:13px;font-weight:600;margin-top:12px}
     @media (prefers-reduced-motion:reduce){*{transition:none!important}}
     @media (max-width:560px){.hero-in{padding-top:26px;padding-bottom:20px}.ticker{gap:18px}}
   </style>
@@ -424,90 +357,28 @@ const stats = [
     <symbol id="i-wa" viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.5A10 10 0 1 0 12 2Zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-1.7-.1-.4-.1-.9-.3-1.6-.6-2.8-1.2-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8 0-1.3.7-2 .9-2.2.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5.2.6.8 2 .9 2.1.1.1.1.3 0 .5-.1.2-.1.3-.3.5l-.4.5c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.4 1.5.3.1.5.1.6-.1.2-.2.7-.8.9-1.1.2-.3.4-.2.6-.1l1.8.9c.3.1.5.2.5.3.1.2.1.7-.1 1.4Z"/></symbol>
   </svg>
 
-  <header class="bar">
-    <div class="wrap bar-in">
-      <a class="mark" href="/" aria-label="AKAY home">
-        <img class="logo-slot" src="/akay-bird.png" alt="" width="320" height="279" />AKAY<span class="dot"></span><b>trade</b>
-      </a>
-      <span class="bar-sub">akay.ie</span>
-      <span class="bar-spacer"></span>
-      <SiteSearch compact />
-      <QuoteLink compact />
-      <button class="theme-btn" id="themeBtn" aria-label="Toggle light or dark theme">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5 19 19M19 5l-1.5 1.5M6.5 17.5 5 19"/></svg>
-        <span id="themeLbl">Theme</span>
-      </button>
-    </div>
-  </header>
+  <SiteHeader />
 
   <section class="hero">
     <div class="wrap hero-in">
-      <p class="eyebrow">Wholesale trader · spirits, beer, HPC &amp; grocery · T1 &amp; T2</p>
-      <h1>Wholesale FMCG and spirits at live trade prices.</h1>
-      <p class="lede">We buy and sell as principal — one counterparty, {TRADING_YEARS} years trading. Pack, duty status and Incoterm on every line, no login. Send us your buying list and get it back priced in minutes.</p>
-      <div class="hero-cta">
-        <a class="cta-quote" href={quoteUrl('excel')} rel="nofollow">
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M12 15.5V3.5m0 0L7.8 7.7M12 3.5l4.2 4.2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M4 15.5V18a2.5 2.5 0 0 0 2.5 2.5h11A2.5 2.5 0 0 0 20 18v-2.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-          Upload your list — get it priced
-        </a>
-        <a class="cta-2" href="#grid">Browse {view.length.toLocaleString('en-IE')} live offers</a>
-        <a class="cta-jump" href="#instant-quote">How it works</a>
-      </div>
-      <div class="ticker">
-        {stats.map((s) => (
-          <div class="stat"><div class="n">{s[0]}</div><div class="l">{s[1]}</div></div>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  {/* Who the counterparty is, before anyone scrolls. Every figure here is a
-      checkable fact from src/lib/site.mjs — no claim goes in this strip that
-      the desk does not actually offer. */}
-  <section class="trust" aria-label="About the counterparty">
-    <ul class="wrap trust-in">
-      <li><b>{LEGAL_NAME}</b><span>CRO {COMPANY_NUMBER} · Shannon, Ireland</span></li>
-      <li><b>VAT {VAT_ID}</b><span>EU reverse charge on intra-EU sales</span></li>
-      <li><b>Principal trader</b><span>We buy the stock and invoice you directly</span></li>
-      <li><b>{TRADING_YEARS} years trading</b><span>Duty-paid (T2) and under bond (T1)</span></li>
-      <li><b>Safe payment</b><span><a href="/guides/escrow-payment-wholesale-spirits/">Escrow</a>, or 30% with order and the balance against a copy of the BL</span></li>
-      <li><b>Pre-shipment photos</b><span>Of your goods, before they ship</span></li>
-      <li><b>{DESK_CONTACT.name}</b><span>{DESK_CONTACT.role} · <a href={`tel:${DESK_PHONE}`}>{DESK_PHONE_DISPLAY}</a></span></li>
-    </ul>
-  </section>
-
-  <section class="iq" id="instant-quote">
-    <div class="wrap iq-in">
-      <div class="iq-copy">
-        <p class="iq-eyebrow"><span class="new">New</span> Instant Quote</p>
-        <h2>Send your list in any format. Get it back priced.</h2>
-        <p class="iq-lede">No rep, no callback, no template to fill in. Upload the list exactly as you already keep it — we read it, write our selling price into it, and hand it straight back to download.</p>
-        <ol class="iq-steps">
-          <li>
-            <span class="iq-n" aria-hidden="true">1</span>
-            <div><b>Upload it however you have it</b><span class="t">Excel, CSV, or whatever your buying list already looks like. No fixed columns and no template — we parse it as it comes.</span></div>
-          </li>
-          <li>
-            <span class="iq-n" aria-hidden="true">2</span>
-            <div><b>We price it against live stock</b><span class="t">Every line is matched against the {view.length.toLocaleString('en-IE')} offers live on this site right now, and our selling price goes straight into your own file.</span></div>
-          </li>
-          <li>
-            <span class="iq-n" aria-hidden="true">3</span>
-            <div><b>Download it back — with your savings</b><span class="t">Include your current cost or target price and we mark the difference on every line, so what you save is there in black and white.</span></div>
-          </li>
-        </ol>
-        <div class="iq-cta">
+      <div class="hero-copy">
+        <p class="eyebrow">Wholesale FMCG · spirits · beer · T1 export &amp; T2 duty-paid</p>
+        <h1>Live trade pricing, straight from the desk.</h1>
+        <p class="lede">Spirits, beer, soft drinks, toiletries and grocery by the case and pallet — {fmt(view.length)} live offers from {fmt(brandCount)} brands, with pack, duty status, Incoterm and stock on every line. No login to see prices.</p>
+        <div class="hero-cta">
           <a class="cta-quote" href={quoteUrl('excel')} rel="nofollow">
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M12 15.5V3.5m0 0L7.8 7.7M12 3.5l4.2 4.2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               <path d="M4 15.5V18a2.5 2.5 0 0 0 2.5 2.5h11A2.5 2.5 0 0 0 20 18v-2.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
             </svg>
-            Upload your list — download it priced
+            Upload your list — get it priced
           </a>
-          <span class="iq-alt">Rather use email? Send it to <a href="mailto:offers@akay.ie?subject=Requirement%20List">offers@akay.ie</a> with "Requirement List" in the subject — any format, same automatic pricing.</span>
+          <a class="cta-ghost" href="/search/">Browse all {fmt(view.length)} offers</a>
+        </div>
+        <div class="ticker">
+          {stats.map((s) => (
+            <div class="stat"><div class="n">{s[0]}</div><div class="l">{s[1]}</div></div>
+          ))}
         </div>
       </div>
 
@@ -520,10 +391,10 @@ const stats = [
                  controls muted playsinline preload="none"
                  aria-label="Screen recording: a buying list uploaded to the Instant Quote tool and downloaded back with our prices and the savings marked."></video>
         ) : (
-          /* aria-hidden: it's a picture of the three steps spelled out above,
-             so a screen reader gets the caption instead of a mock table. The
-             figures are made up — generic product types, never a real line —
-             and the caption says so. */
+          /* aria-hidden: it's a picture of the Instant Quote steps spelled out
+             below, so a screen reader gets the caption instead of a mock
+             table. The figures are made up — generic product types, never a
+             real line — and the caption says so. */
           <div class="iq-win" aria-hidden="true">
             <div class="iq-bar"><i></i><i></i><i></i><span class="fn">my-buying-list.xlsx</span><span class="tag">+ AKAY PRICE</span></div>
             <div class="iq-rows">
@@ -552,8 +423,58 @@ const stats = [
             </div>
           </div>
         )}
-        <figcaption class="iq-cap">Example figures. Your own file comes back with our live selling price written in beside your cost, and the saving worked out on every line. <a href={QUOTE_LANDING_PATH}>See how it works</a>.</figcaption>
+        <figcaption class="iq-cap">Example figures. Your own file comes back with our live selling price written in beside your cost, and the saving worked out on every line. <a href="#instant-quote">How it works ↓</a></figcaption>
       </figure>
+    </div>
+  </section>
+
+  {/* Only facts that can be checked: company registration, and what the
+      catalogue itself shows on every line. Add a claim here only once it is
+      true for every deal. */}
+  <section class="trust" aria-label="About AKAY Trade">
+    <ul class="wrap trust-in">
+      <li><b>Irish registered company</b><span>CRO {CRO_NUMBER}</span></li>
+      <li><b>EU VAT registered</b><span>{VAT_NUMBER}</span></li>
+      <li><b>T1 export &amp; T2 duty-paid</b><span>duty status on every line</span></li>
+      <li><b>Prices in public</b><span>no login, no PDF</span></li>
+      <li><b>Principal trader</b><span>we buy the stock and invoice you</span></li>
+      <li><b>Safe payment</b><span><a href="/guides/escrow-payment-wholesale-spirits/">escrow</a>, or 30% with order and the balance against a copy of the BL</span></li>
+      <li><b>Pre-shipment photos</b><span>of your goods, before they ship</span></li>
+      <li><b>Talk to a trader</b><span><a href={WA_LINK} target="_blank" rel="noopener">WhatsApp</a> or <a href="mailto:offers@akay.ie">email</a></span></li>
+    </ul>
+  </section>
+
+  <section class="iq" id="instant-quote">
+    <div class="wrap iq-in">
+      <div class="iq-copy">
+        <p class="iq-eyebrow"><span class="new">New</span> Instant Quote</p>
+        <h2>Send your list in any format. Get it back priced.</h2>
+        <p class="iq-lede">No rep, no callback, no template to fill in. Upload the list exactly as you already keep it — we read it, write our selling price into it, and hand it straight back to download. <a href={QUOTE_LANDING_PATH}>See how it works</a>.</p>
+      </div>
+      <ol class="iq-steps">
+        <li>
+          <span class="iq-n" aria-hidden="true">1</span>
+          <div><b>Upload it however you have it</b><span class="t">Excel, CSV, or whatever your buying list already looks like. No fixed columns and no template — we parse it as it comes.</span></div>
+        </li>
+        <li>
+          <span class="iq-n" aria-hidden="true">2</span>
+          <div><b>We price it against live stock</b><span class="t">Every line is matched against the {fmt(view.length)} offers live on this site right now — by barcode, brand and pack size — and our selling price goes straight into your own file.</span></div>
+        </li>
+        <li>
+          <span class="iq-n" aria-hidden="true">3</span>
+          <div><b>Download it back — with your savings</b><span class="t">Include your current cost or target price and we mark the difference on every line, so what you save is there in black and white.</span></div>
+        </li>
+      </ol>
+      <div class="iq-cta">
+        <a class="cta-quote" href={quoteUrl('excel')} rel="nofollow">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M12 15.5V3.5m0 0L7.8 7.7M12 3.5l4.2 4.2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M4 15.5V18a2.5 2.5 0 0 0 2.5 2.5h11A2.5 2.5 0 0 0 20 18v-2.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          Upload your list — download it priced
+        </a>
+        <span class="iq-alt">Rather use email? Send it to <a href="mailto:offers@akay.ie?subject=Requirement%20List">offers@akay.ie</a> with "Requirement List" in the subject — any format, same automatic pricing.</span>
+      </div>
     </div>
   </section>
 
@@ -571,39 +492,30 @@ const stats = [
           <svg width="16" height="16" aria-hidden="true"><use href="#i-wa" /></svg>
           WhatsApp {WA_DISPLAY}
         </a>
-        <a class="cta-2" href={`mailto:${BUYING_EMAIL}?subject=${encodeURIComponent('Stock offer')}`}>Email {BUYING_EMAIL}</a>
+        <a class="cta-ghost" href={`mailto:${BUYING_EMAIL}?subject=${encodeURIComponent('Stock offer')}`}>Email {BUYING_EMAIL}</a>
       </div>
     </div>
   </section>
 
-  <section class="controls">
-    <div class="wrap controls-in">
-      <form class="search" action="/search/" method="get" role="search" title="Type to filter this page; press Enter for full search with size, pack and bond filters">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-        <input id="q" name="q" type="search" placeholder="Filter brand or product — press Enter for full search" autocomplete="off" />
+  <main class="wrap" id="offers">
+    <div class="grid-head">
+      <div>
+        <h2>Featured &amp; in stock now</h2>
+        <p class="count">{gridItems.length} of {fmt(view.length)} live offers · <a href="/search/">search &amp; filter all of them →</a></p>
+      </div>
+      <form class="search" action="/search/" method="get" role="search">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input name="q" type="search" placeholder="Search all offers — brand, product or barcode" aria-label="Search all offers" autocomplete="off" />
       </form>
-      <div class="chips" id="cats">
-        {categories.map((c) => (
-          <button class="chip" data-cat={c} aria-pressed={c === 'All' ? 'true' : 'false'}>{c}</button>
-        ))}
-      </div>
-      <select class="sort" id="sort" aria-label="Sort offers">
-        <option value="rel">Sort: Featured</option>
-        <option value="asc">Price ↑ (low→high)</option>
-        <option value="desc">Price ↓ (high→low)</option>
-        <option value="az">Name A→Z</option>
-      </select>
     </div>
-  </section>
-
-  <main class="wrap">
-    <div class="count-row">
-      <p class="count" id="count">Showing {view.length} of {view.length} offers</p>
-      <a class="filters-link" href="/search/">Filter by T1/T2, Incoterm, warehouse, MOQ or EAN →</a>
-    </div>
+    <nav class="chips" aria-label="Shop by category">
+      {categoryLinks.map((c) => (
+        <a class="chip" href={c.href}>{c.name} <span class="chip-n">{fmt(c.count)}</span></a>
+      ))}
+    </nav>
     <div class="grid" id="grid">
       {gridItems.map((o) => (
-        <article class={`card${o.featured ? ' feat-on' : ''}`} data-cat={o.category} data-name={(o.name + ' ' + (o.variants || '') + ' ' + o.brand).toLowerCase()} data-amt={o.unitAmount ?? o.amount ?? ''} data-feat={o.featured ? '1' : '0'}>
+        <article class={`card${o.featured ? ' feat-on' : ''}`}>
           {o.featured && <span class="feat-badge">★ Featured</span>}
           <div class="c-top">
             <div>
@@ -617,7 +529,6 @@ const stats = [
           <div class="metaline">
             {o.tier && <span class="tag tier">{o.tier}</span>}
             {o.origin && <span class="tag">{o.origin}</span>}
-            {o.currency && <span class="tag">{o.currency}</span>}
           </div>
           {(o.tradeTerms || o.ean) && (
             <div class="tline">
@@ -632,7 +543,7 @@ const stats = [
             </div>
             <div class="stock">
               <span class={`pill ${o.st[0]}`}>{o.st[1]}</span>
-              {o.qty ? <span class="qty" title="Cases available">{o.qty.toLocaleString()} cases</span> : <span class="qty muted">on request</span>}
+              {o.qty ? <span class="qty" title="Cases available">{o.qty.toLocaleString('en-IE')} cases</span> : <span class="qty muted">on request</span>}
             </div>
           </div>
           <div class="c-foot">
@@ -648,7 +559,7 @@ const stats = [
         </article>
       ))}
     </div>
-    <div class="empty" id="empty" hidden>No offers match that filter. Try clearing the search.</div>
+    <p class="see-all"><a class="cta-ghost" href="/search/">See all {fmt(view.length)} offers with filters →</a></p>
   </main>
 
   <section id="categories" class="catnav">
@@ -658,7 +569,7 @@ const stats = [
       <nav aria-label="Offer categories">
         <ul class="catnav-list">
           {categoryLinks.map((c) => (
-            <li><a href={c.href}>{c.name}<span class="catnav-count">{c.count}</span></a></li>
+            <li><a href={c.href}>{c.name}<span class="catnav-count">{fmt(c.count)}</span></a></li>
           ))}
         </ul>
       </nav>
@@ -681,53 +592,31 @@ const stats = [
     </div>
   </section>
 
-  <section id="guides" style="border-top:1px solid var(--line);padding:40px 20px;background:var(--paper-2);scroll-margin-top:76px">
+  <section id="guides" class="guides">
     <div class="wrap">
-      <h2 style="font-family:var(--serif);font-size:24px;margin:0 0 12px;color:var(--ink)"><a href="/guides/" style="color:inherit;text-decoration:none">Buyer's guides</a></h2>
-      <p style="color:var(--muted);margin:0 0 26px;font-size:14px">Guides for wholesale buyers: duty status, shipping terms, how to order. <a href="/guides/" style="color:var(--brass);text-decoration:none">See all guides →</a></p>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px">
+      <h2><a href="/guides/">Buyer's guides</a></h2>
+      <p class="catnav-lede">Guides for wholesale buyers: duty status, shipping terms, how to order. <a href="/guides/">See all guides →</a></p>
+      <div class="guide-grid">
         {guides.map((guide) => (
-          <a href={`/guides/${guide.slug}/`} style="background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px;text-decoration:none;transition:.16s;display:flex;flex-direction:column">
-            <h3 style="margin:0 0 8px;font-size:16px;font-family:var(--serif);font-weight:600;color:var(--ink);line-height:1.3">{guide.title}</h3>
-            <p style="margin:0;color:var(--muted);font-size:14px;flex-grow:1">{guide.excerpt}</p>
-            <span style="color:var(--brass);font-size:13px;font-weight:600;margin-top:12px">Read more →</span>
+          <a class="guide-card" href={`/guides/${guide.slug}/`}>
+            <h3>{guide.title}</h3>
+            <p>{guide.excerpt}</p>
+            <span>Read more →</span>
           </a>
         ))}
       </div>
     </div>
   </section>
 
-  <footer>
-    <div class="wrap">
-      <div class="note">
-        Updated throughout the day from our trading desk. Prices are indicative and shown per the listing basis; supplier identity, buy prices and margins are never published. <strong>T1</strong> = export / under-bond · <strong>T2</strong> = for sale in the EU.
-        <br /><br />
-        <a href="/about/" style="color:var(--brass);text-decoration:none">About AKAY</a> · <a href="/guides/" style="color:var(--brass);text-decoration:none">Guides</a> · <a href="/guides/requirement-list-format/" style="color:var(--brass);text-decoration:none">How to order</a> · <a href="#sell-stock" style="color:var(--brass);text-decoration:none">Sell stock to AKAY</a>
-      </div>
-      <div style="font-family:var(--mono);text-align:right">© {LEGAL_NAME} · Shannon, Ireland<br />CRO {COMPANY_NUMBER} · VAT {VAT_ID}<br /><a href={WA_LINK} style="color:var(--brass);text-decoration:none">WhatsApp</a> · <a href="mailto:hello@akay.ie" style="color:var(--brass);text-decoration:none">hello@akay.ie</a></div>
-    </div>
-  </footer>
+  <SiteFooter />
 
   <script>
-    // The header holds the wordmark, search, the Trade Desk link and the theme
-    // toggle, and wraps to a second row on narrow screens. Publish its real
-    // height so the sticky filter bar sits directly under it at every width.
-    const bar = document.querySelector('header.bar');
-    const setBarHeight = () =>
-      document.documentElement.style.setProperty('--bar-h', `${bar.offsetHeight}px`);
-    setBarHeight();
-    new ResizeObserver(setBarHeight).observe(bar);
-
-    const grid = document.getElementById('grid');
-    const cards = Array.from(grid.children);
-
-    // GA4: record which offers drive WhatsApp enquiries. Delegated so it also
-    // covers cards re-ordered by the filter/sort logic below.
-    grid.addEventListener('click', (e) => {
-      const a = e.target.closest('a.enquire');
-      if (!a || typeof window.gtag !== 'function') return;
-      const amt = parseFloat(a.dataset.amount);
-      window.gtag('event', 'whatsapp_enquiry', {
+    // GA4: record which offers drive WhatsApp enquiries.
+    document.getElementById('grid')?.addEventListener('click', (e) => {
+      const a = (e.target as Element).closest('a.enquire') as HTMLAnchorElement | null;
+      if (!a || typeof (window as any).gtag !== 'function') return;
+      const amt = parseFloat(a.dataset.amount || '');
+      (window as any).gtag('event', 'whatsapp_enquiry', {
         offer_name: a.dataset.offer,
         brand: a.dataset.brand,
         category: a.dataset.category,
@@ -735,83 +624,17 @@ const stats = [
         value: Number.isFinite(amt) ? amt : undefined,
       });
     });
-    const q = document.getElementById('q');
-    const cats = document.getElementById('cats');
-    const sortSel = document.getElementById('sort');
-    const countEl = document.getElementById('count');
-    const emptyEl = document.getElementById('empty');
-    const total = cards.length;
-    let state = { q: '', cat: 'All', sort: 'rel' };
-    const order = cards.map((c, i) => [c, i]); // preserve original "featured" order
 
-    // Fast path: search + category just toggle visibility (no DOM reordering).
-    function filter() {
-      let shown = 0;
-      for (const c of cards) {
-        const okCat = state.cat === 'All' || c.dataset.cat === state.cat;
-        const okQ = !state.q || c.dataset.name.includes(state.q);
-        const vis = okCat && okQ;
-        c.hidden = !vis;
-        if (vis) shown++;
-      }
-      countEl.textContent = `Showing ${shown} of ${total} offers` + (state.cat !== 'All' ? ` · ${state.cat}` : '');
-      emptyEl.hidden = shown > 0;
-    }
-
-    // Reordering only runs when the sort changes — batched via a fragment so 1,191 cards stay snappy.
-    function sortCards() {
-      const arr = order.slice();
-      // data-amt is a per-unit figure for every offer, so price sorting compares
-      // like with like. Offers priced "on request" have no number — they always
-      // sink to the bottom instead of masquerading as the cheapest.
-      const priceOf = (el) => { const v = parseFloat(el.dataset.amt); return Number.isFinite(v) ? v : null; };
-      if (state.sort === 'asc' || state.sort === 'desc') {
-        const dir = state.sort === 'asc' ? 1 : -1;
-        arr.sort((a, b) => {
-          const pa = priceOf(a[0]), pb = priceOf(b[0]);
-          if (pa === null && pb === null) return a[1] - b[1];
-          if (pa === null) return 1;
-          if (pb === null) return -1;
-          return (pa - pb) * dir;
-        });
-      }
-      else if (state.sort === 'az') arr.sort((a, b) => a[0].querySelector('.pname').textContent.localeCompare(b[0].querySelector('.pname').textContent));
-      else arr.sort((a, b) => a[1] - b[1]);
-      const frag = document.createDocumentFragment();
-      for (const [c] of arr) frag.appendChild(c);
-      grid.appendChild(frag);
-    }
-
-    q.addEventListener('input', (e) => { state.q = e.target.value.toLowerCase().trim(); filter(); });
-    sortSel.addEventListener('change', (e) => { state.sort = e.target.value; sortCards(); filter(); });
-    cats.addEventListener('click', (e) => {
-      const b = e.target.closest('.chip');
-      if (!b) return;
-      state.cat = b.dataset.cat;
-      Array.from(cats.children).forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
-      filter();
-    });
-
-    // Deep link: akay.ie/#spirits (or #beer, #grocery …) preselects that
-    // category chip. Used by the email-signature link bar and shareable links;
-    // an unknown hash is ignored. Matched case-insensitively against the chips.
+    // Deep links: akay.ie/#spirits (or #beer, #grocery …) used to preselect a
+    // filter chip on the old all-offers homepage. Email signatures and shared
+    // links still use them, so send them to that category's own page. Page
+    // anchors (#instant-quote, #categories, …) are left alone.
+    const CATEGORY_PAGES: Record<string, string> = JSON.parse(
+      document.getElementById('cat-map')?.textContent || '{}'
+    );
     const hashCat = decodeURIComponent(location.hash.slice(1)).trim().toLowerCase();
-    if (hashCat) {
-      const chip = Array.from(cats.children).find((x) => (x.dataset.cat || '').toLowerCase() === hashCat);
-      if (chip) chip.click();
-    }
-
-    // The category-request form that posted to the n8n category-request webhook
-    // was retired with the "offers straight to your inbox" block; the Instant
-    // Quote section that replaced it is static markup and needs no script.
-
-    const root = document.documentElement;
-    document.getElementById('themeBtn').addEventListener('click', () => {
-      const cur = root.getAttribute('data-theme') || (matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light');
-      const next = cur === 'dark' ? 'light' : 'dark';
-      root.setAttribute('data-theme', next);
-      document.getElementById('themeLbl').textContent = next === 'dark' ? 'Light' : 'Dark';
-    });
+    if (hashCat && CATEGORY_PAGES[hashCat]) location.replace(CATEGORY_PAGES[hashCat]);
   </script>
+  <script type="application/json" id="cat-map" set:html={JSON.stringify(Object.fromEntries(categoryLinks.map((c) => [c.name.toLowerCase(), c.href])))} />
 </body>
 </html>
