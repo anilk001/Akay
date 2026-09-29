@@ -7,14 +7,18 @@
 // price floors and sizes are computed from the offers on the page; trading
 // minimums come from TRADING_TERMS and are stated only where the whole page
 // falls under one of them. Nothing here reads a field outside the public
-// allowlist, and warehouse names arrive already filtered by redactLocation().
+// allowlist, and warehouse names arrive already normalised by normaliseLocation().
 import { TRADING_TERMS, QUOTE_URL } from './site.mjs';
 
-// Which house minimum a category trades under. Categories not listed here
-// (wine, champagne, beer, soft drinks, other) have no stated house minimum:
-// their pages say the minimum is given with the quote.
+// Which house minimum a category trades under. A category not listed here
+// ("Other") has no stated house minimum: its pages say the minimum is given
+// with the quote.
 const MINIMUM_BY_CATEGORY = {
   Spirits: 'spirits',
+  Champagne: 'champagne',
+  Beer: 'ftl',
+  Wine: 'ftl',
+  'Soft Drinks': 'ftl',
   Grocery: 'fmcg',
   Confectionery: 'fmcg',
   Toiletries: 'fmcg',
@@ -22,7 +26,9 @@ const MINIMUM_BY_CATEGORY = {
 };
 const MINIMUM_TEXT = {
   spirits: { short: 'EUR 5,000 minimum order', long: TRADING_TERMS.spiritsMinimum },
+  champagne: { short: 'EUR 15,000 minimum order', long: TRADING_TERMS.champagneMinimum },
   fmcg: { short: 'EUR 10,000 minimum order', long: TRADING_TERMS.fmcgMinimum },
+  ftl: { short: 'Full truck load (FTL)', long: TRADING_TERMS.ftlMinimum },
 };
 
 export function houseMinimum(category) {
@@ -166,7 +172,9 @@ export function offerAnswers(offer) {
   if (duty) notes.push(duty);
   if (!offer.moqLabel) {
     const house = houseMinimum(offer.category);
-    if (house) notes.push(`${house.long}. The minimum is per order, so this line can be combined with others to reach it.`);
+    if (house) notes.push(house === MINIMUM_TEXT.ftl
+      ? `${house.long}.`
+      : `${house.long}. The minimum is per order, so this line can be combined with others to reach it.`);
   }
   notes.push(`To buy, send the quantity on WhatsApp or email, or add this line to a buying list and upload it at ${QUOTE_URL.replace('https://', '')} to get it priced with the rest.`);
   return notes;

@@ -34,7 +34,9 @@ export async function GET() {
 ## Trading terms
 
 - ${TRADING_TERMS.spiritsMinimum}
+- ${TRADING_TERMS.champagneMinimum}
 - ${TRADING_TERMS.fmcgMinimum}
+- ${TRADING_TERMS.ftlMinimum}
 - ${TRADING_TERMS.payment}
 - Worldwide delivery; T1 (under bond) and T2 (duty paid) supply
 - Where an offer states its own minimum, that minimum applies

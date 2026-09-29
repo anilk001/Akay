@@ -109,8 +109,8 @@ node n8n/tests/unmatched-demand-digest.test.js # weekly buying brief from unmatc
 - `src/lib/redirects.mjs` — 301s for URLs retired by the 2026-09-29 slug
   change (accents folded, brand spellings merged); `astro.config.mjs` writes
   them to `dist/_redirects` at the end of the build
-- `LOCATIONS_UNDER_REVIEW` in `src/data/airtable.mjs` — warehouse names held
-  off the site until confirmed as warehouses rather than suppliers
+- `LOCATION_ALIASES` in `src/data/airtable.mjs` — public names for warehouse
+  values (NTG is shown as "Netherlands"), applied on every getOffers() path
 - `src/components/Seo.astro` — the `<head>` for every page: title, canonical,
   robots, Open Graph, Twitter, GA4 and JSON-LD. Pages pass props, never
   hand-roll meta tags

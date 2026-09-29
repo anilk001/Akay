@@ -38,7 +38,9 @@ export function companyAddressLine() {
 // the defaults the whole catalogue trades on.
 export const TRADING_TERMS = {
   spiritsMinimum: 'Spirits: minimum order EUR 5,000',
+  champagneMinimum: 'Champagne: minimum order EUR 15,000',
   fmcgMinimum: 'FMCG: minimum order EUR 10,000',
+  ftlMinimum: 'Beer, wine and soft drinks: full truck loads (FTL) only',
   payment: 'Back-to-back on confirmed orders; no credit terms',
 };
 // 1200x630 share card (public/og-akay.png). The bird logo alone is 320x279,
