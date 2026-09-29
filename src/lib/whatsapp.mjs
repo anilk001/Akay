@@ -15,6 +15,13 @@ export const WA_DISPLAY = '+353 87 238 2368';
 // Bare chat link with no prefilled message.
 export const WA_LINK = `https://wa.me/${WA_NUMBER}`;
 
+// "Sell stock to AKAY" — a supplier opening a chat with the buying desk.
+// One plain line, deliberately with no fill-in template: the WhatsApp
+// ingestion pipeline reads incoming messages as offers, and a template of
+// empty "[product] [qty]" slots would be a junk row. What to send is listed
+// on the page instead.
+export const SELL_STOCK_LINK = `${WA_LINK}?text=${encodeURIComponent('Hi AKAY, I have stock to sell to you. My offer list is attached.')}`;
+
 // Build a prefilled enquiry for one offer.
 //
 // Every field is optional in Airtable, so each clause is omitted rather than

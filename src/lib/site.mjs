@@ -14,6 +14,8 @@ export const TRADING_YEARS = 36;
 export const DESK_CONTACT = { name: 'Anil Khetan', role: 'Managing Director' };
 export const DESK_PHONE = '+353872382368';
 export const DESK_PHONE_DISPLAY = '+353 87 238 2368';
+// Where suppliers send offer lists ("Sell stock to AKAY").
+export const BUYING_EMAIL = 'ak@akay.ie';
 // 1200x630 share card (public/og-akay.png). The bird logo alone is 320x279,
 // which every platform renders as a small square thumbnail; this is what
 // WhatsApp, LinkedIn and Slack previews actually show.
