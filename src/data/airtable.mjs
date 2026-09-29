@@ -699,7 +699,44 @@ function snapshotDelisted() {
   }));
 }
 
+// Warehouse / location values held back from the public site until Anil
+// confirms each is a bonded warehouse or port rather than a supplier's own
+// name or premises (golden rule 1: supplier identity never reaches the
+// browser). Matching is case- and space-insensitive. The offer keeps its
+// incoterm; only the place is dropped. To publish a location again, remove it
+// from this list.
+export const LOCATIONS_UNDER_REVIEW = [
+  'New Corp', 'New Corp warehouse', 'NewCorp', 'NTG', 'Reftrans', 'Revera',
+  'Pergudangan Mutiara Tambak Langon D-10, Surabaya, Indonesia',
+];
+const reviewKey = (v) => String(v || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+const REVIEW_KEYS = new Set(LOCATIONS_UNDER_REVIEW.map(reviewKey));
+
+export function redactLocation(offer) {
+  const warehouseHeld = REVIEW_KEYS.has(reviewKey(offer.warehouse));
+  const terms = String(offer.terms || '').trim();
+  const hit = terms.match(/^([A-Z]{3})\b\s*(.*)$/);
+  const m = hit && INCOTERMS.includes(hit[1]) ? hit : null;
+  const termsPlace = m ? m[2] : terms;
+  const termsHeld = termsPlace && REVIEW_KEYS.has(reviewKey(termsPlace));
+  if (!warehouseHeld && !termsHeld) return offer;
+  return {
+    ...offer,
+    warehouse: warehouseHeld ? '' : offer.warehouse,
+    terms: termsHeld ? (m ? m[1] : '') : offer.terms,
+  };
+}
+
 export async function getOffers() {
+  const result = await getOffersUnredacted();
+  return {
+    ...result,
+    offers: result.offers.map(redactLocation),
+    delisted: (result.delisted || []).map(redactLocation),
+  };
+}
+
+async function getOffersUnredacted() {
   // Phase 3: read the Postgres replica instead of Airtable. Deliberately the
   // FIRST branch and deliberately not silent-on-failure in the same way the
   // Airtable path is: if the site is meant to be reading Postgres and cannot,

@@ -1,9 +1,11 @@
 export const prerender = true;
 
-export async function GET() {
-  const llmsTxt = `# AKAY Trade — Wholesale Beverage & FMCG Offers
+import { COMPANY, TRADING_TERMS, companyAddressLine, LEGAL_NAME, SITE_NAME } from '../lib/site.mjs';
 
-> Live B2B wholesale catalogue from Akay Irl Ltd (Shannon, Ireland). Spirits, beer, soft drinks, grocery and FMCG by the case, pallet and container. Duty-paid (T2) and export/under-bond (T1). Prices indicative, trade buyers only. Enquiries via WhatsApp +353 87 238 2368 or offers@akay.ie.
+export async function GET() {
+  const llmsTxt = `# ${SITE_NAME} (${LEGAL_NAME}) — Wholesale Beverage & FMCG Offers
+
+> Live B2B wholesale catalogue from ${LEGAL_NAME}, trading as ${SITE_NAME}, Shannon, Co. Clare, Ireland. Branded spirits, beer, soft drinks, grocery and FMCG for importers and wholesalers. Duty-paid (T2) and export/under-bond (T1). Prices indicative, trade buyers only. Enquiries via WhatsApp +353 87 238 2368 or offers@akay.ie.
 
 ## Catalogue
 
@@ -29,8 +31,22 @@ export async function GET() {
 - [How to send a requirement list](https://akay.ie/guides/requirement-list-format/): uploading a buying list for instant pricing, and what to include so more lines match
 - [Escrow payment explained](https://akay.ie/guides/escrow-payment-wholesale-spirits/): how escrow works on a first wholesale deal, what it costs, what it does not cover, and how it compares to 50/50 and a letter of credit
 
+## Trading terms
+
+- ${TRADING_TERMS.spiritsMinimum}
+- ${TRADING_TERMS.fmcgMinimum}
+- ${TRADING_TERMS.payment}
+- Worldwide delivery; T1 (under bond) and T2 (duty paid) supply
+- Where an offer states its own minimum, that minimum applies
+
 ## Company
 
+- Legal name: ${COMPANY.legalName}
+- Trading as: ${COMPANY.tradingName}
+- Registered address: ${companyAddressLine()}
+- Office telephone: ${COMPANY.officePhone}
+- VAT number: ${COMPANY.vatId}
+- CRO company number: ${COMPANY.croNumber}
 - [About AKAY](https://akay.ie/about/): 36 years in trade, Ireland-based, 1,000+ suppliers, 6,000+ clients
 - [All guides](https://akay.ie/guides/): index of the buyer's guides above
 
@@ -42,13 +58,10 @@ export async function GET() {
 
 Or send a requirement list by email or WhatsApp and receive a quote within 24 hours.
 
-**Email:** offers@akay.ie
+**Email:** ${COMPANY.salesEmail}
 **WhatsApp:** +353 87 238 2368
-**Hours:** Monday–Friday, 9am–5pm GMT
+**Hours:** ${COMPANY.hours}
 
----
-
-Minimum order: 1 case. Optimal: 1+ pallets (40–60 cases). Worldwide delivery. T1 (under-bond) and T2 (duty-paid) options available.
 `;
 
   return new Response(llmsTxt, {

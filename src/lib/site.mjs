@@ -4,11 +4,47 @@
 // from here so a future move is one edit, not a grep.
 export const SITE_URL = 'https://akay.ie';
 export const SITE_NAME = 'AKAY Trade';
-export const LEGAL_NAME = 'Akay Irl Ltd';
-// Company registration, printed in every page footer and the trust strip, and
-// carried in the Organization JSON-LD. Irish CRO number and EU VAT number.
-export const CRO_NUMBER = '250428';
-export const VAT_NUMBER = 'IE8250418E';
+// As registered with the CRO (company 250418): the brackets are part of the name.
+export const LEGAL_NAME = 'Akay (IRL) Ltd';
+
+// The company's registered facts, written down once. llms.txt, the About
+// page, the guides and the Organization JSON-LD all read from here so the
+// name, address and numbers AI assistants and search engines see agree with
+// each other and with the CRO record. Directory listings (Shannon Chamber,
+// europages, …) are edited by hand and must be kept to these same values.
+export const COMPANY = {
+  legalName: LEGAL_NAME,
+  tradingName: SITE_NAME,
+  streetAddress: '36 Gleann An Oir',
+  locality: 'Shannon',
+  region: 'Co. Clare',
+  postalCode: 'V14 V006',
+  country: 'Ireland',
+  countryCode: 'IE',
+  vatId: 'IE8250418E',
+  croNumber: '250418',
+  officePhone: '+353 61 363305',
+  salesEmail: 'offers@akay.ie',
+  hours: 'Monday–Friday, 9am–5pm Irish time',
+};
+// Short aliases for the footer and trust strip.
+export const CRO_NUMBER = COMPANY.croNumber;
+export const VAT_NUMBER = COMPANY.vatId;
+
+/** One-line postal address, e.g. for llms.txt and page footers. */
+export function companyAddressLine() {
+  const c = COMPANY;
+  return `${c.streetAddress}, ${c.locality}, ${c.region}, ${c.postalCode}, ${c.country}`;
+}
+
+// House trading terms, in the words buyers see. Per-offer MOQs from the
+// ingestion normaliser still show on the offer that carries them; these are
+// the defaults the whole catalogue trades on.
+export const TRADING_TERMS = {
+  spiritsMinimum: 'Spirits: minimum order EUR 5,000',
+  fmcgMinimum: 'FMCG: minimum order EUR 10,000',
+  payment: 'Back-to-back on confirmed orders; no credit terms',
+};
 // 1200x630 share card (public/og-akay.png). The bird logo alone is 320x279,
 // which every platform renders as a small square thumbnail; this is what
 // WhatsApp, LinkedIn and Slack previews actually show.

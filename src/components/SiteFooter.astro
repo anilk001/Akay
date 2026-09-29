@@ -2,7 +2,7 @@
 // The one site footer: company registration, contact, and the links a buyer
 // needs from any page. Class names are prefixed `sf-` for the same reason the
 // header's are `sh-`: some pages style bare classes (.note, .wrap) globally.
-import { LEGAL_NAME, CRO_NUMBER, VAT_NUMBER } from '../lib/site.mjs';
+import { LEGAL_NAME, CRO_NUMBER, VAT_NUMBER, companyAddressLine } from '../lib/site.mjs';
 import { WA_LINK, WA_DISPLAY } from '../lib/whatsapp.mjs';
 const year = new Date().getFullYear();
 ---
@@ -30,7 +30,7 @@ const year = new Date().getFullYear();
       <a href={WA_LINK} target="_blank" rel="noopener">WhatsApp {WA_DISPLAY}</a>
       <a href="mailto:offers@akay.ie">offers@akay.ie</a>
       <a href="mailto:hello@akay.ie">hello@akay.ie</a>
-      <span>Shannon, Co. Clare, Ireland</span>
+      <span>{companyAddressLine()}</span>
     </div>
   </div>
   <div class="sf-legal">
