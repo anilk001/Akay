@@ -5,6 +5,10 @@
 export const SITE_URL = 'https://akay.ie';
 export const SITE_NAME = 'AKAY Trade';
 export const LEGAL_NAME = 'Akay Irl Ltd';
+// Company registration, printed in every page footer and the trust strip, and
+// carried in the Organization JSON-LD. Irish CRO number and EU VAT number.
+export const CRO_NUMBER = '250428';
+export const VAT_NUMBER = 'IE8250418E';
 // 1200x630 share card (public/og-akay.png). The bird logo alone is 320x279,
 // which every platform renders as a small square thumbnail; this is what
 // WhatsApp, LinkedIn and Slack previews actually show.

@@ -1,0 +1,125 @@
+---
+// The one site header: wordmark, section nav, search, the Trade Desk link and
+// the theme toggle. Every page renders it as the first thing in <body>, so a
+// buyer who lands on an offer or category page from Google still has the
+// logo, a way home and a way into the rest of the catalogue.
+//
+// It also imports the shared design tokens, which is how every page gets the
+// same palette (see src/styles/tokens.css).
+//
+// Class names are prefixed `sh-`: several pages style bare classes such as
+// .brand, .tag and .note globally, and the header must not pick those up.
+import '../styles/tokens.css';
+import SiteSearch from './SiteSearch.astro';
+import QuoteLink from './QuoteLink.astro';
+
+interface Props {
+  /** Small monospace label beside the wordmark, e.g. "akay.ie / search". */
+  sub?: string;
+  /** The search page has its own full-width search box. */
+  search?: boolean;
+  /** Pre-fills the header search. */
+  value?: string;
+  /** Which nav item to mark as the current page. */
+  current?: 'offers' | 'brands' | 'guides' | 'quote' | 'about' | '';
+  /** Stick to the top on scroll (desktop only). The search page turns this
+      off because its own search-and-filter bar is the sticky one. */
+  sticky?: boolean;
+}
+const { sub = 'akay.ie', search = true, value = '', current = '', sticky = true } = Astro.props;
+
+const NAV = [
+  { key: 'offers', href: '/search/', label: 'All offers' },
+  { key: 'brands', href: '/brands/', label: 'Brands' },
+  { key: 'quote', href: '/instant-quote/', label: 'Instant Quote' },
+  { key: 'guides', href: '/guides/', label: 'Guides' },
+  { key: 'about', href: '/about/', label: 'About' },
+];
+---
+<header class:list={['site-header', { 'sh-static': !sticky }]} id="siteHeader">
+  <div class="sh-in">
+    <a class="sh-mark" href="/" aria-label="AKAY Trade home">
+      <img class="sh-logo" src="/akay-bird.png" alt="" width="320" height="279" />AKAY<span class="sh-dot"></span><b>trade</b>
+    </a>
+    {sub && <span class="sh-sub">{sub}</span>}
+    <nav class="sh-nav" aria-label="Site">
+      {NAV.map((n) => (
+        <a href={n.href} aria-current={current === n.key ? 'page' : undefined}>{n.label}</a>
+      ))}
+    </nav>
+    <span class="sh-spacer"></span>
+    {search && <SiteSearch compact value={value} />}
+    <QuoteLink compact />
+    <button class="sh-theme" id="themeBtn" type="button" aria-label="Toggle light or dark theme">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5 19 19M19 5l-1.5 1.5M6.5 17.5 5 19"/></svg>
+      <span id="themeLbl">Theme</span>
+    </button>
+  </div>
+</header>
+
+<script is:inline>
+  // Theme: remembered across pages when storage is available; otherwise it
+  // simply follows the system setting, as before.
+  (function () {
+    var root = document.documentElement, lbl = document.getElementById('themeLbl');
+    try { var saved = localStorage.getItem('akay-theme'); if (saved === 'light' || saved === 'dark') root.setAttribute('data-theme', saved); } catch (e) {}
+    var now = function () { return root.getAttribute('data-theme') || (matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light'); };
+    if (lbl) lbl.textContent = now() === 'dark' ? 'Light' : 'Dark';
+    document.getElementById('themeBtn').addEventListener('click', function () {
+      var next = now() === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      if (lbl) lbl.textContent = next === 'dark' ? 'Light' : 'Dark';
+      try { localStorage.setItem('akay-theme', next); } catch (e) {}
+    });
+    // Publish the header's real height: it wraps to two rows on phones, and
+    // sticky bars below it (the search page's filter bar) sit under it.
+    var bar = document.getElementById('siteHeader');
+    var setH = function () { root.style.setProperty('--bar-h', bar.offsetHeight + 'px'); };
+    setH();
+    if ('ResizeObserver' in window) new ResizeObserver(setH).observe(bar);
+  })();
+</script>
+
+<style>
+  .site-header{position:sticky;top:0;z-index:40;background:color-mix(in srgb,var(--paper) 88%,transparent);
+    backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line);
+    font-family:var(--sans);line-height:1.5}
+  .sh-static{position:static}
+  .sh-in{max-width:1200px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:16px;min-height:60px;box-sizing:border-box}
+  .sh-mark{display:inline-flex;align-items:center;gap:9px;font-family:var(--serif);font-weight:600;font-size:26px;
+    letter-spacing:.02em;color:var(--ink);text-decoration:none;line-height:1;flex-shrink:0}
+  .sh-mark b{color:var(--brass)}
+  .sh-logo{flex-shrink:0;height:34px;width:auto;filter:drop-shadow(0 1px 2px rgba(0,0,0,.18))}
+  .sh-dot{width:6px;height:6px;border-radius:50%;background:var(--brass-2);display:inline-block;margin:0 2px 2px}
+  .sh-sub{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.04em;white-space:nowrap}
+  .sh-nav{display:flex;gap:4px;margin-left:6px}
+  .sh-nav a{font-size:13.5px;font-weight:500;color:var(--ink-soft);text-decoration:none;padding:6px 9px;border-radius:8px;white-space:nowrap}
+  .sh-nav a:hover{color:var(--ink);background:color-mix(in srgb,var(--ink) 6%,transparent)}
+  .sh-nav a[aria-current="page"]{color:var(--brass);font-weight:600}
+  .sh-spacer{flex:1}
+  .sh-in > :global(.site-search){min-width:220px;flex:1 1 300px}
+  .sh-theme{border:1px solid var(--line);background:var(--card);color:var(--ink-soft);border-radius:9px;flex-shrink:0;
+    height:34px;padding:0 12px;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:7px;font-family:var(--sans)}
+  .sh-theme:hover{border-color:var(--brass-2);color:var(--ink)}
+  .sh-theme:focus-visible,.sh-nav a:focus-visible,.sh-mark:focus-visible{outline:2px solid var(--brass-2);outline-offset:2px}
+
+  /* Drop the pieces the row can afford to lose, widest-first. */
+  @media (max-width:1600px){.sh-sub{display:none}}
+  /* Below this the nav moves to its own scrollable row under the wordmark. */
+  @media (max-width:1060px){
+    .sh-in{flex-wrap:wrap;row-gap:0;padding-top:8px}
+    .sh-nav{order:10;flex:1 0 100%;margin:0 -9px;overflow-x:auto;scrollbar-width:none;padding:2px 0 6px}
+    .sh-nav::-webkit-scrollbar{display:none}
+  }
+  @media (max-width:760px){
+    /* Three rows (wordmark, search, nav) are too tall to pin on a phone. */
+    .site-header{position:static}
+    .sh-in{gap:10px;padding-bottom:0}
+    .sh-mark{font-size:20px;gap:7px}
+    .sh-logo{height:26px}
+    #themeLbl{display:none}
+    .sh-theme{padding:0 9px}
+    /* Search takes a full row rather than being squeezed unreadably narrow. */
+    .sh-in > :global(.site-search){order:5;flex:1 0 100%;max-width:none;margin-top:8px}
+  }
+</style>

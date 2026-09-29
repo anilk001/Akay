@@ -193,9 +193,10 @@ src/
   components/
     SiteSearch.astro      header search form used on every page
     QuoteLink.astro       "Ask AKAY" link to the Trade Desk (quote.akay.ie)
-    HeaderTools.astro     search box + Trade Desk link, as one header row
+    SiteHeader.astro      site header on every page (nav, search, theme)
+    SiteFooter.astro      site footer on every page (CRO/VAT, contact)
   pages/
-    index.astro           the catalogue (design + interactivity)
+    index.astro           homepage: hero, Instant Quote, top 48 offers
     search.astro          instant search with facets (/search)
     search-index.json.ts  public-safe search index endpoint
 scripts/

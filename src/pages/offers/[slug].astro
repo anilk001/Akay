@@ -1,11 +1,12 @@
 ---
-import HeaderTools from '../../components/HeaderTools.astro';
 import { getOffers } from '../../data/airtable.mjs';
 import { withSlugs, brandPages } from '../../lib/slug.mjs';
 import { productOfferSchema, breadcrumbSchema, organizationSchema } from '../../lib/schema.mjs';
+import SiteHeader from '../../components/SiteHeader.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
 import Seo from '../../components/Seo.astro';
 import { priceLabel } from '../../lib/price.mjs';
-import { enquiryLink, WA_LINK, WA_DISPLAY } from '../../lib/whatsapp.mjs';
+import { enquiryLink } from '../../lib/whatsapp.mjs';
 import { reconfirmOfferId, RECONFIRM_ENDPOINT } from '../../lib/site.mjs';
 
 // Get all valid slugs for static generation. Sold-out (delisted) offers keep
@@ -70,10 +71,22 @@ const foundIndex = sameCategory.findIndex((o) => o.slug === offer.slug);
 const selfIndex = foundIndex >= 0
   ? foundIndex
   : [...offer.slug].reduce((sum, c) => sum + c.charCodeAt(0), 0) % Math.max(1, otherOffers.length);
-const relatedOffers = Array.from(
-  { length: Math.min(4, otherOffers.length) },
+const categoryPicks = Array.from(
+  { length: Math.min(8, otherOffers.length) },
   (_, k) => otherOffers[(selfIndex + k) % otherOffers.length]
 );
+// Other lines from the same brand come first — a buyer on a Jameson page is
+// more likely to add another Jameson line than a random spirit — then the
+// rotated category window fills the rest. Brand lines keep catalogue order,
+// so the HTML stays stable between builds.
+const brandKey = (offer.brand || '').trim().toLowerCase();
+const sameBrand = brandKey
+  ? allOffers.filter((o) => o.slug !== offer.slug && (o.brand || '').trim().toLowerCase() === brandKey).slice(0, 4)
+  : [];
+const relatedOffers = [...sameBrand, ...categoryPicks.filter((o) => !sameBrand.includes(o))].slice(0, 4);
+const relatedHeading = sameBrand.length
+  ? `More from ${offer.brand}${sameBrand.length < relatedOffers.length ? ` and other ${offer.category}` : ''}`
+  : (isDelisted ? `Available ${offer.category} Offers` : `Related ${offer.category} Offers`);
 
 // Build schemas
 const orgSchema = organizationSchema();
@@ -138,49 +151,10 @@ if (!isDelisted && offer.stock === 'in' && offer.qty) {
   />
 
   <style>
-    :root {
-      --paper: #F7F5F0;
-      --paper-2: #EFEDE4;
-      --card: #FFFFFF;
-      --ink: #17140F;
-      --ink-soft: #41473F;
-      --muted: #767E72;
-      --line: #E4E0D4;
-      --brass: #B4231F;
-      --ok: #0E7A3B;
-      --ok-bg: #E2F0E5;
-      --warn: #9A6A12;
-      --warn-bg: #F5E9CE;
-      --neu: #5C6A78;
-      --neu-bg: #E9ECEF;
-      --shadow: 0 1px 2px rgba(20, 33, 26, 0.06), 0 6px 20px -8px rgba(20, 33, 26, 0.14);
-      --radius: 14px;
-      --serif: "Hoefler Text", "Iowan Old Style", Palatino, Georgia, "Times New Roman", serif;
-      --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --paper: #0C140F;
-        --paper-2: #081009;
-        --card: #13201A;
-        --ink: #F1EFE7;
-        --ink-soft: #C6CEC4;
-        --muted: #8A968A;
-        --line: #243029;
-        --brass: #EC5A52;
-        --ok: #5FC97E;
-        --ok-bg: #123021;
-        --warn: #E0B65C;
-        --warn-bg: #31280F;
-        --neu: #9AA7B4;
-        --neu-bg: #1B2530;
-        --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 28px -12px rgba(0, 0, 0, 0.6);
-      }
-    }
 
     body {
       margin: 0;
-      padding: 20px;
+      padding: 0;
       background: var(--paper);
       color: var(--ink);
       font: 16px / 1.5 var(--sans);
@@ -205,6 +179,7 @@ if (!isDelisted && offer.stock === 'in' && offer.qty) {
     .container {
       max-width: 720px;
       margin: 0 auto;
+      padding: 24px 20px 48px;
     }
 
     .breadcrumb {
@@ -229,6 +204,15 @@ if (!isDelisted && offer.stock === 'in' && offer.qty) {
       font: 600 1.8em var(--serif);
       color: var(--brass);
       margin: 0.5em 0;
+      font-variant-numeric: tabular-nums;
+    }
+    /* Currency and basis sit smaller and quieter than the number, matching
+       the price layout on catalogue and search cards. */
+    .pd-cur, .pd-basis {
+      font-size: 0.6em;
+      font-weight: 500;
+      color: var(--muted);
+      letter-spacing: 0.02em;
     }
 
     .soldout-banner {
@@ -280,6 +264,12 @@ if (!isDelisted && offer.stock === 'in' && offer.qty) {
     .spec-value {
       text-align: right;
       color: var(--ink);
+    }
+    .spec-code {
+      font-family: var(--mono);
+      font-size: 0.92em;
+      letter-spacing: 0.03em;
+      user-select: all;
     }
     /* "estimated" marks a minimum taken from the supplier's usual terms rather
        than stated for this line. Deliberately quiet — it is a caveat on the
@@ -381,8 +371,8 @@ if (!isDelisted && offer.stock === 'in' && offer.qty) {
   </style>
 </head>
 <body>
+  <SiteHeader current="offers" />
   <div class="container">
-    <HeaderTools />
     <div class="breadcrumb">
       <a href="/">Home</a> / <a href={`/category/${categorySlug}/`}>{offer.category}</a>
       {brandSlug && <> / <a href={`/brands/${brandSlug}/`}>{offer.brand}</a></>} / {offer.name}
@@ -400,7 +390,9 @@ if (!isDelisted && offer.stock === 'in' && offer.qty) {
       )}
 
       <div class="price-display">
-        {offer.currency}{offer.amount?.toFixed(2) || '—'}{basis}
+        {offer.amount != null
+          ? <><span class="pd-cur">{offer.currency}</span> {offer.amount.toFixed(2)}{basis && <span class="pd-basis"> {basis}</span>}</>
+          : 'Price on enquiry'}
         {isDelisted && <span style="font-size: 0.55em; font-weight: normal; color: var(--muted); display: block; margin-top: 0.3em;">Last listed price</span>}
         {other && <span style="font-size: 0.7em; font-weight: normal; display: block; margin-top: 0.3em;">{other}</span>}
       </div>
@@ -431,6 +423,18 @@ if (!isDelisted && offer.stock === 'in' && offer.qty) {
           <div class="spec-row">
             <span class="spec-label">Pack Size</span>
             <span class="spec-value">{offer.spec}</span>
+          </div>
+        )}
+        {offer.ean && (
+          <div class="spec-row">
+            <span class="spec-label">EAN (unit)</span>
+            <span class="spec-value spec-code">{offer.ean}</span>
+          </div>
+        )}
+        {offer.eanCase && offer.eanCase !== offer.ean && (
+          <div class="spec-row">
+            <span class="spec-label">EAN (case)</span>
+            <span class="spec-value spec-code">{offer.eanCase}</span>
           </div>
         )}
         <div class="spec-row">
@@ -489,7 +493,7 @@ if (!isDelisted && offer.stock === 'in' && offer.qty) {
 
     {relatedOffers.length > 0 && (
       <div class="related-offers">
-        <h2>{isDelisted ? `Available ${offer.category} Offers` : `Related ${offer.category} Offers`}</h2>
+        <h2>{relatedHeading}</h2>
         <div class="offer-grid">
           {relatedOffers.map((rel) => (
             <div class="offer-card">
@@ -506,12 +510,10 @@ if (!isDelisted && offer.stock === 'in' && offer.qty) {
     <div class="footer">
       <p>
         <a href={`/category/${categorySlug}/`}>← View all {offer.category} offers</a> |
-        <a href="/">← Back to catalogue</a>
-      </p>
-      <p>
-        AKAY Trade — <a href={WA_LINK} target="_blank" rel="noopener">WhatsApp {WA_DISPLAY}</a> | offers@akay.ie
+        <a href={`/search/?cat=${encodeURIComponent(offer.category)}`}>Search &amp; filter all offers</a>
       </p>
     </div>
   </div>
+  <SiteFooter />
 </body>
 </html>

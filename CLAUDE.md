@@ -107,6 +107,10 @@ node n8n/tests/unmatched-demand-digest.test.js # weekly buying brief from unmatc
 - `src/pages/` — index, category/offer/guide pages, sitemap, robots, llms.txt
 - `src/lib/` — fetch script, schema, slugs, WhatsApp link helpers,
   `normalise.mjs` + `search-engine.mjs` (shared by build, browser and tests)
+- `src/components/SiteHeader.astro` + `SiteFooter.astro` — the header (wordmark,
+  nav, search, theme toggle) and footer (company CRO/VAT, contact) on every
+  page. SiteHeader imports `src/styles/tokens.css`, the one copy of the design
+  tokens — pages must not define their own `:root` palette
 - `src/components/SiteSearch.astro` — header search form on every page
 - `src/pages/search.astro` + `search-index.json.ts` — client-side search over
   the public-safe index (see `tests/` for the acceptance cases)

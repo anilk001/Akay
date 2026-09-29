@@ -1,5 +1,5 @@
 // JSON-LD schema generation for SEO
-import { SITE_URL, SITE_NAME, LEGAL_NAME, SAME_AS } from './site.mjs';
+import { SITE_URL, SITE_NAME, LEGAL_NAME, SAME_AS, CRO_NUMBER, VAT_NUMBER } from './site.mjs';
 
 export function organizationSchema() {
   return {
@@ -14,6 +14,8 @@ export function organizationSchema() {
       'Ireland-based B2B wholesale trading company dealing in spirits, beer, soft drinks and FMCG products by the case and pallet. Duty-paid and export (under-bond) supply across Europe, Asia and the Caribbean.',
     email: 'hello@akay.ie',
     telephone: '+353872382368',
+    vatID: VAT_NUMBER,
+    identifier: { '@type': 'PropertyValue', propertyID: 'CRO', value: CRO_NUMBER },
     address: {
       '@type': 'PostalAddress',
       addressLocality: 'Shannon',
