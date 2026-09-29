@@ -128,7 +128,9 @@ Always confirm Incoterm on your purchase order. Disputes about who pays what are
 AKAY's standard minimums:
 
 - **Spirits:** minimum order EUR 5,000 per order, across as many lines as you like.
+- **Champagne:** minimum order EUR 15,000 per order.
 - **FMCG** (grocery, confectionery, toiletries, household): minimum order EUR 10,000 per order.
+- **Beer, wine and soft drinks:** full truck loads (FTL) only.
 - **Offer-specific minimums:** where an offer page states its own MOQ, that figure applies.
 
 For scale: a pallet holds roughly 40–60 cases; a 20ft container 400–500 cases and a 40ft container 800–1,000, depending on the product.
@@ -212,7 +214,7 @@ For regular buyers: NET 30 (invoice terms).
 ## Common Questions
 
 **Can I order just 1 case?**
-No. Spirits orders start at EUR 5,000 and FMCG orders at EUR 10,000. The minimum is per order, so several lines can be combined to reach it.
+No. Spirits orders start at EUR 5,000, FMCG at EUR 10,000 and champagne at EUR 15,000; beer, wine and soft drinks go by full truck load. The value minimums are per order, so several lines can be combined to reach them.
 
 **Do you ship to [my country]?**
 Yes, AKAY ships worldwide. We have experience with Europe, Middle East, Africa, and Asia. Ask about your destination.
@@ -378,12 +380,12 @@ Email offers@akay.ie or WhatsApp +353 87 238 2368. We're here to help.
   {
     slug: 'about-akay',
     updated: '2026-09-29',
-    title: 'About AKAY — 36 Years in Wholesale Trade',
+    title: 'About AKAY — 30 Years in Wholesale Trade',
     excerpt: 'The story of AKAY Trade: who we are, what we do, and how we serve global wholesale buyers.',
     content: `
 ## Who We Are
 
-AKAY Trade (Akay (IRL) Ltd) is an Ireland-based B2B wholesale trading company specializing in spirits, beer, soft drinks, and FMCG (fast-moving consumer goods) for commercial buyers. We operate from Shannon, Ireland, with 36 years of market experience and relationships spanning 1,000+ suppliers and 6,000+ clients across Europe, Asia, the Caribbean, Africa, and the Middle East.
+AKAY Trade (Akay (IRL) Ltd) is an Ireland-based B2B wholesale trading company specializing in spirits, beer, soft drinks, and FMCG (fast-moving consumer goods) for commercial buyers. We operate from Shannon, Ireland, with 30 years of market experience and relationships spanning 1,000+ suppliers and 6,000+ clients across Europe, Asia, the Caribbean, Africa, and the Middle East.
 
 ## What We Do
 
@@ -459,7 +461,7 @@ Shannon, Loendersloot (Netherlands), Riga (Latvia), and other EU licensed wareho
 5. **Arrange payment** (typically 50% upfront, 50% on shipment — escrow is available on a first deal: https://akay.ie/guides/escrow-payment-wholesale-spirits/)
 6. **Receive goods** and clear customs (if required)
 
-Minimum order: EUR 5,000 for spirits; EUR 10,000 for FMCG. Where an offer states its own minimum, that minimum applies.
+Minimum order: EUR 5,000 for spirits; EUR 15,000 for champagne; EUR 10,000 for FMCG; full truck loads (FTL) for beer, wine and soft drinks. Where an offer states its own minimum, that minimum applies.
 
 ## Contact
 

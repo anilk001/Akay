@@ -699,31 +699,32 @@ function snapshotDelisted() {
   }));
 }
 
-// Warehouse / location values held back from the public site until Anil
-// confirms each is a bonded warehouse or port rather than a supplier's own
-// name or premises (golden rule 1: supplier identity never reaches the
-// browser). Matching is case- and space-insensitive. The offer keeps its
-// incoterm; only the place is dropped. To publish a location again, remove it
-// from this list.
-export const LOCATIONS_UNDER_REVIEW = [
-  'New Corp', 'New Corp warehouse', 'NewCorp', 'NTG', 'Reftrans', 'Revera',
-  'Pergudangan Mutiara Tambak Langon D-10, Surabaya, Indonesia',
-];
-const reviewKey = (v) => String(v || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-const REVIEW_KEYS = new Set(LOCATIONS_UNDER_REVIEW.map(reviewKey));
+// Public names for warehouse / location values. Keys match case- and
+// space-insensitively against both the Warehouse field and the place part of
+// Public Terms ("EXW NTG" -> "EXW Netherlands"). Confirmed by Anil on
+// 2026-09-29: New Corp, NTG, Reftrans, Revera and the Surabaya address are all
+// warehouses, not suppliers; NTG is published as "Netherlands", and the three
+// New Corp spellings are shown one way.
+export const LOCATION_ALIASES = {
+  NTG: 'Netherlands',
+  'New Corp warehouse': 'New Corp',
+  NewCorp: 'New Corp',
+};
+const locKey = (v) => String(v || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+const ALIAS_BY_KEY = new Map(Object.entries(LOCATION_ALIASES).map(([k, v]) => [locKey(k), v]));
 
-export function redactLocation(offer) {
-  const warehouseHeld = REVIEW_KEYS.has(reviewKey(offer.warehouse));
+export function normaliseLocation(offer) {
+  const warehouseAlias = ALIAS_BY_KEY.get(locKey(offer.warehouse));
   const terms = String(offer.terms || '').trim();
   const hit = terms.match(/^([A-Z]{3})\b\s*(.*)$/);
   const m = hit && INCOTERMS.includes(hit[1]) ? hit : null;
-  const termsPlace = m ? m[2] : terms;
-  const termsHeld = termsPlace && REVIEW_KEYS.has(reviewKey(termsPlace));
-  if (!warehouseHeld && !termsHeld) return offer;
+  const place = m ? m[2] : terms;
+  const termsAlias = place ? ALIAS_BY_KEY.get(locKey(place)) : undefined;
+  if (!warehouseAlias && !termsAlias) return offer;
   return {
     ...offer,
-    warehouse: warehouseHeld ? '' : offer.warehouse,
-    terms: termsHeld ? (m ? m[1] : '') : offer.terms,
+    warehouse: warehouseAlias || offer.warehouse,
+    terms: termsAlias ? (m ? `${m[1]} ${termsAlias}` : termsAlias) : offer.terms,
   };
 }
 
@@ -731,8 +732,8 @@ export async function getOffers() {
   const result = await getOffersUnredacted();
   return {
     ...result,
-    offers: result.offers.map(redactLocation),
-    delisted: (result.delisted || []).map(redactLocation),
+    offers: result.offers.map(normaliseLocation),
+    delisted: (result.delisted || []).map(normaliseLocation),
   };
 }
 

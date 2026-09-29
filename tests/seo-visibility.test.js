@@ -1,13 +1,13 @@
 // Search / AI-visibility fixes of 2026-09-29: accent folding in slugs, one
 // brand page per brand however Airtable spells it, 301s for the URLs those
-// changes retired, locations held back pending review, and the buyer-answer
+// changes retired, warehouse names as published, and the buyer-answer
 // text on brand and offer pages. All cases run over the rows below, never the
 // live snapshot (see the snapshot-safe-tests skill).
 
 import assert from 'node:assert/strict';
 import { generateSlug, legacySlug, brandPages, withSlugs } from '../src/lib/slug.mjs';
 import { buildRedirects, redirectsFile } from '../src/lib/redirects.mjs';
-import { redactLocation } from '../src/data/airtable.mjs';
+import { normaliseLocation } from '../src/data/airtable.mjs';
 import { brandAnswers, offerAnswers, houseMinimum, dutyClass } from '../src/lib/buying-answers.mjs';
 import { COMPANY, LEGAL_NAME, companyAddressLine } from '../src/lib/site.mjs';
 import { organizationSchema } from '../src/lib/schema.mjs';
@@ -69,13 +69,12 @@ ok(rules.every((r) => livePages.has(r.to)), 'every redirect target is a built pa
 ok(rules.every((r) => !livePages.has(r.from)), 'no live page is redirected away');
 ok(redirectsFile(rules).includes('/brands/dove-wholesale-2 /brands/dove-wholesale/ 301'), 'slashless form too');
 
-// --- Locations under review never reach the page --------------------------
-eq(redactLocation({ warehouse: 'New Corp', terms: 'EXW New Corp' }), { warehouse: '', terms: 'EXW' });
-eq(redactLocation({ warehouse: 'NewCorp', terms: '' }), { warehouse: '', terms: '' });
-// "NTG" is not an incoterm, so the whole value is the place.
-eq(redactLocation({ warehouse: '', terms: 'NTG' }), { warehouse: '', terms: '' });
-const kept = { warehouse: 'Loendersloot', terms: 'EXW Loendersloot' };
-eq(redactLocation(kept), kept);
+// --- Location names as published ---------------------------------------
+eq(normaliseLocation({ warehouse: 'NTG', terms: 'NTG' }), { warehouse: 'Netherlands', terms: 'Netherlands' });
+eq(normaliseLocation({ warehouse: '', terms: 'EXW NTG' }), { warehouse: '', terms: 'EXW Netherlands' });
+eq(normaliseLocation({ warehouse: 'New Corp warehouse', terms: 'EXW NewCorp' }), { warehouse: 'New Corp', terms: 'EXW New Corp' });
+const kept = { warehouse: 'Reftrans', terms: 'DAP Reftrans' };
+eq(normaliseLocation(kept), kept);
 
 // --- Buyer answers ---------------------------------------------------------
 eq(dutyClass('T1'), 'under-bond');
@@ -84,7 +83,11 @@ eq(dutyClass('T2'), 'duty-paid');
 eq(dutyClass('On Floor'), '');
 eq(houseMinimum('Spirits').short, 'EUR 5,000 minimum order');
 eq(houseMinimum('Toiletries').short, 'EUR 10,000 minimum order');
-eq(houseMinimum('Wine'), null);
+eq(houseMinimum('Wine').short, 'Full truck load (FTL)');
+eq(houseMinimum('Beer').short, 'Full truck load (FTL)');
+eq(houseMinimum('Soft Drinks').short, 'Full truck load (FTL)');
+eq(houseMinimum('Champagne').short, 'EUR 15,000 minimum order');
+eq(houseMinimum('Other'), null);
 
 const jd = brandAnswers("Jack Daniel's", [row(1, "Jack Daniel's"), row(2, "Jack Daniel's", { tier: 'T1', amount: 90, warehouse: 'Riga' })]);
 ok(jd.summary[0].startsWith("AKAY Trade currently lists 2 Jack Daniel's offers, from EUR 90.00 per case."), jd.summary[0]);

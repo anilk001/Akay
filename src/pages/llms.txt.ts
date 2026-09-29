@@ -34,7 +34,9 @@ export async function GET() {
 ## Trading terms
 
 - ${TRADING_TERMS.spiritsMinimum}
+- ${TRADING_TERMS.champagneMinimum}
 - ${TRADING_TERMS.fmcgMinimum}
+- ${TRADING_TERMS.ftlMinimum}
 - ${TRADING_TERMS.payment}
 - Worldwide delivery; T1 (under bond) and T2 (duty paid) supply
 - Where an offer states its own minimum, that minimum applies
@@ -47,7 +49,7 @@ export async function GET() {
 - Office telephone: ${COMPANY.officePhone}
 - VAT number: ${COMPANY.vatId}
 - CRO company number: ${COMPANY.croNumber}
-- [About AKAY](https://akay.ie/about/): 36 years in trade, Ireland-based, 1,000+ suppliers, 6,000+ clients
+- [About AKAY](https://akay.ie/about/): 30 years in trade, Ireland-based, 1,000+ suppliers, 6,000+ clients
 - [All guides](https://akay.ie/guides/): index of the buyer's guides above
 
 ## How to Enquire
