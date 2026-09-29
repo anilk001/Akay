@@ -5,6 +5,15 @@
 export const SITE_URL = 'https://akay.ie';
 export const SITE_NAME = 'AKAY Trade';
 export const LEGAL_NAME = 'Akay Irl Ltd';
+// Company identity for the homepage trust strip, the footer and the
+// Organization JSON-LD. Traders check these before a first deal, so they are
+// written down once and printed everywhere from here.
+export const COMPANY_NUMBER = '250418';      // Companies Registration Office (CRO)
+export const VAT_ID = 'IE8250418E';
+export const TRADING_YEARS = 36;
+export const DESK_CONTACT = { name: 'Anil Khetan', role: 'Managing Director' };
+export const DESK_PHONE = '+353872382368';
+export const DESK_PHONE_DISPLAY = '+353 87 238 2368';
 // 1200x630 share card (public/og-akay.png). The bird logo alone is 320x279,
 // which every platform renders as a small square thumbnail; this is what
 // WhatsApp, LinkedIn and Slack previews actually show.

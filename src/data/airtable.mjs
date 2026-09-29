@@ -12,6 +12,7 @@ import { readFileSync } from 'node:fs';
 import snapshot from './offers-snapshot.json' with { type: 'json' };
 import { parseVolumeMl } from '../lib/normalise.mjs';
 import { tradeTermsView } from '../lib/trade-terms.mjs';
+import { brandSpellings, withCanonicalBrands } from '../lib/brand.mjs';
 
 const TOKEN = process.env.AIRTABLE_TOKEN || process.env.Airtable_Pat || '';
 const BASE = process.env.AIRTABLE_BASE_ID || 'appaDSdZkAE9PGkjT';
@@ -699,7 +700,17 @@ function snapshotDelisted() {
   }));
 }
 
+// Every source (Postgres, Airtable, snapshot) goes through one brand pass, so
+// "Nivea" and "NIVEA" are one brand on every page and in the snapshot. The
+// spelling is chosen over live AND delisted rows together, so a sold-out
+// page keeps the same brand slug as the live one. See src/lib/brand.mjs.
 export async function getOffers() {
+  const res = await loadOffers();
+  const canon = brandSpellings(res.offers, res.delisted);
+  return { ...res, offers: withCanonicalBrands(res.offers, canon), delisted: withCanonicalBrands(res.delisted, canon) };
+}
+
+async function loadOffers() {
   // Phase 3: read the Postgres replica instead of Airtable. Deliberately the
   // FIRST branch and deliberately not silent-on-failure in the same way the
   // Airtable path is: if the site is meant to be reading Postgres and cannot,

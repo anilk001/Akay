@@ -5,9 +5,10 @@ import Seo from '../components/Seo.astro';
 import { withSlugs, categorySlug, brandPages } from '../lib/slug.mjs';
 import { guides } from '../data/guides.mjs';
 import { enquiryLink, WA_LINK } from '../lib/whatsapp.mjs';
+import { listingTermsLine } from '../lib/trade-terms.mjs';
 import SiteSearch from '../components/SiteSearch.astro';
 import QuoteLink from '../components/QuoteLink.astro';
-import { quoteUrl } from '../lib/site.mjs';
+import { quoteUrl, LEGAL_NAME, COMPANY_NUMBER, VAT_ID, TRADING_YEARS, DESK_CONTACT, DESK_PHONE, DESK_PHONE_DISPLAY } from '../lib/site.mjs';
 // The Instant Quote explainer (the .iq section below) and the /instant-quote/
 // landing page show the same walkthrough, so the asset is named in one place.
 import { QUOTE_VIDEO, QUOTE_VIDEO_POSTER, QUOTE_LANDING_PATH } from '../lib/quote-video.mjs';
@@ -38,7 +39,8 @@ const STOCK = { in: ['ok', 'In stock'], warn: ['warn', 'Limited'], enq: ['neu', 
 
 function toView(o) {
   const { basis, other, msg } = priceParts(o.priceDetail);
-  return { ...o, basis, other, wa: enquiryLink(o, msg), st: STOCK[o.stock] || STOCK.enq };
+  // tradeTerms: the shared "MOQ … · Lead …" wording the category and brand grids use.
+  return { ...o, basis, other, wa: enquiryLink(o, msg), st: STOCK[o.stock] || STOCK.enq, tradeTerms: listingTermsLine(o) };
 }
 const view = offers.map(toView);
 // Pin Featured offers to the front of the catalogue; stable sort keeps original order otherwise.
@@ -61,7 +63,7 @@ const topBrands = [...allBrandPages].sort((a, b) => b.offers.length - a.offers.l
 const currencies = Array.from(new Set(view.map((o) => o.currency).filter(Boolean))).sort();
 
 const stats = [
-  [view.length, 'live offers'],
+  [view.length.toLocaleString('en-IE'), 'live offers'],
   // Value of listed stock, e.g. "Over €60 million" — a banded floor, so the
   // wording is printed exactly as stored, with no timestamp beside it. When
   // the stat is absent the row simply has one fewer figure: never €0, never
@@ -69,7 +71,7 @@ const stats = [
   ...(siteStats.stock_value_eur ? [[siteStats.stock_value_eur, 'stock listed']] : []),
   [categories.length - 1, 'categories'],
   [currencies.join(' / ') || '—', 'currencies'],
-  [brandCount, 'brands'],
+  [brandCount.toLocaleString('en-IE'), 'brands'],
 ];
 ---
 
@@ -78,8 +80,8 @@ const stats = [
 <head>
   <Seo
     title="Wholesale Spirits, Beer &amp; FMCG Offers — Live Trade Pricing | AKAY Trade"
-    description="Live wholesale beverage and FMCG offers from AKAY Trade, Ireland. Spirits, beer, soft drinks and grocery by the case and pallet — current trade pricing, pack specs and T1/T2 duty status on every line."
-    ogTitle="AKAY Trade — Live Wholesale Beverage Offers"
+    description="Live wholesale spirits, beer, HPC, grocery and confectionery offers from AKAY Trade, an Irish principal trader. By the case and pallet — trade pricing, pack specs and T1/T2 duty status on every line, no login."
+    ogTitle="AKAY Trade — Live Wholesale FMCG &amp; Spirits Offers"
     path="/"
     schemas={[organizationSchema(), websiteSchema()]}
   />
@@ -164,10 +166,9 @@ const stats = [
     .eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--brass);margin:0 0 12px}
     h1{font-family:var(--serif);font-weight:600;font-size:clamp(30px,5vw,46px);line-height:1.04;margin:0;max-width:16ch;text-wrap:balance;letter-spacing:-.01em}
     .lede{margin:14px 0 0;max-width:56ch;color:var(--ink-soft);font-size:16px}
-    /* A line pointing down to the Instant Quote section rather than a second
-       button straight to quote.akay.ie — the section right below carries the
-       real CTA, and two identical buttons a screen apart read as a mistake. */
-    .cta-note{margin:16px 0 0;font-size:14.5px;color:var(--ink-soft);max-width:56ch}
+    /* The hero now carries the primary button itself (the audit's first fix:
+       no primary action above the fold). The Instant Quote section below keeps
+       its own button, since that is where the explanation sits. */
     /* inline, not inline-flex: the link is mid-sentence and has to be able to
        wrap with the text around it rather than jumping to its own line. */
     .cta-jump{color:var(--brass);font-weight:600;text-decoration:none;
@@ -190,6 +191,19 @@ const stats = [
     :root[data-theme="light"] .cta-quote{color:#fff}
     @media (prefers-reduced-motion:reduce){.cta-quote{transition:none}.cta-quote:hover{transform:none}}
     @media (max-width:520px){.cta-quote{width:100%;justify-content:center;padding:0 16px}}
+    .hero-cta{display:flex;flex-wrap:wrap;align-items:center;gap:12px 18px;margin-top:20px}
+    .cta-2{display:inline-flex;align-items:center;height:50px;padding:0 20px;border-radius:12px;border:1px solid var(--line);
+      background:var(--card);color:var(--ink);font-weight:600;font-size:15px;text-decoration:none;transition:border-color .14s}
+    .cta-2:hover{border-color:var(--forest);color:var(--forest)}
+    .cta-2:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+    @media (max-width:520px){.cta-2{width:100%;justify-content:center}}
+    .trust{border-bottom:1px solid var(--line);background:var(--paper-2)}
+    .trust-in{list-style:none;margin:0 auto;padding-top:14px;padding-bottom:14px;display:grid;gap:10px 22px;
+      grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+    .trust-in li{display:flex;flex-direction:column;gap:2px;font-size:12.5px;color:var(--muted);line-height:1.4}
+    .trust-in b{color:var(--ink);font-size:13.5px;font-weight:600}
+    .trust-in a{color:var(--brass);text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--brass) 40%,transparent)}
+    .trust-in a:hover{color:var(--forest)}
     .ticker{display:flex;flex-wrap:wrap;gap:26px;margin-top:24px;padding-top:20px;border-top:1px solid var(--line-soft)}
     .stat .n{font-family:var(--mono);font-size:22px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
     .stat .l{font-size:12px;color:var(--muted);letter-spacing:.03em}
@@ -314,7 +328,11 @@ const stats = [
       border-radius:999px;padding:0 14px;font-size:13.5px;cursor:pointer;font-family:var(--sans)}
 
     main.wrap{padding:26px 20px 40px}
-    .count{font-family:var(--mono);font-size:12.5px;color:var(--muted);margin:0 0 16px;letter-spacing:.03em}
+    .count-row{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 16px;margin:0 0 16px}
+    .count{font-family:var(--mono);font-size:12.5px;color:var(--muted);margin:0;letter-spacing:.03em}
+    .filters-link{font-size:13px;font-weight:600;color:var(--brass);text-decoration:none}
+    .filters-link:hover{text-decoration:underline}
+    #grid{scroll-margin-top:calc(var(--bar-h,60px) + 84px)}
     .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
     .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px;
       display:flex;flex-direction:column;gap:0;box-shadow:var(--shadow);transition:.16s;position:relative;overflow:hidden;
@@ -339,6 +357,8 @@ const stats = [
     .tag{font-size:11px;padding:3px 8px;border-radius:6px;font-family:var(--mono);letter-spacing:.03em;
       border:1px solid var(--line);color:var(--muted)}
     .tag.tier{border-color:color-mix(in srgb,var(--brass-2) 45%,var(--line));color:var(--brass)}
+    .tline{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:10px;font-family:var(--mono);font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+    .tline span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
     .price-row{margin-top:16px;padding-top:14px;border-top:1px solid var(--line-soft);display:flex;align-items:flex-end;justify-content:space-between;gap:8px}
     .price .amt{font-family:var(--mono);font-size:22px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums;line-height:1}
     .price .cur{font-size:12px;color:var(--muted);font-family:var(--mono)}
@@ -405,18 +425,40 @@ const stats = [
 
   <section class="hero">
     <div class="wrap hero-in">
-      <p class="eyebrow">Wholesale beverage offers · duty-paid &amp; export</p>
-      <h1>Live trade pricing, straight from the desk.</h1>
-      <p class="lede">Spirits and beer by the case, with current pricing, pack specs and duty tier on every line. Filter, compare, and send a WhatsApp enquiry in one tap — no login, no PDF.</p>
-      <p class="cta-note">
-        Got a buying list? <a class="cta-jump" href="#instant-quote">Upload it in any format and download it <span class="nb">priced<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 4v13m0 0-5.5-5.5M12 17l5.5-5.5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a> — no template, no login.
-      </p>
+      <p class="eyebrow">Wholesale trader · spirits, beer, HPC &amp; grocery · T1 &amp; T2</p>
+      <h1>Wholesale FMCG and spirits at live trade prices.</h1>
+      <p class="lede">We buy and sell as principal — one counterparty, {TRADING_YEARS} years trading. Pack, duty status and Incoterm on every line, no login. Send us your buying list and get it back priced in minutes.</p>
+      <div class="hero-cta">
+        <a class="cta-quote" href={quoteUrl('excel')} rel="nofollow">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M12 15.5V3.5m0 0L7.8 7.7M12 3.5l4.2 4.2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M4 15.5V18a2.5 2.5 0 0 0 2.5 2.5h11A2.5 2.5 0 0 0 20 18v-2.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          Upload your list — get it priced
+        </a>
+        <a class="cta-2" href="#grid">Browse {view.length.toLocaleString('en-IE')} live offers</a>
+        <a class="cta-jump" href="#instant-quote">How it works</a>
+      </div>
       <div class="ticker">
         {stats.map((s) => (
           <div class="stat"><div class="n">{s[0]}</div><div class="l">{s[1]}</div></div>
         ))}
       </div>
     </div>
+  </section>
+
+  {/* Who the counterparty is, before anyone scrolls. Every figure here is a
+      checkable fact from src/lib/site.mjs — no claim goes in this strip that
+      the desk does not actually offer. */}
+  <section class="trust" aria-label="About the counterparty">
+    <ul class="wrap trust-in">
+      <li><b>{LEGAL_NAME}</b><span>CRO {COMPANY_NUMBER} · Shannon, Ireland</span></li>
+      <li><b>VAT {VAT_ID}</b><span>EU reverse charge on intra-EU sales</span></li>
+      <li><b>Principal trader</b><span>We buy the stock and invoice you directly</span></li>
+      <li><b>{TRADING_YEARS} years trading</b><span>Duty-paid (T2) and under bond (T1)</span></li>
+      <li><b>Safe payment</b><span><a href="/guides/escrow-payment-wholesale-spirits/">Escrow</a>, or 30% with order and the balance against a copy of the BL</span></li>
+      <li><b>{DESK_CONTACT.name}</b><span>{DESK_CONTACT.role} · <a href={`tel:${DESK_PHONE}`}>{DESK_PHONE_DISPLAY}</a></span></li>
+    </ul>
   </section>
 
   <section class="iq" id="instant-quote">
@@ -518,7 +560,10 @@ const stats = [
   </section>
 
   <main class="wrap">
-    <p class="count" id="count">Showing {view.length} of {view.length} offers</p>
+    <div class="count-row">
+      <p class="count" id="count">Showing {view.length} of {view.length} offers</p>
+      <a class="filters-link" href="/search/">Filter by T1/T2, Incoterm, warehouse, MOQ or EAN →</a>
+    </div>
     <div class="grid" id="grid">
       {gridItems.map((o) => (
         <article class={`card${o.featured ? ' feat-on' : ''}`} data-cat={o.category} data-name={(o.name + ' ' + (o.variants || '') + ' ' + o.brand).toLowerCase()} data-amt={o.unitAmount ?? o.amount ?? ''} data-feat={o.featured ? '1' : '0'}>
@@ -537,6 +582,12 @@ const stats = [
             {o.origin && <span class="tag">{o.origin}</span>}
             {o.currency && <span class="tag">{o.currency}</span>}
           </div>
+          {(o.tradeTerms || o.ean) && (
+            <div class="tline">
+              {o.tradeTerms && <span title={o.tradeTerms}>{o.tradeTerms}</span>}
+              {o.ean && <span>EAN {o.ean}</span>}
+            </div>
+          )}
           <div class="price-row">
             <div class="price">
               <div><span class="cur">{o.currency}</span> <span class="amt">{o.amount != null ? o.amount.toFixed(2) : '—'}</span> <span class="basis">{o.basis}</span></div>
@@ -549,7 +600,7 @@ const stats = [
           </div>
           <div class="c-foot">
             <a class="details" href={`/offers/${o.slug}/`}>Details</a>
-            <span class="incoterm">{o.terms}</span>
+            <span class="incoterm">{o.terms || 'Terms on enquiry'}</span>
             <a class="enquire" href={o.wa} target="_blank" rel="noopener"
                data-offer={o.name} data-brand={o.brand} data-category={o.category}
                data-currency={o.currency} data-amount={o.amount}>
@@ -581,7 +632,7 @@ const stats = [
           {topBrands.map((b) => (
             <li><a href={`/brands/${b.slug}/`}>{b.brand}<span class="catnav-count">{b.offers.length}</span></a></li>
           ))}
-          <li><a href="/brands/">All {allBrandPages.length} brands A–Z</a></li>
+          <li><a href="/brands/">All brands A–Z</a></li>
         </ul>
       </nav>
       <p class="catnav-more">
@@ -612,11 +663,11 @@ const stats = [
   <footer>
     <div class="wrap">
       <div class="note">
-        Live catalogue from AKAY's Airtable. Prices are indicative and shown per the listing basis; supplier identity, buy prices and margins are never published. <strong>T1</strong> = export / under-bond · <strong>T2</strong> = for sale in the EU.
+        Updated throughout the day from our trading desk. Prices are indicative and shown per the listing basis; supplier identity, buy prices and margins are never published. <strong>T1</strong> = export / under-bond · <strong>T2</strong> = for sale in the EU.
         <br /><br />
         <a href="/about/" style="color:var(--brass);text-decoration:none">About AKAY</a> · <a href="/guides/" style="color:var(--brass);text-decoration:none">Guides</a> · <a href="/guides/requirement-list-format/" style="color:var(--brass);text-decoration:none">How to order</a>
       </div>
-      <div style="font-family:var(--mono);text-align:right">© AKAY · Shannon<br /><a href={WA_LINK} style="color:var(--brass);text-decoration:none">WhatsApp</a> · <a href="mailto:hello@akay.ie" style="color:var(--brass);text-decoration:none">hello@akay.ie</a></div>
+      <div style="font-family:var(--mono);text-align:right">© {LEGAL_NAME} · Shannon, Ireland<br />CRO {COMPANY_NUMBER} · VAT {VAT_ID}<br /><a href={WA_LINK} style="color:var(--brass);text-decoration:none">WhatsApp</a> · <a href="mailto:hello@akay.ie" style="color:var(--brass);text-decoration:none">hello@akay.ie</a></div>
     </div>
   </footer>
 
