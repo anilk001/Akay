@@ -184,7 +184,7 @@ Once you agree on price and terms:
 ## Payment Terms
 
 Our standard terms: 30% with the order, balance against a copy of the Bill of Lading. Escrow is available on request.
-For regular buyers: NET 30 (invoice terms).
+We do not offer credit terms: every order, first or repeat, is paid on these terms.
 
 ## Shipping & Delivery
 
