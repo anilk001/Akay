@@ -109,10 +109,10 @@ ok(!offerAnswers(row(1, 'X', { moqLabel: '50 cases' })).some((t) => /EUR 5,000/.
 ok(offerAnswers(row(1, 'X')).some((t) => /EUR 5,000/.test(t)), 'house minimum when none stated');
 
 // --- Company facts agree everywhere ---------------------------------------
-eq(LEGAL_NAME, 'Akay Ireland Ltd');
+eq(LEGAL_NAME, 'Akay (IRL) Ltd');
 eq(companyAddressLine(), '36 Gleann An Oir, Shannon, Co. Clare, V14 V006, Ireland');
 const org = organizationSchema();
-eq(org.legalName, 'Akay Ireland Ltd');
+eq(org.legalName, 'Akay (IRL) Ltd');
 eq(org.vatID, 'IE8250418E');
 eq(org.identifier.value, '250418');
 eq(org.address.postalCode, 'V14 V006');

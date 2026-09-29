@@ -4,7 +4,8 @@
 // from here so a future move is one edit, not a grep.
 export const SITE_URL = 'https://akay.ie';
 export const SITE_NAME = 'AKAY Trade';
-export const LEGAL_NAME = 'Akay Ireland Ltd';
+// As registered with the CRO (company 250418): the brackets are part of the name.
+export const LEGAL_NAME = 'Akay (IRL) Ltd';
 
 // The company's registered facts, written down once. llms.txt, the About
 // page, the guides and the Organization JSON-LD all read from here so the
@@ -26,6 +27,9 @@ export const COMPANY = {
   salesEmail: 'offers@akay.ie',
   hours: 'Monday–Friday, 9am–5pm Irish time',
 };
+// Short aliases for the footer and trust strip.
+export const CRO_NUMBER = COMPANY.croNumber;
+export const VAT_NUMBER = COMPANY.vatId;
 
 /** One-line postal address, e.g. for llms.txt and page footers. */
 export function companyAddressLine() {

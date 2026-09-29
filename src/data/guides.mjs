@@ -385,7 +385,7 @@ Email offers@akay.ie or WhatsApp +353 87 238 2368. We're here to help.
     content: `
 ## Who We Are
 
-AKAY Trade (Akay Ireland Ltd) is an Ireland-based B2B wholesale trading company specializing in spirits, beer, soft drinks, and FMCG (fast-moving consumer goods) for commercial buyers. We operate from Shannon, Ireland, with 30 years of market experience and relationships spanning 1,000+ suppliers and 6,000+ clients across Europe, Asia, the Caribbean, Africa, and the Middle East.
+AKAY Trade (Akay (IRL) Ltd) is an Ireland-based B2B wholesale trading company specializing in spirits, beer, soft drinks, and FMCG (fast-moving consumer goods) for commercial buyers. We operate from Shannon, Ireland, with 30 years of market experience and relationships spanning 1,000+ suppliers and 6,000+ clients across Europe, Asia, the Caribbean, Africa, and the Middle East.
 
 ## What We Do
 
@@ -468,7 +468,7 @@ Minimum order: EUR 5,000 for spirits; EUR 15,000 for champagne; EUR 10,000 for F
 **Enquiries:** offers@akay.ie
 **WhatsApp:** +353 87 238 2368
 **Office:** +353 61 363305
-**Registered office:** Akay Ireland Ltd, 36 Gleann An Oir, Shannon, Co. Clare, V14 V006, Ireland
+**Registered office:** Akay (IRL) Ltd, 36 Gleann An Oir, Shannon, Co. Clare, V14 V006, Ireland
 **VAT:** IE8250418E · **CRO:** 250418
 **Business hours:** Monday–Friday, 9am–5pm Irish time
 
