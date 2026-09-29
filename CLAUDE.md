@@ -99,7 +99,18 @@ node n8n/tests/unmatched-demand-digest.test.js # weekly buying brief from unmatc
 
 - `src/data/airtable.mjs` — live fetch + normalize (public-safe fields only),
   plus `getSiteStats()` for the ticker's Airtable-maintained figures
-- `src/lib/site.mjs` — origin + site-wide SEO constants (`SITE_URL`)
+- `src/lib/site.mjs` — origin + site-wide SEO constants (`SITE_URL`), and
+  `COMPANY` / `TRADING_TERMS`: the legal name, registered address, VAT, CRO,
+  hours and house minimums that llms.txt, the About page and the
+  Organization JSON-LD all read. Change a company fact there, nowhere else
+- `src/lib/buying-answers.mjs` — the "Buying X wholesale" summary + FAQ on
+  brand pages and the "Buying this line" notes on offer pages, computed from
+  public fields only; every sentence must hold for every line it describes
+- `src/lib/redirects.mjs` — 301s for URLs retired by the 2026-09-29 slug
+  change (accents folded, brand spellings merged); `astro.config.mjs` writes
+  them to `dist/_redirects` at the end of the build
+- `LOCATIONS_UNDER_REVIEW` in `src/data/airtable.mjs` — warehouse names held
+  off the site until confirmed as warehouses rather than suppliers
 - `src/components/Seo.astro` — the `<head>` for every page: title, canonical,
   robots, Open Graph, Twitter, GA4 and JSON-LD. Pages pass props, never
   hand-roll meta tags

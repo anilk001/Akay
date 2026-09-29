@@ -1,11 +1,22 @@
-// Generate URL-safe slugs from product names
-export function generateSlug(name, spec = '') {
-  // Combine name and spec for the slug
-  const combined = `${name} ${spec}`.trim();
+// Letters NFKD does not decompose into a base letter plus accent.
+const TRANSLITERATE = { ß: 'ss', ø: 'o', æ: 'ae', œ: 'oe', ł: 'l', đ: 'd', ð: 'd', þ: 'th', ı: 'i' };
 
-  // Convert to lowercase and remove non-ASCII
-  let slug = combined
+// Fold accented letters to their ASCII base ("Moët" -> "moet",
+// "L'Oréal" -> "l'oreal") so the URL keeps the letter instead of losing it.
+// Until 2026-09-29 slugs simply dropped every non-ASCII letter, which gave
+// URLs like /brands/loral-paris-wholesale/ and /brands/dom-prignon-wholesale/.
+// legacySlug() keeps that old rule so the redirect map can send those URLs
+// to their corrected form.
+export function foldAccents(text = '') {
+  return String(text)
     .toLowerCase()
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[ßøæœłđðþı]/g, (ch) => TRANSLITERATE[ch] || ch);
+}
+
+function slugify(text, fold) {
+  let slug = (fold ? foldAccents(text) : String(text).toLowerCase())
     .replace(/[^\w\s-]/g, '') // Remove special characters
     .replace(/\s+/g, '-') // Replace spaces with hyphens
     .replace(/-+/g, '-') // Collapse multiple hyphens
@@ -18,6 +29,17 @@ export function generateSlug(name, spec = '') {
   }
 
   return slug;
+}
+
+// Generate URL-safe slugs from product names
+export function generateSlug(name, spec = '') {
+  return slugify(`${name} ${spec}`.trim(), true);
+}
+
+// The pre-2026-09-29 rule (accented letters dropped). Used only to work out
+// which old URLs need a 301 to their corrected slug.
+export function legacySlug(name, spec = '') {
+  return slugify(`${name} ${spec}`.trim(), false);
 }
 
 // Handle slug collisions by appending -2, -3, etc
@@ -33,28 +55,65 @@ export function dedupeSlug(slug, allSlugs) {
 
 // Brand landing pages: one per brand carrying at least `minOffers` live offers
 // (single-offer brands would be thin doorway pages). Slugs take a "-wholesale"
-// suffix — the search term the pages target — and are deduped in alphabetical
-// brand order so every caller derives identical URLs.
+// suffix — the search term the pages target.
+//
+// Airtable spells some brands several ways ("Dove" / "DOVE", "Jack Daniel's" /
+// "Jack Daniels", "Moët & Chandon" / "Moet & Chandon"). Spellings that reduce to
+// the same slug are one brand and get one page; before 2026-09-29 each spelling
+// got its own page and the later ones a "-2" suffix. The page is named with the
+// best spelling (not all capitals, then the most used, then the accented one),
+// and `variants` lists every spelling so offer pages can link to it.
 export function brandPages(offers, minOffers = 2) {
+  const byKey = new Map();
+  for (const offer of offers) {
+    const brand = (offer.brand || '').trim();
+    if (!brand) continue;
+    const key = generateSlug(brand);
+    if (!key) continue;
+    if (!byKey.has(key)) byKey.set(key, { offers: [], counts: new Map() });
+    const entry = byKey.get(key);
+    entry.offers.push(offer);
+    entry.counts.set(brand, (entry.counts.get(brand) || 0) + 1);
+  }
+  const pages = [];
+  for (const [key, { offers: brandOffers, counts }] of byKey) {
+    if (brandOffers.length < minOffers) continue;
+    const variants = [...counts.keys()];
+    pages.push({ brand: displayBrand(counts), slug: `${key}-wholesale`, offers: brandOffers, variants });
+  }
+  return pages.sort((a, b) => a.brand.localeCompare(b.brand));
+}
+
+function displayBrand(counts) {
+  const isShouting = (b) => /[A-Z]{2}/.test(b) && b === b.toUpperCase() && b.length > 3;
+  return [...counts.entries()].sort(([a, ca], [b, cb]) =>
+    (isShouting(a) - isShouting(b))
+    || (cb - ca)
+    || (/[^\x00-\x7F]/.test(b) - /[^\x00-\x7F]/.test(a))
+    || a.localeCompare(b))[0][0];
+}
+
+// The brand-page URLs the site published before 2026-09-29, one per raw
+// spelling, deduped with -2/-3 in alphabetical order exactly as the old code
+// did. Only the redirect map uses this.
+export function legacyBrandSlugs(offers, minOffers = 2) {
   const byBrand = new Map();
   for (const offer of offers) {
     const brand = (offer.brand || '').trim();
     if (!brand) continue;
-    if (!byBrand.has(brand)) byBrand.set(brand, []);
-    byBrand.get(brand).push(offer);
+    byBrand.set(brand, (byBrand.get(brand) || 0) + 1);
   }
   const slugs = [];
-  const pages = [];
+  const out = [];
   for (const brand of [...byBrand.keys()].sort((a, b) => a.localeCompare(b))) {
-    const brandOffers = byBrand.get(brand);
-    if (brandOffers.length < minOffers) continue;
-    const base = generateSlug(brand);
+    if (byBrand.get(brand) < minOffers) continue;
+    const base = legacySlug(brand);
     if (!base) continue;
     const slug = dedupeSlug(`${base}-wholesale`, slugs);
     slugs.push(slug);
-    pages.push({ brand, slug, offers: brandOffers });
+    out.push({ brand, slug });
   }
-  return pages;
+  return out;
 }
 
 // Build a map of offer ID -> slug for routing
@@ -99,10 +158,10 @@ export function buildOfferBySlug(offers, slugMap) {
 // product instead of two or three competing ones.
 // (The search index and the page routes both call this; it replaced a second,
 // slug-only copy of withSlugs() that the search work added in parallel.)
-export function withSlugs(offers) {
+export function withSlugs(offers, slugFn = generateSlug) {
   const seen = [];
   const withSlug = offers.map((offer) => {
-    const slug = dedupeSlug(generateSlug(offer.name, offer.spec), seen);
+    const slug = dedupeSlug(slugFn(offer.name, offer.spec), seen);
     seen.push(slug);
     return { ...offer, slug };
   });
@@ -110,7 +169,7 @@ export function withSlugs(offers) {
   // Group by the pre-dedupe slug: that is exactly "same name and pack size".
   const groups = new Map();
   for (const offer of withSlug) {
-    const key = generateSlug(offer.name, offer.spec);
+    const key = slugFn(offer.name, offer.spec);
     if (!groups.has(key)) groups.set(key, []);
     groups.get(key).push(offer);
   }

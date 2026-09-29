@@ -1,5 +1,8 @@
 // JSON-LD schema generation for SEO
-import { SITE_URL, SITE_NAME, LEGAL_NAME, SAME_AS } from './site.mjs';
+import { SITE_URL, SITE_NAME, LEGAL_NAME, SAME_AS, COMPANY } from './site.mjs';
+
+// E.164 without spaces, as schema.org consumers expect.
+const tel = (s) => String(s).replace(/\s+/g, '');
 
 export function organizationSchema() {
   return {
@@ -7,17 +10,28 @@ export function organizationSchema() {
     '@type': 'Organization',
     '@id': `${SITE_URL}/#org`,
     name: LEGAL_NAME,
+    legalName: LEGAL_NAME,
     alternateName: SITE_NAME,
     url: SITE_URL,
     logo: `${SITE_URL}/akay-bird.png`,
     description:
       'Ireland-based B2B wholesale trading company dealing in spirits, beer, soft drinks and FMCG products by the case and pallet. Duty-paid and export (under-bond) supply across Europe, Asia and the Caribbean.',
-    email: 'hello@akay.ie',
-    telephone: '+353872382368',
+    email: COMPANY.salesEmail,
+    telephone: tel(COMPANY.officePhone),
+    vatID: COMPANY.vatId,
+    identifier: {
+      '@type': 'PropertyValue',
+      propertyID: 'CRO',
+      name: 'Companies Registration Office (Ireland) number',
+      value: COMPANY.croNumber,
+    },
     address: {
       '@type': 'PostalAddress',
-      addressLocality: 'Shannon',
-      addressCountry: 'IE',
+      streetAddress: COMPANY.streetAddress,
+      addressLocality: COMPANY.locality,
+      addressRegion: COMPANY.region,
+      postalCode: COMPANY.postalCode,
+      addressCountry: COMPANY.countryCode,
     },
     areaServed: ['Europe', 'Asia', 'Caribbean', 'Middle East', 'Africa'],
     knowsAbout: [
@@ -263,10 +277,11 @@ export function articleSchema(title, description, slug, updated = '') {
     // invented from the build date would be false — this site rebuilds every
     // five minutes, and the guides do not change with it.
     ...(updated ? { dateModified: updated } : {}),
-    author: { '@type': 'Organization', name: 'AKAY Trade' },
+    author: { '@type': 'Organization', '@id': `${SITE_URL}/#org`, name: LEGAL_NAME },
     publisher: {
       '@type': 'Organization',
-      name: 'AKAY Trade',
+      '@id': `${SITE_URL}/#org`,
+      name: LEGAL_NAME,
       logo: { '@type': 'ImageObject', url: `${SITE_URL}/akay-bird.png` },
     },
   };

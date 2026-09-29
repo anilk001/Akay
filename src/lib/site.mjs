@@ -4,7 +4,43 @@
 // from here so a future move is one edit, not a grep.
 export const SITE_URL = 'https://akay.ie';
 export const SITE_NAME = 'AKAY Trade';
-export const LEGAL_NAME = 'Akay Irl Ltd';
+export const LEGAL_NAME = 'Akay Ireland Ltd';
+
+// The company's registered facts, written down once. llms.txt, the About
+// page, the guides and the Organization JSON-LD all read from here so the
+// name, address and numbers AI assistants and search engines see agree with
+// each other and with the CRO record. Directory listings (Shannon Chamber,
+// europages, …) are edited by hand and must be kept to these same values.
+export const COMPANY = {
+  legalName: LEGAL_NAME,
+  tradingName: SITE_NAME,
+  streetAddress: '36 Glean an Oir',
+  locality: 'Shannon',
+  region: 'Co. Clare',
+  postalCode: 'V14 V006',
+  country: 'Ireland',
+  countryCode: 'IE',
+  vatId: 'IE8250418E',
+  croNumber: '250418',
+  officePhone: '+353 61 363305',
+  salesEmail: 'offers@akay.ie',
+  hours: 'Monday–Friday, 9am–5pm Irish time',
+};
+
+/** One-line postal address, e.g. for llms.txt and page footers. */
+export function companyAddressLine() {
+  const c = COMPANY;
+  return `${c.streetAddress}, ${c.locality}, ${c.region}, ${c.postalCode}, ${c.country}`;
+}
+
+// House trading terms, in the words buyers see. Per-offer MOQs from the
+// ingestion normaliser still show on the offer that carries them; these are
+// the defaults the whole catalogue trades on.
+export const TRADING_TERMS = {
+  spiritsMinimum: 'Spirits: minimum order EUR 5,000',
+  fmcgMinimum: 'FMCG: full containers only',
+  payment: 'Back-to-back on confirmed orders; no credit terms',
+};
 // 1200x630 share card (public/og-akay.png). The bird logo alone is 320x279,
 // which every platform renders as a small square thumbnail; this is what
 // WhatsApp, LinkedIn and Slack previews actually show.

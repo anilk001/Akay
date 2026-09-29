@@ -7,6 +7,7 @@ import Seo from '../../components/Seo.astro';
 import { priceLabel } from '../../lib/price.mjs';
 import { enquiryLink, WA_LINK, WA_DISPLAY } from '../../lib/whatsapp.mjs';
 import { reconfirmOfferId, RECONFIRM_ENDPOINT } from '../../lib/site.mjs';
+import { offerAnswers, houseMinimum } from '../../lib/buying-answers.mjs';
 
 // Get all valid slugs for static generation. Sold-out (delisted) offers keep
 // their pages — live offers are slugged FIRST so a re-listed line always owns
@@ -18,7 +19,9 @@ export async function getStaticPaths() {
   const liveOffers = all.filter((o) => !o.delisted);
   // Brand page URL per brand name, for the breadcrumb link (only brands that
   // actually get a landing page — brand pages list live stock only).
-  const brandSlugByName = new Map(brandPages(liveOffers).map((p) => [p.brand, p.slug]));
+  const brandSlugByName = new Map(
+    brandPages(liveOffers).flatMap((p) => p.variants.map((v) => [v, p.slug])),
+  );
 
   return all.map((offer) => ({
     params: { slug: offer.slug },
@@ -50,6 +53,10 @@ function priceParts(detail = '') {
 const STOCK = { in: ['ok', 'In stock'], warn: ['warn', 'Limited'], enq: ['neu', 'Enquire'] };
 
 const isDelisted = !!offer.delisted;
+// Plain-language notes under the spec table (duty status, house minimum, how
+// to order). Sold-out pages skip them: they point buyers to similar lines.
+const answerNotes = isDelisted ? [] : offerAnswers(offer);
+const houseMin = houseMinimum(offer.category);
 
 const { basis, other, msg } = priceParts(offer.priceDetail);
 const st = isDelisted ? ['neu', 'Out of stock'] : (STOCK[offer.stock] || STOCK.enq);
@@ -335,6 +342,22 @@ if (!isDelisted && offer.stock === 'in' && offer.qty) {
       border: 1px solid var(--line);
     }
 
+    .buying-notes {
+      margin-top: 1.5em;
+      border-top: 1px solid var(--line);
+      padding-top: 1em;
+      max-width: 70ch;
+    }
+    .buying-notes h2 {
+      font-size: 1.05em;
+      margin: 0 0 0.5em;
+    }
+    .buying-notes p {
+      margin: 0 0 0.6em;
+      font-size: 0.95em;
+      color: var(--ink-soft, var(--ink));
+    }
+
     .related-offers {
       margin: 3em 0 0;
     }
@@ -440,7 +463,7 @@ if (!isDelisted && offer.stock === 'in' && offer.qty) {
               ? (offer.moqEstimated
                   ? <>Typically {offer.moqLabel}<span class="spec-hedge" title="This supplier has not stated a minimum for this line. Shown from their usual terms — confirm on enquiry.">estimated</span></>
                   : offer.moqLabel)
-              : 'On request'}
+              : (houseMin ? houseMin.short : 'On request')}
           </span>
         </div>
         {offer.leadLabel && (
@@ -479,6 +502,13 @@ if (!isDelisted && offer.stock === 'in' && offer.qty) {
           document.querySelectorAll('[data-reconfirm-client]').forEach(function (el) { el.value = c; });
         })();
       </script>
+
+      {answerNotes.length > 0 && (
+        <section class="buying-notes" aria-labelledby="buying-notes-heading">
+          <h2 id="buying-notes-heading">Buying this line</h2>
+          {answerNotes.map((note) => <p>{note}</p>)}
+        </section>
+      )}
 
       <p style="font-size: 0.85em; color: var(--muted); margin-top: 1.5em; margin-bottom: 0;">
         {isDelisted
