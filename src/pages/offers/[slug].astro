@@ -8,6 +8,7 @@ import Seo from '../../components/Seo.astro';
 import { priceLabel } from '../../lib/price.mjs';
 import { enquiryLink } from '../../lib/whatsapp.mjs';
 import { reconfirmOfferId, RECONFIRM_ENDPOINT } from '../../lib/site.mjs';
+import { palletLabel } from '../../lib/trade-terms.mjs';
 import { offerAnswers, houseMinimum } from '../../lib/buying-answers.mjs';
 
 // Get all valid slugs for static generation. Sold-out (delisted) offers keep
@@ -474,6 +475,12 @@ if (!isDelisted && offer.stock === 'in' && offer.qty) {
           <div class="spec-row">
             <span class="spec-label">Lead Time</span>
             <span class="spec-value">{offer.leadLabel}</span>
+          </div>
+        )}
+        {palletLabel(offer) && (
+          <div class="spec-row">
+            <span class="spec-label">Pallet</span>
+            <span class="spec-value">{palletLabel(offer)}</span>
           </div>
         )}
         {offer.mixedLoad && (

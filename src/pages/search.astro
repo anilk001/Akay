@@ -229,7 +229,7 @@ const pageDesc = 'Search AKAY\'s live wholesale catalogue: spirits, beer, soft d
     <div class="wrap sbar-in">
       <form class="qbox" id="qform" role="search" action="/search/" method="get">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-        <input id="q" name="q" type="search" placeholder="Search — e.g. guinness 44cl, jameson 70cl, kinder bueno" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Search offers" />
+        <input id="q" name="q" type="search" placeholder="Search — e.g. guinness 44cl, kinder bueno, or paste EANs" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Search offers" />
         <button type="button" class="clear" id="qclear" aria-label="Clear search" hidden>×</button>
       </form>
       <button type="button" class="filt-btn" id="filtBtn" aria-controls="facets" aria-expanded="false">
@@ -289,6 +289,8 @@ const pageDesc = 'Search AKAY\'s live wholesale catalogue: spirits, beer, soft d
     import { volumeLabel } from '../lib/normalise.mjs';
     import { enquiryLink } from '../lib/whatsapp.mjs';
     import { generateSlug } from '../lib/slug.mjs';
+    import { withCanonicalBrands } from '../lib/brand.mjs';
+    import { eanQuery, matchesEan } from '../lib/ean.mjs';
 
     // ---------- DOM ----------
     const $ = (id) => document.getElementById(id);
@@ -421,12 +423,9 @@ const pageDesc = 'Search AKAY\'s live wholesale catalogue: spirits, beer, soft d
           fv: null,
         };
       });
-      // "Nivea" and "NIVEA" are one brand: merge case variants onto the most common spelling.
-      const spellings = new Map();
-      for (const d of docs) if (d.brand) { const k = d.brand.toLowerCase(); const m = spellings.get(k) || new Map(); m.set(d.brand, (m.get(d.brand) || 0) + 1); spellings.set(k, m); }
-      const shout = (v) => (v.replace(/[^A-Z]/g, '').length === v.replace(/[^A-Za-z]/g, '').length ? 1 : 0); // all-caps loses ties
-      const canon = new Map(Array.from(spellings, ([k, m]) => [k, Array.from(m).sort((a, b) => b[1] - a[1] || shout(a[0]) - shout(b[0]))[0][0]]));
-      for (const d of docs) if (d.brand) d.brand = canon.get(d.brand.toLowerCase());
+      // The build already merges "Nivea"/"NIVEA" (src/lib/brand.mjs); running it
+      // again here keeps the facets clean if the index ever predates that.
+      docs = withCanonicalBrands(docs);
       for (const d of docs) d.fv = Object.fromEntries(FACETS.map((f) => [f.key, f.get(d)]));
       index = buildIndex(docs, (o) => ({
         strong: `${o.brand} ${o.name} ${o.variants}`,
@@ -443,8 +442,12 @@ const pageDesc = 'Search AKAY\'s live wholesale catalogue: spirits, beer, soft d
     function apply() {
       // 1. Text query
       let base, rank = null, partial = false;
-      const hits = state.q ? search(index, state.q, relCache) : null;
-      if (hits) {
+      // A query made only of barcodes is an exact lookup, not a text search.
+      const eans = eanQuery(state.q);
+      const hits = state.q && !eans ? search(index, state.q, relCache) : null;
+      if (eans) {
+        base = docs.filter((o) => matchesEan(o, eans));
+      } else if (hits) {
         base = hits.map((h) => docs[h.idx]);
         rank = new Map(hits.map((h, i) => [h.idx, i]));
         partial = hits.length > 0 && hits[0].matched < hits[0].of;

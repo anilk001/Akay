@@ -31,4 +31,6 @@ export const PUBLIC_KEYS = [
   // reject the key anyway, which is the guard working as intended.
   'moqLabel', 'moqEstimated', 'moqBucket', 'leadLabel', 'leadBucket',
   'moqType', 'leadTimeDays', 'mixedLoad',
+  // Pallet configuration (null when not measured yet).
+  'palletCases', 'palletPieces',
 ];

@@ -29,7 +29,7 @@ export async function GET() {
 - [Incoterms explained](https://akay.ie/guides/incoterms-exw-dap-cfr/): EXW, FCA, DAP, CIF, FOB, CFR shipping terms
 - [How to buy wholesale](https://akay.ie/guides/how-to-buy-wholesale-spirits-eu/): step-by-step wholesale purchasing, MOQs, pricing, enquiry process
 - [How to send a requirement list](https://akay.ie/guides/requirement-list-format/): uploading a buying list for instant pricing, and what to include so more lines match
-- [Escrow payment explained](https://akay.ie/guides/escrow-payment-wholesale-spirits/): how escrow works on a first wholesale deal, what it costs, what it does not cover, and how it compares to 50/50 and a letter of credit
+- [Escrow payment explained](https://akay.ie/guides/escrow-payment-wholesale-spirits/): how escrow works on a first wholesale deal, what it costs, what it does not cover, and how it compares to a deposit with the balance against the Bill of Lading, and to a letter of credit
 
 ## Trading terms
 

@@ -15,7 +15,7 @@ export function organizationSchema() {
     url: SITE_URL,
     logo: `${SITE_URL}/akay-bird.png`,
     description:
-      'Ireland-based B2B wholesale trading company dealing in spirits, beer, soft drinks and FMCG products by the case and pallet. Duty-paid and export (under-bond) supply across Europe, Asia and the Caribbean.',
+      'Ireland-based B2B wholesale trading company that buys and sells, as principal, spirits, beer, soft drinks and FMCG products by the case and pallet. Duty-paid and export (under-bond) supply across Europe, Asia and the Caribbean.',
     email: COMPANY.salesEmail,
     telephone: tel(COMPANY.officePhone),
     vatID: COMPANY.vatId,

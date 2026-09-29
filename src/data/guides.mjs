@@ -189,8 +189,8 @@ Once you agree on price and terms:
 
 ## Payment Terms
 
-Standard for wholesale: 50% upfront, 50% on shipment.
-For regular buyers: NET 30 (invoice terms).
+Our standard terms: 30% with the order, balance against a copy of the Bill of Lading. Escrow is available on request.
+We do not offer credit terms: every order, first or repeat, is paid on these terms.
 
 ## Shipping & Delivery
 
@@ -458,7 +458,7 @@ Shannon, Loendersloot (Netherlands), Riga (Latvia), and other EU licensed wareho
 2. **Upload your buying list** at https://quote.akay.ie in any format — or click WhatsApp or email it to us
 3. **Get a quote** with pricing, terms, and stock status
 4. **Send a PO** to lock the deal
-5. **Arrange payment** (typically 50% upfront, 50% on shipment — escrow is available on a first deal: https://akay.ie/guides/escrow-payment-wholesale-spirits/)
+5. **Arrange payment** (30% with the order, balance against a copy of the Bill of Lading — or escrow: https://akay.ie/guides/escrow-payment-wholesale-spirits/)
 6. **Receive goods** and clear customs (if required)
 
 Minimum order: EUR 5,000 for spirits; EUR 15,000 for champagne; EUR 10,000 for FMCG; full truck loads (FTL) for beer, wine and soft drinks. Where an offer states its own minimum, that minimum applies.
@@ -485,7 +485,7 @@ Have a question? Ask. We're here to help you build a reliable supply chain.
     // Optional, ISO. A guide with no `updated` prints no date and claims no
     // freshness — never fill one in from the build date.
     updated: '2026-09-17',
-    excerpt: 'How escrow protects both sides of a first wholesale deal — what it covers, what it does not, and when 50/50 or a letter of credit makes more sense.',
+    excerpt: 'How escrow protects both sides of a first wholesale deal — what it covers, what it does not, and when a deposit with the balance against the Bill of Lading, or a letter of credit, makes more sense.',
     content: `
 ## Why payment is the hard part of a first deal
 
@@ -538,9 +538,9 @@ This matters more than the list above, because assuming otherwise is how buyers 
 
 Cheapest and fastest, and the buyer carries all of the risk. Fine with a counterparty you have traded with for years. On a first deal with a new supplier it is simply a bet.
 
-### 50% deposit, 50% on shipment
+### 30% with order, balance against a copy of the Bill of Lading
 
-The wholesale default, including ours. It splits the exposure rather than removing it: the buyer risks the deposit, the seller risks the balance. Sensible once a relationship exists, and quick to arrange.
+Our standard terms. It splits the exposure rather than removing it: the buyer risks the 30% deposit, and pays the balance only once a copy of the Bill of Lading shows the goods have shipped. Quick to arrange, and a smaller deposit than the 50/50 many desks ask for.
 
 ### Letter of credit
 
@@ -555,7 +555,7 @@ Sits between the two: most of the protection of a letter of credit, at a fractio
 A buyer takes a mixed pallet of branded spirits at **€48,000, EXW, T1**, from a supplier they have not traded with before.
 
 - **Advance transfer:** the buyer carries €48,000 of risk for the several days between payment and collection, on trust alone.
-- **50/50:** the buyer risks a €24,000 deposit; the seller risks €24,000 of released stock.
+- **30% with order, balance against copy BL:** the buyer risks a €14,400 deposit, and pays the €33,600 balance only against a copy of the Bill of Lading showing the goods are on their way.
 - **Letter of credit:** strong protection, but several hundred euro in bank fees and a week of paperwork before the pallet moves — on a single pallet, the cost and delay are out of proportion.
 - **Escrow with "release on collection of goods":** the buyer funds €48,000, the seller allocates and loads knowing the money is there, and the funds release when the goods are collected. Cost: a few hundred euro, typically split. Exposure on both sides for the days that matter: effectively nil.
 
@@ -565,7 +565,7 @@ Change one thing — make the trigger **inspection at the bonded warehouse befor
 
 We hold over €50 million of branded spirits in a single location and ship worldwide, and a good share of our buyers are placing a first order with us. **Escrow is available on request**, and we would rather set one up than lose a deal to a payment stand-off.
 
-Our standard terms remain 50% deposit and 50% on shipment, which most repeat buyers use. For a first deal, a large order, or a new jurisdiction, ask for escrow when you ask for the price — not after the pro-forma is issued. We will confirm the agent, the fee, who carries it, and the release trigger in writing before anything is committed.
+Our standard terms are 30% with the order and the balance against a copy of the Bill of Lading. For a first deal, a large order, or a new jurisdiction, ask for escrow when you ask for the price — not after the pro-forma is issued. We will confirm the agent, the fee, who carries it, and the release trigger in writing before anything is committed.
 
 ## Ask before you agree terms
 

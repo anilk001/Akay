@@ -47,6 +47,8 @@ export const TRADING_TERMS = {
   ftlMinimum: 'Beer, wine and soft drinks: full truck loads (FTL) only',
   payment: 'Back-to-back on confirmed orders; no credit terms',
 };
+// Where suppliers send offer lists ("Sell stock to AKAY" on the homepage).
+export const BUYING_EMAIL = 'ak@akay.ie';
 // 1200x630 share card (public/og-akay.png). The bird logo alone is 320x279,
 // which every platform renders as a small square thumbnail; this is what
 // WhatsApp, LinkedIn and Slack previews actually show.
