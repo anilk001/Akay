@@ -114,6 +114,7 @@ node n8n/tests/unmatched-demand-digest.test.js # weekly buying brief from unmatc
   them when it re-bakes the snapshot, the refresh job commits the ledger with
   the snapshot, and the build 301s each to its brand page (else its category)
   so indexed offer URLs never 404. Capped at the 20,000 most recent
+  retirements (`MAX_ENTRIES`)
 - `LOCATION_ALIASES` in `src/data/airtable.mjs` — public names for warehouse
   values (NTG is shown as "Netherlands"), applied on every getOffers() path
 - `src/components/Seo.astro` — the `<head>` for every page: title, canonical,
