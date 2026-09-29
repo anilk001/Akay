@@ -57,6 +57,49 @@
   status = 301
 
 # ---------------------------------------------------------------------------
+# URLs from earlier sites on akay.ie that Google still has indexed.
+#
+# Search Console (2026-09) still shows impressions for these, all of which
+# 404 on the Astro site: /contact-us/ alone had 255 impressions at an average
+# position of 3.4 over 90 days. Send each to the closest live page so the
+# ranking transfers instead of dropping out of the index.
+# ---------------------------------------------------------------------------
+[[redirects]]
+  from = "/contact-us/*"
+  to = "/about/"
+  status = 301
+
+[[redirects]]
+  from = "/contact/*"
+  to = "/about/"
+  status = 301
+
+# The old WordPress install's dated posts (/2023/10/15/hello-world/).
+[[redirects]]
+  from = "/2023/*"
+  to = "/"
+  status = 301
+
+# Category renamed "Other" -> "Other FMCG".
+[[redirects]]
+  from = "/category/other/*"
+  to = "/category/other-fmcg/"
+  status = 301
+
+# Brand pages that carried a "-2" suffix before brand spellings were merged
+# on 2026-09-29. src/lib/redirects.mjs maps the ones the current catalogue can
+# still derive; these two dropped out of it before the change shipped.
+[[redirects]]
+  from = "/brands/dove-wholesale-2/*"
+  to = "/brands/dove-wholesale/"
+  status = 301
+
+[[redirects]]
+  from = "/brands/jw-wholesale-2/*"
+  to = "/brands/jw-wholesale/"
+  status = 301
+
+# ---------------------------------------------------------------------------
 # Caching
 # ---------------------------------------------------------------------------
 

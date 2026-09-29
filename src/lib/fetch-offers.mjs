@@ -4,6 +4,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { getOffers, getSiteStats, statsForSnapshot, FORBIDDEN_FIELDS } from '../data/airtable.mjs';
+import { readLedger, updateLedger, serialiseLedger, LEDGER_URL } from './retired-offers.mjs';
 
 // 'live' is Airtable, 'postgres' is the akay.offers replica (OFFERS_SOURCE).
 // Both are real fetches and both may write. 'snapshot' means neither ran, and
@@ -64,15 +65,41 @@ if (prevCount && offers.length < prevCount * SHRINK_FLOOR && !process.env.FORCE_
 // is the artefact with the widest blast radius and, until this, the only one
 // with no check. Refuse to write rather than fail after the fact.
 const body = JSON.stringify({ ...next, generated }, null, 1);
-const leaks = [
-  ...FORBIDDEN_FIELDS.filter((f) => f.includes(' ') && body.includes(f)),
+const leaksIn = (text) => [
+  ...FORBIDDEN_FIELDS.filter((f) => f.includes(' ') && text.includes(f)),
   ...[/postgres(?:ql)?:\/\/[^\s"'<>]*@/i, /\bpat[A-Za-z0-9]{14}\.[a-f0-9]{64}\b/]
-    .filter((re) => re.test(body)).map((re) => String(re)),
+    .filter((re) => re.test(text)).map((re) => String(re)),
 ];
+const leaks = leaksIn(body);
 if (leaks.length) {
   console.error(`Refusing to write snapshot — it contains: ${leaks.join(', ')}`);
   process.exit(1);
 }
 
+// Offer pages this snapshot no longer builds go into the retired-offers
+// ledger, so the next deploy 301s them to their brand page instead of
+// serving a 404 for URLs Google has indexed (see retired-offers.mjs). Read the
+// outgoing snapshot before it is overwritten. An unchanged catalogue retires
+// nothing, so the ledger stays byte-identical and the refresh job still exits
+// at its git diff.
+let prevSnapshot = null;
+try { prevSnapshot = JSON.parse(readFileSync(out, 'utf8')); } catch { /* first bake */ }
+const prevLedger = readLedger();
+const ledger = updateLedger(prevLedger, prevSnapshot, next, generated);
+
+// The ledger is committed to the same public repo, so it gets the same scan.
+// (If a slug ever turns out to carry something private, fixing the name in
+// Airtable is not enough: delete its entry here too.)
+const ledgerBody = serialiseLedger(ledger);
+const ledgerLeaks = leaksIn(ledgerBody);
+if (ledgerLeaks.length) {
+  console.error(`Refusing to write snapshot — the retired-offers ledger contains: ${ledgerLeaks.join(', ')}`);
+  process.exit(1);
+}
+
 writeFileSync(out, body);
+if (ledgerBody !== serialiseLedger(prevLedger)) {
+  writeFileSync(LEDGER_URL, ledgerBody);
+  console.log(`[retired] ledger now holds ${Object.keys(ledger).length} retired offer URLs`);
+}
 console.log(`[${source}] Wrote ${offers.length} offers + ${delisted.length} delisted + ${Object.keys(stats).length} site stat(s) to ${out} (generated ${generated})`);

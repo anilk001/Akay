@@ -10,9 +10,13 @@
 // order the pages use, so the map only ever points at a page this build made.
 // An old URL that is still a live page under the new rules is never
 // redirected. astro.config.mjs writes the result to dist/_redirects.
+//
+// Offers that have left the catalogue altogether are appended from the
+// retired-offers ledger (see retired-offers.mjs): they 301 to their brand page.
 import { withSlugs, legacySlug, brandPages, legacyBrandSlugs } from './slug.mjs';
+import { retiredRedirects } from './retired-offers.mjs';
 
-export function buildRedirects({ offers = [], delisted = [] } = {}) {
+export function buildRedirects({ offers = [], delisted = [] } = {}, retiredLedger = {}) {
   const combined = [...offers, ...delisted];
   const current = withSlugs(combined);
   const legacy = withSlugs(combined, legacySlug);
@@ -37,19 +41,27 @@ export function buildRedirects({ offers = [], delisted = [] } = {}) {
     if (from !== to && !brandPaths.has(from)) rules.set(from, to);
   }
 
-  return [...rules.entries()].map(([from, to]) => ({ from, to }));
+  const out = [...rules.entries()].map(([from, to]) => ({ from, to }));
+  // Ledger entries are URLs Google found in the sitemap, which always carries
+  // the trailing slash, so they need no bare-path twin: at ~20,000 entries
+  // that halves the file Netlify has to read.
+  for (const rule of retiredRedirects(retiredLedger, { offers, delisted })) {
+    if (!rules.has(rule.from)) out.push({ ...rule, bare: false });
+  }
+  return out;
 }
 
 /** Netlify `_redirects` text: one "from to 301" line per rule. */
 export function redirectsFile(rules) {
   const header = [
     '# Generated at build time by src/lib/redirects.mjs — do not edit by hand.',
-    '# Old offer and brand URLs retired by the 2026-09-29 slug changes.',
+    '# Old offer and brand URLs retired by the 2026-09-29 slug changes, then',
+    '# offers that left the catalogue (src/data/retired-offers.json) -> brand page.',
   ];
   // Netlify matches paths with and without the trailing slash separately.
-  const lines = rules.flatMap(({ from, to }) => [
+  const lines = rules.flatMap(({ from, to, bare = true }) => [
     `${from} ${to} 301`,
-    `${from.replace(/\/$/, '')} ${to} 301`,
+    ...(bare ? [`${from.replace(/\/$/, '')} ${to} 301`] : []),
   ]);
   return `${[...header, ...lines].join('\n')}\n`;
 }
