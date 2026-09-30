@@ -12,7 +12,7 @@ import { readFileSync } from 'node:fs';
 import snapshot from './offers-snapshot.json' with { type: 'json' };
 import { parseVolumeMl } from '../lib/normalise.mjs';
 import { tradeTermsView } from '../lib/trade-terms.mjs';
-import { brandSpellings, withCanonicalBrands } from '../lib/brand.mjs';
+import { brandSpellings, withCanonicalBrands, cleanBrand } from '../lib/brand.mjs';
 
 const TOKEN = process.env.AIRTABLE_TOKEN || process.env.Airtable_Pat || '';
 const BASE = process.env.AIRTABLE_BASE_ID || 'appaDSdZkAE9PGkjT';
@@ -492,8 +492,22 @@ function packSize(detail = '', spec = '') {
 // "Nivea Roll On 50ml — Bright & Dry, Silk Touch, Pearl" -> name + variants.
 // Only splits when the tail really is a list (two or more commas), so real
 // product names with a single dash stay intact.
-function splitVariants(rawName = '', variantField = '') {
-  const name = String(rawName).trim();
+//
+// A trailing label left over from the ingestion step ("... coded 2380 crt
+// Price:", "Jameson Original (12 × 35 CL):") is removed first: the price that
+// followed it was stripped out upstream, and a name ending in a colon reads as
+// a broken feed.
+export function cleanProductName(rawName = '') {
+  let name = String(rawName ?? '').trim();
+  for (let prev = null; prev !== name;) {
+    prev = name;
+    name = name.replace(/(?:[\s,;]*\bprices?)?\s*:+\s*$/i, '').replace(/[\s,;]+$/, '').trim();
+  }
+  return name;
+}
+
+export function splitVariants(rawName = '', variantField = '') {
+  const name = cleanProductName(rawName);
   if (variantField) return { name, variants: String(variantField).trim() };
   const idx = name.search(/\s+[—–-]\s+/);
   if (idx > 0) {
@@ -537,7 +551,7 @@ function normalize(fields, recordId = null) {
     id: recordId,
     name,
     variants,
-    brand: fields['Brand'] || '',
+    brand: cleanBrand(fields['Brand']),
     category: fields['Category'] || 'Other',
     spec: fields['Public Spec'] || '',
     currency,
@@ -692,6 +706,7 @@ function renormalizeSnapshotOffer(o, index, idPrefix = 'snapshot') {
     id: o.id || `${idPrefix}-${index}`,
     name,
     variants,
+    brand: cleanBrand(o.brand),
     amount: headline ? headline.amount : o.amount,
     unitAmount: perUnit ? perUnit.amount
       : headline && /case|pack/.test(headline.basis)

@@ -1,6 +1,7 @@
 ---
 import { getOffers } from '../../data/airtable.mjs';
 import { withSlugs } from '../../lib/slug.mjs';
+import { brandCount } from '../../lib/brand.mjs';
 import { categoryItemListSchema, organizationSchema, crumbs } from '../../lib/schema.mjs';
 import SiteHeader from '../../components/SiteHeader.astro';
 import SiteFooter from '../../components/SiteFooter.astro';
@@ -36,7 +37,7 @@ const categorySlug = category.toLowerCase().replace(/\s+/g, '-');
 // Distinct facts per category page — brand count, stock count and the duty
 // tiers actually present — so the ~10 category pages don't read as one
 // boilerplate template repeated ten times.
-const brandNames = Array.from(new Set(categoryOffers.map((o) => o.brand).filter(Boolean))).sort();
+const nBrands = brandCount(categoryOffers);
 // The description names the brands with the most lines, not the first four
 // alphabetically — "100 PIPERS, 1615, 1699 and 1792" told a searcher nothing
 // about what the category carries. Ties break alphabetically so the text is
@@ -60,7 +61,7 @@ function listPhrase(items, max = 3) {
 const pageTitle = `Wholesale ${category} — ${categoryOffers.length} Live Trade Offers | AKAY Trade`;
 const pageDesc = [
   `${categoryOffers.length} wholesale ${category.toLowerCase()} offers from AKAY Trade, Ireland`,
-  brandNames.length ? `${brandNames.length} brands including ${listPhrase(topBrands, 4)}` : null,
+  nBrands ? `${nBrands} brands including ${listPhrase(topBrands, 4)}` : null,
   tiers.length ? `${listPhrase(tiers)} duty status` : null,
   'by the case and pallet, with live trade prices and pack specs.',
 ].filter(Boolean).join(' · ').slice(0, 300);
@@ -76,7 +77,7 @@ const siblingCategories = Array.from(new Set(offers.map((o) => o.category)))
 // between them, which silently produced "491brands" in the rendered copy.
 const introLine = [
   `${categoryOffers.length} live ${category.toLowerCase()} ${categoryOffers.length === 1 ? 'line' : 'lines'} from AKAY Trade`,
-  brandNames.length ? `across ${brandNames.length} ${brandNames.length === 1 ? 'brand' : 'brands'}` : null,
+  nBrands ? `across ${nBrands} ${nBrands === 1 ? 'brand' : 'brands'}` : null,
   'priced by the case and pallet for trade buyers.',
 ].filter(Boolean).join(', ') + (inStockCount > 0
   ? ` ${inStockCount} ${inStockCount === 1 ? 'line is' : 'lines are'} in stock now; the rest are priced on enquiry.`
@@ -298,7 +299,7 @@ const breadcrumbData = crumbs([
       <h1>Wholesale {category} Offers</h1>
       <p>{introLine}</p>
       <p>
-        Prices are indicative and move with the market. Upload your buying list in
+        Live trade prices, subject to stock and confirmation — same price for everyone. Upload your buying list in
         any format at <a href={quoteUrl('excel')} rel="nofollow">{QUOTE_URL.replace('https://', '')}</a> and get it
         back priced on the spot — see
         <a href="/guides/requirement-list-format/">how to send a requirement list</a>.

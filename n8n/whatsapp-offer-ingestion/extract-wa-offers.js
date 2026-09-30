@@ -361,8 +361,13 @@ function stripLabel(line) {
  * else is left in the name, because a name with too much in it still matches on
  * a second look, whereas a name with a word chopped off does not.
  */
+//
+// The count may be spelled out ("two loads Jameson Original 70 cl") and the unit
+// may be a load or truckload. Before 2026-09-30 that shape slipped through, so
+// "two" became the Brand and the name kept "two loads". A spelled-out number
+// still needs a unit word after it: "Two Fingers Tequila" keeps its name.
 function splitQuantity(name) {
-  const QTY = /^(?:ftl|full\s*truck(?:load)?|\d[\d,. ]*\s*(?:cs|cases?|ctns?|cartons?|btls?|bottles?|pcs|pieces?|pal|pallets?|units?))\b/i;
+  const QTY = /^(?:ftl|full\s*truck(?:\s*load)?|(?:\d[\d,. ]*|(?:one|two|three|four|five|six|seven|eight|nine|ten)\s)\s*(?:cs|cases?|ctns?|cartons?|btls?|bottles?|pcs|pieces?|pal|pallets?|units?|(?:full\s*)?(?:truck\s*)?loads?))\b/i;
   const TERMS = /^(?:exw|ex\s*works?|fca|fob|cfr|cnf|cif|dap|ddp)\b/i;
 
   const parts = String(name).split(/\s+[–—-]\s+/);
@@ -401,12 +406,23 @@ function splitQuantity(name) {
   return { name: head, qty: qty.join(' ') };
 }
 
+// Also drops the label the price used to sit behind. "Ballantines 1l x 6, RF,
+// T2, coded 2380 crt Price: EUR 12.40" otherwise leaves "... crt Price:" as the
+// product name, and "Jameson Original (12 × 35 CL): 5,20 €" leaves a trailing
+// colon; both reached the public catalogue that way.
 function stripPrices(line) {
-  return line.replace(new RegExp(PRICE_RE.source, 'gi'), ' ')
-    .replace(/\s*[-–—@|]+\s*$/, '')
-    .replace(/^\s*[-–—@|]+\s*/, '')
+  let out = String(line).replace(new RegExp(PRICE_RE.source, 'gi'), ' ')
     .replace(/\s+/g, ' ')
     .trim();
+  for (let prev = null; prev !== out;) {
+    prev = out;
+    out = out
+      .replace(/\s*[-–—@|]+\s*$/, '')
+      .replace(/(?:[\s,;]*\bprices?)?\s*:+\s*$/i, '')
+      .replace(/[\s,;]+$/, '')
+      .trim();
+  }
+  return out.replace(/^\s*[-–—@|]+\s*/, '').trim();
 }
 
 /**

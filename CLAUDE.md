@@ -89,6 +89,7 @@ npm run sync-offers  # refresh offers-snapshot.json from Airtable (needs token)
 npm test             # normaliser + search engine + n8n node tests
 node n8n/tests/buy-side-guard.test.js     # WhatsApp classifier tests
 node n8n/tests/split-quantity.test.js
+node n8n/tests/extract-wa-offers.test.js   # WhatsApp product-name clean-up (runs the node source)
 node n8n/tests/trade-terms.test.js        # MOQ / lead-time ingestion parser
 node n8n/tests/trade-terms-digest.test.js
 node n8n/tests/instant-quote-intake.test.js   # Instant Quote intake payload rules

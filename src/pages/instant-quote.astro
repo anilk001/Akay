@@ -11,6 +11,7 @@ import SiteHeader from '../components/SiteHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import Seo from '../components/Seo.astro';
 import { quoteUrl, SITE_URL } from '../lib/site.mjs';
+import { brandCount as countBrands } from '../lib/brand.mjs';
 import { QUOTE_VIDEO, QUOTE_VIDEO_POSTER, QUOTE_LANDING_PATH } from '../lib/quote-video.mjs';
 import { WA_LINK, WA_DISPLAY } from '../lib/whatsapp.mjs';
 
@@ -21,7 +22,7 @@ const { stats: siteStats } = await getSiteStats();
 // renders from, so a refresh moves the page and the catalogue together. The
 // only hand-written number is the spirits holding below.
 const offerCount = offers.length;
-const brandCount = new Set(offers.map((o) => o.brand).filter(Boolean)).size;
+const brandCount = countBrands(offers);
 const spiritsCount = offers.filter((o) => o.category === 'Spirits').length;
 const fmt = (n) => n.toLocaleString('en-IE');
 

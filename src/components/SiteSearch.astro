@@ -18,6 +18,10 @@ const { compact = false, value = '' } = Astro.props;
   .site-search svg{position:absolute;left:12px;color:var(--muted,#767E72);pointer-events:none}
   .site-search input{flex:1;min-width:0;height:40px;border:1px solid var(--line,#E4E0D4);background:var(--card,#fff);color:var(--ink,#17140F);
     border-radius:10px;padding:0 12px 0 36px;font-size:14px;font-family:var(--sans,system-ui,sans-serif)}
+  /* No browser-drawn clear cross: it only appears in Chrome/Safari, and on the
+     search page it doubled up with the page's own clear button. */
+  .site-search input::-webkit-search-cancel-button,
+  .site-search input::-webkit-search-decoration{-webkit-appearance:none;appearance:none;display:none}
   .site-search input:focus{outline:2px solid var(--brass-2,var(--brass,#B4231F));outline-offset:1px;border-color:transparent}
   .site-search button{height:40px;padding:0 14px;border:1px solid transparent;border-radius:10px;background:var(--forest,#0E7A3B);color:#fff;
     font-weight:600;font-size:13px;cursor:pointer;white-space:nowrap;font-family:var(--sans,system-ui,sans-serif)}
