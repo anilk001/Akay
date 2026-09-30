@@ -3,6 +3,7 @@ import { writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { getOffers } from './src/data/airtable.mjs';
 import { buildRedirects, redirectsFile } from './src/lib/redirects.mjs';
+import { readLedger } from './src/lib/retired-offers.mjs';
 
 // Writes dist/_redirects: 301s from URLs the slug rules retired to the pages
 // that replaced them (see src/lib/redirects.mjs). Netlify reads _redirects
@@ -11,7 +12,7 @@ const legacyRedirects = {
   name: 'akay-legacy-redirects',
   hooks: {
     'astro:build:done': async ({ dir }) => {
-      const rules = buildRedirects(await getOffers());
+      const rules = buildRedirects(await getOffers(), readLedger());
       await writeFile(new URL('_redirects', dir), redirectsFile(rules));
       console.log(`[redirects] wrote ${rules.length} retired-URL redirects to ${fileURLToPath(new URL('_redirects', dir))}`);
     },

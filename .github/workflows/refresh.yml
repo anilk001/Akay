@@ -220,7 +220,10 @@ jobs:
           env -u AIRTABLE_TOKEN -u OFFERS_SOURCE -u DATABASE_URL npm test 2>&1 | tee -a "$LOG"
           env -u AIRTABLE_TOKEN -u OFFERS_SOURCE -u DATABASE_URL npm run build 2>&1 | tee -a "$LOG"   # ends in scripts/check-public-safety.mjs
 
-          git add src/data/offers-snapshot.json
+          # The retired-offers ledger moves only when the snapshot does (offer
+          # pages that left the catalogue), so it rides in the same commit and
+          # the next deploy 301s those URLs to their brand page.
+          git add src/data/offers-snapshot.json src/data/retired-offers.json
           git commit -m "chore: refresh catalogue snapshot from Airtable"
 
           # The verify step took minutes; a pull request may have merged into

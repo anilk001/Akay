@@ -37,6 +37,15 @@ const categorySlug = category.toLowerCase().replace(/\s+/g, '-');
 // tiers actually present — so the ~10 category pages don't read as one
 // boilerplate template repeated ten times.
 const brandNames = Array.from(new Set(categoryOffers.map((o) => o.brand).filter(Boolean))).sort();
+// The description names the brands with the most lines, not the first four
+// alphabetically — "100 PIPERS, 1615, 1699 and 1792" told a searcher nothing
+// about what the category carries. Ties break alphabetically so the text is
+// stable between refreshes that don't change the counts.
+const brandCounts = new Map();
+for (const o of categoryOffers) if (o.brand) brandCounts.set(o.brand, (brandCounts.get(o.brand) || 0) + 1);
+const topBrands = [...brandCounts.entries()]
+  .sort(([a, ca], [b, cb]) => cb - ca || a.localeCompare(b))
+  .map(([b]) => b);
 const inStockCount = categoryOffers.filter((o) => o.stock === 'in').length;
 const tiers = Array.from(new Set(categoryOffers.map((o) => o.tier).filter(Boolean))).sort();
 
@@ -51,7 +60,7 @@ function listPhrase(items, max = 3) {
 const pageTitle = `Wholesale ${category} — ${categoryOffers.length} Live Trade Offers | AKAY Trade`;
 const pageDesc = [
   `${categoryOffers.length} wholesale ${category.toLowerCase()} offers from AKAY Trade, Ireland`,
-  brandNames.length ? `${brandNames.length} brands including ${listPhrase(brandNames, 4)}` : null,
+  brandNames.length ? `${brandNames.length} brands including ${listPhrase(topBrands, 4)}` : null,
   tiers.length ? `${listPhrase(tiers)} duty status` : null,
   'by the case and pallet, with live trade prices and pack specs.',
 ].filter(Boolean).join(' · ').slice(0, 300);

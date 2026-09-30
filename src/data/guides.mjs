@@ -3,7 +3,7 @@ export const guides = [
     slug: 't1-vs-t2-duty-status',
     updated: '2026-09-29',
     title: 'T1 vs T2: Duty Status Explained for Beverage Trading',
-    excerpt: 'Understand the difference between under-bond (T1) and duty-paid (T2) spirits and beer.',
+    excerpt: 'T1 vs T2 in the drinks trade: under-bond (T1) goods have no excise paid, duty-paid (T2) goods do. Who can buy each, the typical price gap, and how to check you qualify for T1.',
     content: `
 ## What is T1 (Under-Bond)?
 
@@ -47,7 +47,7 @@ AKAY can advise on T1 eligibility for your jurisdiction. Enquire with full busin
   {
     slug: 'incoterms-exw-dap-cfr',
     title: 'Incoterms in Wholesale Drinks: EXW, DAP, CFR, FOB, FCA, CIF Explained',
-    excerpt: 'Understand shipping terms and where responsibility passes from seller to buyer.',
+    excerpt: 'EXW, FCA, CFR, CIF, DAP and DDP explained for wholesale drinks buyers: where risk and cost pass from seller to buyer under each Incoterm, and which suits your order.',
     content: `
 ## What are Incoterms?
 
