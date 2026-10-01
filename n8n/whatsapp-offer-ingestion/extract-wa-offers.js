@@ -71,7 +71,26 @@ const PRICE_RE = new RegExp(
 // 3,30 eur" and "pallet price – 3,55 eur/btl". Neither fragment states a size,
 // so neither is taken as a product line, and the message correctly falls
 // through to single-offer mode where the two prices are then flagged.
-const PRODUCT_SIGNAL = /\d+\s*(?:ml|cl|dl|ltr|l|cc|g|gr|gm|kg)\b|\d+\s*[x×\/]\s*\d+/i;
+//
+// "gram"/"grams" is spelled out as often as it is abbreviated on WhatsApp. On
+// 2026-10-01 "Davidoff 90 gram" failed this test, so no line was product-shaped
+// and the greeting "Hi Anil ," became the product name.
+const PRODUCT_SIGNAL = /\d+\s*(?:ml|cl|dl|ltr|litres?|liters?|l|cc|g|gr|gm|grams?|grm|kg)\b|\d+\s*[x×\/]\s*\d+/i;
+
+// A salutation on a line of its own: "Hi Anil ,", "Hello team!", "Good morning".
+// Never a product. Limited to a greeting plus at most three words and no digits,
+// so a brand that happens to start with "Hi" and states a size still reads as one.
+const GREETING = /^(?:hi|hello|hey|hiya|dear|greetings|good\s+(?:morning|afternoon|evening|day)|shalom|salam|ciao|hola)\b(?:[\s,]+[A-Za-z][A-Za-z'.-]*){0,3}[\s,.!:;-]*$/i;
+
+// An offer announced in a sentence: "Can offer Davidoff 90 gram ,with ...".
+// The words in front of the product are dropped from the name.
+const ANNOUNCE = /^(?:(?:we|i)\s+)?(?:can\s+offer|are\s+offering|offering|offer|have|can\s+supply|supply)\b\s*:?\s*/i;
+
+// Prose that follows the product on the same line once the size has been
+// stated: ", with English Arabic text", ", have 3 loads monthly", ", let me know".
+// Cut there so the sentence does not become the product name. Only these
+// words: ", t2" and ", RF coded" after a size are product attributes and stay.
+const PROSE_TAIL = /\s*,\s*(?=(?:with|have|has|let|please|pls|kindly|can|could|we|i|if|ready)\b)/i;
 
 // Lines that are never a product, however they are shaped.
 //
@@ -130,20 +149,52 @@ const lines = text.split('\n').map((l) => l.trim()).filter(Boolean);
 const wide = messageTerms(text);
 
 // ── Which lines are priced product lines ────────────────────────────────────
+//
+// A brand stated once as a heading covers the priced lines beneath it:
+//
+//   WILLIAM PEEL
+//   70cl - EUR 2.70/btl
+//   1L   - EUR 3.75/btl
+//
+// Each priced line here states a size and a price and nothing else, so the text
+// in front of the price — normally the product — is just "70cl". Read line by
+// line that produced four catalogue rows named "70cl" and "1L" (Java
+// Distribution, 22 Sep 2026). The heading is therefore carried down, but ONLY
+// onto a head that names no product of its own, so a line that does name one
+// keeps exactly what the supplier wrote.
 const priced = [];
 const unpriceable = [];
+const unnamed = [];
+let heading = '';
 for (const line of lines) {
   const hits = findPrices(line);
-  if (!hits.length) continue;
+  if (!hits.length) {
+    if (isHeading(line)) heading = line.trim();
+    continue;
+  }
   const head = line.slice(0, hits[0].start).trim();
-  if (PRODUCT_SIGNAL.test(head) && !BOILERPLATE.test(head)) priced.push({ line, head, hits });
-  else if (head) unpriceable.push({ line, head });
+  if (!PRODUCT_SIGNAL.test(head) || BOILERPLATE.test(head)) {
+    if (head) unpriceable.push({ line, head });
+    continue;
+  }
+  const named = heading && isSizeOnly(head) ? `${heading} ${head}` : head;
+  // Still nothing but a size: no heading stood above the line, so the message
+  // never says what the goods are. Reported rather than turned into a row —
+  // an offer called "70cl" matches no Product and reads as junk in the
+  // catalogue, whereas an exception puts the supplier's own words in front of
+  // a person who can name it.
+  if (isSizeOnly(named)) unnamed.push({ line, head });
+  else priced.push({ line, head: named, hits });
 }
 
 const rows = [];
 const exceptions = [];
 
-if (priced.length >= 2) {
+// The unnamed lines count towards the mode: they ARE priced product lines,
+// just ones no heading could name. Without them a message that is nothing but
+// bare sizes falls into single-offer mode and is reported as "more than one
+// price" instead of as the four products it is.
+if (priced.length + unnamed.length >= 2) {
   // ── List mode ─────────────────────────────────────────────────────────────
 
   // A priced line that states no size is REPORTED, not dropped. One real
@@ -154,6 +205,11 @@ if (priced.length >= 2) {
   for (const u of unpriceable) {
     exceptions.push({ productName: u.head, exceptionReason:
       `priced line states no pack size or volume, so it cannot be matched to a product ("${u.line}")` });
+  }
+
+  for (const u of unnamed) {
+    exceptions.push({ productName: u.head, exceptionReason:
+      `priced line states a size but no product, and no heading above it names one ("${u.line}")` });
   }
 
   for (const p of priced) {
@@ -299,6 +355,45 @@ function looksLikeRange(line, hits) {
 }
 
 /**
+ * A head that states a size and nothing else: "70cl", "1L", "6x70cl 40%".
+ *
+ * A size is an attribute OF a product, never its name, so on its own it can
+ * neither identify goods nor match a Product record. Sizes, pack notations and
+ * ABV are removed and what is left is asked for two letters in a row, which
+ * "70cl" has only because of its unit.
+ */
+function isSizeOnly(head) {
+  const rest = String(head)
+    .replace(/\d+\s*[x×\/]\s*\d+(?:[.,]\d+)?\s*(?:ml|cl|dl|ltr|lt|litres?|liters?|l|cc|g|gr|gm|grams?|grm|kg)?\b/gi, ' ')
+    .replace(/\d+(?:[.,]\d+)?\s*(?:ml|cl|dl|ltr|lt|litres?|liters?|l|cc|g|gr|gm|grams?|grm|kg)\b/gi, ' ')
+    .replace(/\d+(?:[.,]\d+)?\s*%/g, ' ')
+    .replace(/[^A-Za-z]+/g, ' ');
+  return !/[A-Za-z]{2}/.test(rest);
+}
+
+/**
+ * An unpriced line that heads the priced lines beneath it — a brand stated
+ * once, the way a supplier writes a two-brand spot offer.
+ *
+ * Deliberately narrow, because the heading is only ever used to rescue a line
+ * that names nothing at all. A banner ("SPOT OFFER - EXW LUXEMBOURG"), a terms
+ * line and a closing sentence all carry a TERM_LABEL word and are refused, so
+ * the last thing standing above a bare "70cl - EUR 2.70" is a product name or
+ * nothing.
+ */
+function isHeading(line) {
+  const l = String(line).trim();
+  // A greeting is not a brand: "Hi Anil," above "70cl - EUR 2.70" would
+  // otherwise name the goods "Hi Anil, 70cl".
+  if (!l || BOILERPLATE.test(l) || GREETING.test(l) || ATTRIBUTE_LINE.test(l) || TERM_LABEL.test(l)) return false;
+  if (/\?\s*$/.test(l)) return false;
+  if (!/[A-Za-z]{3}/.test(l)) return false;
+  // A heading names goods; a sentence describes them. Eight words is longer
+  // than any brand in the corpus and shorter than the prose around it.
+  return l.split(/\s+/).length <= 8;
+}
+
+/**
  * The product a single-offer message is about, tried in descending order of
  * how much the message itself tells us. Returns '' rather than a guess when
  * nothing qualifies — a made-up product name creates a junk catalogue entry,
@@ -309,25 +404,33 @@ function findProductName(allLines, priceLines) {
   // work for 700ml?" states a price and a size and would otherwise be read as a
   // product — it is a counter-offer from a buyer's side of a conversation.
   const candidates = allLines.filter((l) =>
-    !BOILERPLATE.test(l) && !ATTRIBUTE_LINE.test(l) && !/\?\s*$/.test(l));
+    !BOILERPLATE.test(l) && !GREETING.test(l) && !ATTRIBUTE_LINE.test(l) && !/\?\s*$/.test(l));
 
   // 1. A line stating a size — the strongest signal, and it survives being the
   //    same line as the price ("Nescafé special filtre 200g @6.20€").
-  for (const l of candidates) {
-    if (!PRODUCT_SIGNAL.test(l)) continue;
-    const stripped = stripLabel(stripPrices(l));
-    if (stripped && PRODUCT_SIGNAL.test(stripped)) return stripped;
+  //    A line stating ONLY a size names nothing: "70cl – €2.70/btl" written
+  //    under a "WILLIAM PEEL" heading is that heading's goods, so the nearest
+  //    heading above it supplies the name and the size is kept beside it.
+  let above = '';
+  for (const l of allLines) {
+    if (!priceLines.includes(l) && isHeading(l)) above = l.trim();
+    if (!candidates.includes(l) || !PRODUCT_SIGNAL.test(l)) continue;
+    const stripped = clipProse(stripLabel(stripPrices(l)).replace(ANNOUNCE, ''));
+    if (!stripped || !PRODUCT_SIGNAL.test(stripped)) continue;
+    if (!isSizeOnly(stripped)) return stripped;
+    if (above) return `${above} ${stripped}`;
   }
 
   // 2. An explicit announcement.
   for (const l of candidates) {
-    const m = l.match(/\b(?:we are offering|we offer|offering|we have|offer(?:ing)? for)\b\s*:?\s*(.+)$/i);
+    const m = l.match(/\b(?:we are offering|we offer|can offer|offering|we have|offer(?:ing)? for)\b\s*:?\s*(.+)$/i);
     if (m && m[1].trim().length > 2) return stripPrices(m[1]);
   }
 
-  // 3. The first line that reads like a name at all. Weak, but harmless: 04
-  //    matches on Brand + Name + Volume + Bond, so a wrong name simply fails to
-  //    match a Product and the offer is routed to review rather than created.
+  // 3. The first line that reads like a name at all. Weak, and NOT harmless:
+  //    a name that matches no Product creates a new Product (Needs Review) and
+  //    the offer is still created Live. That is how "Hi Anil ," became an offer
+  //    on 2026-10-01, so greetings are filtered out of `candidates` above.
   for (const l of candidates) {
     if (priceLines.includes(l)) continue;
     if (!/[A-Za-z]{3}/.test(l)) continue;
@@ -337,6 +440,16 @@ function findProductName(allLines, priceLines) {
   }
 
   return '';
+}
+
+/** Cut prose that follows the size on the same line (see PROSE_TAIL). */
+function clipProse(name) {
+  const size = String(name).match(PRODUCT_SIGNAL);
+  if (!size) return String(name).trim();
+  const after = size.index + size[0].length;
+  const rest = name.slice(after);
+  const cut = rest.search(PROSE_TAIL);
+  return (cut < 0 ? name : name.slice(0, after + cut)).replace(/[\s,;-]+$/, '').trim();
 }
 
 /**
@@ -361,12 +474,11 @@ function stripLabel(line) {
  * else is left in the name, because a name with too much in it still matches on
  * a second look, whereas a name with a word chopped off does not.
  */
-//
-// The count may be spelled out ("two loads Jameson Original 70 cl") and the unit
-// may be a load or truckload. Before 2026-09-30 that shape slipped through, so
-// "two" became the Brand and the name kept "two loads". A spelled-out number
-// still needs a unit word after it: "Two Fingers Tequila" keeps its name.
 function splitQuantity(name) {
+  // The count may be spelled out ("two loads Jameson Original 70 cl") and the unit
+  // may be a load or truckload. Before 2026-09-30 that shape slipped through, so
+  // "two" became the Brand and the name kept "two loads". A spelled-out number
+  // still needs a unit word after it: "Two Fingers Tequila" keeps its name.
   const QTY = /^(?:ftl|full\s*truck(?:\s*load)?|(?:\d[\d,. ]*|(?:one|two|three|four|five|six|seven|eight|nine|ten)\s)\s*(?:cs|cases?|ctns?|cartons?|btls?|bottles?|pcs|pieces?|pal|pallets?|units?|(?:full\s*)?(?:truck\s*)?loads?))\b/i;
   const TERMS = /^(?:exw|ex\s*works?|fca|fob|cfr|cnf|cif|dap|ddp)\b/i;
 
@@ -591,3 +703,4 @@ function clip(value, stop) {
 }
 
 function escapeRe(s) { return String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+

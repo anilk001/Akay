@@ -16,7 +16,7 @@ between 2026-07-29 and 2026-08-27. A draft in n8n is invisible until published.
 
 | File | Workflow | Node | State |
 |---|---|---|---|
-| `whatsapp-offer-ingestion/extract-wa-offers.js` | `Bn6Irz2Yx7MTRnKu` | Extract WA Offers | full source, **published 2026-08-30** |
+| `whatsapp-offer-ingestion/extract-wa-offers.js` | `RTbzbswbiF7JgwOb` (self-hosted, n8n.akay.ie) | Extract WA Offers | full source, **published 2026-10-01** (version `5bfcd769`) |
 | `whatsapp-filter-layer/classify-message.buy-side-guard.js` | `DO2ltjkISp2YDNnc` | Classify Message | patch only, **published 2026-08-30** |
 | `whatsapp-offer-broadcast/plan-broadcast.js` | `BeGfFpgxmI7hdCTI` | Plan Broadcast | full source, **published 2026-09-04** |
 | `whatsapp-offer-broadcast/build-results.js` | `BeGfFpgxmI7hdCTI` | Build Results | full source, **published 2026-09-04** |
@@ -48,6 +48,19 @@ real but is not the buying list from the quote tool.
 `classify-message` is a patch rather than full source
 because the node could not be exported verbatim at the time; replace it with the
 full source when convenient rather than transcribing it by hand.
+
+## Which instance runs WhatsApp ingestion
+
+The live **WhatsApp Offer Ingestion — Akay** is `RTbzbswbiF7JgwOb` on the
+self-hosted instance (n8n.akay.ie). The n8n cloud workflow of the same name,
+`Bn6Irz2Yx7MTRnKu`, is inactive and stale — editing it changes nothing.
+
+Before 2026-10-01 this mirror and the live node had drifted both ways: the
+node carried the heading carry-down ("WILLIAM PEEL" over bare "70cl" lines,
+22 Sep) that was never copied here, and this file carried the 30 Sep fixes
+(spelled-out "two loads", trailing "Price:" label) that were never pasted in.
+Both are now in both places. Pull the node's code before editing this file,
+not the other way round.
 
 ## One known difference from the deployed node
 
