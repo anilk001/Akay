@@ -57,10 +57,21 @@ export function withCanonicalBrands(offers, canon = brandSpellings(offers)) {
 // own; digits are left alone ("1664" is a beer).
 const NUMBER_WORDS = /^(?:zero|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|a|an)$/i;
 
-/** The brand to publish: trimmed, and '' for an obviously bogus value. */
-export function cleanBrand(brand) {
+/**
+ * The brand to publish: trimmed, and '' for an obviously bogus value.
+ *
+ * Pass the product name when there is one. A digits-only brand is a quantity
+ * when the name opens with that number used as a multiplier: ingestion read
+ * "27750 x Bacardi Carta Blanca ..." (2026-10-01) as brand "27750". A number
+ * then "x" then a word is a count; "1664 Blanc ..." and "1664 x 24 ..." (a
+ * pack) keep their brand.
+ */
+export function cleanBrand(brand, name = '') {
   const b = String(brand ?? '').trim();
-  return NUMBER_WORDS.test(b) ? '' : b;
+  if (NUMBER_WORDS.test(b)) return '';
+  if (/^\d[\d,.]*$/.test(b) && String(name ?? '').trim().startsWith(b)
+      && /^\s*[x×*]\s+\p{L}/iu.test(String(name).trim().slice(b.length))) return '';
+  return b;
 }
 
 /**

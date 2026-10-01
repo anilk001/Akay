@@ -93,6 +93,12 @@ t('a spelled-out number is not a brand; digits and real names are', () => {
   assert.equal(cleanBrand('1664'), '1664');
   assert.equal(cleanBrand('Two Fingers'), 'Two Fingers');
   assert.equal(cleanBrand(' Jameson '), 'Jameson');
+  // A digits-only brand that the name uses as a count, not a brand.
+  assert.equal(cleanBrand('27750', '27750 x Bacardi Carta Blanca 0,7l'), '');
+  assert.equal(cleanBrand('1.200', '1.200 × Jameson 70cl'), '');
+  assert.equal(cleanBrand('1664', '1664 Blanc 24x33cl'), '1664');
+  assert.equal(cleanBrand('1664', '1664 x 24 Blanc 33cl'), '1664');
+  assert.equal(cleanBrand('1664'), '1664');
   assert.equal(brandCount([{ brand: 'two' }, { brand: 'Jameson' }]), 1);
 });
 

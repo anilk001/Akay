@@ -72,5 +72,22 @@ check('a leading numeral brand stays ("1000 Islands")',
   names('1000 Islands Vodka 70cl EUR 4.10'),
   ['1000 Islands Vodka 70cl']);
 
+// ---- a bare multiplier count in front of the product (2026-10-01) -----------
+check('"27750 x" in front of the product is a quantity, not the brand',
+  names('27750 x Bacardi Carta Blanca Halloween Edition Rum 37,5% 0,7l Flasche . 700ml EUR 4.71'),
+  ['Bacardi Carta Blanca Halloween Edition Rum 37,5% 0,7l Flasche . 700ml']);
+
+check('"1.200 × " with a thousands separator is a quantity',
+  names('1.200 × Jameson Original 70cl EUR 13.20'),
+  ['Jameson Original 70cl']);
+
+check('a leading pack ("6 x 70cl") stays in the name',
+  names('6 x 70cl Jameson Original 40% EUR 13.20'),
+  ['6 x 70cl Jameson Original 40%']);
+
+check('a leading pack with no spaces ("6x1L") stays in the name',
+  names('6x1L Martini Bianco EUR 5.60'),
+  ['6x1L Martini Bianco']);
+
 console.log(`\n${pass} passed, ${fail} failed`);
 if (fail) process.exit(1);

@@ -551,7 +551,7 @@ function normalize(fields, recordId = null) {
     id: recordId,
     name,
     variants,
-    brand: cleanBrand(fields['Brand']),
+    brand: cleanBrand(fields['Brand'], name),
     category: fields['Category'] || 'Other',
     spec: fields['Public Spec'] || '',
     currency,
@@ -706,7 +706,7 @@ function renormalizeSnapshotOffer(o, index, idPrefix = 'snapshot') {
     id: o.id || `${idPrefix}-${index}`,
     name,
     variants,
-    brand: cleanBrand(o.brand),
+    brand: cleanBrand(o.brand, name),
     amount: headline ? headline.amount : o.amount,
     unitAmount: perUnit ? perUnit.amount
       : headline && /case|pack/.test(headline.basis)

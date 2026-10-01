@@ -397,7 +397,12 @@ function splitQuantity(name) {
   // "1000 Islands Vodka" keeps its name, "1250 cs Martini Bianco" does not.
   // Guarded on a non-empty remainder so a line that is ONLY a quantity is left
   // alone rather than reduced to nothing.
-  const lead = head.match(QTY);
+  //
+  // The count may also be written as a multiplier with no unit at all:
+  // "27750 x Bacardi Carta Blanca Halloween Edition Rum 37,5% 0,7l" (2026-10-01).
+  // That left "27750" as the Brand. A number, an "x", then a WORD is a count; a
+  // number, an "x", then a digit is a pack ("6 x 70cl", "6x1L Martini") and stays.
+  const lead = head.match(QTY) || head.match(/^\d[\d,.]*\s*[x×*]\s+(?=\p{L})/u);
   if (lead && head.slice(lead[0].length).trim()) {
     qty.unshift(lead[0].trim());
     head = head.slice(lead[0].length).trim();
