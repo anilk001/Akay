@@ -71,7 +71,26 @@ const PRICE_RE = new RegExp(
 // 3,30 eur" and "pallet price – 3,55 eur/btl". Neither fragment states a size,
 // so neither is taken as a product line, and the message correctly falls
 // through to single-offer mode where the two prices are then flagged.
-const PRODUCT_SIGNAL = /\d+\s*(?:ml|cl|dl|ltr|l|cc|g|gr|gm|kg)\b|\d+\s*[x×\/]\s*\d+/i;
+//
+// "gram"/"grams" is spelled out as often as it is abbreviated on WhatsApp. On
+// 2026-10-01 "Davidoff 90 gram" failed this test, so no line was product-shaped
+// and the greeting "Hi Anil ," became the product name.
+const PRODUCT_SIGNAL = /\d+\s*(?:ml|cl|dl|ltr|litres?|liters?|l|cc|g|gr|gm|grams?|grm|kg)\b|\d+\s*[x×\/]\s*\d+/i;
+
+// A salutation on a line of its own: "Hi Anil ,", "Hello team!", "Good morning".
+// Never a product. Limited to a greeting plus at most three words and no digits,
+// so a brand that happens to start with "Hi" and states a size still reads as one.
+const GREETING = /^(?:hi|hello|hey|hiya|dear|greetings|good\s+(?:morning|afternoon|evening|day)|shalom|salam|ciao|hola)\b(?:[\s,]+[A-Za-z][A-Za-z'.-]*){0,3}[\s,.!:;-]*$/i;
+
+// An offer announced in a sentence: "Can offer Davidoff 90 gram ,with ...".
+// The words in front of the product are dropped from the name.
+const ANNOUNCE = /^(?:(?:we|i)\s+)?(?:can\s+offer|are\s+offering|offering|offer|have|can\s+supply|supply)\b\s*:?\s*/i;
+
+// Prose that follows the product on the same line once the size has been
+// stated: ", with English Arabic text", ", have 3 loads monthly", ", let me know".
+// Cut there so the sentence does not become the product name. Only these
+// words: ", t2" and ", RF coded" after a size are product attributes and stay.
+const PROSE_TAIL = /\s*,\s*(?=(?:with|have|has|let|please|pls|kindly|can|could|we|i|if|ready)\b)/i;
 
 // Lines that are never a product, however they are shaped.
 //
@@ -309,25 +328,26 @@ function findProductName(allLines, priceLines) {
   // work for 700ml?" states a price and a size and would otherwise be read as a
   // product — it is a counter-offer from a buyer's side of a conversation.
   const candidates = allLines.filter((l) =>
-    !BOILERPLATE.test(l) && !ATTRIBUTE_LINE.test(l) && !/\?\s*$/.test(l));
+    !BOILERPLATE.test(l) && !GREETING.test(l) && !ATTRIBUTE_LINE.test(l) && !/\?\s*$/.test(l));
 
   // 1. A line stating a size — the strongest signal, and it survives being the
   //    same line as the price ("Nescafé special filtre 200g @6.20€").
   for (const l of candidates) {
     if (!PRODUCT_SIGNAL.test(l)) continue;
-    const stripped = stripLabel(stripPrices(l));
+    const stripped = clipProse(stripLabel(stripPrices(l)).replace(ANNOUNCE, ''));
     if (stripped && PRODUCT_SIGNAL.test(stripped)) return stripped;
   }
 
   // 2. An explicit announcement.
   for (const l of candidates) {
-    const m = l.match(/\b(?:we are offering|we offer|offering|we have|offer(?:ing)? for)\b\s*:?\s*(.+)$/i);
+    const m = l.match(/\b(?:we are offering|we offer|can offer|offering|we have|offer(?:ing)? for)\b\s*:?\s*(.+)$/i);
     if (m && m[1].trim().length > 2) return stripPrices(m[1]);
   }
 
-  // 3. The first line that reads like a name at all. Weak, but harmless: 04
-  //    matches on Brand + Name + Volume + Bond, so a wrong name simply fails to
-  //    match a Product and the offer is routed to review rather than created.
+  // 3. The first line that reads like a name at all. Weak, and NOT harmless:
+  //    a name that matches no Product creates a new Product (Needs Review) and
+  //    the offer is still created Live. That is how "Hi Anil ," became an offer
+  //    on 2026-10-01, so greetings are filtered out of `candidates` above.
   for (const l of candidates) {
     if (priceLines.includes(l)) continue;
     if (!/[A-Za-z]{3}/.test(l)) continue;
@@ -337,6 +357,16 @@ function findProductName(allLines, priceLines) {
   }
 
   return '';
+}
+
+/** Cut prose that follows the size on the same line (see PROSE_TAIL). */
+function clipProse(name) {
+  const size = String(name).match(PRODUCT_SIGNAL);
+  if (!size) return String(name).trim();
+  const after = size.index + size[0].length;
+  const rest = name.slice(after);
+  const cut = rest.search(PROSE_TAIL);
+  return (cut < 0 ? name : name.slice(0, after + cut)).replace(/[\s,;-]+$/, '').trim();
 }
 
 /**
