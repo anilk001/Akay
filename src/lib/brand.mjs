@@ -50,3 +50,29 @@ export function withCanonicalBrands(offers, canon = brandSpellings(offers)) {
     return c && c !== o.brand ? { ...o, brand: c } : o;
   });
 }
+
+// A brand value that is really a quantity. WhatsApp ingestion took the first
+// word of "two loads Jameson Original 70 cl" as the brand, so the catalogue
+// showed a brand called "two". Spelled-out numbers are never a brand on their
+// own; digits are left alone ("1664" is a beer).
+const NUMBER_WORDS = /^(?:zero|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|a|an)$/i;
+
+/** The brand to publish: trimmed, and '' for an obviously bogus value. */
+export function cleanBrand(brand) {
+  const b = String(brand ?? '').trim();
+  return NUMBER_WORDS.test(b) ? '' : b;
+}
+
+/**
+ * How many distinct brands a list of offers carries. Empty and whitespace-only
+ * brands are not a brand, so they are not counted; case variants count once.
+ * The homepage and Instant Quote page both print this figure, so they share it.
+ */
+export function brandCount(offers) {
+  const seen = new Set();
+  for (const o of offers || []) {
+    const b = cleanBrand(o?.brand);
+    if (b) seen.add(b.toLowerCase());
+  }
+  return seen.size;
+}

@@ -105,11 +105,12 @@ const NAV = [
 
   /* Drop the pieces the row can afford to lose, widest-first. */
   @media (max-width:1600px){.sh-sub{display:none}}
-  /* Below this the nav moves to its own scrollable row under the wordmark. */
+  /* Below this the nav moves to its own row under the wordmark. It wraps
+     rather than scrolls: a hidden-scrollbar row clipped "About" off a 375px
+     phone with nothing to say there was more. */
   @media (max-width:1060px){
     .sh-in{flex-wrap:wrap;row-gap:0;padding-top:8px}
-    .sh-nav{order:10;flex:1 0 100%;margin:0 -9px;overflow-x:auto;scrollbar-width:none;padding:2px 0 6px}
-    .sh-nav::-webkit-scrollbar{display:none}
+    .sh-nav{order:10;flex:1 0 100%;margin:0 -9px;flex-wrap:wrap;row-gap:0;padding:2px 0 6px}
   }
   @media (max-width:760px){
     /* Three rows (wordmark, search, nav) are too tall to pin on a phone. */
@@ -121,5 +122,13 @@ const NAV = [
     .sh-theme{padding:0 9px}
     /* Search takes a full row rather than being squeezed unreadably narrow. */
     .sh-in > :global(.site-search){order:5;flex:1 0 100%;max-width:none;margin-top:8px}
+    /* All five links on one row of a 360-390px phone: tighter padding and
+       type, spread edge to edge. Still wraps on anything narrower. */
+    .sh-nav{gap:0;margin:0 -6px;justify-content:space-between}
+    .sh-nav a{font-size:13px;padding:6px 6px}
+  }
+  @media (max-width:400px){
+    .sh-nav a{font-size:12.5px;padding:6px 5px}
+    .sh-nav{margin:0 -5px}
   }
 </style>

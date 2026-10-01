@@ -4,7 +4,8 @@
 // Every case runs over rows written inline below, never the live snapshot, so
 // a catalogue refresh cannot turn this red (see the snapshot-safe-tests skill).
 import assert from 'node:assert/strict';
-import { brandSpellings, withCanonicalBrands } from '../src/lib/brand.mjs';
+import { brandSpellings, withCanonicalBrands, brandCount, cleanBrand } from '../src/lib/brand.mjs';
+import { cleanProductName, splitVariants } from '../src/data/airtable.mjs';
 import { eanKey, eanQuery, matchesEan } from '../src/lib/ean.mjs';
 
 let n = 0;
@@ -72,6 +73,42 @@ t('matches on the unit or the case barcode, exactly', () => {
   assert.equal(matchesEan(o, eanQuery('15010327253746')), true);
   assert.equal(matchesEan(o, eanQuery('5010327253748')), false); // one digit off is another product
   assert.equal(matchesEan({ ean: '', eanCase: '' }, eanQuery('5010327253749')), false);
+});
+
+// ---- brand count + bogus brands --------------------------------------------
+t('brandCount ignores empty and whitespace-only brands', () => {
+  const rows = [{ brand: 'Jameson' }, { brand: '' }, { brand: '   ' }, { brand: null }, {}, { brand: 'Absolut' }];
+  assert.equal(brandCount(rows), 2);
+});
+
+t('brandCount counts case variants once and trims', () => {
+  assert.equal(brandCount([{ brand: 'Nivea' }, { brand: 'NIVEA ' }, { brand: 'Dove' }]), 2);
+  assert.equal(brandCount([]), 0);
+  assert.equal(brandCount(undefined), 0);
+});
+
+t('a spelled-out number is not a brand; digits and real names are', () => {
+  assert.equal(cleanBrand('two'), '');
+  assert.equal(cleanBrand(' Three '), '');
+  assert.equal(cleanBrand('1664'), '1664');
+  assert.equal(cleanBrand('Two Fingers'), 'Two Fingers');
+  assert.equal(cleanBrand(' Jameson '), 'Jameson');
+  assert.equal(brandCount([{ brand: 'two' }, { brand: 'Jameson' }]), 1);
+});
+
+// ---- product-name clean-up (src/data/airtable.mjs) --------------------------
+t('a trailing "Price:" or ":" label is removed from the name', () => {
+  assert.equal(cleanProductName('Ballantines 1l x 6, RF, T2, coded 2380 crt Price:'), 'Ballantines 1l x 6, RF, T2, coded 2380 crt');
+  assert.equal(cleanProductName('Jameson Original (12 × 35 CL):'), 'Jameson Original (12 × 35 CL)');
+  assert.equal(cleanProductName('JW Red 1l x 12, t2, RF coded, 1364cs full load, Price:'), 'JW Red 1l x 12, t2, RF coded, 1364cs full load');
+});
+
+t('names without a trailing label are left alone', () => {
+  assert.equal(cleanProductName('Best Price Cola 330ml'), 'Best Price Cola 330ml');
+  assert.equal(cleanProductName('Stock Clearance: Haribo 160g'), 'Stock Clearance: Haribo 160g');
+  assert.deepEqual(splitVariants('Nivea Roll On 50ml — Bright & Dry, Silk Touch, Pearl:'),
+    { name: 'Nivea Roll On 50ml', variants: 'Bright & Dry, Silk Touch, Pearl' });
+  assert.deepEqual(splitVariants('Absolut (24 × 20 CL):', 'Original'), { name: 'Absolut (24 × 20 CL)', variants: 'Original' });
 });
 
 console.log(`brand-ean: ${n} passed`);

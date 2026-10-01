@@ -3,6 +3,7 @@ import { getOffers, getSiteStats } from '../data/airtable.mjs';
 import { organizationSchema, websiteSchema } from '../lib/schema.mjs';
 import Seo from '../components/Seo.astro';
 import { withSlugs, categorySlug, brandPages } from '../lib/slug.mjs';
+import { brandCount as countBrands } from '../lib/brand.mjs';
 import { guides } from '../data/guides.mjs';
 import { enquiryLink, WA_LINK, WA_DISPLAY, SELL_STOCK_LINK } from '../lib/whatsapp.mjs';
 import { listingTermsLine } from '../lib/trade-terms.mjs';
@@ -66,7 +67,7 @@ const categories = ['All', ...Array.from(new Set(view.map((o) => o.category))).s
 const categoryLinks = categories
   .filter((c) => c !== 'All')
   .map((c) => ({ name: c, href: `/category/${categorySlug(c)}/`, count: view.filter((o) => o.category === c).length }));
-const brandCount = new Set(view.map((o) => o.brand)).size;
+const brandCount = countBrands(view);
 // Brand landing pages (live stock, 2+ offers). The most-stocked two dozen get
 // homepage links; the /brands/ hub carries the rest, so every brand page has
 // a crawlable path from here.

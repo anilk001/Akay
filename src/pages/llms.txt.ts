@@ -5,7 +5,7 @@ import { COMPANY, TRADING_TERMS, companyAddressLine, LEGAL_NAME, SITE_NAME } fro
 export async function GET() {
   const llmsTxt = `# ${SITE_NAME} (${LEGAL_NAME}) — Wholesale Beverage & FMCG Offers
 
-> Live B2B wholesale catalogue from ${LEGAL_NAME}, trading as ${SITE_NAME}, Shannon, Co. Clare, Ireland. Branded spirits, beer, soft drinks, grocery and FMCG for importers and wholesalers. Duty-paid (T2) and export/under-bond (T1). Prices indicative, trade buyers only. Enquiries via WhatsApp +353 87 238 2368 or offers@akay.ie.
+> Live B2B wholesale catalogue from ${LEGAL_NAME}, trading as ${SITE_NAME}, Shannon, Co. Clare, Ireland. Branded spirits, beer, soft drinks, grocery and FMCG for importers and wholesalers. Duty-paid (T2) and export/under-bond (T1). Live trade prices, subject to stock and confirmation. Same price for everyone, trade buyers only. Enquiries via WhatsApp +353 87 238 2368 or offers@akay.ie.
 
 ## Catalogue
 
@@ -58,7 +58,7 @@ export async function GET() {
 2. Upload your buying list at [quote.akay.ie](https://quote.akay.ie) — any format, no template
 3. Download it back with our selling price on every matched line, and the saving marked against your cost if your list carries one
 
-Or send a requirement list by email or WhatsApp and receive a quote within 24 hours.
+Instant Quote prices your list in about 60 seconds at quote.akay.ie. Lists sent by email or WhatsApp are answered within 24 hours.
 
 **Email:** ${COMPANY.salesEmail}
 **WhatsApp:** +353 87 238 2368

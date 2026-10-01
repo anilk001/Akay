@@ -69,6 +69,10 @@ const pageDesc = 'Search AKAY\'s live wholesale catalogue: spirits, beer, soft d
     .qbox .clear{position:absolute;right:8px;top:50%;transform:translateY(-50%);border:0;background:transparent;color:var(--muted);
       width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:18px;line-height:1}
     .qbox .clear:hover{background:var(--paper-2);color:var(--ink)}
+    /* The custom × above is the clear button; hide the browser's own, which
+       Chrome and Safari draw beside it (two crosses in one box). */
+    .qbox input::-webkit-search-cancel-button,
+    .qbox input::-webkit-search-decoration{-webkit-appearance:none;appearance:none;display:none}
     select.sort{height:40px;border:1px solid var(--line);background:var(--card);color:var(--ink-soft);
       border-radius:999px;padding:0 14px;font-size:13.5px;cursor:pointer;font-family:var(--sans)}
     .filt-btn{display:none;height:40px;border:1px solid var(--line);background:var(--card);color:var(--ink-soft);border-radius:999px;

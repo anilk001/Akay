@@ -173,7 +173,7 @@ Example:
 **Email:** offers@akay.ie (attach requirement list)
 **WhatsApp:** +353 87 238 2368 (text product names and quantities)
 
-By email or WhatsApp, Anil or the team will reply within 24 hours with:
+Instant Quote is the fastest route: your list comes back priced in about 60 seconds. By email or WhatsApp, Anil or the team will reply within 24 hours with:
 - Exact pricing (per case + per unit if applicable)
 - Stock availability
 - Delivery terms and timeline
@@ -326,7 +326,7 @@ Send a text with product names and quantities. Example:
 
 ## What Happens Next
 
-Through Instant Quote, the priced file comes straight back to you — our selling price on every line we could match, the saving against your cost where you gave one, and anything we could not match flagged rather than dropped. Those flagged lines, and any question on terms, come back from Anil or the team within 24 hours.
+Through Instant Quote, the priced file comes straight back to you in about 60 seconds — our selling price on every line we could match, the saving against your cost where you gave one, and anything we could not match flagged rather than dropped. Those flagged lines, and any question on terms, come back from Anil or the team within 24 hours.
 
 By email or WhatsApp, the team will:
 1. Check availability
@@ -450,7 +450,7 @@ Shannon, Loendersloot (Netherlands), Riga (Latvia), and other EU licensed wareho
 - **Authenticity:** All products are genuine, sourced directly or through verified distributors
 - **Documentation:** Invoices, pedigree certificates (for spirits), and phytosanitary docs (for food) provided
 - **Shelf life:** Beverages tested for optimal conditions; FMCG goods within acceptable windows
-- **Communication:** Quick response (typically within 24 hours), expert advice, transparency
+- **Communication:** Instant Quote in about 60 seconds at quote.akay.ie; lists sent by email or WhatsApp answered within 24 hours. Expert advice, transparency
 
 ## How to Buy
 
