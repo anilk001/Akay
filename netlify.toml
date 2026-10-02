@@ -80,11 +80,21 @@
   to = "/"
   status = 301
 
-# Category renamed "Other" -> "Other FMCG".
+# Category renamed "Other" -> "Other FMCG" -> "Household" (2026-10-02).
+# Every Other FMCG record was moved to Household in Airtable, so the
+# other-fmcg page is no longer generated. force = true so a stray page at
+# either old path can never shadow the redirect.
 [[redirects]]
   from = "/category/other/*"
-  to = "/category/other-fmcg/"
+  to = "/category/household/"
   status = 301
+  force = true
+
+[[redirects]]
+  from = "/category/other-fmcg/*"
+  to = "/category/household/"
+  status = 301
+  force = true
 
 # Brand pages that carried a "-2" suffix before brand spellings were merged
 # on 2026-09-29. src/lib/redirects.mjs maps the ones the current catalogue can

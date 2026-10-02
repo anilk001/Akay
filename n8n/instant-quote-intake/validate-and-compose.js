@@ -102,7 +102,8 @@ const lineRows = lines.slice(0, 200).map(function (l) {
 //
 //   Status              Open | Matched | Offered | Won | Lost | Expired
 //   Category            Beer | Spirits | Champagne | Wine | Grocery |
-//                       Confectionery | Toiletries | Soft Drinks | Other FMCG
+//                       Confectionery | Toiletries | Soft Drinks | Household |
+//                       Other FMCG  (Household added 2026-10-02)
 //   Qty Unit            Cases | Pallets | Containers | Bottles | Pieces
 //   Currency            EUR | USD | GBP | AED | SGD | Other
 //   Bond/Customs Status Either | T1 | T2 | Bonded | Duty Paid | On Floor | Other
@@ -122,6 +123,7 @@ const CATEGORY_WORDS = [
   ['Confectionery', /\b(chocolate|candy|sweets|biscuit|wafer|gum|confection)\b/i],
   ['Toiletries', /\b(shampoo|shower gel|deodorant|toothpaste|soap|lotion|razor|perfume|fragrance|cosmetic)\b/i],
   ['Grocery', /\b(coffee|tea|oil|pasta|rice|sauce|cereal|milk|grocery)\b/i],
+  ['Household', /\b(detergent|washing|laundry|softener|capsules?|dishwash(?:er)?|cleaner|bleach|toilet|air freshener|tissues?|kitchen roll|lighters?)\b/i],
 ];
 
 const UNIT_WORDS = [

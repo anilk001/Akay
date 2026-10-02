@@ -140,7 +140,7 @@ eq(hendricks.currency, 'EUR', "a bare cost falls back to the quote's currency");
 
 // Every select value must be a real option or empty — Airtable rejects the
 // WHOLE batch on one unknown value, and this repo writes with typecast off.
-const CATEGORIES = ['', 'Beer', 'Spirits', 'Champagne', 'Wine', 'Grocery', 'Confectionery', 'Toiletries', 'Soft Drinks', 'Other FMCG'];
+const CATEGORIES = ['', 'Beer', 'Spirits', 'Champagne', 'Wine', 'Grocery', 'Confectionery', 'Toiletries', 'Soft Drinks', 'Household', 'Other FMCG'];
 const UNITS = ['', 'Cases', 'Pallets', 'Containers', 'Bottles', 'Pieces'];
 const CURRENCIES = ['', 'EUR', 'USD', 'GBP', 'AED', 'SGD', 'Other'];
 const BONDS = ['', 'Either', 'T1', 'T2', 'Bonded', 'Duty Paid', 'On Floor', 'Other'];
@@ -157,6 +157,21 @@ for (const line of wild.unmatchedLines) {
   ok(CURRENCIES.includes(line.currency), `currency "${line.currency}" is a real option or empty`);
   ok(BONDS.includes(line.bond), `bond status "${line.bond}" is a real option or empty`);
 }
+
+// Household (2026-10-02, replaced Other FMCG): cleaning and paper lines land
+// there, but coffee capsules stay Grocery because Grocery is checked first.
+const household = run({
+  file: B64,
+  lines: [
+    { description: 'Ariel washing capsules 4x30', qty: 2 },
+    { description: 'Fairy dishwasher tablets', qty: 5 },
+    { description: 'Nespresso coffee capsules', qty: 1 },
+  ],
+});
+const [ariel, fairy, nespresso] = household.unmatchedLines;
+eq(ariel.category, 'Household', 'washing capsules are Household');
+eq(fairy.category, 'Household', 'dishwasher tablets are Household');
+eq(nespresso.category, 'Grocery', 'coffee capsules stay Grocery');
 
 // An all-matched upload is the good case, not an empty-list bug.
 const allMatched = run({
