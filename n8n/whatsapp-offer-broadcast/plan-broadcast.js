@@ -35,7 +35,7 @@ const MAX_SENDS_PER_RUN = 450; // hard safety cap across all segments
 const SITE = 'https://akay.ie';
 
 const SPIRITS = ['Spirits', 'Champagne'];
-const FMCG = ['Grocery', 'Confectionery', 'Toiletries', 'Soft Drinks', 'Other FMCG'];
+const FMCG = ['Grocery', 'Confectionery', 'Toiletries', 'Soft Drinks', 'Household', 'Other FMCG'];
 // Priority order: most specific first, so a contact in both "Israel spirits"
 // and "Spirits clients" gets the Israel pick, not two messages.
 const SEGMENTS = [

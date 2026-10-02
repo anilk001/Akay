@@ -23,6 +23,7 @@ const MINIMUM_BY_CATEGORY = {
   Confectionery: 'fmcg',
   Toiletries: 'fmcg',
   'Other FMCG': 'fmcg',
+  Household: 'fmcg',
 };
 const MINIMUM_TEXT = {
   spirits: { short: 'EUR 5,000 minimum order', long: TRADING_TERMS.spiritsMinimum },

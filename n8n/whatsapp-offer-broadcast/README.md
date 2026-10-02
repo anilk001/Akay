@@ -102,7 +102,7 @@ targeting, pacing, logging and PILOT flag all still apply.
 | Clients dubai spirits, Israel spirits, Spirits Clients Far East, EU Spirits Clients, Spirits clients | Spirits, Champagne | — |
 | Duty Free | Spirits, Champagne, Beer, Confectionery | — |
 | Confectionery outside eu | Confectionery | — |
-| Israel FMCG, FMCG Saudi, FMCG EU, FMCG NON EU | Grocery, Confectionery, Toiletries, Soft Drinks, Other FMCG | — |
+| Israel FMCG, FMCG Saudi, FMCG EU, FMCG NON EU | Grocery, Confectionery, Toiletries, Soft Drinks, Household, Other FMCG | — |
 | Russia Clients | any | — |
 | Beers | Beer | — |
 

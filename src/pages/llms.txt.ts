@@ -20,7 +20,7 @@ export async function GET() {
 - [Confectionery](https://akay.ie/category/confectionery/)
 - [Wine](https://akay.ie/category/wine/)
 - [Champagne](https://akay.ie/category/champagne/)
-- [Other FMCG](https://akay.ie/category/other-fmcg/)
+- [Household](https://akay.ie/category/household/)
 - [Brands A–Z](https://akay.ie/brands/): every stocked brand with its live wholesale offers
 
 ## Guides
