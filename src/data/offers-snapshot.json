@@ -136410,7 +136410,7 @@
    "stock": "in",
    "qty": 27750,
    "terms": "",
-   "tier": "",
+   "tier": "T2",
    "origin": "",
    "featured": false,
    "volumeMl": 700,
@@ -195225,7 +195225,7 @@
    "stock": "in",
    "qty": 1200,
    "terms": "EXW Loendersloot",
-   "tier": "",
+   "tier": "T2",
    "origin": "",
    "featured": false,
    "volumeMl": 350,
@@ -776670,7 +776670,7 @@
    "stock": "in",
    "qty": 131,
    "terms": "",
-   "tier": "",
+   "tier": "T1",
    "origin": "",
    "featured": false,
    "volumeMl": 400,
@@ -849012,5 +849012,5 @@
   "stock_value_eur": "Over €100 million"
  },
  "source": "snapshot",
- "generated": "2026-10-01"
+ "generated": "2026-10-02"
 }
